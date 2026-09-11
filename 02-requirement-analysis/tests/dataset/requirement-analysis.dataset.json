@@ -1,0 +1,2899 @@
+{
+  "version": "v1",
+  "cases": [
+    {
+      "case_id": "RA_DS_001",
+      "category": "A_COMPLETE_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Produce complete life analysis and pass eval.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "annual_income",
+        "family_responsibility",
+        "mortgage_balance",
+        "children_info",
+        "spouse_income",
+        "existing_life_coverage",
+        "parents_support",
+        "assets",
+        "annual_expense",
+        "mortgage_years"
+      ],
+      "expected_risks": [
+        "life"
+      ],
+      "expected_priority": {
+        "life": "P1_HIGH"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_evidence": [
+        "annual_income",
+        "existing_life_coverage"
+      ],
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C401/CLIENT_PROFILE.md",
+          "pending_path": "mock/C401/PENDING.md",
+          "conversation_log_path": "mock/C401/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "600k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 600k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1500k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "one child age 5",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "child age 5",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 1000k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "existing life coverage",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "minor support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "supports parents a little",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "300k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 300k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "350k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 350k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_years",
+              "value": "23 years",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "mortgage years 23",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "complete life case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C401",
+          "client_alias": "life-complete"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_002",
+      "category": "A_COMPLETE_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Produce complete medical analysis with only optional city missing.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "age",
+        "customer_health",
+        "social_insurance_status",
+        "existing_medical_coverage",
+        "budget",
+        "care_preference",
+        "family_medical_needs"
+      ],
+      "expected_risks": [
+        "medical"
+      ],
+      "expected_priority": {
+        "medical": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_evidence": [
+        "customer_health",
+        "social_insurance_status"
+      ],
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C402/CLIENT_PROFILE.md",
+          "pending_path": "mock/C402/PENDING.md",
+          "conversation_log_path": "mock/C402/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "medical"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "35",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 35",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "healthy",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "healthy",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "social_insurance_status",
+              "value": "active social insurance",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "social insurance active",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_medical_coverage",
+              "value": "employer medical coverage",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "employer medical",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "budget",
+              "value": "12000",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "budget 12000",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "care_preference",
+              "value": "tier-3 hospital",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "tier-3 preference",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_medical_needs",
+              "value": "standard family needs",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "family medical needs",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "complete medical case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C402",
+          "client_alias": "medical-complete"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_003",
+      "category": "A_COMPLETE_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Produce complete multi-scope analysis for medical, critical illness, life and accident.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "age",
+        "customer_health",
+        "social_insurance_status",
+        "existing_medical_coverage",
+        "budget",
+        "annual_income",
+        "family_responsibility",
+        "existing_critical_illness_coverage",
+        "mortgage_balance",
+        "children_info",
+        "spouse_income",
+        "existing_life_coverage",
+        "occupation",
+        "existing_accident_coverage",
+        "care_preference",
+        "family_medical_needs",
+        "family_financial_status",
+        "parents_support",
+        "assets",
+        "annual_expense",
+        "work_pattern"
+      ],
+      "expected_risks": [
+        "medical",
+        "critical_illness",
+        "life",
+        "accident"
+      ],
+      "expected_priority": {
+        "medical": "P2_MEDIUM",
+        "critical_illness": "P1_HIGH",
+        "life": "P1_HIGH",
+        "accident": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_evidence": [
+        "annual_income",
+        "occupation",
+        "existing_life_coverage"
+      ],
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C403/CLIENT_PROFILE.md",
+          "pending_path": "mock/C403/PENDING.md",
+          "conversation_log_path": "mock/C403/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "medical",
+          "critical_illness",
+          "life",
+          "accident"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "38",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 38",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "healthy",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "healthy",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "social_insurance_status",
+              "value": "active social insurance",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "social insurance active",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_medical_coverage",
+              "value": "high deductible medical",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "medical coverage",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "budget",
+              "value": "30000",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "budget 30000",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "800k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 800k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with two children",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_critical_illness_coverage",
+              "value": "critical illness 500k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "ci 500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1800k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1800k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "two children",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "two children",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "250k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 250k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 1200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "life 1200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "occupation",
+              "value": "office manager",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "occupation office manager",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_accident_coverage",
+              "value": "accident 300k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "accident 300k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "care_preference",
+              "value": "public hospital",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "public hospital",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_medical_needs",
+              "value": "standard",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "standard medical needs",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_financial_status",
+              "value": "stable with surplus",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "financial status stable",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "minor support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "minor parent support",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "600k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 600k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "420k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 420k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "work_pattern",
+              "value": "mostly office work",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "office work",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "complete multi scope case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C403",
+          "client_alias": "multi-complete"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_004",
+      "category": "B_MISSING_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Ask for existing life coverage and avoid formal life analysis.",
+      "expected_status": "NEED_MORE_INFORMATION",
+      "key_information": [
+        "annual_income",
+        "family_responsibility",
+        "mortgage_balance",
+        "children_info",
+        "spouse_income"
+      ],
+      "expected_risks": [],
+      "expected_priority": {},
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_questions": [
+        "existing_life_coverage"
+      ],
+      "forbidden_behavior": [
+        "formal_analysis_when_insufficient",
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C404/CLIENT_PROFILE.md",
+          "pending_path": "mock/C404/PENDING.md",
+          "conversation_log_path": "mock/C404/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "600k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 600k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1500k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "one child age 5",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "child age 5",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 200k",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [
+            "existing_life_coverage"
+          ],
+          "handoff_notes": "missing life coverage"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C404",
+          "client_alias": "life-missing"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_005",
+      "category": "B_MISSING_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Ask for high-value savings fields and avoid formal savings analysis.",
+      "expected_status": "NEED_MORE_INFORMATION",
+      "key_information": [
+        "annual_income",
+        "annual_expense"
+      ],
+      "expected_risks": [],
+      "expected_priority": {},
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_questions": [
+        "financial_goals",
+        "assets"
+      ],
+      "forbidden_behavior": [
+        "formal_analysis_when_insufficient",
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C405/CLIENT_PROFILE.md",
+          "pending_path": "mock/C405/PENDING.md",
+          "conversation_log_path": "mock/C405/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "savings"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "300k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 300k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "250k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "expense 250k",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [
+            "assets",
+            "liabilities",
+            "cash_flow",
+            "financial_goals"
+          ],
+          "handoff_notes": "missing savings core data"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C405",
+          "client_alias": "savings-missing"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_006",
+      "category": "B_MISSING_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Optional medical field missing should still allow complete analysis.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "age",
+        "customer_health",
+        "social_insurance_status",
+        "existing_medical_coverage",
+        "budget",
+        "care_preference",
+        "family_medical_needs"
+      ],
+      "expected_risks": [
+        "medical"
+      ],
+      "expected_priority": {
+        "medical": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C406/CLIENT_PROFILE.md",
+          "pending_path": "mock/C406/PENDING.md",
+          "conversation_log_path": "mock/C406/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "medical"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "41",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 41",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "healthy",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "healthy",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "social_insurance_status",
+              "value": "active social insurance",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "social insurance active",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_medical_coverage",
+              "value": "standard medical rider",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "medical rider",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "budget",
+              "value": "10000",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "budget 10000",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "care_preference",
+              "value": "public hospital",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "public hospital",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_medical_needs",
+              "value": "routine family needs",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "routine needs",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [
+            "city"
+          ],
+          "handoff_notes": "low impact missing field"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C406",
+          "client_alias": "medical-low-impact"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_007",
+      "category": "C_MULTI_TURN_INFORMATION_COLLECTION",
+      "scenario": "multi_turn_update",
+      "expected_behavior": "Ask for savings gaps first, then after update produce preliminary savings analysis.",
+      "expected_status": "PRELIMINARY",
+      "key_information": [
+        "annual_income",
+        "annual_expense",
+        "liabilities",
+        "cash_flow",
+        "financial_goals",
+        "assets"
+      ],
+      "expected_risks": [
+        "savings"
+      ],
+      "expected_priority": {
+        "savings": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "pre_update_expected_questions": [
+        "budget"
+      ],
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "updates": [
+        {
+          "answered_facts": [
+            {
+              "field": "annual_income",
+              "value": "500k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "income 500k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "annual_expense",
+              "value": "300k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 300k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "liabilities",
+              "value": "mortgage 1000k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "liabilities 1000k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "cash_flow",
+              "value": "annual surplus",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "cash flow surplus confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "financial_goals",
+              "value": "education and retirement",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "goal education and retirement",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "assets",
+              "value": "800k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 800k",
+              "source_section": "Requirement Analysis Follow-up"
+            }
+          ],
+          "asked_questions": [
+            {
+              "field": "annual_income",
+              "status": "answered",
+              "last_question": "What is your current annual income?"
+            },
+            {
+              "field": "annual_expense",
+              "status": "answered",
+              "last_question": "What is your current annual expense?"
+            },
+            {
+              "field": "liabilities",
+              "status": "answered",
+              "last_question": "How much total liabilities do you currently carry?"
+            },
+            {
+              "field": "cash_flow",
+              "status": "answered",
+              "last_question": "What is your current monthly cash flow situation?"
+            },
+            {
+              "field": "financial_goals",
+              "status": "answered",
+              "last_question": "What is the primary savings goal?"
+            },
+            {
+              "field": "assets",
+              "status": "answered",
+              "last_question": "How much liquid assets do you have?"
+            }
+          ],
+          "resolved_conflict_fields": []
+        }
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C407/CLIENT_PROFILE.md",
+          "pending_path": "mock/C407/PENDING.md",
+          "conversation_log_path": "mock/C407/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "savings"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "500k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "income 500k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "annual_expense",
+              "value": "300k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 300k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "liabilities",
+              "value": "mortgage 1000k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "liabilities 1000k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "cash_flow",
+              "value": "annual surplus",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "cash flow surplus confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "financial_goals",
+              "value": "education and retirement",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "goal education and retirement",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "assets",
+              "value": "800k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 800k",
+              "source_section": "Requirement Analysis Follow-up"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [
+            "financial_goals",
+            "assets"
+          ],
+          "handoff_notes": "multi turn savings"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C407",
+          "client_alias": "savings-multi-turn"
+        },
+        "question_context": {
+          "asked_questions": [
+            {
+              "field": "annual_income",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is your current annual income?"
+            },
+            {
+              "field": "annual_expense",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is your current annual expense?"
+            },
+            {
+              "field": "liabilities",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "How much total liabilities do you currently carry?"
+            },
+            {
+              "field": "cash_flow",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is your current monthly cash flow situation?"
+            },
+            {
+              "field": "financial_goals",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is the primary savings goal?"
+            },
+            {
+              "field": "assets",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "How much liquid assets do you have?"
+            }
+          ],
+          "answered_fields": [
+            "annual_income",
+            "annual_expense",
+            "liabilities",
+            "cash_flow",
+            "financial_goals",
+            "assets"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_008",
+      "category": "C_MULTI_TURN_INFORMATION_COLLECTION",
+      "scenario": "multi_turn_update",
+      "expected_behavior": "Ask for existing life coverage first, then after update produce preliminary life analysis.",
+      "expected_status": "PRELIMINARY",
+      "key_information": [
+        "annual_income",
+        "family_responsibility",
+        "mortgage_balance",
+        "children_info",
+        "spouse_income",
+        "existing_life_coverage"
+      ],
+      "expected_risks": [
+        "life"
+      ],
+      "expected_priority": {
+        "life": "P1_HIGH"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "pre_update_expected_questions": [
+        "assets",
+        "mortgage_years"
+      ],
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "updates": [
+        {
+          "answered_facts": [
+            {
+              "field": "annual_income",
+              "value": "550k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "income 550k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "family responsibility confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1300k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "mortgage 1300k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "children_info",
+              "value": "one child age 3",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "child age 3 confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "spouse_income",
+              "value": "150k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "spouse income 150k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 200k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "life coverage 200k",
+              "source_section": "Requirement Analysis Follow-up"
+            }
+          ],
+          "asked_questions": [
+            {
+              "field": "annual_income",
+              "status": "answered",
+              "last_question": "What is your current annual income?"
+            },
+            {
+              "field": "family_responsibility",
+              "status": "answered",
+              "last_question": "What is your current family responsibility status?"
+            },
+            {
+              "field": "mortgage_balance",
+              "status": "answered",
+              "last_question": "How much mortgage balance remains on your home?"
+            },
+            {
+              "field": "children_info",
+              "status": "answered",
+              "last_question": "How many children do you have and their ages?"
+            },
+            {
+              "field": "spouse_income",
+              "status": "answered",
+              "last_question": "What is your spouse's current annual income?"
+            },
+            {
+              "field": "existing_life_coverage",
+              "status": "answered",
+              "last_question": "Do you already have any life coverage?"
+            }
+          ],
+          "resolved_conflict_fields": []
+        }
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C408/CLIENT_PROFILE.md",
+          "pending_path": "mock/C408/PENDING.md",
+          "conversation_log_path": "mock/C408/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "550k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "income 550k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "family responsibility confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1300k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "mortgage 1300k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "children_info",
+              "value": "one child age 3",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "child age 3 confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "spouse_income",
+              "value": "150k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "spouse income 150k confirmed",
+              "source_section": "Requirement Analysis Follow-up"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 200k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "life coverage 200k",
+              "source_section": "Requirement Analysis Follow-up"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [
+            "existing_life_coverage"
+          ],
+          "handoff_notes": "multi turn life"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C408",
+          "client_alias": "life-multi-turn"
+        },
+        "question_context": {
+          "asked_questions": [
+            {
+              "field": "annual_income",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is your current annual income?"
+            },
+            {
+              "field": "family_responsibility",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is your current family responsibility status?"
+            },
+            {
+              "field": "mortgage_balance",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "How much mortgage balance remains on your home?"
+            },
+            {
+              "field": "children_info",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "How many children do you have and their ages?"
+            },
+            {
+              "field": "spouse_income",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "What is your spouse's current annual income?"
+            },
+            {
+              "field": "existing_life_coverage",
+              "status": "answered",
+              "ask_count": 1,
+              "last_question": "Do you already have any life coverage?"
+            }
+          ],
+          "answered_fields": [
+            "annual_income",
+            "family_responsibility",
+            "mortgage_balance",
+            "children_info",
+            "spouse_income",
+            "existing_life_coverage"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_009",
+      "category": "D_CONFLICTING_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Detect conflicting income in life scope and ask for confirmation.",
+      "expected_status": "CONFLICTING_INFORMATION",
+      "key_information": [
+        "annual_income",
+        "family_responsibility",
+        "mortgage_balance",
+        "children_info",
+        "spouse_income"
+      ],
+      "expected_risks": [],
+      "expected_priority": {},
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_questions": [
+        "annual_income"
+      ],
+      "forbidden_behavior": [
+        "formal_analysis_when_insufficient",
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C409/CLIENT_PROFILE.md",
+          "pending_path": "mock/C409/PENDING.md",
+          "conversation_log_path": "mock/C409/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "900k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 900k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "one child",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "180k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 180k",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "conflicting life income"
+        },
+        "conflicts": [
+          {
+            "field": "annual_income",
+            "values": [
+              "800k",
+              "500k"
+            ],
+            "reason": "two different income statements",
+            "resolution_status": "UNRESOLVED"
+          }
+        ],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C409",
+          "client_alias": "life-conflict"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_010",
+      "category": "D_CONFLICTING_INFORMATION",
+      "scenario": "analysis_only",
+      "expected_behavior": "Detect conflicting income in critical illness scope and ask for confirmation.",
+      "expected_status": "CONFLICTING_INFORMATION",
+      "key_information": [
+        "age",
+        "customer_health",
+        "annual_income",
+        "family_responsibility",
+        "existing_critical_illness_coverage"
+      ],
+      "expected_risks": [],
+      "expected_priority": {},
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_questions": [
+        "annual_income"
+      ],
+      "forbidden_behavior": [
+        "formal_analysis_when_insufficient",
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C410/CLIENT_PROFILE.md",
+          "pending_path": "mock/C410/PENDING.md",
+          "conversation_log_path": "mock/C410/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "critical_illness"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "36",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 36",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "healthy",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "healthy",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with two children",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_critical_illness_coverage",
+              "value": "critical illness 300k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "ci 300k",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "conflicting ci income"
+        },
+        "conflicts": [
+          {
+            "field": "annual_income",
+            "values": [
+              "700k",
+              "420k"
+            ],
+            "reason": "two different income statements",
+            "resolution_status": "UNRESOLVED"
+          }
+        ],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C410",
+          "client_alias": "ci-conflict"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_011",
+      "category": "E_UNSUPPORTED_CONCLUSION",
+      "scenario": "mutated_eval",
+      "expected_behavior": "Eval should catch missing evidence refs on a life analysis.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "annual_income",
+        "existing_life_coverage"
+      ],
+      "expected_risks": [
+        "life"
+      ],
+      "expected_priority": {
+        "life": "P1_HIGH"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "FAIL",
+        "expected_issue_types": [
+          "UNSUPPORTED_CONCLUSION"
+        ]
+      },
+      "forbidden_behavior": [],
+      "mutation": {
+        "type": "clear_evidence_refs_first_risk"
+      },
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C411/CLIENT_PROFILE.md",
+          "pending_path": "mock/C411/PENDING.md",
+          "conversation_log_path": "mock/C411/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "620k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 620k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1400k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1400k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "one child",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "220k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 220k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 1000k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "life 1000k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "minor support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "minor support",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "320k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 320k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "360k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 360k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_years",
+              "value": "20 years",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "mortgage years 20",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "unsupported conclusion life"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C411",
+          "client_alias": "unsupported-life"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_012",
+      "category": "E_UNSUPPORTED_CONCLUSION",
+      "scenario": "mutated_eval",
+      "expected_behavior": "Eval should catch evidence entry without fact refs.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "annual_income",
+        "existing_life_coverage",
+        "occupation"
+      ],
+      "expected_risks": [
+        "life",
+        "accident"
+      ],
+      "expected_priority": {
+        "life": "P1_HIGH",
+        "accident": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "FAIL",
+        "expected_issue_types": [
+          "UNSUPPORTED_CONCLUSION"
+        ]
+      },
+      "forbidden_behavior": [],
+      "mutation": {
+        "type": "clear_fact_refs_first_evidence"
+      },
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C412/CLIENT_PROFILE.md",
+          "pending_path": "mock/C412/PENDING.md",
+          "conversation_log_path": "mock/C412/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life",
+          "accident"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "42",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 42",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "700k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 700k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with two children",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1600k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1600k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "two children",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "two children",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "210k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 210k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 800k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "life 800k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "occupation",
+              "value": "office analyst",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "occupation office analyst",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_accident_coverage",
+              "value": "accident 200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "accident 200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "minor support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "minor support",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "450k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 450k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "390k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 390k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_years",
+              "value": "18 years",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "mortgage years 18",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "work_pattern",
+              "value": "office work",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "office work",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "unsupported conclusion multi"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C412",
+          "client_alias": "unsupported-multi"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_013",
+      "category": "F_MISSING_RISK",
+      "scenario": "mutated_eval",
+      "expected_behavior": "Eval should catch a missing risk entry on an analyzable scope.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "annual_income",
+        "existing_life_coverage",
+        "existing_critical_illness_coverage"
+      ],
+      "expected_risks": [
+        "medical",
+        "critical_illness",
+        "life",
+        "accident"
+      ],
+      "expected_priority": {
+        "medical": "P2_MEDIUM",
+        "critical_illness": "P1_HIGH",
+        "life": "P1_HIGH",
+        "accident": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "FAIL",
+        "expected_issue_types": [
+          "MISSING_RISK"
+        ]
+      },
+      "forbidden_behavior": [],
+      "mutation": {
+        "type": "clear_risk_map"
+      },
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C413/CLIENT_PROFILE.md",
+          "pending_path": "mock/C413/PENDING.md",
+          "conversation_log_path": "mock/C413/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "medical",
+          "critical_illness",
+          "life",
+          "accident"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "39",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 39",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "healthy",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "healthy",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "social_insurance_status",
+              "value": "active social insurance",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "social active",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_medical_coverage",
+              "value": "medical 500k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "medical 500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "budget",
+              "value": "25000",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "budget 25000",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "750k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 750k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_critical_illness_coverage",
+              "value": "critical illness 500k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "ci 500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1100k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1100k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "one child",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "190k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 190k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 900k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "life 900k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "occupation",
+              "value": "office supervisor",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "occupation office supervisor",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_accident_coverage",
+              "value": "accident 300k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "accident 300k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "care_preference",
+              "value": "public hospital",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "public hospital",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_medical_needs",
+              "value": "standard",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "standard",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_financial_status",
+              "value": "stable",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "stable",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "minor support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "minor support",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "500k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "350k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 350k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "work_pattern",
+              "value": "office work",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "office work",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "missing risk case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C413",
+          "client_alias": "missing-risk"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_014",
+      "category": "G_PRODUCT_BOUNDARY_VIOLATION",
+      "scenario": "mutated_eval",
+      "expected_behavior": "Eval should catch product boundary leakage.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "annual_income",
+        "existing_life_coverage"
+      ],
+      "expected_risks": [
+        "life"
+      ],
+      "expected_priority": {
+        "life": "P1_HIGH"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "FAIL",
+        "expected_issue_types": [
+          "PRODUCT_RECOMMENDATION_LEAK"
+        ]
+      },
+      "forbidden_behavior": [],
+      "mutation": {
+        "type": "inject_product_summary"
+      },
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C414/CLIENT_PROFILE.md",
+          "pending_path": "mock/C414/PENDING.md",
+          "conversation_log_path": "mock/C414/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "annual_income",
+              "value": "580k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 580k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "1200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 1200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "one child",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "one child",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "210k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 210k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 900k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "life 900k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "minor support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "minor support",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "350k savings",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "assets 350k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "330k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "expense 330k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_years",
+              "value": "19 years",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "mortgage years 19",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "product boundary case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C414",
+          "client_alias": "product-boundary"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_015",
+      "category": "H_COMPLEX_FAMILY",
+      "scenario": "analysis_only",
+      "expected_behavior": "Handle complex family with life, critical illness, savings and accident scopes.",
+      "expected_status": "COMPLETE",
+      "key_information": [
+        "age",
+        "customer_health",
+        "annual_income",
+        "family_responsibility",
+        "mortgage_balance",
+        "children_info",
+        "spouse_income",
+        "existing_life_coverage",
+        "existing_critical_illness_coverage",
+        "annual_expense",
+        "assets",
+        "liabilities",
+        "cash_flow",
+        "financial_goals",
+        "liquidity_needs",
+        "time_horizon",
+        "budget",
+        "occupation",
+        "existing_accident_coverage",
+        "risk_preference",
+        "parents_support",
+        "family_financial_status"
+      ],
+      "expected_risks": [
+        "life",
+        "critical_illness",
+        "savings",
+        "accident"
+      ],
+      "expected_priority": {
+        "life": "P1_HIGH",
+        "critical_illness": "P1_HIGH",
+        "savings": "P2_MEDIUM",
+        "accident": "P2_MEDIUM"
+      },
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "expected_evidence": [
+        "financial_goals",
+        "existing_life_coverage",
+        "existing_critical_illness_coverage"
+      ],
+      "forbidden_behavior": [
+        "product_recommendation"
+      ],
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1",
+          "profile_path": "mock/C415/CLIENT_PROFILE.md",
+          "pending_path": "mock/C415/PENDING.md",
+          "conversation_log_path": "mock/C415/CONVERSATION_LOG.md",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life",
+          "critical_illness",
+          "savings",
+          "accident"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": "42",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "age 42",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "healthy",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "healthy",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "900k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "income 900k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "married with two children and parent support",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "family responsibility",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "2200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "mortgage 2200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "children_info",
+              "value": "two children age 8 and 12",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "two children",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "180k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "spouse income 180k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "term life 1000k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "life 1000k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_critical_illness_coverage",
+              "value": "critical illness 500k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "ci 500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "520k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "expense 520k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "assets",
+              "value": "1200k investable assets",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "assets 1200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "liabilities",
+              "value": "mortgage 2200k",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "liabilities 2200k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "cash_flow",
+              "value": "stable annual surplus",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "cash flow stable",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "financial_goals",
+              "value": "education and retirement",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "goals education and retirement",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "liquidity_needs",
+              "value": "medium",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "liquidity medium",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "time_horizon",
+              "value": "15 years",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "time horizon 15 years",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "budget",
+              "value": "40000",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "budget 40000",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "occupation",
+              "value": "operations director",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "occupation operations director",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "existing_accident_coverage",
+              "value": "accident 500k",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "accident 500k",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "risk_preference",
+              "value": "balanced",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "balanced",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "moderate support",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "moderate parent support",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "family_financial_status",
+              "value": "strong but leveraged",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "strong but leveraged",
+              "source_section": "Confirmed Facts"
+            },
+            {
+              "field": "work_pattern",
+              "value": "frequent travel",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "frequent travel",
+              "source_section": "Confirmed Facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "complex family complete"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C415",
+          "client_alias": "complex-family"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      }
+    },
+    {
+      "case_id": "RA_DS_016",
+      "category": "I_ESTIMATED_F1_F2",
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1-test",
+          "profile_path": "x",
+          "pending_path": "x",
+          "conversation_log_path": "x",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life",
+          "critical_illness"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": 35,
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "35",
+              "source_section": "facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "大体健康",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "大体健康",
+              "source_section": "facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "已婚，1名5岁子女",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "已婚，1名5岁子女",
+              "source_section": "facts"
+            },
+            {
+              "field": "children_info",
+              "value": "1 个孩子，5 岁",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "1 个孩子，5 岁",
+              "source_section": "facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "需赡养一方父母",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "需赡养一方父母",
+              "source_section": "facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "约35万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约35万",
+              "source_section": "facts"
+            },
+            {
+              "field": "assets",
+              "value": "约200万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约200万",
+              "source_section": "facts"
+            },
+            {
+              "field": "mortgage_years",
+              "value": "20年",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "20年",
+              "source_section": "facts"
+            },
+            {
+              "field": "family_financial_status",
+              "value": "年结余约45万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "年结余约45万",
+              "source_section": "facts"
+            },
+            {
+              "field": "budget",
+              "value": "约2万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约2万",
+              "source_section": "facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "约60万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "年收入大概60万",
+              "source_section": "facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "约150万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "还有大概150万房贷",
+              "source_section": "facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "约20万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "约20万",
+              "source_section": "facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "从未投保任何寿险 / 定期寿险",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "寿险我没买过",
+              "source_section": "facts"
+            },
+            {
+              "field": "existing_critical_illness_coverage",
+              "value": "个人终身重疾险保额约50万",
+              "value_status": "KNOWN",
+              "source_round": "R2",
+              "source_text": "买过一份50万重疾险",
+              "source_section": "facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "test case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C016",
+          "client_alias": "EST无寿险"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      },
+      "updates": [],
+      "mutation": null,
+      "expected_status": "PRELIMINARY",
+      "expected_risks": [
+        "life",
+        "critical_illness"
+      ],
+      "expected_priority": {
+        "life": "P0_CRITICAL",
+        "critical_illness": "P1_HIGH"
+      },
+      "expected_questions": [],
+      "expected_evidence": [],
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "forbidden_behavior": [],
+      "pre_update_expected_questions": []
+    },
+    {
+      "case_id": "RA_DS_017",
+      "category": "I_ESTIMATED_F1_F2",
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1-test",
+          "profile_path": "x",
+          "pending_path": "x",
+          "conversation_log_path": "x",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "life"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": 35,
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "35",
+              "source_section": "facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "大体健康",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "大体健康",
+              "source_section": "facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "已婚，1名5岁子女",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "已婚，1名5岁子女",
+              "source_section": "facts"
+            },
+            {
+              "field": "children_info",
+              "value": "1 个孩子，5 岁",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "1 个孩子，5 岁",
+              "source_section": "facts"
+            },
+            {
+              "field": "parents_support",
+              "value": "需赡养一方父母",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "需赡养一方父母",
+              "source_section": "facts"
+            },
+            {
+              "field": "annual_expense",
+              "value": "约35万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约35万",
+              "source_section": "facts"
+            },
+            {
+              "field": "assets",
+              "value": "约200万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约200万",
+              "source_section": "facts"
+            },
+            {
+              "field": "mortgage_years",
+              "value": "20年",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "20年",
+              "source_section": "facts"
+            },
+            {
+              "field": "family_financial_status",
+              "value": "年结余约45万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "年结余约45万",
+              "source_section": "facts"
+            },
+            {
+              "field": "budget",
+              "value": "约2万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约2万",
+              "source_section": "facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "约60万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "年收入大概60万",
+              "source_section": "facts"
+            },
+            {
+              "field": "mortgage_balance",
+              "value": "约150万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "约150万",
+              "source_section": "facts"
+            },
+            {
+              "field": "spouse_income",
+              "value": "约20万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "约20万",
+              "source_section": "facts"
+            },
+            {
+              "field": "existing_life_coverage",
+              "value": "定期寿险保额1000万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "买了1000万定寿",
+              "source_section": "facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "test case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C017",
+          "client_alias": "EST寿险充足"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      },
+      "updates": [],
+      "mutation": null,
+      "expected_status": "PRELIMINARY",
+      "expected_risks": [
+        "life"
+      ],
+      "expected_priority": {
+        "life": "P2_MEDIUM"
+      },
+      "expected_questions": [],
+      "expected_evidence": [],
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "forbidden_behavior": [],
+      "pre_update_expected_questions": []
+    },
+    {
+      "case_id": "RA_DS_018",
+      "category": "I_ESTIMATED_F1_F2",
+      "input": {
+        "source": {
+          "skill": "client_intake",
+          "adapter_version": "v1-test",
+          "profile_path": "x",
+          "pending_path": "x",
+          "conversation_log_path": "x",
+          "intake_complete": true
+        },
+        "analysis_scope": [
+          "critical_illness"
+        ],
+        "client_profile": {
+          "facts": [
+            {
+              "field": "age",
+              "value": 40,
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "40",
+              "source_section": "facts"
+            },
+            {
+              "field": "customer_health",
+              "value": "健康",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "健康",
+              "source_section": "facts"
+            },
+            {
+              "field": "family_responsibility",
+              "value": "已婚，1子",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "已婚，1子",
+              "source_section": "facts"
+            },
+            {
+              "field": "family_financial_status",
+              "value": "年结余约45万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "年结余约45万",
+              "source_section": "facts"
+            },
+            {
+              "field": "budget",
+              "value": "约2万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "约2万",
+              "source_section": "facts"
+            },
+            {
+              "field": "annual_income",
+              "value": "约60万",
+              "value_status": "ESTIMATED",
+              "source_round": "R1",
+              "source_text": "年收入大概60万",
+              "source_section": "facts"
+            },
+            {
+              "field": "existing_critical_illness_coverage",
+              "value": "重疾险保额500万",
+              "value_status": "KNOWN",
+              "source_round": "R1",
+              "source_text": "重疾500万",
+              "source_section": "facts"
+            }
+          ],
+          "inferred_notes": [],
+          "follow_up_items": [],
+          "handoff_notes": "test case"
+        },
+        "conflicts": [],
+        "constraints": [],
+        "metadata": {
+          "client_id": "C018",
+          "client_alias": "EST重疾充足"
+        },
+        "question_context": {
+          "asked_questions": [],
+          "answered_fields": []
+        }
+      },
+      "updates": [],
+      "mutation": null,
+      "expected_status": "PRELIMINARY",
+      "expected_risks": [
+        "critical_illness"
+      ],
+      "expected_priority": {
+        "critical_illness": "P2_MEDIUM"
+      },
+      "expected_questions": [],
+      "expected_evidence": [],
+      "eval_requirements": {
+        "expected_eval_status": "PASS",
+        "expected_issue_types": []
+      },
+      "forbidden_behavior": [],
+      "pre_update_expected_questions": []
+    }
+  ]
+}

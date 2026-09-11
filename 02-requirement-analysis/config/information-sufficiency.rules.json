@@ -1,0 +1,104 @@
+{
+  "version": "v1",
+  "scoring": {
+    "required_total_weight": 0.7,
+    "recommended_total_weight": 0.2,
+    "optional_total_weight": 0.1,
+    "estimated_multiplier": 0.7,
+    "assumed_multiplier": 0.3,
+    "thresholds": {
+      "sufficient": 0.85,
+      "partial": 0.6
+    }
+  },
+  "requirement_dependencies": [
+    {
+      "requirement_type": "medical",
+      "required_information": [
+        { "field": "age", "impact": "high", "reason": "影响医疗险可投保性与费率判断" },
+        { "field": "customer_health", "impact": "high", "reason": "影响医疗需求和可保性判断" },
+        { "field": "social_insurance_status", "impact": "high", "reason": "影响医疗费用自付缺口判断" },
+        { "field": "existing_medical_coverage", "impact": "high", "reason": "影响现有保障缺口判断" },
+        { "field": "budget", "impact": "medium", "reason": "影响需求可行性与分析边界" }
+      ],
+      "recommended_information": [
+        { "field": "care_preference", "impact": "medium", "reason": "影响医疗资源偏好和缺口分析精度" },
+        { "field": "family_medical_needs", "impact": "medium", "reason": "影响家庭层面的医疗保障需求判断" }
+      ],
+      "optional_information": [
+        { "field": "city", "impact": "low", "reason": "影响就医环境背景，但不是唯一阻塞项" }
+      ]
+    },
+    {
+      "requirement_type": "critical_illness",
+      "required_information": [
+        { "field": "age", "impact": "high", "reason": "影响重疾需求与保障期限判断" },
+        { "field": "customer_health", "impact": "high", "reason": "影响重疾保障可获得性与现实需求" },
+        { "field": "annual_income", "impact": "high", "reason": "影响收入中断损失判断" },
+        { "field": "family_responsibility", "impact": "high", "reason": "影响重疾后家庭负担判断" },
+        { "field": "existing_critical_illness_coverage", "impact": "high", "reason": "影响现有重疾缺口判断" }
+      ],
+      "recommended_information": [
+        { "field": "family_financial_status", "impact": "medium", "reason": "影响重疾恢复期财务承压能力判断" },
+        { "field": "budget", "impact": "medium", "reason": "影响优先级与可行性分析" }
+      ],
+      "optional_information": [
+        { "field": "risk_preference", "impact": "low", "reason": "影响表达细化，但不是必要阻塞项" }
+      ]
+    },
+    {
+      "requirement_type": "accident",
+      "required_information": [
+        { "field": "age", "impact": "medium", "reason": "影响意外风险暴露特征" },
+        { "field": "occupation", "impact": "high", "reason": "影响职业相关意外风险判断" },
+        { "field": "existing_accident_coverage", "impact": "high", "reason": "影响现有意外保障缺口判断" },
+        { "field": "family_responsibility", "impact": "medium", "reason": "影响意外事故后家庭责任压力判断" }
+      ],
+      "recommended_information": [
+        { "field": "annual_income", "impact": "medium", "reason": "影响意外导致收入损失的影响判断" },
+        { "field": "work_pattern", "impact": "medium", "reason": "影响通勤与职业暴露分析" }
+      ],
+      "optional_information": [
+        { "field": "lifestyle", "impact": "low", "reason": "影响附加风险背景，但非核心阻塞项" }
+      ]
+    },
+    {
+      "requirement_type": "life",
+      "required_information": [
+        { "field": "annual_income", "impact": "high", "reason": "影响家庭经济支柱责任判断" },
+        { "field": "family_responsibility", "impact": "high", "reason": "影响寿险需求基础判断" },
+        { "field": "mortgage_balance", "impact": "high", "reason": "影响家庭负债责任测算" },
+        { "field": "children_info", "impact": "high", "reason": "影响子女抚养责任判断" },
+        { "field": "spouse_income", "impact": "high", "reason": "影响家庭收入替代能力判断" },
+        { "field": "existing_life_coverage", "impact": "high", "reason": "影响寿险缺口判断" }
+      ],
+      "recommended_information": [
+        { "field": "parents_support", "impact": "medium", "reason": "影响赡养责任判断" },
+        { "field": "assets", "impact": "medium", "reason": "影响家庭应急承压能力判断" },
+        { "field": "annual_expense", "impact": "medium", "reason": "影响现金流责任测算" }
+      ],
+      "optional_information": [
+        { "field": "mortgage_years", "impact": "low", "reason": "影响测算精度，但不影响方向性判断" }
+      ]
+    },
+    {
+      "requirement_type": "savings",
+      "required_information": [
+        { "field": "annual_income", "impact": "high", "reason": "影响储蓄与配置能力判断" },
+        { "field": "annual_expense", "impact": "high", "reason": "影响可支配现金流判断" },
+        { "field": "assets", "impact": "high", "reason": "影响现有财务基础判断" },
+        { "field": "liabilities", "impact": "high", "reason": "影响资金约束与目标实现能力判断" },
+        { "field": "cash_flow", "impact": "high", "reason": "影响长期储蓄持续性判断" },
+        { "field": "financial_goals", "impact": "high", "reason": "没有目标无法判断储蓄需求方向" }
+      ],
+      "recommended_information": [
+        { "field": "liquidity_needs", "impact": "medium", "reason": "影响资金锁定期限判断" },
+        { "field": "time_horizon", "impact": "medium", "reason": "影响储蓄目标节奏与结构判断" },
+        { "field": "budget", "impact": "medium", "reason": "影响可执行性判断" }
+      ],
+      "optional_information": [
+        { "field": "risk_preference", "impact": "low", "reason": "影响表达层细化，但不决定基础需求方向" }
+      ]
+    }
+  ]
+}

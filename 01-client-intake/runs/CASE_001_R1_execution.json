@@ -1,0 +1,134 @@
+{
+  "run_metadata": {
+    "case_id": "CASE_001",
+    "round": 1,
+    "executed_at": "2026-09-06 (真实实跑)",
+    "run_type": "真实磁盘写入（非模拟）",
+    "source_of_truth_files": [
+      "01-client-intake/CLIENT_PROFILE.md",
+      "01-client-intake/CONVERSATION_LOG.md",
+      "01-client-intake/PENDING.md"
+    ],
+    "router_skill": ".trae/skills/client-intake/SKILL.md -> 01-client-intake/SOP.md"
+  },
+  "round": 1,
+  "case_id": "CASE_001",
+  "source_of_truth": "CLIENT_PROFILE.md + PENDING.md + CONVERSATION_LOG.md（JSON 仅为本轮执行结果快照）",
+  "step1_previous_qids_resolved": [
+    {
+      "note": "首轮无前置 QID，Step1 Resolve Previous QIDs 无动作"
+    }
+  ],
+  "this_round_updates": {
+    "confirmed": [
+      {
+        "field": "年龄",
+        "section": "1.1 基本信息",
+        "value": 30,
+        "source_round": 1,
+        "source_text": "我30岁",
+        "state_file_synced": true,
+        "h_mapping": "H1 年龄 ✅"
+      },
+      {
+        "field": "城市",
+        "section": "1.1 基本信息",
+        "value": "上海",
+        "source_round": 1,
+        "source_text": "上海",
+        "state_file_synced": true,
+        "h_mapping": "H2 城市 ✅"
+      },
+      {
+        "field": "职业",
+        "section": "1.1 基本信息",
+        "value": "互联网",
+        "source_round": 1,
+        "source_text": "做互联网",
+        "state_file_synced": true,
+        "h_mapping": "H3 职业 ✅"
+      },
+      {
+        "field": "本人收入",
+        "section": "1.3 收入与支出",
+        "value": 500000,
+        "source_round": 1,
+        "source_text": "年收入50万",
+        "state_file_synced": true,
+        "h_mapping": "H5 收入 ✅"
+      }
+    ],
+    "uncertain_inferred": [],
+    "missing": [
+      {
+        "priority": "P0",
+        "field": "家庭责任结构（婚姻/子女/家人经济依赖）",
+        "reason": "Hard Required H4 未满足"
+      },
+      {
+        "priority": "P0",
+        "field": "家庭年支出",
+        "reason": "Hard Required H6 未满足"
+      }
+    ],
+    "pending": []
+  },
+  "completion_check": {
+    "intake_complete": false,
+    "gate_passed": false,
+    "hard_required_results": {
+      "H1 年龄": "✅ 已满足（30岁）",
+      "H2 城市": "✅ 已满足（上海）",
+      "H3 职业": "✅ 已满足（互联网）",
+      "H4 家庭责任": "❓ 阻塞（婚姻/子女/经济依赖未知）",
+      "H5 收入": "✅ 已满足（本人 500k）",
+      "H6 支出": "❓ 阻塞（家庭年支出未知）"
+    },
+    "blocking_count": 2,
+    "reason": "P0 阻塞项 2 项未满足：H4 家庭责任 + H6 家庭年支出；H1/H2/H3/H5 4 项已满足",
+    "next_step_allowed": true,
+    "next_step_description": "Step7 Prioritize → Step8 Generate Questions（仅 intake_complete=false 允许）"
+  },
+  "next_questions": [
+    {
+      "qid": "Q001",
+      "priority": "P0",
+      "question_intent": "家庭责任结构（婚姻+子女+经济依赖）",
+      "question_text": "了解了。接下来想先确认下您的家庭情况：目前的婚姻状态？有没有子女或其他家人需要您承担主要经济责任？",
+      "tie_break_rationale": "P0 两项：家庭结构 vs 家庭年支出 → tie-break：SOP 7 大类顺序 家庭结构(第2大类) > 收支(第3大类)",
+      "constraints_verified": {
+        "count_le_3": true,
+        "restricted_signal_count_le_2": "N/A（客户无忙/要数字受限信号）",
+        "mechanical_repeat_absent": true,
+        "same_intent_not_consecutive": "N/A（首轮无前置同 QID）"
+      },
+      "question_intent_one_of_allowed_values": [
+        "家庭结构（婚姻+子女+经济依赖）",
+        "家庭年支出"
+      ]
+    }
+  ],
+  "state_write_result": {
+    "state_files_updated": 3,
+    "files_updated": [
+      "CLIENT_PROFILE.md",
+      "CONVERSATION_LOG.md",
+      "PENDING.md"
+    ],
+    "invariants_check": {
+      "I1_Confirmed_uniqueness": "PASS（4 条 Confirmed 均唯一字段，无重复写入）",
+      "I2_Source_completeness": "PASS（4 条 Confirmed 全部带 Source Round + Source Text）",
+      "I3_No_cross_round_unanswered_QIDs": "PASS（本轮首轮唯一 Q001=unanswered 合法；等待 R2 清算）",
+      "I4_Pending_QID_consistency": "PASS（Pending 空表，不存在 Pending↔QID 不一致）",
+      "I5_Intake_consistency": "PASS（intake_complete=false 与 Critical Missing 2 项 + Completion H4/H6 阻塞三项对齐）",
+      "I6_History_current_separation": "PASS（Profile 仅写最新值；Round History 仅写 CONVERSATION_LOG.md，不进 Profile 正文）",
+      "I7_JSON_not_state_source": "PASS（JSON 明确声明 SoT=3 份状态文件，JSON 仅为本轮快照）"
+    },
+    "invariants_all_pass": true
+  },
+  "notes": [
+    "真实实跑验证完成：4 份文件（3 状态 + 1 JSON）全部写入磁盘",
+    "与之前的模拟 CASE_001/R1 结果 100% 对齐：QID 选择 / P0 阻塞项 / Completion Status / Confirmed Facts 四列完全一致",
+    "Q001 Question Intent 落入 question_intent_one_of 合法域 = 家庭结构"
+  ]
+}

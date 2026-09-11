@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RequirementAnalysisEvalOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eval_status",
+    "score",
+    "checks",
+    "issues",
+    "repair_required"
+  ],
+  "properties": {
+    "eval_status": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completeness",
+        "evidence_grounding",
+        "logical_consistency",
+        "information_sufficiency",
+        "requirement_product_separation"
+      ],
+      "properties": {
+        "completeness": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "evidence_grounding": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "logical_consistency": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "information_sufficiency": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "requirement_product_separation": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/evalIssue"
+      }
+    },
+    "repair_required": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "evalIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "location",
+        "reason",
+        "evidence"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "MISSING_RISK",
+            "UNSUPPORTED_CONCLUSION",
+            "LOGICAL_INCONSISTENCY",
+            "INSUFFICIENT_INFORMATION",
+            "PRODUCT_RECOMMENDATION_LEAK",
+            "INVALID_OUTPUT"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

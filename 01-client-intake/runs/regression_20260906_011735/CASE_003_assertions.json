@@ -1,0 +1,24 @@
+﻿{
+    "case_id":  "CASE_003",
+    "customer_input_r1":  "想了解一下保险，你先说说都有什么类型的？\r\n我38，自己开公司的。",
+    "assertion_count":  8,
+    "must_have":  [
+                      "age = 38",
+                      "occupation = 公司创始人 / 企业主",
+                      "先解释需要了解情况"
+                  ],
+    "must_not_have":  [
+                          "产品推荐",
+                          "直接讨论保险类型优劣"
+                      ],
+    "must_update_profile":  [
+                                "写入年龄、职业"
+                            ],
+    "must_update_log":  [
+                            "Round 1 原文写入"
+                        ],
+    "must_update_pending":  [
+                                "无新增"
+                            ],
+    "completion_expect_r1":  "false"
+}

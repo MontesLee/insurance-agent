@@ -1,0 +1,142 @@
+{
+  "analysis_status": "PRELIMINARY",
+  "analysis_scope": [
+    "medical",
+    "critical_illness",
+    "life"
+  ],
+  "information_sufficiency": {
+    "sufficiency_status": "PARTIAL",
+    "decision_note": "可做初步分析，但部分高影响信息仍需补充。",
+    "method": "weighted_dependency_map_v1",
+    "sufficiency_score": 0.72,
+    "scope_results": [
+      {
+        "requirement_type": "life",
+        "scope_score": 0.72,
+        "scope_status": "PARTIAL",
+        "blocking_fields": [
+          "existing_life_coverage"
+        ],
+        "conflict_fields": []
+      }
+    ],
+    "blocking_fields": [
+      "existing_life_coverage"
+    ],
+    "conflict_fields": []
+  },
+  "information_gaps": [
+    {
+      "field": "social_insurance_status",
+      "importance": "P2_MEDIUM",
+      "impact": "影响医疗需求判断精度",
+      "reason": "客户尚未明确社保医保状态",
+      "gap_type": "NOT_PROVIDED"
+    }
+  ],
+  "risk_map": [
+    {
+      "requirement_type": "life",
+      "risk_exposure": "家庭主要收入来源承担房贷与子女抚养责任",
+      "potential_financial_impact": "收入中断将影响房贷与教育支出",
+      "existing_protection": "已知现有终身重疾 50 万，寿险情况未知",
+      "coverage_gap": "家庭责任对应的生命风险保障信息不充分，存在缺口",
+      "priority": "P1_HIGH",
+      "reasoning": "存在房贷和未成年子女，且客户本人收入占比高。",
+      "evidence_refs": [
+        "EV001"
+      ]
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "requirement_type": "life",
+      "gap_summary": "家庭责任与现有已知保障之间存在明显信息缺口与潜在保障缺口。",
+      "priority": "P1_HIGH",
+      "evidence_refs": [
+        "EV001"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "REQ001",
+      "requirement_type": "life",
+      "summary": "需要优先确认并评估家庭经济支柱相关的生命风险保障需求。",
+      "priority": "P1_HIGH",
+      "boundary": "requirement_only"
+    }
+  ],
+  "priorities": [
+    {
+      "target_id": "REQ001",
+      "priority": "P1_HIGH",
+      "reason": "对家庭现金流稳定性影响较大。"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "EV001",
+      "fact_refs": [
+        "annual_income",
+        "mortgage_balance",
+        "children_info"
+      ],
+      "value_status": "KNOWN",
+      "reasoning": "客户本人收入较高，承担房贷和未成年子女抚养责任。",
+      "conclusion": "life 需求至少应进入高优先级评估。"
+    }
+  ],
+  "assumptions": [
+    {
+      "field": "spouse_income_stability",
+      "assumption": "暂按配偶收入持续稳定处理",
+      "reason": "当前没有配偶收入波动信息"
+    }
+  ],
+  "unknowns": [
+    {
+      "field": "existing_life_coverage",
+      "reason": "上游尚无明确寿险保额或保单信息"
+    }
+  ],
+  "next_actions": [
+    {
+      "action_type": "ask_user",
+      "description": "补充现有寿险保障和社保医保状态后再更新正式分析。"
+    }
+  ],
+  "question_plan": {
+    "question_status": "READY_TO_ASK",
+    "selected_questions": [
+      {
+        "question_id": "QAQ001",
+        "field": "existing_life_coverage",
+        "question_type": "gap_fill",
+        "priority_score": 95,
+        "question": "我现在大致能判断你家的保障方向了，但还有一个信息会明显影响寿险缺口判断：你们目前有没有已经配置过寿险？大概保额就可以。",
+        "why_ask": "直接影响 life 需求缺口判断。",
+        "allow_approximate": true,
+        "related_requirement_types": [
+          "life"
+        ]
+      }
+    ],
+    "deferred_fields": [
+      "social_insurance_status"
+    ]
+  },
+  "adapter_trace": {
+    "source_skill": "client_intake",
+    "consumed_fields": [
+      "annual_income",
+      "mortgage_balance",
+      "children_info",
+      "follow_up_items"
+    ]
+  },
+  "guardrails": {
+    "product_recommendation_included": false
+  }
+}

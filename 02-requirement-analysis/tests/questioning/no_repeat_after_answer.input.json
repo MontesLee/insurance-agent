@@ -1,0 +1,45 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "01-client-intake/clients/C202-去重样例/CLIENT_PROFILE.md",
+    "pending_path": "01-client-intake/clients/C202-去重样例/PENDING.md",
+    "conversation_log_path": "01-client-intake/clients/C202-去重样例/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": ["life"],
+  "client_profile": {
+    "facts": [
+      { "field": "annual_income", "value": "60万", "value_status": "KNOWN", "source_round": "R1", "source_text": "年收入60万", "source_section": "Confirmed Facts" },
+      { "field": "family_responsibility", "value": "已婚有娃", "value_status": "KNOWN", "source_round": "R1", "source_text": "已婚有一个孩子", "source_section": "Confirmed Facts" },
+      { "field": "mortgage_balance", "value": "150万", "value_status": "KNOWN", "source_round": "R1", "source_text": "房贷150万", "source_section": "Confirmed Facts" },
+      { "field": "children_info", "value": "1个孩子", "value_status": "KNOWN", "source_round": "R1", "source_text": "一个孩子", "source_section": "Confirmed Facts" },
+      { "field": "spouse_income", "value": "20万", "value_status": "KNOWN", "source_round": "R1", "source_text": "配偶收入20万", "source_section": "Confirmed Facts" },
+      { "field": "parents_support", "value": "需少量支持", "value_status": "KNOWN", "source_round": "R2", "source_text": "偶尔支持父母", "source_section": "Confirmed Facts" },
+      { "field": "assets", "value": "30万", "value_status": "KNOWN", "source_round": "R2", "source_text": "30万存款", "source_section": "Confirmed Facts" },
+      { "field": "annual_expense", "value": "35万", "value_status": "KNOWN", "source_round": "R2", "source_text": "一年开支35万", "source_section": "Confirmed Facts" }
+    ],
+    "inferred_notes": [],
+    "follow_up_items": [],
+    "handoff_notes": "已回答字段不应重复追问"
+  },
+  "conflicts": [],
+  "constraints": [],
+  "metadata": {
+    "client_id": "C202",
+    "client_alias": "去重样例"
+  },
+  "question_context": {
+    "asked_questions": [
+      {
+        "field": "existing_life_coverage",
+        "status": "answered",
+        "ask_count": 1,
+        "last_question": "你们目前有没有已经配置过寿险？"
+      }
+    ],
+    "answered_fields": [
+      "existing_life_coverage"
+    ]
+  }
+}

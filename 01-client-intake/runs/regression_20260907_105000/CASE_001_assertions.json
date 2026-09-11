@@ -1,0 +1,32 @@
+﻿{
+    "case_id":  "CASE_001",
+    "customer_input_r1":  "我今年35岁，在北京做互联网，收入大概80万。\r\n老婆暂时没工作，有一个4岁的孩子。\r\n房贷还有200万。\r\n之前买过一点保险，但具体记不清了。",
+    "assertion_count":  16,
+    "must_have":  [
+                      "age = 35",
+                      "city = 北京",
+                      "occupation = 互联网行业",
+                      "annual_income = 800000",
+                      "spouse employment = 暂时无工作",
+                      "child age = 4",
+                      "mortgage_balance = 2000000"
+                  ],
+    "must_not_have":  [
+                          "gender = 男",
+                          "spouse_age = 任意数字",
+                          "产品推荐",
+                          "医学判断"
+                      ],
+    "must_update_profile":  [
+                                "CLIENT_PROFILE 中写入年龄/城市/职业/收入/家庭/房贷余额",
+                                "CLIENT_PROFILE 中记录商保概况，但不写具体险种"
+                            ],
+    "must_update_log":  [
+                            "CONVERSATION_LOG 新增 Round 1 原文",
+                            "所有本轮新生成的问题均注册 QID"
+                        ],
+    "must_update_pending":  [
+                                "PENDING 保持为空"
+                            ],
+    "completion_expect_r1":  "false"
+}

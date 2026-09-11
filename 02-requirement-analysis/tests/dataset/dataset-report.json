@@ -1,0 +1,408 @@
+﻿{
+    "total_cases":  15,
+    "passed_cases":  15,
+    "overall_pass_rate":  100,
+    "averages":  {
+                     "completeness":  93.33,
+                     "evidence_grounding":  96.33,
+                     "information_sufficiency":  100,
+                     "logical_consistency":  100,
+                     "product_boundary":  97.33
+                 },
+    "case_results":  [
+                         {
+                             "case_id":  "RA_DS_001",
+                             "category":  "A_COMPLETE_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "life"
+                                              ],
+                             "actual_question_fields":  [
+
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_002",
+                             "category":  "A_COMPLETE_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "medical"
+                                              ],
+                             "actual_question_fields":  [
+
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_003",
+                             "category":  "A_COMPLETE_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "medical",
+                                                  "critical_illness",
+                                                  "life",
+                                                  "accident"
+                                              ],
+                             "actual_question_fields":  [
+                                                            "mortgage_years"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_004",
+                             "category":  "B_MISSING_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "NEED_MORE_INFORMATION",
+                             "actual_status":  "NEED_MORE_INFORMATION",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+
+                                              ],
+                             "actual_question_fields":  [
+                                                            "existing_life_coverage",
+                                                            "assets"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_005",
+                             "category":  "B_MISSING_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "NEED_MORE_INFORMATION",
+                             "actual_status":  "NEED_MORE_INFORMATION",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+
+                                              ],
+                             "actual_question_fields":  [
+                                                            "assets",
+                                                            "financial_goals"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_006",
+                             "category":  "B_MISSING_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "medical"
+                                              ],
+                             "actual_question_fields":  [
+
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_007",
+                             "category":  "C_MULTI_TURN_INFORMATION_COLLECTION",
+                             "passed":  true,
+                             "expected_status":  "PRELIMINARY",
+                             "actual_status":  "PRELIMINARY",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "savings"
+                                              ],
+                             "actual_question_fields":  [
+                                                            "budget"
+                                                        ],
+                             "pre_update_question_fields":  [
+                                                                "budget"
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_008",
+                             "category":  "C_MULTI_TURN_INFORMATION_COLLECTION",
+                             "passed":  true,
+                             "expected_status":  "PRELIMINARY",
+                             "actual_status":  "PRELIMINARY",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "life"
+                                              ],
+                             "actual_question_fields":  [
+                                                            "assets",
+                                                            "mortgage_years"
+                                                        ],
+                             "pre_update_question_fields":  [
+                                                                "assets",
+                                                                "mortgage_years"
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_009",
+                             "category":  "D_CONFLICTING_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "CONFLICTING_INFORMATION",
+                             "actual_status":  "CONFLICTING_INFORMATION",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+
+                                              ],
+                             "actual_question_fields":  [
+                                                            "annual_income",
+                                                            "existing_life_coverage"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_010",
+                             "category":  "D_CONFLICTING_INFORMATION",
+                             "passed":  true,
+                             "expected_status":  "CONFLICTING_INFORMATION",
+                             "actual_status":  "CONFLICTING_INFORMATION",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+
+                                              ],
+                             "actual_question_fields":  [
+                                                            "annual_income",
+                                                            "budget"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         },
+                         {
+                             "case_id":  "RA_DS_011",
+                             "category":  "E_UNSUPPORTED_CONCLUSION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "FAIL",
+                             "actual_eval_status":  "FAIL",
+                             "expected_issue_types":  [
+                                                          "UNSUPPORTED_CONCLUSION"
+                                                      ],
+                             "actual_issue_types":  [
+                                                        "UNSUPPORTED_CONCLUSION"
+                                                    ],
+                             "actual_risks":  [
+                                                  "life"
+                                              ],
+                             "actual_question_fields":  [
+
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  93
+                         },
+                         {
+                             "case_id":  "RA_DS_012",
+                             "category":  "E_UNSUPPORTED_CONCLUSION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "FAIL",
+                             "actual_eval_status":  "FAIL",
+                             "expected_issue_types":  [
+                                                          "UNSUPPORTED_CONCLUSION"
+                                                      ],
+                             "actual_issue_types":  [
+                                                        "UNSUPPORTED_CONCLUSION"
+                                                    ],
+                             "actual_risks":  [
+                                                  "life",
+                                                  "accident"
+                                              ],
+                             "actual_question_fields":  [
+
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  96
+                         },
+                         {
+                             "case_id":  "RA_DS_013",
+                             "category":  "F_MISSING_RISK",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "FAIL",
+                             "actual_eval_status":  "FAIL",
+                             "expected_issue_types":  [
+                                                          "MISSING_RISK"
+                                                      ],
+                             "actual_issue_types":  [
+                                                        "MISSING_RISK",
+                                                        "MISSING_RISK",
+                                                        "MISSING_RISK",
+                                                        "MISSING_RISK"
+                                                    ],
+                             "actual_risks":  [
+                                                  "medical",
+                                                  "critical_illness",
+                                                  "life",
+                                                  "accident"
+                                              ],
+                             "actual_question_fields":  [
+                                                            "mortgage_years"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  80
+                         },
+                         {
+                             "case_id":  "RA_DS_014",
+                             "category":  "G_PRODUCT_BOUNDARY_VIOLATION",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "FAIL",
+                             "actual_eval_status":  "FAIL",
+                             "expected_issue_types":  [
+                                                          "PRODUCT_RECOMMENDATION_LEAK"
+                                                      ],
+                             "actual_issue_types":  [
+                                                        "PRODUCT_RECOMMENDATION_LEAK"
+                                                    ],
+                             "actual_risks":  [
+                                                  "life"
+                                              ],
+                             "actual_question_fields":  [
+
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  92
+                         },
+                         {
+                             "case_id":  "RA_DS_015",
+                             "category":  "H_COMPLEX_FAMILY",
+                             "passed":  true,
+                             "expected_status":  "COMPLETE",
+                             "actual_status":  "COMPLETE",
+                             "expected_eval_status":  "PASS",
+                             "actual_eval_status":  "PASS",
+                             "expected_issue_types":  [
+
+                                                      ],
+                             "actual_issue_types":  [
+
+                                                    ],
+                             "actual_risks":  [
+                                                  "life",
+                                                  "critical_illness",
+                                                  "savings",
+                                                  "accident"
+                                              ],
+                             "actual_question_fields":  [
+                                                            "mortgage_years"
+                                                        ],
+                             "pre_update_question_fields":  [
+
+                                                            ],
+                             "eval_score":  100
+                         }
+                     ]
+}

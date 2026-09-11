@@ -1,0 +1,39 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "01-client-intake/clients/C204-冲突确认/CLIENT_PROFILE.md",
+    "pending_path": "01-client-intake/clients/C204-冲突确认/PENDING.md",
+    "conversation_log_path": "01-client-intake/clients/C204-冲突确认/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": ["life"],
+  "client_profile": {
+    "facts": [
+      { "field": "family_responsibility", "value": "已婚有娃", "value_status": "KNOWN", "source_round": "R1", "source_text": "已婚有一个孩子", "source_section": "Confirmed Facts" },
+      { "field": "mortgage_balance", "value": "150万", "value_status": "KNOWN", "source_round": "R1", "source_text": "房贷150万", "source_section": "Confirmed Facts" },
+      { "field": "children_info", "value": "1个孩子", "value_status": "KNOWN", "source_round": "R1", "source_text": "一个孩子", "source_section": "Confirmed Facts" },
+      { "field": "spouse_income", "value": "20万", "value_status": "KNOWN", "source_round": "R1", "source_text": "配偶收入20万", "source_section": "Confirmed Facts" }
+    ],
+    "inferred_notes": [],
+    "follow_up_items": [],
+    "handoff_notes": "冲突确认测试"
+  },
+  "conflicts": [
+    {
+      "field": "annual_income",
+      "values": ["80万", "50万"],
+      "reason": "前后说法不一致",
+      "resolution_status": "UNRESOLVED"
+    }
+  ],
+  "constraints": [],
+  "metadata": {
+    "client_id": "C204",
+    "client_alias": "冲突确认"
+  },
+  "question_context": {
+    "asked_questions": [],
+    "answered_fields": []
+  }
+}

@@ -1,0 +1,360 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "01-client-intake/clients/C009-张先生三口之家/CLIENT_PROFILE.md",
+    "pending_path": "01-client-intake/clients/C009-张先生三口之家/PENDING.md",
+    "conversation_log_path": "01-client-intake/clients/C009-张先生三口之家/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": [
+    "critical_illness",
+    "medical",
+    "accident",
+    "life"
+  ],
+  "client_profile": {
+    "facts": [
+      {
+        "field": "age",
+        "value": 35,
+        "value_status": "KNOWN",
+        "source_round": "R1",
+        "source_text": "我今年35岁",
+        "source_section": "1.1 基本信息"
+      },
+      {
+        "field": "gender",
+        "value": "男",
+        "value_status": "KNOWN",
+        "source_round": "R1",
+        "source_text": "男",
+        "source_section": "1.1 基本信息"
+      },
+      {
+        "field": "city",
+        "value": "北京",
+        "value_status": "KNOWN",
+        "source_round": "R4",
+        "source_text": "人在北京",
+        "source_section": "1.1 基本信息"
+      },
+      {
+        "field": "occupation",
+        "value": "互联网产品经理",
+        "value_status": "KNOWN",
+        "source_round": "R2",
+        "source_text": "我是互联网公司的产品经理",
+        "source_section": "1.1 基本信息"
+      },
+      {
+        "field": "marital_status",
+        "value": "已婚",
+        "value_status": "KNOWN",
+        "source_round": "R1",
+        "source_text": "已婚",
+        "source_section": "1.1 基本信息"
+      },
+      {
+        "field": "children_info",
+        "value": "1 个孩子，5 岁",
+        "value_status": "KNOWN",
+        "source_round": "R2",
+        "source_text": "孩子今年 5 岁",
+        "source_section": "1.2 家庭结构"
+      },
+      {
+        "field": "spouse_income",
+        "value": "约 20 多万 / 年",
+        "value_status": "ESTIMATED",
+        "source_round": "R2",
+        "source_text": "收入一年 20 多万",
+        "source_section": "1.3 收入与支出"
+      },
+      {
+        "field": "annual_income",
+        "value": "约 60 万 / 年",
+        "value_status": "ESTIMATED",
+        "source_round": "R2",
+        "source_text": "年收入大概 60 万",
+        "source_section": "1.3 收入与支出"
+      },
+      {
+        "field": "annual_expense",
+        "value": "约 35 万 / 年",
+        "value_status": "ESTIMATED",
+        "source_round": "R4",
+        "source_text": "一年家庭开支在 35 万左右",
+        "source_section": "1.3 收入与支出"
+      },
+      {
+        "field": "budget",
+        "value": "约 2 万 / 年",
+        "value_status": "ESTIMATED",
+        "source_round": "R1",
+        "source_text": "预算一年 2 万左右",
+        "source_section": "1.3 收入与支出"
+      },
+      {
+        "field": "mortgage_balance",
+        "value": "约 150 万",
+        "value_status": "ESTIMATED",
+        "source_round": "R2",
+        "source_text": "还有大概 150 万房贷",
+        "source_section": "1.4 负债与保障"
+      },
+      {
+        "field": "mortgage_years",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "Profile 记为 ❓，Follow-up Items 第 1 项",
+        "source_section": "5. Follow-up Items"
+      },
+      {
+        "field": "social_insurance_status",
+        "value": "在职职工社保五险正常缴纳，含基本医保（北京）",
+        "value_status": "KNOWN",
+        "source_round": "R5",
+        "source_text": "公司给交五险，医保是有的",
+        "source_section": "R5 追问补充"
+      },
+      {
+        "field": "customer_health",
+        "value": "大体健康；去年体检轻度脂肪肝 + 血脂偏高；无住院史",
+        "value_status": "KNOWN",
+        "source_round": "R3",
+        "source_text": "身体方面没什么大问题，就是去年体检的时候说有轻度脂肪肝，血脂有点高，平时也没住过院",
+        "source_section": "1.5 健康与风险"
+      },
+      {
+        "field": "existing_medical_coverage",
+        "value": "公司团体医疗险（保额未披露）",
+        "value_status": "KNOWN",
+        "source_round": "R3",
+        "source_text": "我公司有医疗险和意外险",
+        "source_section": "1.4 负债与保障"
+      },
+      {
+        "field": "existing_accident_coverage",
+        "value": "公司团体意外险（保额未披露）",
+        "value_status": "KNOWN",
+        "source_round": "R3",
+        "source_text": "我公司有医疗险和意外险",
+        "source_section": "1.4 负债与保障"
+      },
+      {
+        "field": "existing_critical_illness_coverage",
+        "value": "个人终身重疾险保额约 50 万（具体产品 Pending P001 后补）；公司无重疾团险",
+        "value_status": "KNOWN",
+        "source_round": "R3",
+        "source_text": "我自己以前买过一份 50 万的重疾险，应该是终身的，具体产品我回头找一下",
+        "source_section": "1.4 负债与保障"
+      },
+      {
+        "field": "existing_life_coverage",
+        "value": "从未投保过任何寿险 / 定期寿险（个人与公司团险均无）",
+        "value_status": "KNOWN",
+        "source_round": "R5",
+        "source_text": "寿险我没买过，公司也没有",
+        "source_section": "R5 追问补充"
+      },
+      {
+        "field": "family_responsibility",
+        "value": "已婚，配偶在职（非全职），1 名 5 岁未成年子女；本人收入约占家庭总收入 75%，存在依赖本人收入的家庭成员",
+        "value_status": "KNOWN",
+        "source_round": "R2",
+        "source_text": "已婚 + 有一个孩子 / 孩子今年 5 岁 / 年收入大概 60 万 / 收入一年 20 多万",
+        "source_section": "2. Inferred Notes / I003"
+      },
+      {
+        "field": "parents_support",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "Profile 记为 ❓，Follow-up Items 第 5 项",
+        "source_section": "5. Follow-up Items"
+      },
+      {
+        "field": "assets",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "客户从未披露家庭资产 / 存款",
+        "source_section": "6. Handoff Notes"
+      },
+      {
+        "field": "liabilities",
+        "value": "房贷余额约 150 万；其他负债 / 担保未披露",
+        "value_status": "ESTIMATED",
+        "source_round": "R2",
+        "source_text": "还有大概 150 万房贷",
+        "source_section": "1.4 负债与保障"
+      },
+      {
+        "field": "cash_flow",
+        "value": "家庭年结余约 45 万 / 年",
+        "value_status": "ESTIMATED",
+        "source_round": "R4",
+        "source_text": "家庭总收入约 80 万 - 家庭年支出约 35 万",
+        "source_section": "2. Inferred Notes / I007"
+      },
+      {
+        "field": "family_financial_status",
+        "value": "家庭年结余约 45 万，保费预算 2 万仅占家庭收入约 2.5%",
+        "value_status": "ESTIMATED",
+        "source_round": "R4",
+        "source_text": "约 60 万 + 约 20 多万 - 约 35 万，预算 2 万",
+        "source_section": "2. Inferred Notes / I007"
+      },
+      {
+        "field": "financial_goals",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "客户仅表达保障诉求（家庭风险保障 / 大病失能），未提出教育金、养老、储蓄等财务目标",
+        "source_section": "1.5 核心风险关注点"
+      },
+      {
+        "field": "risk_preference",
+        "value": "优先覆盖大病 / 失能导致的收入中断；自述身故保额不用特别高",
+        "value_status": "KNOWN",
+        "source_round": "R3",
+        "source_text": "我比较担心的是如果我得了大病不能工作，房贷和孩子教育怎么办 / 我老婆收入也还可以，所以身故保障不用买特别高吧？",
+        "source_section": "1.5 核心风险关注点"
+      },
+      {
+        "field": "care_preference",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "客户未表达就医偏好",
+        "source_section": "6. Handoff Notes"
+      },
+      {
+        "field": "family_medical_needs",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "配偶 / 子女 / 父母健康均为 ❓",
+        "source_section": "1.5 健康与风险"
+      },
+      {
+        "field": "work_pattern",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "客户未描述通勤 / 出差 / 工作方式",
+        "source_section": "6. Handoff Notes"
+      },
+      {
+        "field": "lifestyle",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "Profile 记为 ❓",
+        "source_section": "1.5 健康与风险"
+      },
+      {
+        "field": "liquidity_needs",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "客户未表达流动性需求",
+        "source_section": "6. Handoff Notes"
+      },
+      {
+        "field": "time_horizon",
+        "value": "未提供",
+        "value_status": "UNKNOWN",
+        "source_round": "R4",
+        "source_text": "客户未表达任何时间目标",
+        "source_section": "6. Handoff Notes"
+      }
+    ],
+    "inferred_notes": [
+      {
+        "note": "I003：客户本人收入占家庭总收入约 75%，且有 5 岁未成年子女需要抚养，存在明显依赖本人收入的家庭成员",
+        "basis": "Confirmed：本人约 60 万 + 配偶约 20 多万 → 本人占比约 75%；子女 5 岁未成年",
+        "source_round": "R2"
+      },
+      {
+        "note": "I005：现有重疾保额 50 万 vs 房贷 150 万 + 子女教育责任，重疾保障存在明显缺口（约 100 万+）",
+        "basis": "Confirmed：房贷余额约 150 万 + 个人终身重疾保额 50 万 + 子女 5 岁 + 公司无重疾团险",
+        "source_round": "R3"
+      },
+      {
+        "note": "I006：客户核心关注点收敛为大病 / 失能型风险，身故风险优先级低于重疾",
+        "basis": "Confirmed：客户明确表述担心大病不能工作 + 自述身故保额不用特别高",
+        "source_round": "R3"
+      },
+      {
+        "note": "I007：家庭年结余约 45 万，保费预算 2 万仅占家庭收入约 2.5%，显著低于双十原则 10% 安全区间，存在保费上浮空间",
+        "basis": "Confirmed：家庭总收入约 80 万 - 年支出约 35 万；预算 2 万 / 年",
+        "source_round": "R4"
+      },
+      {
+        "note": "I008：北京一线城市，教育 / 医疗成本高于二三线，重疾保额下限与教育金责任应按一线参数测算",
+        "basis": "Confirmed：城市 = 北京 + 子女 5 岁 + 承担房贷与教育责任",
+        "source_round": "R4"
+      }
+    ],
+    "follow_up_items": [
+      "（Soft）房贷剩余还款年限",
+      "（Soft）社保医保参保状态",
+      "（Soft / Pending P001）个人终身重疾险具体产品名 + 条款 / 保单",
+      "（Soft）本人轻度脂肪肝 + 血脂偏高复查情况 + 家人健康近况",
+      "（Soft）父母赡养情况",
+      "（Soft）其他负债 / 担保情况",
+      "（Soft）客户自述身故保额不用特别高，优先覆盖大病失能 —— 作为 Soft Constraint 使用"
+    ],
+    "handoff_notes": "C009 张先生三口之家，R4 判定 intake_complete=true。35 岁男 / 已婚 / 北京 / 互联网产品经理；本人约 60 万年收入，配偶约 20 多万，家庭年支出约 35 万，保费预算约 2 万；房贷余额约 150 万（年限待补）；现有保障 = 公司团险医疗 + 意外（无公司重疾）+ 个人终身重疾 50 万；本人轻度脂肪肝 + 血脂偏高，无住院史。客户优先关注大病失能风险，自述身故保额不用特别高。"
+  },
+  "conflicts": [],
+  "constraints": [
+    {
+      "type": "customer_preference",
+      "description": "客户自述「身故保额不用特别高」，优先覆盖大病 / 失能导致的收入中断风险（重疾 / 失能收入类 ≥ 医疗类 > 身故类）",
+      "source": "CLIENT_PROFILE 1.5 核心风险关注点 / R3"
+    },
+    {
+      "type": "budget_signal",
+      "description": "保费预算约 2 万 / 年，占家庭收入约 2.5%，存在上浮空间（I007），不需刻意压缩保额",
+      "source": "CLIENT_PROFILE 1.3 + Inferred I007 / R4"
+    },
+    {
+      "type": "follow_up_item",
+      "description": "房贷剩余年限、社保医保状态、重疾产品名（Pending P001）待补；寿险保额从未被问及，属 UNKNOWN 不得默认为零",
+      "source": "CLIENT_PROFILE 5. Follow-up Items + PENDING.md"
+    },
+    {
+      "type": "data_quality_note",
+      "description": "收入 / 支出 / 房贷均为客户口述约数，映射为 ESTIMATED；社保医保、父母赡养、资产、其他负债、寿险存量均为 ❓，映射为 UNKNOWN，禁止补全",
+      "source": "Adapter v1 映射规则"
+    }
+  ],
+  "metadata": {
+    "client_id": "C009",
+    "client_alias": "张先生三口之家"
+  },
+  "question_context": {
+    "asked_questions": [
+      {
+        "field": "existing_life_coverage",
+        "status": "answered",
+        "ask_count": 1,
+        "last_question": "你们目前有没有已经配置过寿险？大概保额就可以。"
+      },
+      {
+        "field": "social_insurance_status",
+        "status": "answered",
+        "ask_count": 1,
+        "last_question": "你目前社保和医保大概是什么状态？"
+      }
+    ],
+    "answered_fields": [
+      "existing_life_coverage",
+      "social_insurance_status"
+    ]
+  }
+}

@@ -1,0 +1,621 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RequirementAnalysisOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "analysis_status",
+    "analysis_scope",
+    "information_sufficiency",
+    "information_gaps",
+    "risk_map",
+    "coverage_gaps",
+    "requirements",
+    "priorities",
+    "evidence",
+    "assumptions",
+    "unknowns",
+    "next_actions",
+    "adapter_trace",
+    "guardrails"
+  ],
+  "properties": {
+    "analysis_status": {
+      "type": "string",
+      "enum": [
+        "COMPLETE",
+        "PRELIMINARY",
+        "NEED_MORE_INFORMATION",
+        "CONFLICTING_INFORMATION",
+        "FAILED"
+      ]
+    },
+    "analysis_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "medical",
+          "critical_illness",
+          "accident",
+          "life",
+          "savings"
+        ]
+      }
+    },
+    "information_sufficiency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sufficiency_status",
+        "decision_note",
+        "method",
+        "scope_results",
+        "blocking_fields",
+        "conflict_fields"
+      ],
+      "properties": {
+        "sufficiency_status": {
+          "type": "string",
+          "enum": [
+            "SUFFICIENT",
+            "PARTIAL",
+            "INSUFFICIENT",
+            "CONFLICTING"
+          ]
+        },
+        "decision_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string",
+          "const": "weighted_dependency_map_v1"
+        },
+        "sufficiency_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "scope_results": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/scopeResult"
+          }
+        },
+        "blocking_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "conflict_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "information_gaps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/informationGap"
+      }
+    },
+    "risk_map": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/riskEntry"
+      }
+    },
+    "coverage_gaps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/coverageGap"
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/requirement"
+      }
+    },
+    "priorities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/priorityEntry"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/evidenceEntry"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/assumptionEntry"
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/unknownEntry"
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/actionEntry"
+      }
+    },
+    "question_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_status",
+        "selected_questions",
+        "deferred_fields"
+      ],
+      "properties": {
+        "question_status": {
+          "type": "string",
+          "enum": [
+            "NOT_NEEDED",
+            "READY_TO_ASK",
+            "WAITING_FOR_USER_RESPONSE",
+            "CONFLICT_CONFIRMATION_REQUIRED"
+          ]
+        },
+        "selected_questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/questionEntry"
+          }
+        },
+        "deferred_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "adapter_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_skill",
+        "consumed_fields"
+      ],
+      "properties": {
+        "source_skill": {
+          "type": "string",
+          "const": "client_intake"
+        },
+        "consumed_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "guardrails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_recommendation_included"
+      ],
+      "properties": {
+        "product_recommendation_included": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    }
+  },
+  "definitions": {
+    "priority": {
+      "type": "string",
+      "enum": [
+        "P0_CRITICAL",
+        "P1_HIGH",
+        "P2_MEDIUM",
+        "P3_LOW"
+      ]
+    },
+    "valueStatus": {
+      "type": "string",
+      "enum": [
+        "KNOWN",
+        "UNKNOWN",
+        "ESTIMATED",
+        "ASSUMED"
+      ]
+    },
+    "requirementType": {
+      "type": "string",
+      "enum": [
+        "medical",
+        "critical_illness",
+        "accident",
+        "life",
+        "savings"
+      ]
+    },
+    "informationGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "importance",
+        "impact",
+        "reason",
+        "gap_type"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "importance": {
+          "$ref": "#/definitions/priority"
+        },
+        "impact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gap_type": {
+          "type": "string",
+          "enum": [
+            "NOT_PROVIDED",
+            "EXPLICIT_UNKNOWN",
+            "CANNOT_INFER",
+            "CONFLICTING_INFORMATION"
+          ]
+        }
+      }
+    },
+    "scopeResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_type",
+        "scope_score",
+        "scope_status",
+        "blocking_fields",
+        "conflict_fields"
+      ],
+      "properties": {
+        "requirement_type": {
+          "$ref": "#/definitions/requirementType"
+        },
+        "scope_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "scope_status": {
+          "type": "string",
+          "enum": [
+            "SUFFICIENT",
+            "PARTIAL",
+            "INSUFFICIENT",
+            "CONFLICTING"
+          ]
+        },
+        "blocking_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "conflict_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "riskEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_type",
+        "risk_exposure",
+        "potential_financial_impact",
+        "existing_protection",
+        "coverage_gap",
+        "priority",
+        "reasoning",
+        "evidence_refs"
+      ],
+      "properties": {
+        "requirement_type": {
+          "$ref": "#/definitions/requirementType"
+        },
+        "risk_exposure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "potential_financial_impact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "existing_protection": {
+          "type": "string",
+          "minLength": 1
+        },
+        "coverage_gap": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "$ref": "#/definitions/priority"
+        },
+        "reasoning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "coverageGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_type",
+        "gap_summary",
+        "priority",
+        "evidence_refs"
+      ],
+      "properties": {
+        "requirement_type": {
+          "$ref": "#/definitions/requirementType"
+        },
+        "gap_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "$ref": "#/definitions/priority"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "requirement_type",
+        "summary",
+        "priority",
+        "boundary"
+      ],
+      "properties": {
+        "requirement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement_type": {
+          "$ref": "#/definitions/requirementType"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "$ref": "#/definitions/priority"
+        },
+        "boundary": {
+          "type": "string",
+          "const": "requirement_only"
+        }
+      }
+    },
+    "priorityEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_id",
+        "priority",
+        "reason"
+      ],
+      "properties": {
+        "target_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "$ref": "#/definitions/priority"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidenceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "fact_refs",
+        "value_status",
+        "reasoning",
+        "conclusion"
+      ],
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fact_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "value_status": {
+          "$ref": "#/definitions/valueStatus"
+        },
+        "reasoning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conclusion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "assumptionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "assumption",
+        "reason"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assumption": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "unknownEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "reason"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "actionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_type",
+        "description"
+      ],
+      "properties": {
+        "action_type": {
+          "type": "string",
+          "enum": [
+            "ask_user",
+            "recheck_sufficiency",
+            "proceed_analysis",
+            "handoff_human_review"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "questionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_id",
+        "field",
+        "question_type",
+        "priority_score",
+        "question",
+        "why_ask",
+        "allow_approximate",
+        "related_requirement_types"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question_type": {
+          "type": "string",
+          "enum": [
+            "gap_fill",
+            "conflict_confirmation"
+          ]
+        },
+        "priority_score": {
+          "type": "number"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_ask": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allow_approximate": {
+          "type": "boolean"
+        },
+        "related_requirement_types": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/requirementType"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,433 @@
+﻿{
+    "run_id":  "regression_20260906_011735",
+    "run_level":  "Level 3",
+    "timestamp":  "2026-09-06 01:17:35",
+    "cases_run":  [
+                      "CASE_001",
+                      "CASE_002",
+                      "CASE_003",
+                      "CASE_004",
+                      "CASE_005",
+                      "CASE_006",
+                      "CASE_007",
+                      "CASE_008"
+                  ],
+    "case_count":  8,
+    "pass_count":  8,
+    "fail_count":  0,
+    "hard_fail_total":  0,
+    "six_dim_avg_total":  30,
+    "cases":  [
+                  {
+                      "case_id":  "CASE_001",
+                      "assertions":  {
+                                         "case_id":  "CASE_001",
+                                         "customer_input_r1":  "我今年35岁，在北京做互联网，收入大概80万。\r\n老婆暂时没工作，有一个4岁的孩子。\r\n房贷还有200万。\r\n之前买过一点保险，但具体记不清了。",
+                                         "assertion_count":  16,
+                                         "must_have":  [
+                                                           "age = 35",
+                                                           "city = 北京",
+                                                           "occupation = 互联网行业",
+                                                           "annual_income = 800000",
+                                                           "spouse employment = 暂时无工作",
+                                                           "child age = 4",
+                                                           "mortgage_balance = 2000000"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "gender = 男",
+                                                               "spouse_age = 任意数字",
+                                                               "产品推荐",
+                                                               "医学判断"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "CLIENT_PROFILE 中写入年龄/城市/职业/收入/家庭/房贷余额",
+                                                                     "CLIENT_PROFILE 中记录商保概况，但不写具体险种"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "CONVERSATION_LOG 新增 Round 1 原文",
+                                                                 "所有本轮新生成的问题均注册 QID"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "PENDING 保持为空"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_001",
+                                   "overview":  {
+                                                    "total_assertions":  16,
+                                                    "passed_assertions":  16,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_002",
+                      "assertions":  {
+                                         "case_id":  "CASE_002",
+                                         "customer_input_r1":  "你好，直接给我推荐个重疾险吧，要性价比高的。\r\n我42岁，在银行上班，一年收入大概50万。",
+                                         "assertion_count":  11,
+                                         "must_have":  [
+                                                           "age = 42",
+                                                           "occupation = 银行 / 金融",
+                                                           "annual_income = 500000",
+                                                           "引导话术：先了解情况再分析"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "具体产品推荐",
+                                                               "方案建议",
+                                                               "再问年龄/职业/收入"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "写入年龄、职业、收入"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "Round 1 原文写入",
+                                                                 "首个问题必须注册 QID"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "无新增"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_002",
+                                   "overview":  {
+                                                    "total_assertions":  11,
+                                                    "passed_assertions":  11,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_003",
+                      "assertions":  {
+                                         "case_id":  "CASE_003",
+                                         "customer_input_r1":  "想了解一下保险，你先说说都有什么类型的？\r\n我38，自己开公司的。",
+                                         "assertion_count":  8,
+                                         "must_have":  [
+                                                           "age = 38",
+                                                           "occupation = 公司创始人 / 企业主",
+                                                           "先解释需要了解情况"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "产品推荐",
+                                                               "直接讨论保险类型优劣"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "写入年龄、职业"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "Round 1 原文写入"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "无新增"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_003",
+                                   "overview":  {
+                                                    "total_assertions":  8,
+                                                    "passed_assertions":  8,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_004",
+                      "assertions":  {
+                                         "case_id":  "CASE_004",
+                                         "customer_input_r1":  "我32，北京的。\r\n收入嘛去年100多，今年估计少点。\r\n老婆30左右吧，具体没问过。\r\n孩子两个，一个小学，一个幼儿园。\r\n房贷反正还有不少。\r\n保险买过，但不知道是不是重疾。\r\n哦对了我去年做过甲状腺检查，应该没什么。",
+                                         "assertion_count":  14,
+                                         "must_have":  [
+                                                           "age = 32",
+                                                           "city = 北京",
+                                                           "last_year_income = 100多万",
+                                                           "spouse_age 模糊记录",
+                                                           "children = 2",
+                                                           "做过甲状腺检查"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "spouse_age = 精确数字",
+                                                               "甲状腺正常",
+                                                               "职业稳定",
+                                                               "风险偏好强"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "写入 confirmed 的基础事实",
+                                                                     "inferred 若出现，必须在白名单内且写 basis"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "Round 1 原文写入"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "无新增，除非客户明确承诺补资料"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_004",
+                                   "overview":  {
+                                                    "total_assertions":  14,
+                                                    "passed_assertions":  14,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_005",
+                      "assertions":  {
+                                         "case_id":  "CASE_005",
+                                         "customer_input_r1":  "我35，北京，收入80万。",
+                                         "assertion_count":  9,
+                                         "must_have":  [
+                                                           "age = 35",
+                                                           "city = 北京",
+                                                           "annual_income = 800000",
+                                                           "至少生成一个 P0 问题",
+                                                           "首个问题主题 = 家庭结构 或 家庭年支出"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "产品推荐"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "写入年龄、城市、收入"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "所有本轮新生成的问题均注册 QID"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "PENDING 保持为空"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_005",
+                                   "overview":  {
+                                                    "total_assertions":  9,
+                                                    "passed_assertions":  9,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_006",
+                      "assertions":  {
+                                         "case_id":  "CASE_006",
+                                         "customer_input_r1":  "我去年收入80万。",
+                                         "assertion_count":  5,
+                                         "must_have":  [
+                                                           "last_year_income = 800000"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "current_year_income = 800000"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "CLIENT_PROFILE 中写入去年收入 = 80万"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "CONVERSATION_LOG 新增 Round 1 原文"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "PENDING 保持为空"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_006",
+                                   "overview":  {
+                                                    "total_assertions":  5,
+                                                    "passed_assertions":  5,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_007",
+                      "assertions":  {
+                                         "case_id":  "CASE_007",
+                                         "customer_input_r1":  "保单我晚点找一下发给你。",
+                                         "assertion_count":  5,
+                                         "must_have":  [
+                                                           "pending: 保单待补"
+                                                       ],
+                                         "must_not_have":  [
+                                                               "新建多个重复 Pending Item"
+                                                           ],
+                                         "must_update_profile":  [
+                                                                     "Profile 不把保单细节写成 confirmed"
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "对应问题状态变为 pending"
+                                                             ],
+                                         "must_update_pending":  [
+                                                                     "创建带 related_qid 的 Pending Item"
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_007",
+                                   "overview":  {
+                                                    "total_assertions":  5,
+                                                    "passed_assertions":  5,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  },
+                  {
+                      "case_id":  "CASE_008",
+                      "assertions":  {
+                                         "case_id":  "CASE_008",
+                                         "customer_input_r1":  "我35岁，北京，收入80万。",
+                                         "assertion_count":  4,
+                                         "must_have":  [
+                                                           "age = 35",
+                                                           "city = 北京",
+                                                           "annual_income = 800000"
+                                                       ],
+                                         "must_not_have":  [
+
+                                                           ],
+                                         "must_update_profile":  [
+
+                                                                 ],
+                                         "must_update_log":  [
+                                                                 "生成 Question Intent = 家庭结构 或 家庭年支出 的 P0 问题"
+                                                             ],
+                                         "must_update_pending":  [
+
+                                                                 ],
+                                         "completion_expect_r1":  "false"
+                                     },
+                      "eval":  {
+                                   "case_id":  "CASE_008",
+                                   "overview":  {
+                                                    "total_assertions":  4,
+                                                    "passed_assertions":  4,
+                                                    "failed_assertions":  0,
+                                                    "hard_fail_count":  0,
+                                                    "hard_fail_hits":  [
+
+                                                                       ],
+                                                    "overall_verdict":  "PASS"
+                                                },
+                                   "grade_6d":  {
+                                                    "Boundary":  5,
+                                                    "StateWriting":  5,
+                                                    "Completion":  5,
+                                                    "QuestionQuality":  5,
+                                                    "Evidence":  5,
+                                                    "Discipline":  5,
+                                                    "Total":  30,
+                                                    "SABCD":  "S"
+                                                }
+                               }
+                  }
+              ]
+}

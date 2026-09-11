@@ -1,0 +1,21 @@
+﻿{
+    "case_id":  "CASE_006",
+    "customer_input_r1":  "我去年收入80万。",
+    "assertion_count":  5,
+    "must_have":  [
+                      "last_year_income = 800000"
+                  ],
+    "must_not_have":  [
+                          "current_year_income = 800000"
+                      ],
+    "must_update_profile":  [
+                                "CLIENT_PROFILE 中写入去年收入 = 80万"
+                            ],
+    "must_update_log":  [
+                            "CONVERSATION_LOG 新增 Round 1 原文"
+                        ],
+    "must_update_pending":  [
+                                "PENDING 保持为空"
+                            ],
+    "completion_expect_r1":  "false"
+}

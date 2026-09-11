@@ -1,0 +1,37 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "01-client-intake/clients/C104-冲突样例/CLIENT_PROFILE.md",
+    "pending_path": "01-client-intake/clients/C104-冲突样例/PENDING.md",
+    "conversation_log_path": "01-client-intake/clients/C104-冲突样例/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": ["life"],
+  "client_profile": {
+    "facts": [
+      { "field": "annual_income", "value": "60万", "value_status": "KNOWN", "source_round": "R2", "source_text": "今年收入60万", "source_section": "Confirmed Facts" },
+      { "field": "family_responsibility", "value": "已婚+1个孩子", "value_status": "KNOWN", "source_round": "R2", "source_text": "已婚有一个孩子", "source_section": "Confirmed Facts" },
+      { "field": "mortgage_balance", "value": "150万", "value_status": "KNOWN", "source_round": "R2", "source_text": "房贷150万", "source_section": "Confirmed Facts" },
+      { "field": "children_info", "value": "1个孩子，5岁", "value_status": "KNOWN", "source_round": "R2", "source_text": "孩子5岁", "source_section": "Confirmed Facts" },
+      { "field": "spouse_income", "value": "20万", "value_status": "KNOWN", "source_round": "R2", "source_text": "老婆收入20万", "source_section": "Confirmed Facts" },
+      { "field": "existing_life_coverage", "value": "已有定寿100万", "value_status": "KNOWN", "source_round": "R3", "source_text": "有100万定寿", "source_section": "Confirmed Facts" }
+    ],
+    "inferred_notes": [],
+    "follow_up_items": [],
+    "handoff_notes": "存在关键冲突字段"
+  },
+  "conflicts": [
+    {
+      "field": "annual_income",
+      "values": ["去年收入80万", "去年收入50万"],
+      "reason": "前后说法不一致",
+      "resolution_status": "UNRESOLVED"
+    }
+  ],
+  "constraints": [],
+  "metadata": {
+    "client_id": "C104",
+    "client_alias": "冲突样例"
+  }
+}

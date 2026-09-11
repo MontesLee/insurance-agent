@@ -1,0 +1,102 @@
+﻿{
+  "version": "v1",
+  "selection": {
+    "max_questions_per_round": 2,
+    "base_priority_scores": {
+      "P0_CRITICAL": 100,
+      "P1_HIGH": 80,
+      "P2_MEDIUM": 55,
+      "P3_LOW": 30
+    },
+    "impact_scores": {
+      "high": 25,
+      "medium": 15,
+      "low": 5
+    },
+    "gap_type_bonus": {
+      "CONFLICTING_INFORMATION": 40,
+      "EXPLICIT_UNKNOWN": 10,
+      "CANNOT_INFER": 5,
+      "NOT_PROVIDED": 0
+    },
+    "difficulty_scores": {
+      "easy": 15,
+      "medium": 8,
+      "hard": 0
+    },
+    "repeat_penalty_per_ask": 20
+  },
+  "field_rules": [
+    {
+      "field": "social_insurance_status",
+      "difficulty": "easy",
+      "allow_approximate": true,
+      "why_ask": "会明显影响医疗需求缺口判断。",
+      "question_templates": [
+        "我现在大致能判断医疗方向了，但还有一个信息会明显影响判断：你目前社保和医保大概是什么状态？不需要很细，大概说一下就行。",
+        "再补一个很关键但很好回答的信息：你现在社保、医保是正常在交吗？有个大概情况就可以。"
+      ]
+    },
+    {
+      "field": "existing_life_coverage",
+      "difficulty": "easy",
+      "allow_approximate": true,
+      "why_ask": "直接影响 life 需求缺口判断。",
+      "question_templates": [
+        "我现在大致能判断你家的保障方向了，但还有一个信息会明显影响寿险缺口判断：你们目前有没有已经配置过寿险？大概保额就可以。",
+        "还有一个很关键的信息想确认下：你现在名下有没有寿险保障？不用找保单，大概保额就行。"
+      ]
+    },
+    {
+      "field": "financial_goals",
+      "difficulty": "medium",
+      "allow_approximate": true,
+      "why_ask": "没有目标就无法判断储蓄需求方向。",
+      "question_templates": [
+        "储蓄类需求我现在还差一个方向性信息：你这笔钱更想解决什么目标？比如教育、养老、长期积累，先说一个大方向就行。",
+        "我想先确认下目标，不然后面储蓄分析会偏：你更希望这部分资金未来主要用于什么？大概说一个重点目标就可以。"
+      ]
+    },
+    {
+      "field": "assets",
+      "difficulty": "medium",
+      "allow_approximate": true,
+      "why_ask": "会影响家庭可承压能力和储蓄分析。",
+      "question_templates": [
+        "我还想补一个会影响判断的重要信息：你们家现在大概有多少可动用资产或存款？给个区间也可以。",
+        "再确认一个财务基础信息：你们现在手上大概有多少存款或比较容易动用的资产？估个范围就行。"
+      ]
+    },
+    {
+      "field": "mortgage_years",
+      "difficulty": "easy",
+      "allow_approximate": true,
+      "why_ask": "会影响寿险责任测算精度，但不是最先阻塞项。",
+      "question_templates": [
+        "顺手再补一个精度信息：房贷大概还要还多少年？估个年限就可以。",
+        "还有一个小信息想顺带确认下：房贷剩余年限大概还有多久？不用特别精确。"
+      ]
+    },
+    {
+      "field": "annual_income",
+      "difficulty": "easy",
+      "allow_approximate": true,
+      "why_ask": "收入口径会直接影响责任和保障缺口判断。",
+      "conflict_template": "我这里发现一个需要你帮我确认的小冲突：你前面关于收入的说法不太一致。现在以哪个数字为准？如果方便的话，直接告诉我最新、最接近真实的口径就行。",
+      "question_templates": [
+        "我想再补一个会影响判断的信息：你目前每年的收入大概是多少？给个大概范围就可以，不需要特别精确。",
+        "为了更准确测算保障缺口，还想跟你确认下：你现在的年收入大概在什么水平？区间也可以，不用很细。"
+      ]
+    },
+    {
+      "field": "budget",
+      "difficulty": "easy",
+      "allow_approximate": true,
+      "why_ask": "会影响分析边界和优先级。",
+      "question_templates": [
+        "还有一个会影响判断边界的信息：你目前能接受的大概预算范围是多少？给个大概数就可以。",
+        "为了避免我判断偏了，还想确认一下预算：你心里大概能接受每年投入多少？区间也可以。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# 调试产物 / 临时文件
+tmp/
+*.log
+
+# DEBUG ONLY 调试脚本（非生产）
+.trae/internal/
+
+# 修复前备份文件（版本历史由 git 管理）
+*.bak-*
+
+# IDE / 系统杂项
+Thumbs.db
+Desktop.ini

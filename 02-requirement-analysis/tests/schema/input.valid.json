@@ -1,0 +1,63 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "01-client-intake/clients/C009-张先生三口之家/CLIENT_PROFILE.md",
+    "pending_path": "01-client-intake/clients/C009-张先生三口之家/PENDING.md",
+    "conversation_log_path": "01-client-intake/clients/C009-张先生三口之家/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": [
+    "medical",
+    "critical_illness",
+    "life"
+  ],
+  "client_profile": {
+    "facts": [
+      {
+        "field": "annual_income",
+        "value": "约 60 万 / 年",
+        "value_status": "KNOWN",
+        "source_round": "R2",
+        "source_text": "年收入大概60万",
+        "source_section": "Confirmed Facts"
+      },
+      {
+        "field": "mortgage_balance",
+        "value": "约 150 万",
+        "value_status": "KNOWN",
+        "source_round": "R2",
+        "source_text": "还有大概150万房贷",
+        "source_section": "Confirmed Facts"
+      }
+    ],
+    "inferred_notes": [
+      {
+        "note": "客户本人收入占家庭总收入较高，家庭存在明显收入依赖。",
+        "basis": "本人收入约 60 万 / 配偶收入约 20 多万",
+        "source_round": "R2"
+      }
+    ],
+    "follow_up_items": [
+      "房贷剩余年限",
+      "社保医保参保状态"
+    ],
+    "handoff_notes": "已完成 Client Intake，可进入需求分析。"
+  },
+  "conflicts": [],
+  "constraints": [
+    {
+      "type": "customer_preference",
+      "description": "客户更关注大病失能风险，身故保障不希望特别高。",
+      "source": "CLIENT_PROFILE handoff / inferred"
+    }
+  ],
+  "metadata": {
+    "client_id": "C009",
+    "client_alias": "张先生三口之家"
+  },
+  "question_context": {
+    "asked_questions": [],
+    "answered_fields": []
+  }
+}

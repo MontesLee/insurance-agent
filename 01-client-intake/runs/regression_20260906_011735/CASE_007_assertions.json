@@ -1,0 +1,21 @@
+﻿{
+    "case_id":  "CASE_007",
+    "customer_input_r1":  "保单我晚点找一下发给你。",
+    "assertion_count":  5,
+    "must_have":  [
+                      "pending: 保单待补"
+                  ],
+    "must_not_have":  [
+                          "新建多个重复 Pending Item"
+                      ],
+    "must_update_profile":  [
+                                "Profile 不把保单细节写成 confirmed"
+                            ],
+    "must_update_log":  [
+                            "对应问题状态变为 pending"
+                        ],
+    "must_update_pending":  [
+                                "创建带 related_qid 的 Pending Item"
+                            ],
+    "completion_expect_r1":  "false"
+}
