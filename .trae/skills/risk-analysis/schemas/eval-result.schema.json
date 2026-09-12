@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "eval-result.schema.json",
+  "title": "RiskAnalysisEvalResult",
+  "description": "独立 Eval 结果。7 项检查（6 + Anti-Sales）全部机检；自然语言断言记 MANUAL 且不计通过。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eval_status", "checks", "failures", "repair_required", "repair_attempts", "max_repair_attempts"],
+  "properties": {
+    "eval_status": { "type": "string", "enum": ["PASS", "FAIL", "NEEDS_REVIEW"] },
+
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completeness",
+        "evidence_grounding",
+        "reasoning_consistency",
+        "separation",
+        "unknown_integrity",
+        "priority_consistency",
+        "anti_sales"
+      ],
+      "properties": {
+        "completeness": { "$ref": "#/definitions/checkResult" },
+        "evidence_grounding": { "$ref": "#/definitions/checkResult" },
+        "reasoning_consistency": { "$ref": "#/definitions/checkResult" },
+        "separation": { "$ref": "#/definitions/checkResult" },
+        "unknown_integrity": { "$ref": "#/definitions/checkResult" },
+        "priority_consistency": { "$ref": "#/definitions/checkResult" },
+        "anti_sales": { "$ref": "#/definitions/checkResult" }
+      }
+    },
+
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/issue" }
+    },
+
+    "repair_required": { "type": "boolean" },
+    "repair_attempts": { "type": "integer", "minimum": 0 },
+    "max_repair_attempts": { "type": "integer", "const": 2 },
+
+    "repair_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt", "failed_codes", "action"],
+        "properties": {
+          "attempt": { "type": "integer", "minimum": 1 },
+          "failed_codes": { "type": "array", "items": { "$ref": "#/definitions/issueCode" } },
+          "action": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+
+    "needs_review_note": {
+      "type": "string",
+      "minLength": 1,
+      "description": "NEEDS_REVIEW 时必须说明：哪些无法可靠判断 / 为什么 / 需要人工确认什么。"
+    }
+  },
+
+  "definitions": {
+    "issueCode": {
+      "type": "string",
+      "enum": [
+        "MISSING_RISK",
+        "UNSUPPORTED_CONCLUSION",
+        "LOGICAL_INCONSISTENCY",
+        "PRODUCT_RECOMMENDATION_LEAK",
+        "UNKNOWN_AS_KNOWN",
+        "PRIORITY_INCONSISTENT",
+        "SALES_BIAS",
+        "INVALID_OUTPUT"
+      ]
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": { "$ref": "#/definitions/issueCode" },
+        "severity": { "type": "string", "enum": ["BLOCKING", "WARNING"] },
+        "risk_id": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "checkResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "score", "issues"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "MANUAL", "NOT_EXECUTED"],
+          "description": "MANUAL 与 NOT_EXECUTED 均不计通过。"
+        },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "issues": { "type": "array", "items": { "$ref": "#/definitions/issue" } },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

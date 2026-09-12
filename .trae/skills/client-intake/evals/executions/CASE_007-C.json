@@ -1,0 +1,151 @@
+{
+  "case_id": "CASE_007-C",
+  "client_dir": "CASE_007-C-Regression",
+  "note": "CASE_007 分支 C：pending -> expired 提醒节奏。R1 公共轮次建 P001；R3/R5 各提醒 1 次（不新建 QID、不重复建 Pending）；R7 第 3 次提醒仍无果 -> P001 自动 expired，Q001 同步 ignored，不再有第 4 次提醒。",
+  "rounds": [
+    {
+      "round": 1,
+      "customer_text": "保单我晚点找一下发给你。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "pending",
+          "reminded": 0,
+          "next": "R3",
+          "memo": "客户主动承诺后续提供，不重复建单"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "pending", "answer": "", "pid": "P001", "last": 1
+        }
+      ],
+      "notes": "客户承诺晚点补保单 -> 建 Pending Item P001 并挂 related_qid=Q001，Q001 状态转 pending，排定首次提醒于 R3。"
+    },
+    {
+      "round": 3,
+      "customer_text": "最近比较忙，先聊别的吧。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "pending",
+          "reminded": 1,
+          "next": "R5",
+          "memo": "第 1 次提醒（R3）：客户表示忙碌，未拒绝也未交付"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "pending", "answer": "", "pid": "P001", "last": 3
+        }
+      ],
+      "notes": "第 1 次提醒：只提醒 P001（reminder_count 1 -> next R5），不开新 QID、不复制 Pending。客户未拒绝，故 Q001 维持 pending 而非 declined。"
+    },
+    {
+      "round": 5,
+      "customer_text": "这个先放一下，咱们继续聊收入和支出。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "pending",
+          "reminded": 2,
+          "next": "R7",
+          "memo": "第 2 次提醒（R5）：客户主动转移话题，仍未提供"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "pending", "answer": "", "pid": "P001", "last": 5
+        }
+      ],
+      "notes": "第 2 次提醒：reminder_count 2 -> next R7。仍未新建 QID，Pending 仍只有 P001 一条。"
+    },
+    {
+      "round": 7,
+      "customer_text": "还是没找到，咱们先继续别的内容吧。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "expired",
+          "reminded": 3,
+          "next": "",
+          "memo": "第 3 次提醒无果 -> 自动 expired，停止提醒；related_qid Q001 同步 ignored"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）", "商保概况（3 次提醒未果，已 expired）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "ignored", "answer": "", "pid": "P001", "last": 7
+        }
+      ],
+      "notes": "第 3 次提醒后客户仍未交付且未明确拒绝 -> 按提醒上限自动 expired（reminder_count 3，next 清空停止提醒），related_qid Q001 同步 ignored。不得发起第 4 次主动提醒，也不得把『没找到』写成『无保单』confirmed。"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+# overlay.yaml 模板（纯 YAML）
+
+# ===== 必填：复制本文件后逐项替换 <...> 占位符 =====
+
+id: <new-insurance-type>     # kebab-case，必须与所在目录名一致
+name: <新险种中文名>
+version: 0.1
+status: draft                # draft | active；新险种一律 draft 起步
+priority: <10-50>            # 越大越优先；建议区间 10-50
+
+triggers:
+  keywords:                  # 客户原话命中任一即候选
+    - <客户会说的口语词1>
+    - <客户会说的口语词2>
+  goal_types:                # 结构化目标类型，与下游 requirement-analysis 对齐
+    - <goal_type_id>
+
+requires_confirm: true       # 命中后是否需客户确认才纳入必填范围
+
+dimensions: intake-dimensions.md
+
+# ===== 架构守卫 =====
+# 仅属于本险种的专有术语。
+# 这些词禁止出现在通用层（SKILL.md / references/ / schemas/）。
+# check-overlay-integrity.ps1 会扫描，命中即报"领域污染"。
+contamination_terms:
+  - <专有术语1>
+  - <专有术语2>
+
+# ===== 边界红线 =====
+# 本险种额外禁止的行为。不要重复通用层已有禁令
+# （产品推荐、保额计算等已全局禁止），只写本险种特有风险点。
+boundary:
+  must_not:
+    - <禁止行为1>
+    - <禁止行为2>

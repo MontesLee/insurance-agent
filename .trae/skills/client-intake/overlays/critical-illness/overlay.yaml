@@ -1,0 +1,38 @@
+id: critical-illness
+name: 重疾险
+version: 0.1
+status: active
+priority: 40
+
+triggers:
+  keywords:
+    - 重疾
+    - 大病
+    - 重大疾病
+    - 癌症
+    - 恶性肿瘤
+    - 确诊即赔
+    - 收入损失
+    - 生个大病
+    - 因病致贫
+  goal_types:
+    - critical_illness
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  - 确诊即赔
+  - 重疾分组
+  - 多次赔付
+  - 轻症
+  - 中症
+  - 保费豁免
+
+boundary:
+  must_not:
+    - 评价客户既往疾病、体检异常的严重程度或预后
+    - 预判核保结论（能否投保、是否加费、是否除外责任）
+    - 建议重疾保额或保费（属方案设计环节）
+    - 把客户自述的病名当作医学诊断结论记录（应记录客户原话）

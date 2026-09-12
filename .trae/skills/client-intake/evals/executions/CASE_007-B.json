@@ -1,0 +1,79 @@
+{
+  "case_id": "CASE_007-B",
+  "client_dir": "CASE_007-B-Regression",
+  "note": "CASE_007 分支 B：pending -> declined。R1 为三分支公共轮次，本分支 R3 客户明确表示不再提供 -> P001 转 declined，Q001 同步 declined，停止提醒且不写入任何 confirmed（『找不到』不等于『没有保单』）。",
+  "rounds": [
+    {
+      "round": 1,
+      "customer_text": "保单我晚点找一下发给你。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "pending",
+          "reminded": 0,
+          "next": "R3",
+          "memo": "客户主动承诺后续提供，不重复建单"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "pending", "answer": "", "pid": "P001", "last": 1
+        }
+      ],
+      "notes": "客户承诺晚点补保单 -> 建 Pending Item P001 并挂 related_qid=Q001，Q001 状态转 pending。本轮仅建 1 条 Pending；收到承诺后不再追加新问题。"
+    },
+    {
+      "round": 3,
+      "customer_text": "我找不到了，先不发了。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "declined",
+          "reminded": 0,
+          "next": "",
+          "memo": "客户 R3 明确表示不再提供，按 declined 关闭并停止提醒；『找不到』不构成『无保单』的事实，Profile 不落 confirmed"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）", "商保概况（客户拒绝提供）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "declined", "answer": "我找不到了，先不发了。", "pid": "P001", "last": 3
+        }
+      ],
+      "notes": "客户明确拒绝 -> P001 置 declined、清空下次提醒，related_qid Q001 同步 declined。拒绝本身不是事实，Profile 不写『无商业保险』；也不再就同一资料追问，改由后续轮次从其他 P0 缺口继续。"
+    }
+  ]
+}

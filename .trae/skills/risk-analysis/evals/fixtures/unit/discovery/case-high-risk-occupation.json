@@ -1,0 +1,448 @@
+﻿{
+  "input_version": "1.0",
+  "client_state": {
+    "client_state_version": "1.0",
+    "source": {
+      "origin_skill": "client-intake",
+      "origin_artifact": "CLIENT_PROFILE.md",
+      "profile_path": "client-intake-data/clients/high-risk-occupation/CLIENT_PROFILE.md",
+      "adapter": "risk-analysis/scripts/build-client-state.ps1",
+      "adapter_version": "1.0",
+      "intake_complete": true
+    },
+    "missing_from_upstream": [
+      {
+        "field": "annual_income",
+        "profile": "financial_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "household_income",
+        "profile": "financial_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "mortgage_balance",
+        "profile": "responsibility_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "liabilities",
+        "profile": "responsibility_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "children_education",
+        "profile": "responsibility_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "elderly_support",
+        "profile": "responsibility_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "family_responsibility",
+        "profile": "responsibility_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      },
+      {
+        "field": "dependents",
+        "profile": "family_profile",
+        "reason": "MISSING_FROM_UPSTREAM: client-intake 未提供"
+      }
+    ],
+    "conflicts": [],
+    "family_profile": {
+      "age": {
+        "value": 41,
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "age"
+          }
+        },
+        "confidence": 1.0
+      },
+      "marital_status": {
+        "value": "已婚",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "marital_status"
+          }
+        },
+        "confidence": 0.9
+      },
+      "children_count": {
+        "value": 2,
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "children_count"
+          }
+        },
+        "confidence": 0.9
+      },
+      "children_info": {
+        "value": "儿子 10 岁、女儿 5 岁",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "children_info"
+          }
+        },
+        "confidence": 0.9
+      },
+      "dependents": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "dependents"
+          }
+        },
+        "confidence": 0.0
+      }
+    },
+    "financial_profile": {
+      "annual_income": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "annual_income"
+          }
+        },
+        "confidence": 0.0
+      },
+      "household_income": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "household_income"
+          }
+        },
+        "confidence": 0.0
+      }
+    },
+    "responsibility_profile": {
+      "mortgage_balance": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "mortgage_balance"
+          }
+        },
+        "confidence": 0.0
+      },
+      "liabilities": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "liabilities"
+          }
+        },
+        "confidence": 0.0
+      },
+      "children_education": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "children_education"
+          }
+        },
+        "confidence": 0.0
+      },
+      "elderly_support": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "elderly_support"
+          }
+        },
+        "confidence": 0.0
+      },
+      "family_responsibility": {
+        "value": null,
+        "status": "UNKNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "family_responsibility"
+          }
+        },
+        "confidence": 0.0
+      }
+    },
+    "existing_protection": {
+      "social_insurance_status": {
+        "value": "城乡居民医保",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "social_insurance_status"
+          }
+        },
+        "confidence": 0.9
+      },
+      "existing_medical_coverage": {
+        "value": 0,
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "existing_medical_coverage"
+          }
+        },
+        "confidence": 0.9
+      },
+      "existing_accident_coverage": {
+        "value": 0,
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "existing_accident_coverage"
+          }
+        },
+        "confidence": 0.9
+      }
+    },
+    "health_profile": {
+      "customer_health": {
+        "value": "健康",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "customer_health"
+          }
+        },
+        "confidence": 0.9
+      }
+    },
+    "employment_profile": {
+      "occupation": {
+        "value": "高空作业施工员（建筑工地）",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "occupation"
+          }
+        },
+        "confidence": 0.9
+      },
+      "employment_type": {
+        "value": "灵活就业",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "employment_type"
+          }
+        },
+        "confidence": 0.9
+      },
+      "income_stability": {
+        "value": "不稳定，按项目结算",
+        "status": "KNOWN",
+        "source": {
+          "layer": "client_state",
+          "origin": {
+            "skill": "client-intake",
+            "field": "income_stability"
+          }
+        },
+        "confidence": 0.9
+      }
+    }
+  },
+  "requirements": [
+    {
+      "requirement_id": "REQ-003",
+      "requirement_type": "accident",
+      "summary": "关注意外伤残风险",
+      "priority": "P1_HIGH",
+      "boundary": "requirement_only"
+    }
+  ],
+  "upstream": {
+    "client_intake": {
+      "provided": true,
+      "intake_complete": true,
+      "profile_path": "client-intake-data/clients/high-risk-occupation/CLIENT_PROFILE.md"
+    },
+    "requirement_analysis": {
+      "provided": true,
+      "analysis_status": "PRELIMINARY",
+      "analysis_scope": [
+        "life",
+        "critical_illness",
+        "accident"
+      ],
+      "output_path": "requirement_analysis/tmp/high-risk-occupation.json",
+      "unknowns": [],
+      "assumptions": []
+    }
+  },
+  "analysis_scope": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+  ],
+  "provenance_index": [
+    {
+      "client_state_field": "family_profile.age",
+      "origin_skill": "client-intake",
+      "origin_field": "age",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "family_profile.marital_status",
+      "origin_skill": "client-intake",
+      "origin_field": "marital_status",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "family_profile.children_count",
+      "origin_skill": "client-intake",
+      "origin_field": "children_count",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "family_profile.children_info",
+      "origin_skill": "client-intake",
+      "origin_field": "children_info",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "family_profile.dependents",
+      "origin_skill": "client-intake",
+      "origin_field": "dependents",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "financial_profile.annual_income",
+      "origin_skill": "client-intake",
+      "origin_field": "annual_income",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "financial_profile.household_income",
+      "origin_skill": "client-intake",
+      "origin_field": "household_income",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "responsibility_profile.mortgage_balance",
+      "origin_skill": "client-intake",
+      "origin_field": "mortgage_balance",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "responsibility_profile.liabilities",
+      "origin_skill": "client-intake",
+      "origin_field": "liabilities",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "responsibility_profile.children_education",
+      "origin_skill": "client-intake",
+      "origin_field": "children_education",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "responsibility_profile.elderly_support",
+      "origin_skill": "client-intake",
+      "origin_field": "elderly_support",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "responsibility_profile.family_responsibility",
+      "origin_skill": "client-intake",
+      "origin_field": "family_responsibility",
+      "status": "UNKNOWN"
+    },
+    {
+      "client_state_field": "existing_protection.social_insurance_status",
+      "origin_skill": "client-intake",
+      "origin_field": "social_insurance_status",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "existing_protection.existing_medical_coverage",
+      "origin_skill": "client-intake",
+      "origin_field": "existing_medical_coverage",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "existing_protection.existing_accident_coverage",
+      "origin_skill": "client-intake",
+      "origin_field": "existing_accident_coverage",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "health_profile.customer_health",
+      "origin_skill": "client-intake",
+      "origin_field": "customer_health",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "employment_profile.occupation",
+      "origin_skill": "client-intake",
+      "origin_field": "occupation",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "employment_profile.employment_type",
+      "origin_skill": "client-intake",
+      "origin_field": "employment_type",
+      "status": "KNOWN"
+    },
+    {
+      "client_state_field": "employment_profile.income_stability",
+      "origin_skill": "client-intake",
+      "origin_field": "income_stability",
+      "status": "KNOWN"
+    }
+  ]
+}

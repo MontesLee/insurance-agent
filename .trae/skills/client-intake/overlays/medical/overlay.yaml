@@ -1,0 +1,40 @@
+id: medical
+name: 医疗险
+version: 0.1
+status: active
+priority: 35
+
+triggers:
+  keywords:
+    - 医疗险
+    - 百万医疗
+    - 住院
+    - 报销
+    - 看病
+    - 医保不够
+    - 特需
+    - 外购药
+    - 门诊
+    - 看病贵
+  goal_types:
+    - medical
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  - 百万医疗
+  - 免赔额
+  - 特需部
+  - 质子重离子
+  - 外购药
+  - 院外药
+  - 续保条件
+
+boundary:
+  must_not:
+    - 评价既往症对未来理赔的影响
+    - 预判核保结论或续保风险
+    - 比较或推荐具体医疗险产品
+    - 解释社保报销比例（属政策科普，越界）

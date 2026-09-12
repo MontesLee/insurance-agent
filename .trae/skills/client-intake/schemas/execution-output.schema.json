@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "client-intake/execution-output.schema.json",
+  "title": "Client Intake Execution Output",
+  "description": "client-intake Skill 每轮执行结果契约（binding）。来源：原 SOP.md §八。由 scripts/validate-execution-output.ps1 校验。",
+  "type": "object",
+  "required": [
+    "round",
+    "source_of_truth",
+    "this_round_updates",
+    "completion_check",
+    "next_questions",
+    "state_write_result"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "round": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "本轮轮次"
+    },
+    "client_id": {
+      "type": "string",
+      "pattern": "^C\\d{3}$",
+      "description": "当前客户编号（多客户并行模式必填）"
+    },
+    "source_of_truth": {
+      "type": "object",
+      "description": "明确下一轮应读哪三份状态文件",
+      "required": ["client_profile", "conversation_log", "pending"],
+      "additionalProperties": false,
+      "properties": {
+        "client_profile": { "type": "string", "minLength": 1 },
+        "conversation_log": { "type": "string", "minLength": 1 },
+        "pending": { "type": "string", "minLength": 1 }
+      }
+    },
+    "this_round_updates": {
+      "type": "object",
+      "required": ["confirmed", "inferred", "missing", "pending"],
+      "additionalProperties": false,
+      "properties": {
+        "confirmed": {
+          "type": "object",
+          "description": "仅本轮新增或被修正的 confirmed"
+        },
+        "inferred": {
+          "type": "array",
+          "description": "本轮新增 inferred，必须写 basis",
+          "items": {
+            "type": "object",
+            "required": ["item", "basis"],
+            "properties": {
+              "item": { "type": "string", "minLength": 1 },
+              "basis": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "missing": {
+          "type": "array",
+          "description": "当前仍阻塞的关键信息",
+          "items": { "type": "string" }
+        },
+        "pending": {
+          "type": "array",
+          "description": "本轮新增或变更的 pending",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "completion_check": {
+      "type": "object",
+      "description": "结束还是继续的流程决策",
+      "required": ["intake_complete", "blocking_items", "follow_up_items"],
+      "additionalProperties": false,
+      "properties": {
+        "intake_complete": { "type": "boolean" },
+        "blocking_items": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "follow_up_items": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "decision_note": { "type": "string" }
+      }
+    },
+    "next_questions": {
+      "type": "array",
+      "description": "若已完成 Intake 可为空数组",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "priority", "question", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^Q\\d{3}$"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2", "P3"]
+          },
+          "question": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "state_write_result": {
+      "type": "object",
+      "description": "三份状态文件是否已写回",
+      "required": ["profile_updated", "conversation_log_updated", "pending_updated"],
+      "additionalProperties": false,
+      "properties": {
+        "profile_updated": { "type": "boolean" },
+        "conversation_log_updated": { "type": "boolean" },
+        "pending_updated": { "type": "boolean" },
+        "index_updated": { "type": "boolean" }
+      }
+    },
+    "notes": { "type": "string", "description": "本轮说明" }
+  },
+  "allOf": [
+    {
+      "comment": "I5：intake_complete=true 时不得再有阻塞项，且不得再生成追问",
+      "if": {
+        "properties": { "completion_check": { "properties": { "intake_complete": { "const": true } } } },
+        "required": ["completion_check"]
+      },
+      "then": {
+        "properties": {
+          "completion_check": {
+            "properties": { "blocking_items": { "maxItems": 0 } }
+          },
+          "next_questions": { "maxItems": 0 }
+        }
+      }
+    },
+    {
+      "comment": "Gate：未完成时必须给出至少一个追问（除非本轮明确选择不追问，此时 notes 需说明）",
+      "if": {
+        "properties": { "completion_check": { "properties": { "intake_complete": { "const": false } } } },
+        "required": ["completion_check"]
+      },
+      "then": {
+        "anyOf": [
+          { "properties": { "next_questions": { "minItems": 1 } } },
+          { "required": ["notes"] }
+        ]
+      }
+    }
+  ]
+}

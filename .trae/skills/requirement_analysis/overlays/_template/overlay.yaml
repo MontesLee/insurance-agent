@@ -1,0 +1,44 @@
+﻿id: <new-domain-id>
+name: <新险种需求>
+version: 0.1
+status: draft
+priority: 10
+
+triggers:
+  keywords:
+    - <关键词1>
+    - <关键词2>
+  goal_types:
+    - <requirement_type>
+
+requires_confirm: false
+
+dimensions: requirement-dimensions.md
+
+contamination_terms:
+  - <险种专有术语1>
+  - <险种专有术语2>
+
+boundary:
+  must_not:
+    - 计算或建议具体保额（属方案设计环节）
+    - 提及任何具体产品名称或费率
+
+analysis:
+  required_fields:
+    - <必填事实字段>
+  evidence_fact_refs:
+    - <证据引用字段>
+  coverage_field: <已有保障字段>
+  need_formula: none
+  priority_rule: coverage_value_sensitive
+  priority_when_no_coverage_info: P1_HIGH
+  priority_when_zero_coverage: P0_CRITICAL
+  priority_when_adequate: P2_MEDIUM
+  priority_when_inadequate: P1_HIGH
+
+texts:
+  risk: "<风险表述>"
+  impact: "<财务影响表述>"
+  gap: "<缺口表述>"
+  reasoning: "<判定理由>"

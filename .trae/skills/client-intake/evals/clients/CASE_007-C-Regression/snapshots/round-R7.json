@@ -1,0 +1,82 @@
+﻿{
+    "round":  7,
+    "case_id":  "CASE_007-C",
+    "source_of_truth":  {
+                            "client_profile":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-C-Regression\\CLIENT_PROFILE.md",
+                            "conversation_log":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-C-Regression\\CONVERSATION_LOG.md",
+                            "pending":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-C-Regression\\PENDING.md"
+                        },
+    "this_round_updates":  {
+                               "confirmed":  [
+
+                                             ],
+                               "inferred":  [
+
+                                            ],
+                               "missing":  [
+                                               "年龄（H1）",
+                                               "城市（H2）",
+                                               "职业（H3）",
+                                               "家庭责任（H4）",
+                                               "收入（H5）",
+                                               "家庭年支出（H6）",
+                                               "商保概况（3 次提醒未果，已 expired）"
+                                           ],
+                               "pending":  [
+                                               {
+                                                   "id":  "P001",
+                                                   "item":  "现有保单资料"
+                                               }
+                                           ]
+                           },
+    "confirmed":  [
+
+                  ],
+    "pending_items":  [
+                          {
+                              "id":  "P001",
+                              "item":  "现有保单资料",
+                              "qid":  "Q001",
+                              "status":  "expired",
+                              "round":  "1",
+                              "reminded":  "3",
+                              "next":  "",
+                              "pm":  "保单我晚点找一下发给你。"
+                          }
+                      ],
+    "qids":  [
+                 {
+                     "id":  "Q001",
+                     "intent":  "商保概况",
+                     "question":  "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+                     "status":  "ignored",
+                     "first":  "1",
+                     "last":  "7",
+                     "pid":  "P001"
+                 }
+             ],
+    "completion_check":  {
+                             "intake_complete":  false,
+                             "blocking_items":  [
+                                                    "年龄（H1）",
+                                                    "城市（H2）",
+                                                    "职业（H3）",
+                                                    "家庭责任（H4）",
+                                                    "收入（H5）",
+                                                    "家庭年支出（H6）",
+                                                    "商保概况（3 次提醒未果，已 expired）"
+                                                ],
+                             "follow_up_items":  [
+
+                                                 ]
+                         },
+    "next_questions":  [
+
+                       ],
+    "state_write_result":  {
+                               "profile_updated":  true,
+                               "conversation_log_updated":  true,
+                               "pending_updated":  true
+                           },
+    "notes":  "第 3 次提醒后客户仍未交付且未明确拒绝 -\u003e 按提醒上限自动 expired（reminder_count 3，next 清空停止提醒），related_qid Q001 同步 ignored。不得发起第 4 次主动提醒，也不得把『没找到』写成『无保单』confirmed。"
+}

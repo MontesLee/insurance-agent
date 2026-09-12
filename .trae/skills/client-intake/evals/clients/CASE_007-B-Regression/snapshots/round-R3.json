@@ -1,0 +1,82 @@
+﻿{
+    "round":  3,
+    "case_id":  "CASE_007-B",
+    "source_of_truth":  {
+                            "client_profile":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-B-Regression\\CLIENT_PROFILE.md",
+                            "conversation_log":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-B-Regression\\CONVERSATION_LOG.md",
+                            "pending":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-B-Regression\\PENDING.md"
+                        },
+    "this_round_updates":  {
+                               "confirmed":  [
+
+                                             ],
+                               "inferred":  [
+
+                                            ],
+                               "missing":  [
+                                               "年龄（H1）",
+                                               "城市（H2）",
+                                               "职业（H3）",
+                                               "家庭责任（H4）",
+                                               "收入（H5）",
+                                               "家庭年支出（H6）",
+                                               "商保概况（客户拒绝提供）"
+                                           ],
+                               "pending":  [
+                                               {
+                                                   "id":  "P001",
+                                                   "item":  "现有保单资料"
+                                               }
+                                           ]
+                           },
+    "confirmed":  [
+
+                  ],
+    "pending_items":  [
+                          {
+                              "id":  "P001",
+                              "item":  "现有保单资料",
+                              "qid":  "Q001",
+                              "status":  "declined",
+                              "round":  "1",
+                              "reminded":  "0",
+                              "next":  "",
+                              "pm":  "保单我晚点找一下发给你。"
+                          }
+                      ],
+    "qids":  [
+                 {
+                     "id":  "Q001",
+                     "intent":  "商保概况",
+                     "question":  "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+                     "status":  "declined",
+                     "first":  "1",
+                     "last":  "3",
+                     "pid":  "P001"
+                 }
+             ],
+    "completion_check":  {
+                             "intake_complete":  false,
+                             "blocking_items":  [
+                                                    "年龄（H1）",
+                                                    "城市（H2）",
+                                                    "职业（H3）",
+                                                    "家庭责任（H4）",
+                                                    "收入（H5）",
+                                                    "家庭年支出（H6）",
+                                                    "商保概况（客户拒绝提供）"
+                                                ],
+                             "follow_up_items":  [
+
+                                                 ]
+                         },
+    "next_questions":  [
+
+                       ],
+    "state_write_result":  {
+                               "profile_updated":  true,
+                               "conversation_log_updated":  true,
+                               "pending_updated":  true
+                           },
+    "notes":  "客户明确拒绝 -\u003e P001 置 declined、清空下次提醒，related_qid Q001 同步 declined。拒绝本身不是事实，Profile 不写『无商业保险』；也不再就同一资料追问，改由后续轮次从其他 P0 缺口继续。"
+}

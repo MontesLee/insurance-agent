@@ -1,4 +1,4 @@
-﻿﻿# Client Intake Skill Regression Script
+﻿# Client Intake Skill Regression Script
 # Usage (PowerShell 5):
 #   Level 0 (init empty client folder only): & .\scripts\run-regression.ps1 -Level 0 -ClientId C001-张三三口之家
 #   Level 1 (single case):   & .\scripts\run-regression.ps1 -CaseId CASE_001
@@ -20,7 +20,7 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $IntakeDir = Join-Path $Root "01-client-intake"
 $ClientsDir = Join-Path $IntakeDir "clients"
-$CaseDir   = Join-Path $Root "test-cases\client-intake"
+$CaseDir   = Join-Path $Root ".trae\skills\client-intake\evals\cases"   # 用例已迁入 Skill（原 test-cases\client-intake）
 $RunsDir   = Join-Path $IntakeDir "runs"
 
 if (-not (Test-Path $ClientsDir)) {
@@ -489,40 +489,61 @@ function Parse-CaseAssertions {
 function Invoke-EvalSingleCase {
     param([hashtable]$Assertions, [string]$CaseId)
 
-    $total  = $Assertions.assertion_count
-    # Gold baseline: all 156+ assertions verified 100% pass in prior runs.
-    $passed = $total
-    $failed = 0
-    $hfCount = 0
-    $hfHits = @()
+    # 真评估：委托 Skill 内的断言驱动执行器。
+    # 旧实现在此写死 $passed = $total / $failed = 0，并按 CaseId 固定 30 分 S 级（"gold baseline 假评估"），已移除。
+    # 现在：可机检断言真判定；不可机检记 MANUAL；Case 未真正执行记 NOT_EXECUTED。三者均不冒充通过。
+    $evalScript = Join-Path $Root ".trae\skills\client-intake\scripts\run-eval.ps1"
+    $caseOutDir = Join-Path $RunDir $CaseId
 
-    $grade = switch ($CaseId) {
-        "CASE_001" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_002" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_003" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_004" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_005" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_006" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_007" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        "CASE_008" { [ordered]@{ Boundary=5; StateWriting=5; Completion=5; QuestionQuality=5; Evidence=5; Discipline=5; Total=30; SABCD="S" } }
-        default   { [ordered]@{ Boundary=3; StateWriting=3; Completion=3; QuestionQuality=3; Evidence=3; Discipline=3; Total=18; SABCD="B" } }
+    if (-not (Test-Path -LiteralPath $evalScript)) {
+        return [ordered]@{
+            case_id  = $CaseId
+            overview = [ordered]@{
+                total_assertions  = $Assertions.assertion_count
+                passed_assertions = 0
+                failed_assertions = 0
+                hard_fail_count   = 0
+                hard_fail_hits    = @("EVAL_SCRIPT_MISSING")
+                overall_verdict   = "FAIL"
+            }
+            grade_6d = $null
+        }
     }
 
-    $overall = "PASS"
-    if ($hfCount -gt 0) { $overall = "FAIL" }
-    if ($failed -gt 0)  { $overall = if ($grade.SABCD -ge "C") {"PASS"} else {"FAIL"} }
+    New-Item -ItemType Directory -Force -Path $caseOutDir | Out-Null
+    & $evalScript -CaseId $CaseId -CaseDir $CaseDir -ClientRoot $ClientsDir -OutDir $caseOutDir | Out-Null
+
+    $verdict = "UNVERIFIED"
+    $passed = 0
+    $failed = 0
+    $summaryFile = Get-ChildItem -LiteralPath $caseOutDir -Recurse -Filter 'eval_summary.json' -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($summaryFile) {
+        try {
+            $sj = Get-Content -LiteralPath $summaryFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+            $c = @($sj.cases | Where-Object { $_.Case -eq $CaseId })
+            if ($c.Count -ge 1) {
+                $passed = [int]$c[0].PASS
+                $failed = [int]$c[0].FAIL
+                $st = [string]$c[0].Status
+                if ($st -eq "NOT_EXECUTED") { $verdict = "NOT_EXECUTED" }
+                elseif ($failed -gt 0)      { $verdict = "FAIL" }
+                else                        { $verdict = "PARTIAL" }
+            }
+        } catch { $verdict = "UNVERIFIED" }
+    }
 
     return [ordered]@{
-        case_id   = $CaseId
-        overview  = [ordered]@{
-            total_assertions  = $total
+        case_id  = $CaseId
+        overview = [ordered]@{
+            total_assertions  = $Assertions.assertion_count
             passed_assertions = $passed
             failed_assertions = $failed
-            hard_fail_count   = $hfCount
-            hard_fail_hits    = $hfHits
-            overall_verdict   = $overall
+            hard_fail_count   = $failed
+            hard_fail_hits    = @()
+            overall_verdict   = $verdict
         }
-        grade_6d  = $grade
+        # 六维评分改由人工/Agent 按 evals/eval-policy.md 判定，脚本不再自动打分
+        grade_6d = $null
     }
 }
 
@@ -570,7 +591,8 @@ function Write-Reports {
         pass_count  = ($Results | Where-Object { $_.eval.overview.overall_verdict -eq "PASS" }).Count
         fail_count  = ($Results | Where-Object { $_.eval.overview.overall_verdict -eq "FAIL" }).Count
         hard_fail_total = ($Results | ForEach-Object { $_.eval.overview.hard_fail_count } | Measure-Object -Sum).Sum
-        six_dim_avg_total = [math]::Round(($Results | ForEach-Object { $_.eval.grade_6d.Total } | Measure-Object -Average).Average, 2)
+        # 六维评分已改为人工/Agent 按 evals/eval-policy.md 判定，脚本不再自动计算均分
+        six_dim_avg_total = 0
         cases = $Results
     }
     $jsonPath = Join-Path $RunDir "regression_report.json"
@@ -593,8 +615,9 @@ function Write-Reports {
     [void]$md.AppendLine("| Overall FAIL | $($resultsJson.fail_count) |")
     [void]$md.AppendLine("| Hard Fail Total | $($resultsJson.hard_fail_total) |")
     [void]$md.AppendLine("| 6-Dim Avg Score | $($resultsJson.six_dim_avg_total) / 30 |")
-    [void]$md.AppendLine("| P0 2/3 (8 Case Coverage) | **PASS** (8/8 = 100%) |")
-    [void]$md.AppendLine("| P0 3/3 (Regression Script Automated) | **PASS** (this script = P0 3/3 delivery) |")
+    $executedCount = @($Results | Where-Object { $_.eval.overview.overall_verdict -ne "NOT_EXECUTED" }).Count
+    $coveragePct = if ($CaseList.Count -gt 0) { [math]::Round(100 * $executedCount / $CaseList.Count, 1) } else { 0 }
+    [void]$md.AppendLine("| 实际执行 Case 数 | $executedCount / $($CaseList.Count)（$coveragePct%）—— NOT_EXECUTED / UNVERIFIED 一律不计为通过 |")
     [void]$md.AppendLine("")
     [void]$md.AppendLine("## Per-Case Results")
     [void]$md.AppendLine("")
@@ -606,15 +629,20 @@ function Write-Reports {
         [void]$md.AppendLine("| $($r.case_id) ($($meta.Name)) | $($meta.Difficulty) | $($meta.Tags -join '/') | $($v.total_assertions) | $($v.passed_assertions) | $($v.failed_assertions) | $($v.hard_fail_count) | $($r.eval.grade_6d.Total) / 30 | **$($r.eval.grade_6d.SABCD)** | **$($v.overall_verdict)** |")
     }
     [void]$md.AppendLine("")
-    [void]$md.AppendLine("## P0 Production Readiness Final Verdict")
+    [void]$md.AppendLine("## Production Readiness 判定（仅依据本次实跑，不引用任何历史基线）")
     [void]$md.AppendLine("")
-    [void]$md.AppendLine("| P0 Item | Status | Evidence |")
-    [void]$md.AppendLine("|---------|--------|----------|")
-    [void]$md.AppendLine("| P0 1/3: 注册入口实跑 + 字段级 Diff 100% | ✅ PASS | `CASE_001_R1_SKILL_ENTRY_execution.json` 与基线 100% 一致 |")
-    [void]$md.AppendLine("| P0 2/3: 8 Case 全量模拟 100% 覆盖 | ✅ PASS | 8/8 Case，156+ 断言，190+ HF 检查点，0 Hard Fail |")
-    [void]$md.AppendLine("| P0 3/3: Level 1-2-3 回归脚本自动化 | ✅ PASS | 本脚本 = `scripts/run-regression.ps1`，支持 L1/L2/L3 三档 + JSON + Markdown 报告 |")
+    [void]$md.AppendLine("| 判定项 | 状态 | 证据 |")
+    [void]$md.AppendLine("|--------|------|------|")
+    [void]$md.AppendLine("| 1. 全部 Case 是否真正执行 | $(if($executedCount -eq $CaseList.Count){'✅'}else{'❌'}) $executedCount/$($CaseList.Count) | 未执行 Case 记 NOT_EXECUTED，其断言记 UNVERIFIED |")
+    [void]$md.AppendLine("| 2. 可机检断言是否全通过 | $(if($resultsJson.fail_count -eq 0){'✅'}else{'❌'}) | PASS=$($resultsJson.pass_count) / FAIL=$($resultsJson.fail_count) |")
+    [void]$md.AppendLine("| 3. 回归脚本自动化 | ✅ | scripts/run-regression.ps1 + Skill 内 scripts/run-eval.ps1（断言驱动，无硬编码通过）|")
     [void]$md.AppendLine("")
-    [void]$md.AppendLine("**P0 三项硬约束 = 3/3 全部 PASS，Production Readiness = READY**")
+    $ready = "NOT_READY"
+    if ($executedCount -eq $CaseList.Count -and $resultsJson.fail_count -eq 0) { $ready = "READY" }
+    [void]$md.AppendLine("**Production Readiness = $ready**")
+    [void]$md.AppendLine("")
+    [void]$md.AppendLine("> 判定规则：全部 Case 真正执行 且 FAIL=0 才判 READY。")
+    [void]$md.AppendLine("> 旧报告中的「gold baseline 100% pass」「P0 3/3 READY」为硬编码声明，已作废，不再作为证据。")
     [void]$md.AppendLine("")
 
     $mdPath = Join-Path $RunDir "REPORT.md"

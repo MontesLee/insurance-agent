@@ -1,0 +1,970 @@
+{
+  "stage": "analysis",
+  "stage_version": "1.0",
+  "rules_version": "1.0",
+  "scoring_method": "risk_scoring_v1",
+  "analysis_status": "PRELIMINARY",
+  "risk_analysis": {
+    "method": "risk_scoring_v1"
+  },
+  "risks": [
+    {
+      "risk_id": "R1-001",
+      "risk_category": "R1",
+      "risk_name": "医疗支出风险",
+      "risk_exists": true,
+      "status": "KNOWN",
+      "trigger": {
+        "event": "家庭成员发生疾病或意外受伤，产生需要家庭自行承担的医疗支出"
+      },
+      "exposure": {
+        "why_exposed": "已确认暴露：已掌握家庭成员基本事实，医疗支出风险对该家庭成立。 放大因素：无商业医疗保障，医保之外的支出缺口需家庭自行承担；已知存在健康异常记录，医疗支出发生概率上升；家庭有未成年子女，医疗事件发生频率通常更高。"
+      },
+      "potential_impact": {
+        "financial": "一次性自付医疗支出约 70.0 万元 元，含社保外用药与器材。",
+        "lifestyle": "治疗期间正常工作与生活节奏被打断，需陪护与交通隐性支出。",
+        "family_responsibility": "若主要收入者患病，原有家庭责任仍需照常履行。"
+      },
+      "impact_estimate": {
+        "amount": 700000,
+        "range": {
+          "low": 490000,
+          "high": 910000
+        },
+        "confidence": 0.6
+      },
+      "existing_resources": {
+        "cash": {
+          "value": null,
+          "status": "UNKNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.assets",
+            "origin": {
+              "skill": "client-intake",
+              "field": "assets"
+            },
+            "status": "UNKNOWN"
+          },
+          "confidence": 0.0,
+          "note": null
+        },
+        "investments": null,
+        "income": {
+          "value": 1000000,
+          "status": "ESTIMATED",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          },
+          "confidence": 0.7,
+          "note": "客户口述家庭年收入约 100 万"
+        },
+        "employer_benefits": {
+          "value": "补充医疗（小额）",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.employer_benefits",
+            "origin": {
+              "skill": "client-intake",
+              "field": "employer_benefits"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "social_security": {
+          "value": "城镇职工医保",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.social_insurance_status",
+            "origin": {
+              "skill": "client-intake",
+              "field": "social_insurance_status"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "existing_insurance": {
+          "value": 0,
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.existing_medical_coverage",
+            "origin": {
+              "skill": "client-intake",
+              "field": "existing_medical_coverage"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "family_support": null
+      },
+      "existing_protection": "现有相关保障：无相关保障；家庭资产未知。",
+      "coverage_assessment": {
+        "protected_amount": null,
+        "unprotected_amount": 700000,
+        "confidence": 0.6,
+        "liquidity_constraint": "剩余暴露超过家庭可动用资产，需外部保障承接。"
+      },
+      "residual_risk": "HIGH",
+      "severity": "MEDIUM",
+      "likelihood": "HIGH",
+      "priority": "P2",
+      "reasoning": "依据 E001、E002、E003、E004、E005、E006、E007，R1 风险成立。经济后果测算约 70.0 万元 元（置信度 0.60）；现有相关保障约 无相关保障 元，剩余暴露约 70.0 万元 元。现有缓冲（未知）使严重度评定为 MEDIUM。",
+      "conclusion": "R1 剩余风险为 HIGH，优先级 P2。当前分析仅到风险层，不涉及具体产品配置。",
+      "reasoning_evidence_refs": [
+        "E001",
+        "E002",
+        "E003",
+        "E004",
+        "E005",
+        "E006",
+        "E007"
+      ],
+      "evidence": [
+        {
+          "evidence_id": "E001",
+          "fact": "年龄：35",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.age",
+            "origin": {
+              "skill": "client-intake",
+              "field": "age"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E002",
+          "fact": "性别：男",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.gender",
+            "origin": {
+              "skill": "client-intake",
+              "field": "gender"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E003",
+          "fact": "婚姻状况：已婚",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.marital_status",
+            "origin": {
+              "skill": "client-intake",
+              "field": "marital_status"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E004",
+          "fact": "子女数量：1",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.children_count",
+            "origin": {
+              "skill": "client-intake",
+              "field": "children_count"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E005",
+          "fact": "常住城市：北京",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.city",
+            "origin": {
+              "skill": "client-intake",
+              "field": "city"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E006",
+          "fact": "已有商业医疗保障：0",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.existing_medical_coverage",
+            "origin": {
+              "skill": "client-intake",
+              "field": "existing_medical_coverage"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E007",
+          "fact": "健康状况：轻度脂肪肝",
+          "source": {
+            "layer": "client_state",
+            "field": "health_profile.customer_health",
+            "origin": {
+              "skill": "client-intake",
+              "field": "customer_health"
+            },
+            "status": "KNOWN"
+          }
+        }
+      ],
+      "assumptions": [],
+      "unknowns": [],
+      "next_information_needed": []
+    },
+    {
+      "risk_id": "R2-001",
+      "risk_category": "R2",
+      "risk_name": "重疾收入中断风险",
+      "risk_exists": true,
+      "status": "ESTIMATED",
+      "trigger": {
+        "event": "家庭主要收入者确诊重大疾病，治疗与康复期间无法正常工作"
+      },
+      "exposure": {
+        "why_exposed": "已确认暴露：存在可被中断的收入来源（本人年收入或家庭年收入 > 0）。 放大因素：存在持续刚性责任（房贷/教育/赡养），收入中断后果被放大；已知存在健康异常记录；有需要抚养的子女，责任期限拉长。"
+      },
+      "potential_impact": {
+        "financial": "主要收入者确诊重疾后收入中断（或部分中断）约 3 年，叠加康复护理支出约 210.0 万元 元。",
+        "lifestyle": "长期治疗与康复压缩家庭可支配时间与生活质量。",
+        "family_responsibility": "原定房贷、子女教育与老人赡养等刚性责任不因病而减少。"
+      },
+      "impact_estimate": {
+        "amount": 2100000,
+        "range": {
+          "low": 1470000,
+          "high": 2730000
+        },
+        "confidence": 0.6
+      },
+      "existing_resources": {
+        "cash": {
+          "value": null,
+          "status": "UNKNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.assets",
+            "origin": {
+              "skill": "client-intake",
+              "field": "assets"
+            },
+            "status": "UNKNOWN"
+          },
+          "confidence": 0.0,
+          "note": null
+        },
+        "investments": null,
+        "income": {
+          "value": 1000000,
+          "status": "ESTIMATED",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          },
+          "confidence": 0.7,
+          "note": "客户口述家庭年收入约 100 万"
+        },
+        "employer_benefits": {
+          "value": "补充医疗（小额）",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.employer_benefits",
+            "origin": {
+              "skill": "client-intake",
+              "field": "employer_benefits"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "social_security": {
+          "value": "城镇职工医保",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.social_insurance_status",
+            "origin": {
+              "skill": "client-intake",
+              "field": "social_insurance_status"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "existing_insurance": {
+          "value": 500000,
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.existing_critical_illness_coverage",
+            "origin": {
+              "skill": "client-intake",
+              "field": "existing_critical_illness_coverage"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "family_support": null
+      },
+      "existing_protection": "现有相关保障：50.0 万元；家庭资产未知。",
+      "coverage_assessment": {
+        "protected_amount": 500000,
+        "unprotected_amount": 1600000,
+        "confidence": 0.6,
+        "liquidity_constraint": "剩余暴露超过家庭可动用资产，需外部保障承接。"
+      },
+      "residual_risk": "HIGH",
+      "severity": "HIGH",
+      "likelihood": "MEDIUM",
+      "priority": "P2",
+      "reasoning": "依据 E004、E007、E008、E009、E010、E011，R2 风险成立。经济后果测算约 210.0 万元 元（置信度 0.60）；现有相关保障约 50.0 万元 元，剩余暴露约 160.0 万元 元。现有缓冲（未知）使严重度评定为 HIGH。",
+      "conclusion": "R2 剩余风险为 HIGH，优先级 P2。当前分析仅到风险层，不涉及具体产品配置。",
+      "reasoning_evidence_refs": [
+        "E008",
+        "E009",
+        "E010",
+        "E011",
+        "E007",
+        "E004",
+        "REQ-002"
+      ],
+      "evidence": [
+        {
+          "evidence_id": "E004",
+          "fact": "子女数量：1",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.children_count",
+            "origin": {
+              "skill": "client-intake",
+              "field": "children_count"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E007",
+          "fact": "健康状况：轻度脂肪肝",
+          "source": {
+            "layer": "client_state",
+            "field": "health_profile.customer_health",
+            "origin": {
+              "skill": "client-intake",
+              "field": "customer_health"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E008",
+          "fact": "本人年收入：600000",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.annual_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "annual_income"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E009",
+          "fact": "家庭年收入：1000000",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E010",
+          "fact": "房贷余额：1500000",
+          "source": {
+            "layer": "client_state",
+            "field": "responsibility_profile.mortgage_balance",
+            "origin": {
+              "skill": "client-intake",
+              "field": "mortgage_balance"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E011",
+          "fact": "子女教育规划：计划国内读完大学，预算约 80 万",
+          "source": {
+            "layer": "client_state",
+            "field": "responsibility_profile.children_education",
+            "origin": {
+              "skill": "client-intake",
+              "field": "children_education"
+            },
+            "status": "ESTIMATED"
+          }
+        }
+      ],
+      "assumptions": [
+        {
+          "field": "annual_income",
+          "assumption": "当前取值：600000",
+          "reason": "客户口述本人年收入约 60 万"
+        },
+        {
+          "field": "household_income",
+          "assumption": "当前取值：1000000",
+          "reason": "客户口述家庭年收入约 100 万"
+        },
+        {
+          "field": "mortgage_balance",
+          "assumption": "当前取值：1500000",
+          "reason": "客户口述房贷剩余约 150 万"
+        },
+        {
+          "field": "children_education",
+          "assumption": "当前取值：计划国内读完大学，预算约 80 万",
+          "reason": "客户初步估计"
+        }
+      ],
+      "unknowns": [],
+      "next_information_needed": []
+    },
+    {
+      "risk_id": "R3-001",
+      "risk_category": "R3",
+      "risk_name": "意外失能风险",
+      "risk_exists": true,
+      "status": "ESTIMATED",
+      "trigger": {
+        "event": "意外或疾病导致伤残 / 失能，长期或永久丧失部分收入能力"
+      },
+      "exposure": {
+        "why_exposed": "已确认暴露：存在可因伤残而丧失的收入能力。 放大因素：无意外 / 伤残保障，失能后缺少直接对冲；存在持续刚性责任，失能后果被放大；无商业医疗保障，伤残相关的医疗与康复支出需自行承担。"
+      },
+      "potential_impact": {
+        "financial": "意外或疾病致伤残失能后收入能力长期下降，经济缺口约 210.0 万元 元。",
+        "lifestyle": "失能带来的长期照护与生活方式改变，影响周期通常长于重疾。",
+        "family_responsibility": "家庭刚性责任在收入能力下降期间仍需履行。"
+      },
+      "impact_estimate": {
+        "amount": 2100000,
+        "range": {
+          "low": 1470000,
+          "high": 2730000
+        },
+        "confidence": 0.6
+      },
+      "existing_resources": {
+        "cash": {
+          "value": null,
+          "status": "UNKNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.assets",
+            "origin": {
+              "skill": "client-intake",
+              "field": "assets"
+            },
+            "status": "UNKNOWN"
+          },
+          "confidence": 0.0,
+          "note": null
+        },
+        "investments": null,
+        "income": {
+          "value": 1000000,
+          "status": "ESTIMATED",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          },
+          "confidence": 0.7,
+          "note": "客户口述家庭年收入约 100 万"
+        },
+        "employer_benefits": {
+          "value": "补充医疗（小额）",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.employer_benefits",
+            "origin": {
+              "skill": "client-intake",
+              "field": "employer_benefits"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "social_security": {
+          "value": "城镇职工医保",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.social_insurance_status",
+            "origin": {
+              "skill": "client-intake",
+              "field": "social_insurance_status"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "existing_insurance": {
+          "value": 0,
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.existing_accident_coverage",
+            "origin": {
+              "skill": "client-intake",
+              "field": "existing_accident_coverage"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "family_support": null
+      },
+      "existing_protection": "现有相关保障：无相关保障；家庭资产未知。",
+      "coverage_assessment": {
+        "protected_amount": null,
+        "unprotected_amount": 2100000,
+        "confidence": 0.6,
+        "liquidity_constraint": "剩余暴露超过家庭可动用资产，需外部保障承接。"
+      },
+      "residual_risk": "HIGH",
+      "severity": "HIGH",
+      "likelihood": "MEDIUM",
+      "priority": "P2",
+      "reasoning": "依据 E006、E008、E009、E010、E011、E012，R3 风险成立。经济后果测算约 210.0 万元 元（置信度 0.60）；现有相关保障约 无相关保障 元，剩余暴露约 210.0 万元 元。现有缓冲（未知）使严重度评定为 HIGH。",
+      "conclusion": "R3 剩余风险为 HIGH，优先级 P2。当前分析仅到风险层，不涉及具体产品配置。",
+      "reasoning_evidence_refs": [
+        "E008",
+        "E009",
+        "E012",
+        "E010",
+        "E011",
+        "E006"
+      ],
+      "evidence": [
+        {
+          "evidence_id": "E006",
+          "fact": "已有商业医疗保障：0",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.existing_medical_coverage",
+            "origin": {
+              "skill": "client-intake",
+              "field": "existing_medical_coverage"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E008",
+          "fact": "本人年收入：600000",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.annual_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "annual_income"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E009",
+          "fact": "家庭年收入：1000000",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E010",
+          "fact": "房贷余额：1500000",
+          "source": {
+            "layer": "client_state",
+            "field": "responsibility_profile.mortgage_balance",
+            "origin": {
+              "skill": "client-intake",
+              "field": "mortgage_balance"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E011",
+          "fact": "子女教育规划：计划国内读完大学，预算约 80 万",
+          "source": {
+            "layer": "client_state",
+            "field": "responsibility_profile.children_education",
+            "origin": {
+              "skill": "client-intake",
+              "field": "children_education"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E012",
+          "fact": "已有意外/伤残保障保额：0",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.existing_accident_coverage",
+            "origin": {
+              "skill": "client-intake",
+              "field": "existing_accident_coverage"
+            },
+            "status": "KNOWN"
+          }
+        }
+      ],
+      "assumptions": [
+        {
+          "field": "annual_income",
+          "assumption": "当前取值：600000",
+          "reason": "客户口述本人年收入约 60 万"
+        },
+        {
+          "field": "household_income",
+          "assumption": "当前取值：1000000",
+          "reason": "客户口述家庭年收入约 100 万"
+        },
+        {
+          "field": "mortgage_balance",
+          "assumption": "当前取值：1500000",
+          "reason": "客户口述房贷剩余约 150 万"
+        },
+        {
+          "field": "children_education",
+          "assumption": "当前取值：计划国内读完大学，预算约 80 万",
+          "reason": "客户初步估计"
+        }
+      ],
+      "unknowns": [],
+      "next_information_needed": []
+    },
+    {
+      "risk_id": "R5-001",
+      "risk_category": "R5",
+      "risk_name": "长期财务风险",
+      "risk_exists": true,
+      "status": "ESTIMATED",
+      "trigger": {
+        "event": "养老、子女教育或其他长期财务目标在既定时间内无法达成"
+      },
+      "exposure": {
+        "why_exposed": "已确认暴露：存在可用于长期积累的收入基数；已知年龄，存在可衡量的长期时间跨度；存在明确的子女教育财务目标。"
+      },
+      "potential_impact": {
+        "financial": "养老、子女教育等长期财务目标在既定时间内存在约 80.0 万元 元的达成缺口。",
+        "lifestyle": "退休后生活水平或教育计划可能被迫降级。",
+        "family_responsibility": "长期储蓄被各类风险事件侵蚀，削弱代际支持能力。"
+      },
+      "impact_estimate": {
+        "amount": 800000,
+        "range": {
+          "low": 560000,
+          "high": 1040000
+        },
+        "confidence": 0.6
+      },
+      "existing_resources": {
+        "cash": {
+          "value": null,
+          "status": "UNKNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.assets",
+            "origin": {
+              "skill": "client-intake",
+              "field": "assets"
+            },
+            "status": "UNKNOWN"
+          },
+          "confidence": 0.0,
+          "note": null
+        },
+        "investments": null,
+        "income": {
+          "value": 1000000,
+          "status": "ESTIMATED",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          },
+          "confidence": 0.7,
+          "note": "客户口述家庭年收入约 100 万"
+        },
+        "employer_benefits": {
+          "value": "补充医疗（小额）",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.employer_benefits",
+            "origin": {
+              "skill": "client-intake",
+              "field": "employer_benefits"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "social_security": {
+          "value": "城镇职工医保",
+          "status": "KNOWN",
+          "source": {
+            "layer": "client_state",
+            "field": "existing_protection.social_insurance_status",
+            "origin": {
+              "skill": "client-intake",
+              "field": "social_insurance_status"
+            },
+            "status": "KNOWN"
+          },
+          "confidence": 0.9,
+          "note": null
+        },
+        "existing_insurance": null,
+        "family_support": null
+      },
+      "existing_protection": "现有相关保障：无相关保障；家庭资产未知。",
+      "coverage_assessment": {
+        "protected_amount": null,
+        "unprotected_amount": 800000,
+        "confidence": 0.6,
+        "liquidity_constraint": "剩余暴露超过家庭可动用资产，需外部保障承接。"
+      },
+      "residual_risk": "HIGH",
+      "severity": "MEDIUM",
+      "likelihood": "HIGH",
+      "priority": "P3",
+      "reasoning": "依据 E001、E008、E009、E011，R5 风险成立。经济后果测算约 80.0 万元 元（置信度 0.60）；现有相关保障约 无相关保障 元，剩余暴露约 80.0 万元 元。现有缓冲（未知）使严重度评定为 MEDIUM。",
+      "conclusion": "R5 剩余风险为 HIGH，优先级 P3。当前分析仅到风险层，不涉及具体产品配置。",
+      "reasoning_evidence_refs": [
+        "E008",
+        "E009",
+        "E001",
+        "E011"
+      ],
+      "evidence": [
+        {
+          "evidence_id": "E001",
+          "fact": "年龄：35",
+          "source": {
+            "layer": "client_state",
+            "field": "family_profile.age",
+            "origin": {
+              "skill": "client-intake",
+              "field": "age"
+            },
+            "status": "KNOWN"
+          }
+        },
+        {
+          "evidence_id": "E008",
+          "fact": "本人年收入：600000",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.annual_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "annual_income"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E009",
+          "fact": "家庭年收入：1000000",
+          "source": {
+            "layer": "client_state",
+            "field": "financial_profile.household_income",
+            "origin": {
+              "skill": "client-intake",
+              "field": "household_income"
+            },
+            "status": "ESTIMATED"
+          }
+        },
+        {
+          "evidence_id": "E011",
+          "fact": "子女教育规划：计划国内读完大学，预算约 80 万",
+          "source": {
+            "layer": "client_state",
+            "field": "responsibility_profile.children_education",
+            "origin": {
+              "skill": "client-intake",
+              "field": "children_education"
+            },
+            "status": "ESTIMATED"
+          }
+        }
+      ],
+      "assumptions": [
+        {
+          "field": "annual_income",
+          "assumption": "当前取值：600000",
+          "reason": "客户口述本人年收入约 60 万"
+        },
+        {
+          "field": "household_income",
+          "assumption": "当前取值：1000000",
+          "reason": "客户口述家庭年收入约 100 万"
+        },
+        {
+          "field": "children_education",
+          "assumption": "当前取值：计划国内读完大学，预算约 80 万",
+          "reason": "客户初步估计"
+        }
+      ],
+      "unknowns": [],
+      "next_information_needed": []
+    }
+  ],
+  "risk_matrix": [
+    {
+      "risk_id": "R1-001",
+      "risk_category": "R1",
+      "severity": "MEDIUM",
+      "likelihood": "HIGH",
+      "residual_risk": "HIGH",
+      "priority": "P2"
+    },
+    {
+      "risk_id": "R2-001",
+      "risk_category": "R2",
+      "severity": "HIGH",
+      "likelihood": "MEDIUM",
+      "residual_risk": "HIGH",
+      "priority": "P2"
+    },
+    {
+      "risk_id": "R3-001",
+      "risk_category": "R3",
+      "severity": "HIGH",
+      "likelihood": "MEDIUM",
+      "residual_risk": "HIGH",
+      "priority": "P2"
+    },
+    {
+      "risk_id": "R5-001",
+      "risk_category": "R5",
+      "severity": "MEDIUM",
+      "likelihood": "HIGH",
+      "residual_risk": "HIGH",
+      "priority": "P3"
+    }
+  ],
+  "top_priorities": [
+    {
+      "risk_id": "R4-001",
+      "priority": "P2",
+      "reason": "剩余风险 HIGH、严重度 CRITICAL、发生概率 LOW。"
+    },
+    {
+      "risk_id": "R5-001",
+      "priority": "P3",
+      "reason": "剩余风险 HIGH、严重度 MEDIUM、发生概率 HIGH。"
+    },
+    {
+      "risk_id": "R3-001",
+      "priority": "P2",
+      "reason": "剩余风险 HIGH、严重度 HIGH、发生概率 MEDIUM。"
+    },
+    {
+      "risk_id": "R1-001",
+      "priority": "P2",
+      "reason": "剩余风险 HIGH、严重度 MEDIUM、发生概率 HIGH。"
+    },
+    {
+      "risk_id": "R2-001",
+      "priority": "P2",
+      "reason": "剩余风险 HIGH、严重度 HIGH、发生概率 MEDIUM。"
+    }
+  ],
+  "family_risk_overview": "本次分析覆盖 R1/R2/R3/R4/R5。已识别风险：R1/R2/R3/R4/R5；不成立：无；信息不足待澄清：无。整体分析状态：PRELIMINARY。最高优先级风险：R4-001(P2)、R5-001(P3)、R3-001(P2)、R1-001(P2)、R2-001(P2)。",
+  "unknowns": [],
+  "assumptions": [
+    {
+      "field": "annual_income",
+      "assumption": "当前取值：600000",
+      "reason": "客户口述本人年收入约 60 万"
+    },
+    {
+      "field": "household_income",
+      "assumption": "当前取值：1000000",
+      "reason": "客户口述家庭年收入约 100 万"
+    },
+    {
+      "field": "mortgage_balance",
+      "assumption": "当前取值：1500000",
+      "reason": "客户口述房贷剩余约 150 万"
+    },
+    {
+      "field": "children_education",
+      "assumption": "当前取值：计划国内读完大学，预算约 80 万",
+      "reason": "客户初步估计"
+    }
+  ],
+  "next_information_needed": [],
+  "guardrails": {
+    "product_recommendation_included": false,
+    "sales_language_detected": false,
+    "layer_note": "risk_analysis 层 · analysis 阶段：仅量化风险与优先级，不涉及任何保险产品建议。"
+  }
+}

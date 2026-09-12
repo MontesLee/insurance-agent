@@ -1,0 +1,49 @@
+﻿id: medical
+name: 医疗需求
+version: 0.1
+status: active
+priority: 35
+
+triggers:
+  keywords:
+    - 医疗
+    - 住院
+    - 看病
+    - 社保
+  goal_types:
+    - medical
+
+requires_confirm: false
+
+dimensions: requirement-dimensions.md
+
+contamination_terms:
+  - 百万医疗
+  - 免赔额
+  - 报销比例
+  - 特药责任
+
+boundary:
+  must_not:
+    - 计算或建议医疗保额或报销额度
+    - 评价社保待遇高低
+
+analysis:
+  required_fields:
+    - customer_health
+  evidence_fact_refs:
+    - customer_health
+    - social_insurance_status
+    - existing_medical_coverage
+  coverage_field: existing_medical_coverage
+  need_formula: none
+  priority_rule: medical_gate
+  priority_when_gate_satisfied: P2_MEDIUM
+  priority_when_gate_unsatisfied: P1_HIGH
+
+texts:
+  risk: "Household may face medical reimbursement and treatment cost exposure."
+  impact: "Medical costs and out-of-pocket treatment burden may pressure household cash flow."
+  impact_unknown: "UNKNOWN: social insurance status is not clear, so self-pay exposure cannot be judged precisely."
+  gap: "Need to clarify and evaluate medical protection adequacy before formal product-level discussion."
+  reasoning: "Known health information suggests medical protection should be reviewed. Existing protection and social insurance status directly affect the likely reimbursement gap."

@@ -1,0 +1,94 @@
+{
+  "case_id": "CASE_007-A",
+  "client_dir": "CASE_007-A-Regression",
+  "note": "CASE_007 分支 A：pending -> received。R1 为三分支公共轮次（客户承诺补保单 -> 建 Pending 并挂 QID），本分支 R3 客户提供保单照片 -> P001 转 received，Q001 同步 answered。",
+  "rounds": [
+    {
+      "round": 1,
+      "customer_text": "保单我晚点找一下发给你。",
+      "confirmed": [],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "pending",
+          "reminded": 0,
+          "next": "R3",
+          "memo": "客户主动承诺后续提供，不重复建单"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "pending", "answer": "", "pid": "P001", "last": 1
+        }
+      ],
+      "notes": "客户承诺晚点补保单 -> 不把『有待补资料』写成 confirmed，改为建 Pending Item P001 并挂 related_qid=Q001，Q001 状态转 pending。本轮仅建 1 条 Pending，不重复建单；收到承诺后本轮不再追加新问题，避免打断客户。"
+    },
+    {
+      "round": 3,
+      "customer_text": "这是保单照片，你先看一下。",
+      "confirmed": [
+        { "s": "1.4", "f": "商保概况", "k": "existing_insurance", "v": "已有商业保单（客户 R3 提供保单照片；具体险种与保额待核对）", "t": "这是保单照片，你先看一下。" }
+      ],
+      "inferred": [],
+      "pending": [
+        {
+          "id": "P001",
+          "item": "现有保单资料",
+          "qid": "Q001",
+          "pm": "保单我晚点找一下发给你。",
+          "round": 1,
+          "status": "received",
+          "reminded": 0,
+          "next": "",
+          "memo": "客户 R3 已提供保单照片，Pending 关闭；具体险种与保额转由 Q002 跟进"
+        }
+      ],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "未满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任（H4）", "收入（H5）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [
+        {
+          "id": "Q002",
+          "p": "P1",
+          "intent": "商保明细",
+          "q": "照片收到了，谢谢。再确认一下：这份保单是什么险种、保额大概多少？",
+          "reason": "P001 已 received，资料缺口从『有没有保单』细化为『险种与保额』，开新 QID 跟进"
+        }
+      ],
+      "qids": [
+        {
+          "id": "Q001", "p": "P1", "intent": "商保概况",
+          "q": "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+          "first": 1, "status": "answered", "answer": "这是保单照片，你先看一下。", "pid": "P001", "last": 3
+        },
+        {
+          "id": "Q002", "p": "P1", "intent": "商保明细",
+          "q": "照片收到了，谢谢。再确认一下：这份保单是什么险种、保额大概多少？",
+          "first": 3, "status": "unanswered", "answer": "", "pid": "", "last": 3
+        }
+      ],
+      "notes": "资料已到手 -> P001 状态置 received，related_qid Q001 同步 answered，提醒计数清零、不再排下次提醒；同时把剩余缺口（险种/保额）开成新 QID Q002 继续跟进。"
+    }
+  ]
+}

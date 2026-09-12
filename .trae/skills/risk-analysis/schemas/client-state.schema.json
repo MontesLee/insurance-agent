@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "client-state.schema.json",
+  "title": "CanonicalClientState",
+  "description": "规范化的客户事实层（唯一事实源）。由 client-intake 的 CLIENT_PROFILE.md 经 risk-analysis 的 client-state adapter 生成。下游所有 Skill 引用 client_state.<profile>.<field>，不得直接引用上游 Skill 字段。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "client_state_version",
+    "source",
+    "family_profile",
+    "financial_profile",
+    "responsibility_profile",
+    "existing_protection",
+    "health_profile",
+    "employment_profile",
+    "missing_from_upstream",
+    "conflicts"
+  ],
+  "properties": {
+    "client_state_version": { "type": "string", "const": "1.0" },
+
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin_skill", "origin_artifact", "profile_path", "adapter", "adapter_version", "intake_complete"],
+      "properties": {
+        "origin_skill": { "type": "string", "const": "client-intake" },
+        "origin_artifact": { "type": "string", "minLength": 1 },
+        "profile_path": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 },
+        "adapter_version": { "type": "string", "minLength": 1 },
+        "intake_complete": { "type": "boolean" }
+      }
+    },
+
+    "family_profile":         { "$ref": "#/definitions/profile" },
+    "financial_profile":      { "$ref": "#/definitions/profile" },
+    "responsibility_profile": { "$ref": "#/definitions/profile" },
+    "existing_protection":    { "$ref": "#/definitions/profile" },
+    "health_profile":         { "$ref": "#/definitions/profile" },
+    "employment_profile":     { "$ref": "#/definitions/profile" },
+
+    "missing_from_upstream": {
+      "type": "array",
+      "description": "上游完全未提供该字段（MISSING_FROM_UPSTREAM）。不得反向给上游加字段。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "profile", "reason"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "profile": { "$ref": "#/definitions/profileName" },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+
+    "conflicts": {
+      "type": "array",
+      "description": "同一字段在上游出现不一致取值。保留 UNKNOWN 并列出候选值，不得自行择一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "candidate_values", "reason"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "candidate_values": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "profileName": {
+      "type": "string",
+      "enum": ["family_profile", "financial_profile", "responsibility_profile", "existing_protection", "health_profile", "employment_profile"]
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED"],
+      "description": "五态。INFERRED 只允许由消费方 Skill 自身推导产生，上游透传字段不得标 INFERRED。"
+    },
+
+    "originSkill": {
+      "type": "string",
+      "enum": ["client-intake", "requirement-analysis", "unknown"]
+    },
+
+    "factValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "status", "source", "confidence"],
+      "properties": {
+        "value": {
+          "description": "UNKNOWN 时必须为 null。",
+          "anyOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "null" }
+          ]
+        },
+        "status": { "$ref": "#/definitions/status" },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["layer", "origin"],
+          "properties": {
+            "layer": { "type": "string", "const": "client_state" },
+            "origin": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["skill", "field"],
+              "properties": {
+                "skill": { "$ref": "#/definitions/originSkill" },
+                "field": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "note": { "type": "string", "minLength": 1 }
+      },
+      "if": {
+        "properties": { "status": { "enum": ["ESTIMATED", "ASSUMED", "INFERRED"] } }
+      },
+      "then": {
+        "required": ["value", "status", "source", "confidence", "note"],
+        "description": "ESTIMATED / ASSUMED / INFERRED 必须写明依据，否则 Eval 判 UNKNOWN_INTEGRITY FAIL。"
+      },
+      "else": {
+        "if": { "properties": { "status": { "const": "UNKNOWN" } } },
+        "then": { "properties": { "value": { "const": null } } }
+      }
+    },
+
+    "profile": {
+      "type": "object",
+      "description": "字段名一律 snake_case。上游词表外的字段不丢弃，原样保留并在 note 标注 unmapped_original_field=<原名>。",
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*$": { "$ref": "#/definitions/factValue" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

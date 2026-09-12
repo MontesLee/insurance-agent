@@ -1,0 +1,60 @@
+﻿id: life
+name: 寿险需求
+version: 0.1
+status: active
+priority: 45
+
+triggers:
+  keywords:
+    - 寿险
+    - 身故
+    - 家庭责任
+    - 房贷
+    - 顶梁柱
+  goal_types:
+    - life
+
+requires_confirm: false
+
+dimensions: requirement-dimensions.md
+
+contamination_terms:
+  - 定寿
+  - 全残责任
+  - 保额缺口
+  - 家庭责任缺口
+  - 寿险保额
+
+boundary:
+  must_not:
+    - 计算或建议寿险保额（属方案设计环节）
+    - 评价家庭责任轻重
+    - 指定或建议受益人（只记录客户意向）
+
+analysis:
+  required_fields:
+    - annual_income
+    - family_responsibility
+    - mortgage_balance
+    - children_info
+    - spouse_income
+  evidence_fact_refs:
+    - annual_income
+    - family_responsibility
+    - mortgage_balance
+    - children_info
+    - spouse_income
+    - existing_life_coverage
+  coverage_field: existing_life_coverage
+  need_formula: life_income_x10_mortgage_children20w
+  priority_rule: coverage_value_sensitive
+  priority_when_no_coverage_info: P1_HIGH
+  priority_when_zero_coverage: P0_CRITICAL
+  priority_when_adequate: P2_MEDIUM
+  priority_when_inadequate: P1_HIGH
+
+texts:
+  risk: "Primary earner dependency plus debt and child responsibility create meaningful life-risk exposure."
+  impact: "Income interruption or death would likely affect mortgage servicing and child-related household obligations."
+  gap: "Need to evaluate whether family responsibility, mortgage burden and current life protection are aligned."
+  reasoning: "Known income, mortgage and child responsibility indicate a clear dependency on the primary earner. Life priority reflects coverage presence and adequacy: a confirmed zero-coverage client is the most urgent actionable gap, while unknown coverage is a confirmation task rather than a higher tier than a confirmed gap."

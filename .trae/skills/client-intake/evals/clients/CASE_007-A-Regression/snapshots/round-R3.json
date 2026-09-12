@@ -1,0 +1,108 @@
+﻿{
+    "round":  3,
+    "case_id":  "CASE_007-A",
+    "source_of_truth":  {
+                            "client_profile":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-A-Regression\\CLIENT_PROFILE.md",
+                            "conversation_log":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-A-Regression\\CONVERSATION_LOG.md",
+                            "pending":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_007-A-Regression\\PENDING.md"
+                        },
+    "this_round_updates":  {
+                               "confirmed":  [
+                                                 {
+                                                     "key":  "existing_insurance",
+                                                     "field":  "商保概况",
+                                                     "value":  "已有商业保单（客户 R3 提供保单照片；具体险种与保额待核对）",
+                                                     "source_round":  "R3",
+                                                     "source_text":  "这是保单照片，你先看一下。"
+                                                 }
+                                             ],
+                               "inferred":  [
+
+                                            ],
+                               "missing":  [
+                                               "年龄（H1）",
+                                               "城市（H2）",
+                                               "职业（H3）",
+                                               "家庭责任（H4）",
+                                               "收入（H5）",
+                                               "家庭年支出（H6）"
+                                           ],
+                               "pending":  [
+                                               {
+                                                   "id":  "P001",
+                                                   "item":  "现有保单资料"
+                                               }
+                                           ]
+                           },
+    "confirmed":  [
+                      {
+                          "key":  "existing_insurance",
+                          "field":  "商保概况",
+                          "section":  "1.4",
+                          "value":  "已有商业保单（客户 R3 提供保单照片；具体险种与保额待核对）",
+                          "source_round":  "R3",
+                          "source_text":  "这是保单照片，你先看一下。"
+                      }
+                  ],
+    "pending_items":  [
+                          {
+                              "id":  "P001",
+                              "item":  "现有保单资料",
+                              "qid":  "Q001",
+                              "status":  "received",
+                              "round":  "1",
+                              "reminded":  "0",
+                              "next":  "",
+                              "pm":  "保单我晚点找一下发给你。"
+                          }
+                      ],
+    "qids":  [
+                 {
+                     "id":  "Q001",
+                     "intent":  "商保概况",
+                     "question":  "您现在手上有商业保险吗？有的话方便把保单拍给我，我先看看险种和保额",
+                     "status":  "answered",
+                     "first":  "1",
+                     "last":  "3",
+                     "pid":  "P001"
+                 },
+                 {
+                     "id":  "Q002",
+                     "intent":  "商保明细",
+                     "question":  "照片收到了，谢谢。再确认一下：这份保单是什么险种、保额大概多少？",
+                     "status":  "unanswered",
+                     "first":  "3",
+                     "last":  "3",
+                     "pid":  ""
+                 }
+             ],
+    "completion_check":  {
+                             "intake_complete":  false,
+                             "blocking_items":  [
+                                                    "年龄（H1）",
+                                                    "城市（H2）",
+                                                    "职业（H3）",
+                                                    "家庭责任（H4）",
+                                                    "收入（H5）",
+                                                    "家庭年支出（H6）"
+                                                ],
+                             "follow_up_items":  [
+
+                                                 ]
+                         },
+    "next_questions":  [
+                           {
+                               "id":  "Q002",
+                               "priority":  "P1",
+                               "intent":  "商保明细",
+                               "question":  "照片收到了，谢谢。再确认一下：这份保单是什么险种、保额大概多少？",
+                               "reason":  "P001 已 received，资料缺口从『有没有保单』细化为『险种与保额』，开新 QID 跟进"
+                           }
+                       ],
+    "state_write_result":  {
+                               "profile_updated":  true,
+                               "conversation_log_updated":  true,
+                               "pending_updated":  true
+                           },
+    "notes":  "资料已到手 -\u003e P001 状态置 received，related_qid Q001 同步 answered，提醒计数清零、不再排下次提醒；同时把剩余缺口（险种/保额）开成新 QID Q002 继续跟进。"
+}

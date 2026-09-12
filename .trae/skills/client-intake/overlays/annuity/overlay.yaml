@@ -1,0 +1,38 @@
+id: annuity
+name: 年金 / 养老
+version: 0.1
+status: draft
+priority: 25
+
+triggers:
+  keywords:
+    - 养老
+    - 退休
+    - 养老金
+    - 年金
+    - 退休金
+    - 老了以后
+    - 社保够不够
+    - 以房养老
+  goal_types:
+    - annuity
+    - retirement
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  - 领取年龄
+  - 保证领取
+  - 现金价值
+  - 年领
+  - 月领
+  - 预定利率
+
+boundary:
+  must_not:
+    - 预测社保养老金金额或政策变化
+    - 测算养老资金缺口（属方案设计环节）
+    - 预测寿命、利率或投资收益
+    - 建议缴费金额或缴费期

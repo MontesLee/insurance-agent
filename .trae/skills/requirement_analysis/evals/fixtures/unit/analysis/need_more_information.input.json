@@ -1,0 +1,29 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "client-intake-data/clients/C303-insufficient/CLIENT_PROFILE.md",
+    "pending_path": "client-intake-data/clients/C303-insufficient/PENDING.md",
+    "conversation_log_path": "client-intake-data/clients/C303-insufficient/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": ["savings"],
+  "client_profile": {
+    "facts": [
+      { "field": "annual_income", "value": "30万", "value_status": "KNOWN", "source_round": "R1", "source_text": "年收入30万", "source_section": "Confirmed Facts" }
+    ],
+    "inferred_notes": [],
+    "follow_up_items": ["annual_expense", "assets", "liabilities", "cash_flow", "financial_goals"],
+    "handoff_notes": "明显信息不足样例"
+  },
+  "conflicts": [],
+  "constraints": [],
+  "metadata": {
+    "client_id": "C303",
+    "client_alias": "insufficient"
+  },
+  "question_context": {
+    "asked_questions": [],
+    "answered_fields": []
+  }
+}

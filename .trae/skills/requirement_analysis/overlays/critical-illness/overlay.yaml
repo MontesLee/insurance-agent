@@ -1,0 +1,51 @@
+﻿id: critical-illness
+name: 重疾需求
+version: 0.1
+status: active
+priority: 40
+
+triggers:
+  keywords:
+    - 重疾
+    - 大病
+    - 癌症
+    - 收入中断
+  goal_types:
+    - critical_illness
+
+requires_confirm: false
+
+dimensions: requirement-dimensions.md
+
+contamination_terms:
+  - 重疾保额
+  - 轻症中症
+  - 重疾多次给付
+  - 豁免保费
+
+boundary:
+  must_not:
+    - 计算或建议重疾保额（属方案设计环节）
+    - 预判核保结论或理赔结论
+
+analysis:
+  required_fields:
+    - annual_income
+    - family_responsibility
+  evidence_fact_refs:
+    - annual_income
+    - family_responsibility
+    - existing_critical_illness_coverage
+  coverage_field: existing_critical_illness_coverage
+  need_formula: ci_50w_plus_income_x3
+  priority_rule: coverage_value_sensitive
+  priority_when_no_coverage_info: P1_HIGH
+  priority_when_zero_coverage: P0_CRITICAL
+  priority_when_adequate: P2_MEDIUM
+  priority_when_inadequate: P1_HIGH
+
+texts:
+  risk: "Major illness may create both treatment expenses and income interruption risk."
+  impact: "Household cash flow and recovery-stage financial pressure may rise materially."
+  gap: "Need to evaluate whether current critical illness protection is sufficient for recovery-stage income interruption and family responsibility."
+  reasoning: "Income and family responsibility imply a major illness could create treatment costs plus income interruption. CI priority stays high when existing coverage is inadequate against the need estimate (50万 base + income*3), rather than dropping solely because some coverage exists."

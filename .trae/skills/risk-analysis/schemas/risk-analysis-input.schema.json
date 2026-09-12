@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "risk-analysis-input.schema.json",
+  "title": "RiskAnalysisInput",
+  "description": "risk-analysis 引擎输入 = Canonical Client State（事实）+ RequirementAnalysisOutput.requirements（需求）。不自由双读两份上游 output。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "input_version",
+    "client_state",
+    "requirements",
+    "upstream",
+    "analysis_scope",
+    "provenance_index"
+  ],
+  "properties": {
+    "input_version": { "type": "string", "const": "1.0" },
+
+    "client_state": { "$ref": "client-state.schema.json" },
+
+    "requirements": {
+      "type": "array",
+      "description": "来自 requirement-analysis 的需求层结论。原样透传，risk-analysis 不得重新产出 requirement。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "requirement_type", "summary", "priority", "boundary"],
+        "properties": {
+          "requirement_id": { "type": "string", "minLength": 1 },
+          "requirement_type": {
+            "type": "string",
+            "enum": ["medical", "critical_illness", "accident", "life", "savings"]
+          },
+          "summary": { "type": "string", "minLength": 1 },
+          "priority": { "$ref": "#/definitions/priority4" },
+          "boundary": { "type": "string", "const": "requirement_only" }
+        }
+      }
+    },
+
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["client_intake", "requirement_analysis"],
+      "properties": {
+        "client_intake": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provided"],
+          "properties": {
+            "provided": { "type": "boolean" },
+            "intake_complete": { "type": "boolean" },
+            "profile_path": { "type": "string", "minLength": 1 }
+          },
+          "if": { "properties": { "provided": { "const": true } } },
+          "then": { "required": ["provided", "intake_complete", "profile_path"] }
+        },
+        "requirement_analysis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provided"],
+          "properties": {
+            "provided": { "type": "boolean" },
+            "analysis_status": {
+              "type": "string",
+              "enum": ["COMPLETE", "PRELIMINARY", "NEED_MORE_INFORMATION", "CONFLICTING_INFORMATION", "FAILED"]
+            },
+            "analysis_scope": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["medical", "critical_illness", "accident", "life", "savings"] }
+            },
+            "output_path": { "type": "string", "minLength": 1 },
+            "unknowns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["field", "reason"],
+                "properties": {
+                  "field": { "type": "string", "minLength": 1 },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            },
+            "assumptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["field", "assumption", "reason"],
+                "properties": {
+                  "field": { "type": "string", "minLength": 1 },
+                  "assumption": { "type": "string", "minLength": 1 },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          },
+          "if": { "properties": { "provided": { "const": true } } },
+          "then": { "required": ["provided", "analysis_status", "output_path"] }
+        }
+      }
+    },
+
+    "analysis_scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/definitions/riskCategory" }
+    },
+
+    "provenance_index": {
+      "type": "array",
+      "description": "ClientState source 的扁平索引，供 Eval 2（Evidence Grounding）O(1) 校验。",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["client_state_field", "origin_skill", "origin_field", "status"],
+        "properties": {
+          "client_state_field": { "type": "string", "minLength": 1 },
+          "origin_skill": { "type": "string", "enum": ["client-intake", "requirement-analysis", "unknown"] },
+          "origin_field": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED"] }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "riskCategory": {
+      "type": "string",
+      "enum": ["R1", "R2", "R3", "R4", "R5"]
+    },
+    "priority4": {
+      "type": "string",
+      "enum": ["P0_CRITICAL", "P1_HIGH", "P2_MEDIUM", "P3_LOW"]
+    }
+  }
+}

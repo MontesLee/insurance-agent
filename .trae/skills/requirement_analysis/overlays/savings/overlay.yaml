@@ -1,0 +1,55 @@
+﻿id: savings
+name: 储蓄与长期目标需求
+version: 0.1
+status: active
+priority: 20
+
+triggers:
+  keywords:
+    - 储蓄
+    - 教育金
+    - 养老
+    - 理财
+  goal_types:
+    - savings
+
+requires_confirm: false
+
+dimensions: requirement-dimensions.md
+
+contamination_terms:
+  - 年金领取
+  - 现金价值
+  - 预定利率
+  - 万能账户
+
+boundary:
+  must_not:
+    - 推荐具体理财或年金产品
+    - 预测投资收益率
+
+analysis:
+  required_fields:
+    - annual_income
+    - annual_expense
+    - liabilities
+    - cash_flow
+    - financial_goals
+  evidence_fact_refs:
+    - annual_income
+    - annual_expense
+    - liabilities
+    - cash_flow
+    - financial_goals
+    - assets
+  coverage_field: assets
+  need_formula: none
+  priority_rule: savings_assets_gate
+  priority_when_gate_satisfied: P2_MEDIUM
+  priority_when_gate_unsatisfied: P1_HIGH
+
+texts:
+  risk: "Long-term savings goals may be under-supported if current cash flow and liabilities leave limited room for accumulation."
+  impact: "Delayed goal achievement may affect education, retirement or other long-horizon plans."
+  gap: "Need to evaluate whether current cash flow and asset base can support stated long-term savings goals."
+  reasoning: "Savings analysis depends on income, expense, liabilities, cash flow and goals. If asset base is unclear, the direction can still be identified but the adequacy judgment remains incomplete."

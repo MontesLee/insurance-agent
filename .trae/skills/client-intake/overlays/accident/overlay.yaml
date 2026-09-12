@@ -1,0 +1,37 @@
+id: accident
+name: 意外险
+version: 0.1
+status: active
+priority: 20
+
+triggers:
+  keywords:
+    - 意外
+    - 摔伤
+    - 磕碰
+    - 交通事故
+    - 出差多
+    - 经常开车
+    - 高风险运动
+    - 工伤
+    - 猫抓狗咬
+  goal_types:
+    - accident
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  # 注：「职业类别」不在此列 —— 它是跨险种的核保通用概念（重疾/寿险/医疗同样受其影响），
+  # 通用层 H3 已用它作为采集深度标准。本 overlay 只禁止"下分类结论"，不禁止采集。
+  - 伤残等级
+  - 意外医疗
+  - 高风险运动
+
+boundary:
+  must_not:
+    - 判定客户职业属于几类（应以保险公司职业分类表为准）
+    - 评价某项运动或工作的危险程度
+    - 预判核保或拒保结论
+    - 计算或建议意外保额

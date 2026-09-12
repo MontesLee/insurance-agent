@@ -1,0 +1,38 @@
+id: inheritance
+name: 财富传承 / 终身寿
+version: 0.1
+status: draft
+priority: 15
+
+triggers:
+  keywords:
+    - 传承
+    - 遗产
+    - 留给小孩
+    - 资产隔离
+    - 家企隔离
+    - 终身寿
+    - 遗产税
+    - 婚前财产
+    - 分家
+  goal_types:
+    - inheritance
+    - wealth_transfer
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  - 资产隔离
+  - 家企隔离
+  - 定向传承
+  - 遗产税
+  - 婚前财产
+
+boundary:
+  must_not:
+    - 提供法律意见或税务意见（应建议咨询律师/税务师）
+    - 预判遗产税立法或政策走向
+    - 评价家庭关系或继承安排的合理性
+    - 建议传承架构或保额

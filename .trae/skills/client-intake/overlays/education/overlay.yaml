@@ -1,0 +1,35 @@
+id: education
+name: 教育金
+version: 0.1
+status: draft
+priority: 30
+
+triggers:
+  keywords:
+    - 教育金
+    - 孩子上学
+    - 学费
+    - 留学
+    - 出国读书
+    - 子女教育
+    - 幼儿园费用
+    - 学区
+  goal_types:
+    - education
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  - 教育金
+  - 升学节点
+  - 领取年限
+  - 投保豁免
+
+boundary:
+  must_not:
+    - 预测未来学费或留学费用
+    - 测算教育资金缺口或建议金额
+    - 评价教育路径选择（国内/国际/留学）
+    - 建议缴费金额或缴费期

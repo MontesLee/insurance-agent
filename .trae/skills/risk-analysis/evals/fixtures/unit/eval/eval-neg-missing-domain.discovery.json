@@ -1,0 +1,1319 @@
+﻿{
+    "stage":  "discovery",
+    "stage_version":  "1.0",
+    "rules_version":  "1.0",
+    "taxonomy_version":  "1.0",
+    "analysis_status":  "PRELIMINARY",
+    "discovery":  {
+                      "method":  "risk_dependency_graph_v1",
+                      "domains_evaluated":  [
+                                                "R1",
+                                                "R2",
+                                                "R3",
+                                                "R4",
+                                                "R5"
+                                            ],
+                      "identified":  [
+                                         "R1",
+                                         "R2",
+                                         "R3",
+                                         "R4",
+                                         "R5"
+                                     ],
+                      "not_identified":  [
+
+                                         ],
+                      "undetermined":  [
+
+                                       ]
+                  },
+    "risk_candidates":  [
+                            {
+                                "risk_id":  "R1-001",
+                                "risk_category":  "R1",
+                                "risk_name":  "Medical Risk",
+                                "risk_name_zh":  "医疗支出风险",
+                                "status":  "KNOWN",
+                                "risk_exists":  true,
+                                "discovery_status":  "IDENTIFIED",
+                                "trigger":  {
+                                                "event":  "家庭成员发生疾病或意外受伤，产生需要家庭自行承担的医疗支出"
+                                            },
+                                "exposure":  {
+                                                 "why_exposed":  "已确认暴露：已掌握家庭成员基本事实，医疗支出风险对该家庭成立。 放大因素：无商业医疗保障，医保之外的支出缺口需家庭自行承担；已知存在健康异常记录，医疗支出发生概率上升；家庭有未成年子女，医疗事件发生频率通常更高。"
+                                             },
+                                "exposure_signals":  [
+                                                         {
+                                                             "signal_id":  "R1-G1",
+                                                             "target":  "person_facts",
+                                                             "op":  "group_status_satisfied",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "age",
+                                                                                            "gender",
+                                                                                            "marital_status",
+                                                                                            "children_count",
+                                                                                            "city"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "已掌握家庭成员基本事实，医疗支出风险对该家庭成立"
+                                                         }
+                                                     ],
+                                "amplifier_signals":  [
+                                                          {
+                                                              "signal_id":  "R1-A1",
+                                                              "target":  "social_insurance_status",
+                                                              "op":  "status_absent",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "social_insurance_status"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "社保/医保参保状态为无或未参保，医疗支出需更高比例自付"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R1-A2",
+                                                              "target":  "existing_medical_coverage",
+                                                              "op":  "numeric_eq",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "existing_medical_coverage"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "无商业医疗保障，医保之外的支出缺口需家庭自行承担"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R1-A3",
+                                                              "target":  "customer_health",
+                                                              "op":  "string_contains",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "customer_health"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "已知存在健康异常记录，医疗支出发生概率上升"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R1-A4",
+                                                              "target":  "children_count",
+                                                              "op":  "numeric_gt",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "children_count"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "家庭有未成年子女，医疗事件发生频率通常更高"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R1-A5",
+                                                              "target":  "dependents",
+                                                              "op":  "status_satisfied",
+                                                              "state":  "ABSENT",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+                                                                                            "dependents"
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "存在其他需要照护的家庭成员"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R1-A6",
+                                                              "target":  "employer_benefits",
+                                                              "op":  "status_absent",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "employer_benefits"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "单位未提供补充医疗福利，缺少第二层支付来源"
+                                                          }
+                                                      ],
+                                "evidence":  [
+                                                 {
+                                                     "evidence_id":  "E001",
+                                                     "fact":  "年龄：35",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.age",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "age"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E002",
+                                                     "fact":  "性别：男",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.gender",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "gender"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E003",
+                                                     "fact":  "婚姻状况：已婚",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.marital_status",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "marital_status"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E004",
+                                                     "fact":  "子女数量：1",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.children_count",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_count"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E005",
+                                                     "fact":  "常住城市：北京",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.city",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "city"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E006",
+                                                     "fact":  "已有商业医疗保障：0",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "existing_protection.existing_medical_coverage",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "existing_medical_coverage"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E007",
+                                                     "fact":  "健康状况：轻度脂肪肝",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "health_profile.customer_health",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "customer_health"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 }
+                                             ],
+                                "reasoning_evidence_refs":  [
+                                                                "E001",
+                                                                "E002",
+                                                                "E003",
+                                                                "E004",
+                                                                "E005",
+                                                                "E006",
+                                                                "E007"
+                                                            ],
+                                "assumptions":  [
+
+                                                ],
+                                "unknowns":  [
+
+                                             ],
+                                "next_information_needed":  [
+
+                                                            ]
+                            },
+                            {
+                                "risk_id":  "R2-001",
+                                "risk_category":  "R2",
+                                "risk_name":  "Critical Illness Risk",
+                                "risk_name_zh":  "重疾收入中断风险",
+                                "status":  "ESTIMATED",
+                                "risk_exists":  true,
+                                "discovery_status":  "IDENTIFIED",
+                                "trigger":  {
+                                                "event":  "家庭主要收入者确诊重大疾病，治疗与康复期间无法正常工作"
+                                            },
+                                "exposure":  {
+                                                 "why_exposed":  "已确认暴露：存在可被中断的收入来源（本人年收入或家庭年收入 \u003e 0）。 放大因素：存在持续刚性责任（房贷/教育/赡养），收入中断后果被放大；已知存在健康异常记录；有需要抚养的子女，责任期限拉长。"
+                                             },
+                                "exposure_signals":  [
+                                                         {
+                                                             "signal_id":  "R2-G1",
+                                                             "target":  "income_anchor",
+                                                             "op":  "group_numeric_gt",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "annual_income",
+                                                                                            "household_income"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "存在可被中断的收入来源（本人年收入或家庭年收入 \u003e 0）"
+                                                         }
+                                                     ],
+                                "amplifier_signals":  [
+                                                          {
+                                                              "signal_id":  "R2-A1",
+                                                              "target":  "existing_critical_illness_coverage",
+                                                              "op":  "numeric_eq",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "existing_critical_illness_coverage"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "无重疾保障，收入中断期缺少直接对冲"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R2-A2",
+                                                              "target":  "responsibility_scale",
+                                                              "op":  "group_status_satisfied",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "mortgage_balance",
+                                                                                             "children_education"
+                                                                                         ],
+                                                                             "absent":  [
+                                                                                            "liabilities",
+                                                                                            "elderly_support"
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "family_responsibility"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "存在持续刚性责任（房贷/教育/赡养），收入中断后果被放大"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R2-A3",
+                                                              "target":  "income_stability",
+                                                              "op":  "string_contains",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "income_stability"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "收入稳定性偏低，中断缓冲更薄"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R2-A4",
+                                                              "target":  "customer_health",
+                                                              "op":  "string_contains",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "customer_health"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "已知存在健康异常记录"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R2-A5",
+                                                              "target":  "assets",
+                                                              "op":  "numeric_lt",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "assets"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "可动用金融资产有限，独立吸收收入中断的能力弱"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R2-A6",
+                                                              "target":  "children_count",
+                                                              "op":  "numeric_gt",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "children_count"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "有需要抚养的子女，责任期限拉长"
+                                                          }
+                                                      ],
+                                "evidence":  [
+                                                 {
+                                                     "evidence_id":  "E004",
+                                                     "fact":  "子女数量：1",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.children_count",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_count"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E007",
+                                                     "fact":  "健康状况：轻度脂肪肝",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "health_profile.customer_health",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "customer_health"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E008",
+                                                     "fact":  "本人年收入：600000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "financial_profile.annual_income",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "annual_income"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E009",
+                                                     "fact":  "家庭年收入：1000000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "financial_profile.household_income",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "household_income"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E010",
+                                                     "fact":  "房贷余额：1500000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.mortgage_balance",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "mortgage_balance"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E011",
+                                                     "fact":  "子女教育规划：计划国内读完大学，预算约 80 万",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.children_education",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_education"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 }
+                                             ],
+                                "reasoning_evidence_refs":  [
+                                                                "E008",
+                                                                "E009",
+                                                                "E010",
+                                                                "E011",
+                                                                "E007",
+                                                                "E004",
+                                                                "REQ-002"
+                                                            ],
+                                "assumptions":  [
+                                                    {
+                                                        "field":  "annual_income",
+                                                        "assumption":  "当前取值：600000",
+                                                        "reason":  "客户口述本人年收入约 60 万"
+                                                    },
+                                                    {
+                                                        "field":  "household_income",
+                                                        "assumption":  "当前取值：1000000",
+                                                        "reason":  "客户口述家庭年收入约 100 万"
+                                                    },
+                                                    {
+                                                        "field":  "mortgage_balance",
+                                                        "assumption":  "当前取值：1500000",
+                                                        "reason":  "客户口述房贷剩余约 150 万"
+                                                    },
+                                                    {
+                                                        "field":  "children_education",
+                                                        "assumption":  "当前取值：计划国内读完大学，预算约 80 万",
+                                                        "reason":  "客户初步估计"
+                                                    }
+                                                ],
+                                "unknowns":  [
+
+                                             ],
+                                "next_information_needed":  [
+
+                                                            ]
+                            },
+                            {
+                                "risk_id":  "R3-001",
+                                "risk_category":  "R3",
+                                "risk_name":  "Accident / Disability Risk",
+                                "risk_name_zh":  "意外失能风险",
+                                "status":  "ESTIMATED",
+                                "risk_exists":  true,
+                                "discovery_status":  "IDENTIFIED",
+                                "trigger":  {
+                                                "event":  "意外或疾病导致伤残 / 失能，长期或永久丧失部分收入能力"
+                                            },
+                                "exposure":  {
+                                                 "why_exposed":  "已确认暴露：存在可因伤残而丧失的收入能力。 放大因素：无意外 / 伤残保障，失能后缺少直接对冲；存在持续刚性责任，失能后果被放大；无商业医疗保障，伤残相关的医疗与康复支出需自行承担。"
+                                             },
+                                "exposure_signals":  [
+                                                         {
+                                                             "signal_id":  "R3-G1",
+                                                             "target":  "income_anchor",
+                                                             "op":  "group_numeric_gt",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "annual_income",
+                                                                                            "household_income"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "存在可因伤残而丧失的收入能力"
+                                                         },
+                                                         {
+                                                             "signal_id":  "R3-G2",
+                                                             "target":  "occupation",
+                                                             "op":  "string_contains",
+                                                             "state":  "ABSENT",
+                                                             "fields":  {
+                                                                            "matched":  [
+
+                                                                                        ],
+                                                                            "absent":  [
+                                                                                           "occupation"
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "职业属于高风险作业类别，意外暴露显著高于平均水平"
+                                                         }
+                                                     ],
+                                "amplifier_signals":  [
+                                                          {
+                                                              "signal_id":  "R3-A1",
+                                                              "target":  "existing_accident_coverage",
+                                                              "op":  "numeric_eq",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "existing_accident_coverage"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "无意外 / 伤残保障，失能后缺少直接对冲"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R3-A2",
+                                                              "target":  "employment_type",
+                                                              "op":  "string_in",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "employment_type"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "用工形态不稳定，失能后缺少制度性缓冲"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R3-A3",
+                                                              "target":  "responsibility_scale",
+                                                              "op":  "group_status_satisfied",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "mortgage_balance",
+                                                                                             "children_education"
+                                                                                         ],
+                                                                             "absent":  [
+                                                                                            "liabilities",
+                                                                                            "elderly_support"
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "family_responsibility"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "存在持续刚性责任，失能后果被放大"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R3-A4",
+                                                              "target":  "existing_medical_coverage",
+                                                              "op":  "numeric_eq",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "existing_medical_coverage"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "无商业医疗保障，伤残相关的医疗与康复支出需自行承担"
+                                                          }
+                                                      ],
+                                "evidence":  [
+                                                 {
+                                                     "evidence_id":  "E006",
+                                                     "fact":  "已有商业医疗保障：0",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "existing_protection.existing_medical_coverage",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "existing_medical_coverage"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E008",
+                                                     "fact":  "本人年收入：600000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "financial_profile.annual_income",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "annual_income"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E009",
+                                                     "fact":  "家庭年收入：1000000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "financial_profile.household_income",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "household_income"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E010",
+                                                     "fact":  "房贷余额：1500000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.mortgage_balance",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "mortgage_balance"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E011",
+                                                     "fact":  "子女教育规划：计划国内读完大学，预算约 80 万",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.children_education",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_education"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E012",
+                                                     "fact":  "已有意外/伤残保障保额：0",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "existing_protection.existing_accident_coverage",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "existing_accident_coverage"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 }
+                                             ],
+                                "reasoning_evidence_refs":  [
+                                                                "E008",
+                                                                "E009",
+                                                                "E012",
+                                                                "E010",
+                                                                "E011",
+                                                                "E006"
+                                                            ],
+                                "assumptions":  [
+                                                    {
+                                                        "field":  "annual_income",
+                                                        "assumption":  "当前取值：600000",
+                                                        "reason":  "客户口述本人年收入约 60 万"
+                                                    },
+                                                    {
+                                                        "field":  "household_income",
+                                                        "assumption":  "当前取值：1000000",
+                                                        "reason":  "客户口述家庭年收入约 100 万"
+                                                    },
+                                                    {
+                                                        "field":  "mortgage_balance",
+                                                        "assumption":  "当前取值：1500000",
+                                                        "reason":  "客户口述房贷剩余约 150 万"
+                                                    },
+                                                    {
+                                                        "field":  "children_education",
+                                                        "assumption":  "当前取值：计划国内读完大学，预算约 80 万",
+                                                        "reason":  "客户初步估计"
+                                                    }
+                                                ],
+                                "unknowns":  [
+
+                                             ],
+                                "next_information_needed":  [
+
+                                                            ]
+                            },
+                            {
+                                "risk_id":  "R4-001",
+                                "risk_category":  "R4",
+                                "risk_name":  "Death / Family Responsibility Risk",
+                                "risk_name_zh":  "身故家庭责任风险",
+                                "status":  "ESTIMATED",
+                                "risk_exists":  true,
+                                "discovery_status":  "IDENTIFIED",
+                                "trigger":  {
+                                                "event":  "家庭主要收入者身故，其承担的长期责任无法继续履行"
+                                            },
+                                "exposure":  {
+                                                 "why_exposed":  "已确认暴露：存在需要长期履行的家庭责任（房贷 / 负债 / 教育 / 赡养）；有需要抚养的子女。 放大因素：无人身寿险保障，身故后缺少直接的资金来源替代；子女尚在受教育阶段，责任期限较长；处于婚姻关系中，存在共同承担的家庭责任。"
+                                             },
+                                "exposure_signals":  [
+                                                         {
+                                                             "signal_id":  "R4-G1",
+                                                             "target":  "responsibility_scale",
+                                                             "op":  "group_status_satisfied",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "mortgage_balance",
+                                                                                            "children_education"
+                                                                                        ],
+                                                                            "absent":  [
+                                                                                           "liabilities",
+                                                                                           "elderly_support"
+                                                                                       ],
+                                                                            "unresolved":  [
+                                                                                               "family_responsibility"
+                                                                                           ]
+                                                                        },
+                                                             "description":  "存在需要长期履行的家庭责任（房贷 / 负债 / 教育 / 赡养）"
+                                                         },
+                                                         {
+                                                             "signal_id":  "R4-G2",
+                                                             "target":  "children_count",
+                                                             "op":  "numeric_gt",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "children_count"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "有需要抚养的子女"
+                                                         },
+                                                         {
+                                                             "signal_id":  "R4-G3",
+                                                             "target":  "dependents",
+                                                             "op":  "status_satisfied",
+                                                             "state":  "ABSENT",
+                                                             "fields":  {
+                                                                            "matched":  [
+
+                                                                                        ],
+                                                                            "absent":  [
+                                                                                           "dependents"
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "存在其他需要扶养的家庭成员"
+                                                         }
+                                                     ],
+                                "amplifier_signals":  [
+                                                          {
+                                                              "signal_id":  "R4-A1",
+                                                              "target":  "existing_life_coverage",
+                                                              "op":  "numeric_eq",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "existing_life_coverage"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "无人身寿险保障，身故后缺少直接的资金来源替代"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R4-A2",
+                                                              "target":  "spouse_income",
+                                                              "op":  "numeric_eq",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "spouse_income"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "配偶无独立收入，家庭缺少第二收入来源"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R4-A3",
+                                                              "target":  "children_info",
+                                                              "op":  "string_contains",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "children_info"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "子女尚在受教育阶段，责任期限较长"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R4-A4",
+                                                              "target":  "marital_status",
+                                                              "op":  "string_in",
+                                                              "state":  "MATCHED",
+                                                              "fields":  {
+                                                                             "matched":  [
+                                                                                             "marital_status"
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+
+                                                                                            ]
+                                                                         },
+                                                              "description":  "处于婚姻关系中，存在共同承担的家庭责任"
+                                                          }
+                                                      ],
+                                "evidence":  [
+                                                 {
+                                                     "evidence_id":  "E003",
+                                                     "fact":  "婚姻状况：已婚",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.marital_status",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "marital_status"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E004",
+                                                     "fact":  "子女数量：1",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.children_count",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_count"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E010",
+                                                     "fact":  "房贷余额：1500000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.mortgage_balance",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "mortgage_balance"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E011",
+                                                     "fact":  "子女教育规划：计划国内读完大学，预算约 80 万",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.children_education",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_education"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E013",
+                                                     "fact":  "已有人身寿险保额：0",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "existing_protection.existing_life_coverage",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "existing_life_coverage"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E014",
+                                                     "fact":  "子女情况：女儿 6 岁，小学一年级",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.children_info",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_info"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 }
+                                             ],
+                                "reasoning_evidence_refs":  [
+                                                                "E010",
+                                                                "E011",
+                                                                "E004",
+                                                                "E013",
+                                                                "E014",
+                                                                "E003",
+                                                                "REQ-001"
+                                                            ],
+                                "assumptions":  [
+                                                    {
+                                                        "field":  "mortgage_balance",
+                                                        "assumption":  "当前取值：1500000",
+                                                        "reason":  "客户口述房贷剩余约 150 万"
+                                                    },
+                                                    {
+                                                        "field":  "children_education",
+                                                        "assumption":  "当前取值：计划国内读完大学，预算约 80 万",
+                                                        "reason":  "客户初步估计"
+                                                    }
+                                                ],
+                                "unknowns":  [
+
+                                             ],
+                                "next_information_needed":  [
+
+                                                            ]
+                            },
+                            {
+                                "risk_id":  "R5-001",
+                                "risk_category":  "R5",
+                                "risk_name":  "Long-term Financial / Savings Risk",
+                                "risk_name_zh":  "长期财务风险",
+                                "status":  "ESTIMATED",
+                                "risk_exists":  true,
+                                "discovery_status":  "IDENTIFIED",
+                                "trigger":  {
+                                                "event":  "养老、子女教育或其他长期财务目标在既定时间内无法达成"
+                                            },
+                                "exposure":  {
+                                                 "why_exposed":  "已确认暴露：存在可用于长期积累的收入基数；已知年龄，存在可衡量的长期时间跨度；存在明确的子女教育财务目标。"
+                                             },
+                                "exposure_signals":  [
+                                                         {
+                                                             "signal_id":  "R5-G1",
+                                                             "target":  "income_anchor",
+                                                             "op":  "group_numeric_gt",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "annual_income",
+                                                                                            "household_income"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "存在可用于长期积累的收入基数"
+                                                         },
+                                                         {
+                                                             "signal_id":  "R5-G2",
+                                                             "target":  "age",
+                                                             "op":  "numeric_gte",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "age"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "已知年龄，存在可衡量的长期时间跨度"
+                                                         },
+                                                         {
+                                                             "signal_id":  "R5-G3",
+                                                             "target":  "children_education",
+                                                             "op":  "status_satisfied",
+                                                             "state":  "MATCHED",
+                                                             "fields":  {
+                                                                            "matched":  [
+                                                                                            "children_education"
+                                                                                        ],
+                                                                            "absent":  [
+
+                                                                                       ],
+                                                                            "unresolved":  [
+
+                                                                                           ]
+                                                                        },
+                                                             "description":  "存在明确的子女教育财务目标"
+                                                         }
+                                                     ],
+                                "amplifier_signals":  [
+                                                          {
+                                                              "signal_id":  "R5-A1",
+                                                              "target":  "cash_flow",
+                                                              "op":  "numeric_lte",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "cash_flow"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "年度结余有限，长期储蓄能力受限"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R5-A2",
+                                                              "target":  "income_stability",
+                                                              "op":  "string_contains",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "income_stability"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "收入不稳定，长期积累的可持续性存疑"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R5-A3",
+                                                              "target":  "assets",
+                                                              "op":  "numeric_lt",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "assets"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "可动用资产有限，长期目标的资金基础薄弱"
+                                                          },
+                                                          {
+                                                              "signal_id":  "R5-A4",
+                                                              "target":  "premium_budget",
+                                                              "op":  "status_absent",
+                                                              "state":  "UNRESOLVED",
+                                                              "fields":  {
+                                                                             "matched":  [
+
+                                                                                         ],
+                                                                             "absent":  [
+
+                                                                                        ],
+                                                                             "unresolved":  [
+                                                                                                "premium_budget"
+                                                                                            ]
+                                                                         },
+                                                              "description":  "尚未规划风险管理预算，长期安排的确定性不足"
+                                                          }
+                                                      ],
+                                "evidence":  [
+                                                 {
+                                                     "evidence_id":  "E001",
+                                                     "fact":  "年龄：35",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "family_profile.age",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "age"
+                                                                               },
+                                                                    "status":  "KNOWN"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E008",
+                                                     "fact":  "本人年收入：600000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "financial_profile.annual_income",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "annual_income"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E009",
+                                                     "fact":  "家庭年收入：1000000",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "financial_profile.household_income",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "household_income"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 },
+                                                 {
+                                                     "evidence_id":  "E011",
+                                                     "fact":  "子女教育规划：计划国内读完大学，预算约 80 万",
+                                                     "source":  {
+                                                                    "layer":  "client_state",
+                                                                    "field":  "responsibility_profile.children_education",
+                                                                    "origin":  {
+                                                                                   "skill":  "client-intake",
+                                                                                   "field":  "children_education"
+                                                                               },
+                                                                    "status":  "ESTIMATED"
+                                                                }
+                                                 }
+                                             ],
+                                "reasoning_evidence_refs":  [
+                                                                "E008",
+                                                                "E009",
+                                                                "E001",
+                                                                "E011"
+                                                            ],
+                                "assumptions":  [
+                                                    {
+                                                        "field":  "annual_income",
+                                                        "assumption":  "当前取值：600000",
+                                                        "reason":  "客户口述本人年收入约 60 万"
+                                                    },
+                                                    {
+                                                        "field":  "household_income",
+                                                        "assumption":  "当前取值：1000000",
+                                                        "reason":  "客户口述家庭年收入约 100 万"
+                                                    },
+                                                    {
+                                                        "field":  "children_education",
+                                                        "assumption":  "当前取值：计划国内读完大学，预算约 80 万",
+                                                        "reason":  "客户初步估计"
+                                                    }
+                                                ],
+                                "unknowns":  [
+
+                                             ],
+                                "next_information_needed":  [
+
+                                                            ]
+                            }
+                        ],
+    "unknowns":  [
+
+                 ],
+    "assumptions":  [
+                        {
+                            "field":  "annual_income",
+                            "assumption":  "当前取值：600000",
+                            "reason":  "客户口述本人年收入约 60 万"
+                        },
+                        {
+                            "field":  "household_income",
+                            "assumption":  "当前取值：1000000",
+                            "reason":  "客户口述家庭年收入约 100 万"
+                        },
+                        {
+                            "field":  "mortgage_balance",
+                            "assumption":  "当前取值：1500000",
+                            "reason":  "客户口述房贷剩余约 150 万"
+                        },
+                        {
+                            "field":  "children_education",
+                            "assumption":  "当前取值：计划国内读完大学，预算约 80 万",
+                            "reason":  "客户初步估计"
+                        }
+                    ],
+    "next_information_needed":  [
+
+                                ],
+    "guardrails":  {
+                       "product_recommendation_included":  false,
+                       "sales_language_detected":  false,
+                       "layer_note":  "risk_analysis 层 · discovery 阶段：仅判定风险是否成立，不做严重度/优先级评估，不涉及任何保险产品建议。"
+                   }
+}

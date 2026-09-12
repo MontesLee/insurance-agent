@@ -1,0 +1,29 @@
+{
+  "source": {
+    "skill": "client_intake",
+    "adapter_version": "v1",
+    "profile_path": "client-intake-data/clients/C102-高影响缺失/CLIENT_PROFILE.md",
+    "pending_path": "client-intake-data/clients/C102-高影响缺失/PENDING.md",
+    "conversation_log_path": "client-intake-data/clients/C102-高影响缺失/CONVERSATION_LOG.md",
+    "intake_complete": true
+  },
+  "analysis_scope": ["medical"],
+  "client_profile": {
+    "facts": [
+      { "field": "age", "value": "35", "value_status": "KNOWN", "source_round": "R1", "source_text": "我35岁", "source_section": "Confirmed Facts" },
+      { "field": "customer_health", "value": "有轻度脂肪肝", "value_status": "KNOWN", "source_round": "R3", "source_text": "体检轻度脂肪肝", "source_section": "Confirmed Facts" },
+      { "field": "existing_medical_coverage", "value": "公司医疗险", "value_status": "KNOWN", "source_round": "R3", "source_text": "公司有医疗险", "source_section": "Confirmed Facts" },
+      { "field": "budget", "value": "2万", "value_status": "KNOWN", "source_round": "R1", "source_text": "预算2万", "source_section": "Confirmed Facts" },
+      { "field": "care_preference", "value": "希望就医方便", "value_status": "KNOWN", "source_round": "R3", "source_text": "希望理赔和就医方便", "source_section": "Confirmed Facts" }
+    ],
+    "inferred_notes": [],
+    "follow_up_items": ["社保医保状态"],
+    "handoff_notes": "缺失高影响 required 字段"
+  },
+  "conflicts": [],
+  "constraints": [],
+  "metadata": {
+    "client_id": "C102",
+    "client_alias": "高影响缺失"
+  }
+}

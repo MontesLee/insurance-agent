@@ -1,0 +1,98 @@
+﻿{
+    "round":  1,
+    "case_id":  "CASE_003",
+    "source_of_truth":  {
+                            "client_profile":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_003-Regression\\CLIENT_PROFILE.md",
+                            "conversation_log":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_003-Regression\\CONVERSATION_LOG.md",
+                            "pending":  "D:\\Workspace\\insurance-agent\\.trae\\skills\\client-intake\\evals\\clients\\CASE_003-Regression\\PENDING.md"
+                        },
+    "this_round_updates":  {
+                               "confirmed":  [
+                                                 {
+                                                     "key":  "age",
+                                                     "field":  "年龄",
+                                                     "value":  "38",
+                                                     "source_round":  "R1",
+                                                     "source_text":  "我38"
+                                                 },
+                                                 {
+                                                     "key":  "occupation",
+                                                     "field":  "职业",
+                                                     "value":  "公司创始人 / 企业主（客户原话：自己开公司的）",
+                                                     "source_round":  "R1",
+                                                     "source_text":  "自己开公司的"
+                                                 }
+                                             ],
+                               "inferred":  [
+
+                                            ],
+                               "missing":  [
+                                               "家庭责任结构（H4）",
+                                               "城市（H2）",
+                                               "收入（H5）",
+                                               "家庭年支出（H6）"
+                                           ],
+                               "pending":  [
+
+                                           ]
+                           },
+    "confirmed":  [
+                      {
+                          "key":  "age",
+                          "field":  "年龄",
+                          "section":  "1.1",
+                          "value":  "38",
+                          "source_round":  "R1",
+                          "source_text":  "我38"
+                      },
+                      {
+                          "key":  "occupation",
+                          "field":  "职业",
+                          "section":  "1.1",
+                          "value":  "公司创始人 / 企业主（客户原话：自己开公司的）",
+                          "source_round":  "R1",
+                          "source_text":  "自己开公司的"
+                      }
+                  ],
+    "pending_items":  [
+
+                      ],
+    "qids":  [
+                 {
+                     "id":  "Q001",
+                     "intent":  "家庭结构",
+                     "question":  "类型我可以稍后结合您的情况讲。先问一句，您家里现在是什么情况？爱人、孩子有吗",
+                     "status":  "unanswered",
+                     "first":  "1",
+                     "last":  "1",
+                     "pid":  ""
+                 }
+             ],
+    "completion_check":  {
+                             "intake_complete":  false,
+                             "blocking_items":  [
+                                                    "家庭责任结构（H4）",
+                                                    "城市（H2）",
+                                                    "收入（H5）",
+                                                    "家庭年支出（H6）"
+                                                ],
+                             "follow_up_items":  [
+
+                                                 ]
+                         },
+    "next_questions":  [
+                           {
+                               "id":  "Q001",
+                               "priority":  "P0",
+                               "intent":  "家庭结构",
+                               "question":  "类型我可以稍后结合您的情况讲。先问一句，您家里现在是什么情况？爱人、孩子有吗",
+                               "reason":  "H4 家庭责任未满足，阻塞进入 Needs Analysis"
+                           }
+                       ],
+    "state_write_result":  {
+                               "profile_updated":  true,
+                               "conversation_log_updated":  true,
+                               "pending_updated":  true
+                           },
+    "notes":  "边界处理：客户要求讲解险种类型，不做类型优劣讨论（越界），先说明需结合个人情况判断，再回到 P0 问题。"
+}

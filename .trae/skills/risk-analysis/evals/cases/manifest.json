@@ -1,0 +1,61 @@
+{
+  "manifest_version": "1.0",
+  "skill": "risk-analysis",
+  "stage": "eval",
+  "description": "Eval 阶段用例清单（单一真源）。test-risk-analysis-eval.ps1 读此文件驱动；verify-contract.py §8 读此文件校验产物。",
+  "positive": [
+    { "name": "case-all-unknown.json",                  "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-chinese-negative-tokens.json",      "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-dual-income-family.json",            "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-high-risk-occupation.json",          "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-income-conflict.json",               "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-no-requirements.json",               "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-responsibility-without-income.json", "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-retired-no-income.json",             "expect_status": "PASS", "expect_all_checks": "PASS" },
+    { "name": "case-single-no-dependents.json",          "expect_status": "PASS", "expect_all_checks": "PASS" }
+  ],
+  "negative": [
+    {
+      "fixture": "eval-neg-missing-domain.json",
+      "target_check": "completeness",
+      "discovery_sidecar": "eval-neg-missing-domain.discovery.json",
+      "mutation": "删除 R4 整个风险对象；需 side-car Discovery 才能启用「应发现域覆盖」子检查"
+    },
+    {
+      "fixture": "eval-neg-missing-risk.json",
+      "target_check": "completeness",
+      "discovery_sidecar": null,
+      "mutation": "risk_exists=true 但删除 impact_estimate 对象（金额置 0 只是 WARNING，不足以 BLOCKING）"
+    },
+    {
+      "fixture": "eval-neg-priority.json",
+      "target_check": "priority_consistency",
+      "discovery_sidecar": null,
+      "mutation": "severity/likelihood/residual 全 LOW 却标 priority=P1"
+    },
+    {
+      "fixture": "eval-neg-product-leak.json",
+      "target_check": "separation",
+      "discovery_sidecar": null,
+      "mutation": "conclusion 混入产品名 + 销售动词"
+    },
+    {
+      "fixture": "eval-neg-sales.json",
+      "target_check": "anti_sales",
+      "discovery_sidecar": null,
+      "mutation": "conclusion 追加恐吓 / 夸大 token"
+    },
+    {
+      "fixture": "eval-neg-unknown-as-known.json",
+      "target_check": "unknown_integrity",
+      "discovery_sidecar": null,
+      "mutation": "risk status=KNOWN 但全部 evidence.source.status 置 UNKNOWN"
+    },
+    {
+      "fixture": "eval-neg-unsupported.json",
+      "target_check": "evidence_grounding",
+      "discovery_sidecar": null,
+      "mutation": "reasoning_evidence_refs 指向悬空锚点 E999"
+    }
+  ]
+}

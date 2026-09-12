@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "risk.schema.json",
+  "title": "Risk",
+  "description": "单个风险对象。严格遵循 dependency-based analysis：家庭结构 → 责任 → 资产/收入 → 风险事件 → 经济后果 → 现有缓冲 → Residual Risk → Priority。每个结论必须可回溯到 Evidence。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "risk_id",
+    "risk_category",
+    "risk_name",
+    "status",
+    "trigger",
+    "exposure",
+    "potential_impact",
+    "impact_estimate",
+    "existing_resources",
+    "existing_protection",
+    "coverage_assessment",
+    "residual_risk",
+    "severity",
+    "likelihood",
+    "priority",
+    "reasoning",
+    "conclusion",
+    "reasoning_evidence_refs",
+    "evidence",
+    "assumptions",
+    "unknowns",
+    "next_information_needed"
+  ],
+  "properties": {
+    "risk_id": {
+      "type": "string",
+      "pattern": "^R[1-9]-[0-9]{3}$",
+      "description": "格式 R<域>-<序号>，例 R2-001。与 requirement 的 REQ-### 区分，防止层间混淆。"
+    },
+    "risk_category": { "$ref": "#/definitions/riskCategory" },
+    "risk_name": { "type": "string", "minLength": 1 },
+    "risk_exists": { "type": "boolean", "description": "风险是否存在。false 时 residual_risk/severity 仍须填写以支持 Eval。" },
+    "materiality": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH"] },
+
+    "status": { "$ref": "#/definitions/status" },
+
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event"],
+      "properties": { "event": { "type": "string", "minLength": 1 } }
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["why_exposed"],
+      "properties": { "why_exposed": { "type": "string", "minLength": 1 } }
+    },
+
+    "potential_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["financial", "lifestyle", "family_responsibility"],
+      "properties": {
+        "financial": { "type": "string", "minLength": 1 },
+        "lifestyle": { "type": "string", "minLength": 1 },
+        "family_responsibility": { "type": "string", "minLength": 1 }
+      }
+    },
+    "impact_estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "range", "confidence"],
+      "properties": {
+        "amount": { "type": ["number", "null"] },
+        "range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["low", "high"],
+          "properties": {
+            "low": { "type": ["number", "null"] },
+            "high": { "type": ["number", "null"] }
+          }
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "existing_resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cash", "investments", "income", "employer_benefits", "social_security", "existing_insurance", "family_support"],
+      "properties": {
+        "cash": { "$ref": "#/definitions/factValueOrNull" },
+        "investments": { "$ref": "#/definitions/factValueOrNull" },
+        "income": { "$ref": "#/definitions/factValueOrNull" },
+        "employer_benefits": { "$ref": "#/definitions/factValueOrNull" },
+        "social_security": { "$ref": "#/definitions/factValueOrNull" },
+        "existing_insurance": { "$ref": "#/definitions/factValueOrNull" },
+        "family_support": { "$ref": "#/definitions/factValueOrNull" }
+      }
+    },
+    "existing_protection": { "type": "string", "minLength": 1 },
+
+    "coverage_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_amount", "unprotected_amount", "confidence"],
+      "properties": {
+        "protected_amount": { "type": ["number", "null"] },
+        "unprotected_amount": { "type": ["number", "null"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "liquidity_constraint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "资产是否真可动用、是否需保留应急金、流动性是否匹配风险发生时点。Residual Risk 不得简单金额相减。"
+        }
+      }
+    },
+
+    "residual_risk": { "$ref": "#/definitions/residualRiskLevel" },
+    "severity": { "$ref": "#/definitions/severityLevel" },
+    "likelihood": { "$ref": "#/definitions/likelihoodLevel" },
+    "priority": { "$ref": "#/definitions/riskPriority" },
+
+    "reasoning": { "type": "string", "minLength": 1, "description": "Evidence → Reasoning 链。" },
+    "conclusion": { "type": "string", "minLength": 1, "description": "不得超出 evidence 支撑范围。" },
+    "reasoning_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "description": "可引用 E###（事实）与 REQ-###（需求）。Eval 2 据此校验证据锚定。",
+      "items": { "type": "string", "pattern": "^(E[0-9]{3}|REQ-[0-9]{3})$" }
+    },
+
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/evidenceEntry" }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "assumption", "reason"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "assumption": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "reason"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "next_information_needed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "question", "why_needed"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "question": { "type": "string", "minLength": 1 },
+          "why_needed": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "riskCategory": {
+      "type": "string",
+      "enum": ["R1", "R2", "R3", "R4", "R5"],
+      "description": "R1 Medical / R2 Critical Illness / R3 Accident-Disability / R4 Death-FamilyResponsibility / R5 Long-term Financial。风险域，不是产品分类。"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED"]
+    },
+    "residualRiskLevel": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL", "UNKNOWN"] },
+    "severityLevel": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "likelihoodLevel": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "UNKNOWN"] },
+    "riskPriority": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
+
+    "factValueOrNull": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "status", "source", "confidence"],
+          "properties": {
+            "value": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }, { "type": "null" }] },
+            "status": { "$ref": "#/definitions/status" },
+            "source": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["layer", "field", "origin", "status"],
+              "properties": {
+                "layer": { "type": "string", "enum": ["client_state", "requirement_analysis", "unknown"] },
+                "field": { "type": "string", "minLength": 1 },
+                "origin": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["skill", "field"],
+                  "properties": {
+                    "skill": { "type": "string", "enum": ["client-intake", "requirement-analysis", "unknown"] },
+                    "field": { "type": "string", "minLength": 1 }
+                  }
+                },
+                "status": { "type": "string", "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED", "UNVERIFIED"] }
+              }
+            },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "note": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+
+    "evidenceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "fact", "source"],
+      "properties": {
+        "evidence_id": { "type": "string", "pattern": "^E[0-9]{3}$" },
+        "fact": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["layer", "field", "origin", "status"],
+          "properties": {
+            "layer": { "type": "string", "enum": ["client_state", "requirement_analysis", "unknown"] },
+            "field": { "type": "string", "minLength": 1 },
+            "origin": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["skill", "field"],
+              "properties": {
+                "skill": { "type": "string", "enum": ["client-intake", "requirement-analysis", "unknown"] },
+                "field": { "type": "string", "minLength": 1 }
+              }
+            },
+            "status": { "type": "string", "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED", "UNVERIFIED"] }
+          }
+        }
+      },
+      "if": { "properties": { "source": { "properties": { "layer": { "const": "unknown" } } } } },
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "field": { "const": "unknown" },
+              "origin": { "properties": { "skill": { "const": "unknown" }, "field": { "const": "unknown" } } },
+              "status": { "const": "UNVERIFIED" }
+            }
+          }
+        },
+        "description": "不可溯源时必须显式 unknown/UNVERIFIED，禁止伪装成 KNOWN。"
+      }
+    }
+  }
+}

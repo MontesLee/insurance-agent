@@ -1,0 +1,48 @@
+﻿id: accident
+name: 意外需求
+version: 0.1
+status: active
+priority: 30
+
+triggers:
+  keywords:
+    - 意外
+    - 工伤
+    - 伤残
+    - 职业风险
+  goal_types:
+    - accident
+
+requires_confirm: false
+
+dimensions: requirement-dimensions.md
+
+contamination_terms:
+  - 意外身故
+  - 意外伤残
+  - 意外医疗
+  - 职业类别
+
+boundary:
+  must_not:
+    - 计算或建议意外保额
+    - 判定职业风险等级结论（只记录职业事实）
+
+analysis:
+  required_fields:
+    - occupation
+  evidence_fact_refs:
+    - occupation
+    - family_responsibility
+    - existing_accident_coverage
+  coverage_field: existing_accident_coverage
+  need_formula: none
+  priority_rule: accident_gate
+  priority_when_gate_satisfied: P1_HIGH
+  priority_when_gate_unsatisfied: P2_MEDIUM
+
+texts:
+  risk: "Occupation-related accident exposure may affect earnings continuity and household stability."
+  impact: "Accident events may cause short-term treatment cost and temporary income disruption."
+  gap: "Need to confirm whether current accident protection matches occupation exposure and family responsibility."
+  reasoning: "Occupation and family responsibility together determine whether an accident would create meaningful income disruption or liability pressure."

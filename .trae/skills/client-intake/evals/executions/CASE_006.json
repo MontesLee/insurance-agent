@@ -1,0 +1,81 @@
+{
+  "case_id": "CASE_006",
+  "client_dir": "CASE_006-Regression",
+  "note": "信息冲突测试。R2 客户更正 R1 说法，按规则用最新值覆盖，旧值进 Conflict Notes，Profile 不保留双份当前值。",
+  "rounds": [
+    {
+      "round": 1,
+      "customer_text": "我去年收入80万。",
+      "confirmed": [
+        { "s": "1.3", "f": "去年收入", "k": "last_year_income", "v": "80万", "t": "我去年收入80万" }
+      ],
+      "inferred": [],
+      "pending": [],
+      "conflicts": [],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "已满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任结构（H4）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [
+        {
+          "id": "Q001",
+          "p": "P0",
+          "intent": "家庭结构",
+          "q": "方便先说一下您家里的情况吗？比如有没有爱人、孩子",
+          "reason": "H4 家庭责任未满足，阻塞进入 Needs Analysis"
+        }
+      ],
+      "qids": [
+        {
+          "id": "Q001", "p": "P0", "intent": "家庭结构",
+          "q": "方便先说一下您家里的情况吗？比如有没有爱人、孩子",
+          "first": 1, "status": "unanswered", "answer": "", "pid": "", "last": 1
+        }
+      ],
+      "notes": "客户仅提供去年收入，未说明今年收入；不得替客户推断今年收入。"
+    },
+    {
+      "round": 2,
+      "customer_text": "不是，刚才说错了，去年其实60万，今年预计80万。",
+      "confirmed": [
+        { "s": "1.3", "f": "去年收入", "k": "last_year_income", "v": "60万", "t": "去年其实60万" },
+        { "s": "1.3", "f": "今年收入预估", "k": "current_year_income", "v": "80万", "t": "今年预计80万" }
+      ],
+      "inferred": [],
+      "pending": [],
+      "conflicts": ["R1 旧说法被 R2 修正：去年收入 80万 -> 60万（客户主动更正）"],
+      "h_status": {
+        "H1": "未满足", "H2": "未满足", "H3": "未满足",
+        "H4": "未满足", "H5": "已满足", "H6": "未满足"
+      },
+      "intake_complete": false,
+      "blocking": ["年龄（H1）", "城市（H2）", "职业（H3）", "家庭责任结构（H4）", "家庭年支出（H6）"],
+      "followup": [],
+      "next_questions": [
+        {
+          "id": "Q002",
+          "p": "P0",
+          "intent": "家庭结构",
+          "q": "明白，那就按 60 万和 80 万记。家里这边呢，结婚了吗？",
+          "reason": "Q001 被 ignored；客户本轮用于更正信息，P0 不降级但换问法重问（5.2）"
+        }
+      ],
+      "qids": [
+        {
+          "id": "Q001", "p": "P0", "intent": "家庭结构",
+          "q": "方便先说一下您家里的情况吗？比如有没有爱人、孩子",
+          "first": 1, "status": "ignored", "answer": "", "pid": "", "last": 2
+        },
+        {
+          "id": "Q002", "p": "P0", "intent": "家庭结构",
+          "q": "明白，那就按 60 万和 80 万记。家里这边呢，结婚了吗？",
+          "first": 2, "status": "unanswered", "answer": "", "pid": "", "last": 2
+        }
+      ],
+      "notes": "冲突处理：去年收入用最新口径 60 万覆盖，旧值 80 万不再作为当前值保留（仅存于 Log 与 Conflict Notes）；今年收入 80 万为新字段。"
+    }
+  ]
+}

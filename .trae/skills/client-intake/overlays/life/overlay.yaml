@@ -1,0 +1,34 @@
+id: life
+name: 寿险
+version: 0.1
+status: active
+priority: 45
+
+triggers:
+  keywords:
+    - 寿险
+    - 身故
+    - 房贷
+    - 家庭责任
+    - 万一我不在
+    - 家里顶梁柱
+    - 留一笔钱
+  goal_types:
+    - life
+
+requires_confirm: true
+
+dimensions: intake-dimensions.md
+
+contamination_terms:
+  - 定寿
+  - 全残责任
+  - 保额缺口
+  - 家庭责任缺口
+
+boundary:
+  must_not:
+    - 计算或建议寿险保额（属方案设计环节）
+    - 评价家庭责任轻重
+    - 指定或建议受益人（只记录客户意向）
+    - 预判核保结论
