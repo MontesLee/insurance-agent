@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KnowledgeSearchOutput",
+  "type": "object",
+  "required": ["status", "query", "results", "retrieval_metadata"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial_evidence", "insufficient_evidence", "retrieval_error"]
+    },
+    "query": { "type": "string" },
+    "normalized_query": { "type": "string" },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["chunk_id", "document_id", "document_name", "source_type", "source_level", "section", "content", "score"],
+        "properties": {
+          "chunk_id": { "type": "string" },
+          "document_id": { "type": "string" },
+          "document_name": { "type": "string" },
+          "source_type": { "type": "string" },
+          "source_level": { "type": "string" },
+          "section": { "type": "string" },
+          "content": { "type": "string" },
+          "score": { "type": "number" },
+          "retrieval_score": { "type": "number" },
+          "rerank_score": { "type": "number" },
+          "final_score": { "type": "number" },
+          "metadata": { "type": "object" }
+        }
+      }
+    },
+    "conflict": { "type": "boolean", "default": false },
+    "reason": { "type": "string" },
+    "retrieval_metadata": { "type": "object" }
+  }
+}

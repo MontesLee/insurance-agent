@@ -1,0 +1,23 @@
+{
+  "repair_version": "1.0-externality",
+  "repair_method": "risk_repair_v1",
+  "max_attempts": 2,
+  "stop_on_no_change": true,
+  "note": "负向测试专用：把 RECOMPUTE_RESIDUAL 的模式由 AUTO 翻成 REVIEW，验证动作模式确实由规则文件决定而非引擎硬编码。其余动作与正式规则一致。",
+
+  "actions": {
+    "CLAMP_NOT_IDENTIFIED_BANDS": { "codes": ["LOGICAL_INCONSISTENCY"], "mode": "AUTO", "description": "同正式规则" },
+    "RECOMPUTE_RESIDUAL": { "codes": ["LOGICAL_INCONSISTENCY"], "mode": "REVIEW", "review_reason": "（负向测试）该动作被规则文件置为 REVIEW，不得自动重算。" },
+    "RECOMPUTE_PRIORITY": { "codes": ["PRIORITY_INCONSISTENT"], "mode": "AUTO", "description": "同正式规则" },
+    "DROP_DANGLING_REFS": { "codes": ["UNSUPPORTED_CONCLUSION"], "mode": "AUTO", "description": "同正式规则" },
+    "ESCALATE_UNSUPPORTED": { "codes": ["UNSUPPORTED_CONCLUSION"], "mode": "REVIEW", "review_reason": "同正式规则" },
+    "ESCALATE_MISSING_RISK": { "codes": ["MISSING_RISK"], "mode": "REVIEW", "review_reason": "同正式规则" },
+    "ESCALATE_UNKNOWN_AS_KNOWN": { "codes": ["UNKNOWN_AS_KNOWN"], "mode": "REVIEW", "review_reason": "同正式规则" },
+    "ESCALATE_SALES_BIAS": { "codes": ["SALES_BIAS"], "mode": "REVIEW", "review_reason": "同正式规则" },
+    "ESCALATE_PRODUCT_LEAK": { "codes": ["PRODUCT_RECOMMENDATION_LEAK"], "mode": "REVIEW", "review_reason": "同正式规则" },
+    "ESCALATE_INVALID_OUTPUT": { "codes": ["INVALID_OUTPUT"], "mode": "REVIEW", "review_reason": "同正式规则" }
+  },
+
+  "needs_review_note_template": "Repair Loop 未能收敛（attempts={attempts}/{max}）。剩余 BLOCKING：{codes}。无法可靠判断项：{reasons}。需人工确认：{ask}",
+  "needs_review_ask": "逐项确认是补充事实、撤回结论，还是调整判定规则；不得由机检代为选择。"
+}

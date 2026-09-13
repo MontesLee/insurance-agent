@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "description": "risk-analysis · Repair Loop（Phase 7）用例清单（单一真源）。test-risk-analysis-repair.ps1 与 verify-contract.py §9 均读本文件。",
+  "fixture_dirs": {
+    "repair": "evals/fixtures/unit/repair",
+    "eval": "evals/fixtures/unit/eval"
+  },
+  "cases": [
+    {
+      "name": "clean-idempotent",
+      "dir": "repair",
+      "fixture": "repair-clean.json",
+      "expect": { "eval_status": "PASS", "repair_attempts": 0, "repair_required": false, "output_unchanged": true },
+      "note": "已合格产物不得被修改；repair_attempts 必须为 0"
+    },
+    {
+      "name": "residual-recomputed",
+      "dir": "repair",
+      "fixture": "repair-residual.json",
+      "expect": { "eval_status": "PASS", "repair_attempts": 1, "repair_required": true,
+                  "action": "RECOMPUTE_RESIDUAL", "code": "LOGICAL_INCONSISTENCY" },
+      "note": "residual 错档由公式重算修回"
+    },
+    {
+      "name": "priority-recomputed",
+      "dir": "repair",
+      "fixture": "repair-priority.json",
+      "expect": { "eval_status": "PASS", "repair_attempts": 1, "repair_required": true,
+                  "action": "RECOMPUTE_PRIORITY", "code": "PRIORITY_INCONSISTENT" },
+      "note": "priority 与矩阵失配，按 priority_matrix + overrides 重算"
+    },
+    {
+      "name": "not-identified-clamped",
+      "dir": "repair",
+      "fixture": "repair-not-identified.json",
+      "expect": { "eval_status": "PASS", "repair_attempts": 1, "repair_required": true,
+                  "action": "CLAMP_NOT_IDENTIFIED_BANDS", "code": "LOGICAL_INCONSISTENCY" },
+      "note": "risk_exists=false 越档 → 强制 LOW/LOW/P3"
+    },
+    {
+      "name": "dangling-ref-dropped",
+      "dir": "repair",
+      "fixture": "repair-dangling.json",
+      "expect": { "eval_status": "PASS", "repair_attempts": 1, "repair_required": true,
+                  "action": "DROP_DANGLING_REFS", "code": "UNSUPPORTED_CONCLUSION",
+                  "absent_ref": "E999" },
+      "note": "删除悬空锚点（虚假溯源主张），保留合法锚点"
+    },
+    {
+      "name": "multiround-converges",
+      "dir": "repair",
+      "fixture": "repair-multiround.json",
+      "scoring": "repair-alt.scoring.json",
+      "expect": { "eval_status": "PASS", "repair_attempts": 2, "repair_required": true },
+      "note": "第 1 轮修 residual 后才暴露 priority 失配，第 2 轮收敛"
+    },
+    {
+      "name": "fixpoint-stops-early",
+      "dir": "repair",
+      "fixture": "repair-fixpoint.json",
+      "scoring": "repair-alt.scoring.json",
+      "expect": { "eval_status": "NEEDS_REVIEW", "repair_attempts": 0, "repair_required": true },
+      "note": "AUTO 动作存在但重算结果与原值相同 → 不动点，提前终止，不空转消耗 attempt"
+    },
+    {
+      "name": "sales-bias-escalated",
+      "dir": "eval",
+      "fixture": "eval-neg-sales.json",
+      "expect": { "eval_status": "NEEDS_REVIEW", "repair_attempts": 0, "repair_required": true,
+                  "output_unchanged": true },
+      "note": "立场问题禁止自动清洗；产物必须原样保留以留痕"
+    },
+    {
+      "name": "unknown-as-known-escalated",
+      "dir": "eval",
+      "fixture": "eval-neg-unknown-as-known.json",
+      "expect": { "eval_status": "NEEDS_REVIEW", "repair_attempts": 0, "repair_required": true,
+                  "output_unchanged": true },
+      "note": "主张越界非计算错误；降级 status 修不干净，整体上报"
+    },
+    {
+      "name": "missing-domain-escalated",
+      "dir": "eval",
+      "fixture": "eval-neg-missing-domain.json",
+      "discovery": "eval-neg-missing-domain.discovery.json",
+      "expect": { "eval_status": "NEEDS_REVIEW", "repair_attempts": 0, "repair_required": true,
+                  "output_unchanged": true },
+      "note": "域缺失需上游事实，禁止凭空生成 Risk 对象"
+    },
+    {
+      "name": "rule-externality-noauto",
+      "dir": "repair",
+      "fixture": "repair-residual.json",
+      "repair_rules": "repair-noauto.rules.json",
+      "expect": { "eval_status": "NEEDS_REVIEW", "repair_attempts": 0, "repair_required": true,
+                  "output_unchanged": true },
+      "note": "把 RECOMPUTE_RESIDUAL 的模式由 AUTO 翻成 REVIEW，原本 1 轮收敛的用例必须转为上报——证明动作模式外置可控"
+    }
+  ]
+}

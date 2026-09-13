@@ -283,6 +283,38 @@ $cases.Add(@{
 })
 
 $cases.Add(@{
+    Name = 'adversarial: 整句式中文否定（无需固定赡养 / 不承担赡养）→ R4 NOT_IDENTIFIED'
+    Run  = {
+        $o = Invoke-RdDiscovery -Fixture 'case-embedded-negation.json' -OutName 'disc_embedded_neg.json'
+        Assert-RdStageShape $o 5
+        Assert-Contains $o.discovery.not_identified 'R4' '客户原话是整句时也必须识别为"明确无责任"，不得因否定词不在词首而误判成立'
+        $r4 = Get-RdCandidate $o 'R4'
+        # 消极结论不是"什么都不说"：必须列出支撑该结论的消极事实，且每条都可溯源
+        Assert-True (@($r4.evidence).Count -ge 1) '消极结论必须给出消极证据，不得凭空断言不成立'
+        foreach ($ev in @($r4.evidence)) {
+            Assert-True ([string]$ev.source.layer -ne 'unknown') "消极证据必须可溯源：($($ev.fact))"
+        }
+    }
+})
+
+$cases.Add(@{
+    Name = 'negative: 清空 negative_substrings → R4 结论必须改变（证明子串词表真外置）'
+    Run  = {
+        $r = (Get-Content -LiteralPath $rulesPath -Raw -Encoding UTF8) | ConvertFrom-Json
+        $r.negative_substrings = @()
+        $corrupt = Join-Path $tmp 'corrupt-rules-no-substring.json'
+        ($r | ConvertTo-Json -Depth 32) | Set-Content -LiteralPath $corrupt -Encoding UTF8
+        try {
+            $o = Invoke-RdDiscovery -Fixture 'case-embedded-negation.json' -OutName 'disc_corrupt_sub.json' -Rules $corrupt
+            $r4 = Get-RdCandidate $o 'R4'
+            Assert-True ($r4.discovery_status -ne 'NOT_IDENTIFIED') '清空子串词表后 R4 必须改变（否则说明整句否定被硬编码在引擎里）'
+        } finally {
+            if (Test-Path -LiteralPath $corrupt) { [System.IO.File]::Delete($corrupt) }
+        }
+    }
+})
+
+$cases.Add(@{
     Name = 'negative: 清空 negative_tokens → 结论必须改变（证明规则真外置）'
     Run  = {
         $r = (Get-Content -LiteralPath $rulesPath -Raw -Encoding UTF8) | ConvertFrom-Json

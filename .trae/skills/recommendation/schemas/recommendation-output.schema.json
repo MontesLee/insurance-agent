@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RecommendationOutput",
+  "description": "Structured, evidence-backed recommendation. Decision-support output, NOT a sales script. Every claim carries provenance.",
+  "type": "object",
+  "required": [
+    "skill", "version", "status", "decision_context",
+    "candidate_evaluations", "primary_recommendation",
+    "alternatives", "not_recommended", "tradeoffs",
+    "uncertainties", "evidence_refs", "human_review_required"
+  ],
+  "properties": {
+    "skill": { "type": "string", "const": "recommendation" },
+    "version": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["COMPLETE", "INSUFFICIENT_INPUT", "NO_CANDIDATES", "INCOMPLETE_EVIDENCE"]
+    },
+    "decision_context": {
+      "type": "object",
+      "properties": {
+        "priority_goals": { "type": "array" },
+        "risk_gaps": { "type": "array" },
+        "hard_constraints": { "type": "array" },
+        "uncertainties": { "type": "array" }
+      }
+    },
+    "candidate_evaluations": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/candidateEvaluation" }
+    },
+    "primary_recommendation": {
+      "type": ["object", "null"],
+      "properties": {
+        "candidate_id": { "type": "string" },
+        "fit": {
+          "type": "string",
+          "enum": ["strong_fit", "good_fit", "partial_fit", "poor_fit", "not_suitable", "insufficient_evidence"]
+        },
+        "reason_codes": { "type": "array", "items": { "type": "string" } },
+        "provenance": { "type": "array" }
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "candidate_id": { "type": "string" },
+          "fit": { "type": "string" },
+          "tradeoff": { "type": "string" }
+        }
+      }
+    },
+    "not_recommended": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "candidate_id": { "type": "string" },
+          "reason": { "type": "string" },
+          "exception": { "type": "boolean" }
+        }
+      }
+    },
+    "tradeoffs": { "type": "array" },
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["missing_information", "insufficient_evidence", "evidence_conflict", "assumption", "human_review"] },
+          "detail": { "type": "string" },
+          "candidate_id": { "type": ["string", "null"] }
+        },
+        "required": ["type", "detail"]
+      }
+    },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "human_review_required": { "type": "boolean" }
+  },
+  "definitions": {
+    "candidateEvaluation": {
+      "type": "object",
+      "required": [
+        "candidate_id", "requirement_fit", "risk_fit",
+        "constraint_fit", "evidence", "recommendation_status"
+      ],
+      "properties": {
+        "candidate_id": { "type": "string" },
+        "requirement_fit": {
+          "type": "object",
+          "required": ["overall", "matched", "partial", "unmet"],
+          "properties": {
+            "overall": {
+              "type": "string",
+              "enum": ["strong_fit", "good_fit", "partial_fit", "poor_fit", "not_suitable", "insufficient_evidence"]
+            },
+            "score": { "type": "number" },
+            "matched": { "type": "array" },
+            "partial": { "type": "array" },
+            "unmet": { "type": "array" }
+          }
+        },
+        "risk_fit": {
+          "type": "object",
+          "required": ["overall", "covered_risks", "remaining_gaps"],
+          "properties": {
+            "overall": {
+              "type": "string",
+              "enum": ["strong_fit", "good_fit", "partial_fit", "poor_fit", "not_suitable", "insufficient_evidence"]
+            },
+            "score": { "type": "number" },
+            "covered_risks": { "type": "array" },
+            "remaining_gaps": { "type": "array" }
+          }
+        },
+        "constraint_fit": {
+          "type": "object",
+          "required": ["hard_constraints", "soft_constraints", "violations"],
+          "properties": {
+            "hard_constraints": { "type": "array" },
+            "soft_constraints": { "type": "array" },
+            "violations": { "type": "array" }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": ["status", "refs"],
+          "properties": {
+            "status": { "type": "string", "enum": ["supported", "insufficient", "conflict"] },
+            "refs": { "type": "array" },
+            "missing_evidence": { "type": "array" }
+          }
+        },
+        "tradeoffs": { "type": "array" },
+        "uncertainties": { "type": "array" },
+        "recommendation_status": {
+          "type": "string",
+          "enum": ["primary", "alternative", "not_recommended", "insufficient_evidence"]
+        },
+        "provenance": { "type": "array" }
+      }
+    }
+  }
+}

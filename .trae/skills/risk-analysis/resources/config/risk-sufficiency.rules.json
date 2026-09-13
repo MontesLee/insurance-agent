@@ -2,35 +2,21 @@
   "rules_version": "1.0",
   "method": "risk_dependency_graph_v1",
   "description": "risk-analysis 信息充分性规则。不使用单一百分比：每个风险域有独立依赖图（required/important/optional 三层），任一 required 缺失即置 INSUFFICIENT，与总分无关。",
-
-  "status_satisfied": ["KNOWN", "ESTIMATED", "ASSUMED", "INFERRED"],
-  "status_unsatisfied": ["UNKNOWN"],
-
+  "status_satisfied": [
+    "KNOWN",
+    "ESTIMATED",
+    "ASSUMED",
+    "INFERRED"
+  ],
   "tier_weights": {
     "required": 1.0,
     "important": 0.6,
     "optional": 0.2
   },
-
   "thresholds": {
     "sufficient_score": 0.85,
     "note": "required 全部满足是 SUFFICIENT 的必要非充分条件；score 再高只要有 required 缺失即 INSUFFICIENT。"
   },
-
-  "domain_status_rules": {
-    "CONFLICTING": "域内存在 conflict 字段",
-    "INSUFFICIENT": "存在未满足的 required 字段或 required group",
-    "SUFFICIENT": "required 全部满足且 score >= sufficient_score",
-    "PARTIAL": "required 全部满足但 score < sufficient_score"
-  },
-
-  "overall_status_rules": {
-    "CONFLICTING": "任一域 CONFLICTING",
-    "INSUFFICIENT": "无 CONFLICTING 且任一域 INSUFFICIENT",
-    "SUFFICIENT": "全域 SUFFICIENT",
-    "PARTIAL": "其他"
-  },
-
   "analysis_status_rules": {
     "by_sufficiency_status": {
       "CONFLICTING": "CONFLICTING_INFORMATION",
@@ -38,93 +24,200 @@
       "PARTIAL": "PRELIMINARY",
       "SUFFICIENT": "FORMAL"
     },
-    "precedence": ["FAILED", "NEEDS_REVIEW", "CONFLICTING_INFORMATION", "NEED_MORE_INFORMATION", "PRELIMINARY", "FORMAL"],
+    "precedence": [
+      "FAILED",
+      "NEEDS_REVIEW",
+      "CONFLICTING_INFORMATION",
+      "NEED_MORE_INFORMATION",
+      "PRELIMINARY",
+      "FORMAL"
+    ],
     "note": "NEEDS_REVIEW / FAILED 由 Eval 与引擎异常置位，Phase 3 只负责前四种映射。"
   },
-
   "groups": {
     "income_anchor": {
-      "any_of": ["annual_income", "household_income"],
+      "any_of": [
+        "annual_income",
+        "household_income"
+      ],
       "description": "收入基数。用于量化收入中断 / 身故造成的现金流损失规模。"
     },
     "absorb_capacity": {
-      "any_of": ["household_income", "annual_income", "assets"],
+      "any_of": [
+        "household_income",
+        "annual_income",
+        "assets"
+      ],
       "description": "家庭吸收医疗等一次性支出的能力。三者知其一即可。"
     },
     "responsibility_scale": {
-      "any_of": ["mortgage_balance", "liabilities", "children_education", "elderly_support", "family_responsibility"],
+      "any_of": [
+        "mortgage_balance",
+        "liabilities",
+        "children_education",
+        "elderly_support",
+        "family_responsibility"
+      ],
       "description": "长期责任规模。任一存在都会放大收入中断 / 身故的后果。"
     }
   },
-
-  "field_profile_index": {
-    "age": "family_profile",
-    "gender": "family_profile",
-    "city": "family_profile",
-    "marital_status": "family_profile",
-    "spouse_employment": "family_profile",
-    "spouse_income": "family_profile",
-    "children_count": "family_profile",
-    "children_info": "family_profile",
-    "dependents": "family_profile",
-    "household_income": "financial_profile",
-    "annual_income": "financial_profile",
-    "household_expense": "financial_profile",
-    "assets": "financial_profile",
-    "cash_flow": "financial_profile",
-    "premium_budget": "financial_profile",
-    "mortgage_balance": "responsibility_profile",
-    "liabilities": "responsibility_profile",
-    "children_education": "responsibility_profile",
-    "elderly_support": "responsibility_profile",
-    "family_responsibility": "responsibility_profile",
-    "social_insurance_status": "existing_protection",
-    "existing_life_coverage": "existing_protection",
-    "existing_critical_illness_coverage": "existing_protection",
-    "existing_medical_coverage": "existing_protection",
-    "existing_accident_coverage": "existing_protection",
-    "employer_benefits": "existing_protection",
-    "customer_health": "health_profile",
-    "health_history": "health_profile",
-    "occupation": "employment_profile",
-    "employment_type": "employment_profile",
-    "income_stability": "employment_profile"
-  },
-
   "domains": {
     "R1": {
       "name": "Medical Risk",
-      "required":  { "fields": ["social_insurance_status", "existing_medical_coverage"], "groups": ["absorb_capacity"] },
-      "important": { "fields": ["customer_health", "household_expense", "age", "children_count", "dependents"], "groups": [] },
-      "optional":  { "fields": ["employer_benefits", "city", "health_history"], "groups": [] }
+      "required": {
+        "fields": [
+          "social_insurance_status",
+          "existing_medical_coverage"
+        ],
+        "groups": [
+          "absorb_capacity"
+        ]
+      },
+      "important": {
+        "fields": [
+          "customer_health",
+          "household_expense",
+          "age",
+          "children_count",
+          "dependents"
+        ],
+        "groups": []
+      },
+      "optional": {
+        "fields": [
+          "employer_benefits",
+          "city",
+          "health_history"
+        ],
+        "groups": []
+      }
     },
     "R2": {
       "name": "Critical Illness Risk",
-      "required":  { "fields": ["existing_critical_illness_coverage"], "groups": ["income_anchor"] },
-      "important": { "fields": ["customer_health", "age", "income_stability", "assets"], "groups": ["responsibility_scale"] },
-      "optional":  { "fields": ["social_insurance_status", "household_expense", "occupation", "employment_type"], "groups": [] }
+      "required": {
+        "fields": [
+          "existing_critical_illness_coverage"
+        ],
+        "groups": [
+          "income_anchor"
+        ]
+      },
+      "important": {
+        "fields": [
+          "customer_health",
+          "age",
+          "income_stability",
+          "assets"
+        ],
+        "groups": [
+          "responsibility_scale"
+        ]
+      },
+      "optional": {
+        "fields": [
+          "social_insurance_status",
+          "household_expense",
+          "occupation",
+          "employment_type"
+        ],
+        "groups": []
+      }
     },
     "R3": {
       "name": "Accident / Disability Risk",
-      "required":  { "fields": ["existing_accident_coverage"], "groups": ["income_anchor"] },
-      "important": { "fields": ["occupation", "employment_type", "income_stability", "existing_medical_coverage"], "groups": ["responsibility_scale"] },
-      "optional":  { "fields": ["age", "gender", "existing_life_coverage", "assets", "city"], "groups": [] }
+      "required": {
+        "fields": [
+          "existing_accident_coverage"
+        ],
+        "groups": [
+          "income_anchor"
+        ]
+      },
+      "important": {
+        "fields": [
+          "occupation",
+          "employment_type",
+          "income_stability",
+          "existing_medical_coverage"
+        ],
+        "groups": [
+          "responsibility_scale"
+        ]
+      },
+      "optional": {
+        "fields": [
+          "age",
+          "gender",
+          "existing_life_coverage",
+          "assets",
+          "city"
+        ],
+        "groups": []
+      }
     },
     "R4": {
       "name": "Death / Family Responsibility Risk",
-      "required":  { "fields": ["existing_life_coverage"], "groups": ["income_anchor", "responsibility_scale"] },
-      "important": { "fields": ["marital_status", "children_count", "children_info", "spouse_income", "dependents", "assets"], "groups": [] },
-      "optional":  { "fields": ["spouse_employment", "household_expense", "city", "household_income"], "groups": [] }
+      "required": {
+        "fields": [
+          "existing_life_coverage"
+        ],
+        "groups": [
+          "income_anchor",
+          "responsibility_scale"
+        ]
+      },
+      "important": {
+        "fields": [
+          "marital_status",
+          "children_count",
+          "children_info",
+          "spouse_income",
+          "dependents",
+          "assets"
+        ],
+        "groups": []
+      },
+      "optional": {
+        "fields": [
+          "spouse_employment",
+          "household_expense",
+          "city",
+          "household_income"
+        ],
+        "groups": []
+      }
     },
     "R5": {
       "name": "Long-term Financial / Savings Risk",
-      "required":  { "fields": [], "groups": ["income_anchor"] },
-      "important": { "fields": ["assets", "household_expense", "cash_flow", "premium_budget", "age", "children_education"], "groups": [] },
-      "optional":  { "fields": ["spouse_income", "employment_type", "income_stability", "city"], "groups": [] },
+      "required": {
+        "fields": [],
+        "groups": [
+          "income_anchor"
+        ]
+      },
+      "important": {
+        "fields": [
+          "assets",
+          "household_expense",
+          "cash_flow",
+          "premium_budget",
+          "age",
+          "children_education"
+        ],
+        "groups": []
+      },
+      "optional": {
+        "fields": [
+          "spouse_income",
+          "employment_type",
+          "income_stability",
+          "city"
+        ],
+        "groups": []
+      },
       "note": "R5 常态为 P3。required 仅保留 income_anchor，避免长期财务目标信息缺失阻塞整条链路。"
     }
   },
-
   "eiv": {
     "max_questions_per_round": 3,
     "blocking_multiplier": 2.0,
@@ -141,47 +234,164 @@
     },
     "conflict_bonus": 0.5,
     "normalizer": 4.0,
-    "priority_thresholds": { "HIGH": 0.75, "MEDIUM": 0.45 },
+    "priority_thresholds": {
+      "HIGH": 0.75,
+      "MEDIUM": 0.45
+    },
     "formula": "raw = tier_weight * blocking_multiplier * spread * status_factor + conflict_bonus; eiv = min(raw / normalizer, 1.0)",
     "note": "spread = min(1 + step*(受影响域数-1), cap)。跨域影响越广、越是 blocking、越是 UNKNOWN，信息价值越高。"
   },
-
   "question_templates": {
-    "age": { "question": "请确认家庭成员各自年龄？", "why_needed": "年龄决定医疗、重疾与意外的发生率区间，也决定长期财务目标的时间跨度。" },
-    "gender": { "question": "请确认被分析成员的性别？", "why_needed": "部分风险的发生率与性别相关，用于校准可能性档位。" },
-    "city": { "question": "家庭常住城市是？", "why_needed": "不同城市医疗资源与社保政策不同，影响医疗支出自付比例的判断。" },
-    "marital_status": { "question": "目前的婚姻状况是？", "why_needed": "婚姻状况决定身故 / 收入中断风险的直接承受人与责任范围。" },
-    "spouse_employment": { "question": "配偶目前是否在职？工作形态是怎样的？", "why_needed": "配偶就业状况决定家庭是否具备第二收入来源，直接影响收入中断后的缓冲能力。" },
-    "spouse_income": { "question": "配偶的年收入大概是多少？", "why_needed": "配偶收入是家庭收入中断时最重要的替代来源，决定身故与失能风险的缺口规模。" },
-    "children_count": { "question": "目前有几个子女需要抚养？", "why_needed": "子女数量决定家庭责任规模与教育支出的长期负担。" },
-    "children_info": { "question": "子女的年龄分别是多大？", "why_needed": "子女年龄决定抚养责任还需持续多少年，是量化家庭责任的核心参数。" },
-    "dependents": { "question": "除子女外，是否还有其他需要长期赡养或扶助的家庭成员？", "why_needed": "额外被扶养人会显著拉长家庭责任期限，放大身故与失能后果。" },
-    "household_income": { "question": "家庭税后年收入大概是多少？", "why_needed": "家庭收入是所有收入中断类风险的损失基数，缺失则无法量化后果。" },
-    "annual_income": { "question": "您本人目前的年收入大概是多少？", "why_needed": "本人收入决定身故 / 失能 / 重疾造成的收入损失规模，是残值风险的核心基数。" },
-    "household_expense": { "question": "家庭每年的固定生活开支大概是多少？", "why_needed": "固定开支决定收入中断后家庭现金流能支撑多久，是后果持续性的关键。" },
-    "assets": { "question": "如果家庭主要收入来源中断，目前大概有多少可以随时动用的现金或金融资产？", "why_needed": "用于判断家庭能否独立吸收收入中断带来的现金流冲击，决定残余风险高低。" },
-    "cash_flow": { "question": "家庭每年的结余（收入减支出）大概是多少？", "why_needed": "结余水平决定家庭自我积累保障的能力，影响长期财务风险评估。" },
-    "premium_budget": { "question": "家庭每年可用于风险管理的预算大概是多少？", "why_needed": "预算约束决定后续方案的可执行性，不影响风险本身但影响处理路径。" },
-    "mortgage_balance": { "question": "目前房贷 / 其他贷款的剩余本金大概是多少？", "why_needed": "负债余额是家庭刚性责任的主要构成，直接放大身故与收入中断的后果。" },
-    "liabilities": { "question": "除房贷外，家庭是否还有其他负债（车贷、消费贷、私人借款等）？金额大概多少？", "why_needed": "其他负债同样属于刚性支出，缺失会低估家庭责任规模。" },
-    "children_education": { "question": "子女未来教育大致规划与费用预期是怎样的？", "why_needed": "教育支出是典型的长期刚性责任，决定身故 / 失能风险的持续时间与规模。" },
-    "elderly_support": { "question": "是否需要赡养父母？每月或每年的赡养支出大概是多少？", "why_needed": "赡养责任属于长期刚性支出，会显著拉长家庭责任期限。" },
-    "family_responsibility": { "question": "目前家庭最主要的长期责任有哪些（房贷、子女教育、赡养父母等）？", "why_needed": "长期责任是身故 / 收入中断风险的放大器，缺失则无法判断风险是否成立。" },
-    "social_insurance_status": { "question": "家庭成员目前的社保 / 医保参保情况如何？", "why_needed": "社保是医疗支出的第一层保障，直接影响医疗风险的自付比例与残余风险。" },
-    "existing_life_coverage": { "question": "目前是否已经有人身寿险保障？保额大概是多少？", "why_needed": "已有寿险是身故风险的直接对冲，缺失则无法计算残余风险。" },
-    "existing_critical_illness_coverage": { "question": "目前是否已有重大疾病保障？保额大概是多少？", "why_needed": "已有重疾保障是重疾收入中断风险的直接对冲，决定残余风险规模。" },
-    "existing_medical_coverage": { "question": "除医保外，是否还有商业医疗保障（如住院医疗、意外医疗）？", "why_needed": "商业医疗险是医保之外的主要支付来源，直接决定医疗支出的自付缺口。" },
-    "existing_accident_coverage": { "question": "目前是否有意外或伤残类保障？保额大概是多少？", "why_needed": "已有意外 / 伤残保障是失能风险的直接对冲，缺失则无法判断残余风险。" },
-    "employer_benefits": { "question": "单位提供了哪些福利保障（补充医疗、团险、体检等）？", "why_needed": "雇主福利是家庭现有保障的组成部分，忽略会高估保障缺口。" },
-    "customer_health": { "question": "目前的健康状况如何？近期体检有无异常？", "why_needed": "健康状况是重疾与医疗风险可能性的主要输入，缺失时不得假设健康。" },
-    "health_history": { "question": "既往是否有住院、手术或慢性病病史？", "why_needed": "既往病史直接影响重疾与医疗风险的可能性档位。" },
-    "occupation": { "question": "目前的职业与主要工作内容是什么？", "why_needed": "职业类型决定意外与失能风险的暴露程度。" },
-    "employment_type": { "question": "目前的用工形态是？（全职 / 灵活就业 / 自雇 / 无固定职业）", "why_needed": "用工形态决定收入稳定性与雇主保障的可得性。" },
-    "income_stability": { "question": "收入来源是否稳定？是否存在明显的波动或不确定性？", "why_needed": "收入稳定性决定收入中断风险的现实暴露程度。" }
+    "age": {
+      "question": "请确认家庭成员各自年龄？",
+      "why_needed": "年龄决定医疗、重疾与意外的发生率区间，也决定长期财务目标的时间跨度。"
+    },
+    "gender": {
+      "question": "请确认被分析成员的性别？",
+      "why_needed": "部分风险的发生率与性别相关，用于校准可能性档位。"
+    },
+    "city": {
+      "question": "家庭常住城市是？",
+      "why_needed": "不同城市医疗资源与社保政策不同，影响医疗支出自付比例的判断。"
+    },
+    "marital_status": {
+      "question": "目前的婚姻状况是？",
+      "why_needed": "婚姻状况决定身故 / 收入中断风险的直接承受人与责任范围。"
+    },
+    "spouse_employment": {
+      "question": "配偶目前是否在职？工作形态是怎样的？",
+      "why_needed": "配偶就业状况决定家庭是否具备第二收入来源，直接影响收入中断后的缓冲能力。"
+    },
+    "spouse_income": {
+      "question": "配偶的年收入大概是多少？",
+      "why_needed": "配偶收入是家庭收入中断时最重要的替代来源，决定身故与失能风险的缺口规模。"
+    },
+    "children_count": {
+      "question": "目前有几个子女需要抚养？",
+      "why_needed": "子女数量决定家庭责任规模与教育支出的长期负担。"
+    },
+    "children_info": {
+      "question": "子女的年龄分别是多大？",
+      "why_needed": "子女年龄决定抚养责任还需持续多少年，是量化家庭责任的核心参数。"
+    },
+    "dependents": {
+      "question": "除子女外，是否还有其他需要长期赡养或扶助的家庭成员？",
+      "why_needed": "额外被扶养人会显著拉长家庭责任期限，放大身故与失能后果。"
+    },
+    "household_income": {
+      "question": "家庭税后年收入大概是多少？",
+      "why_needed": "家庭收入是所有收入中断类风险的损失基数，缺失则无法量化后果。"
+    },
+    "annual_income": {
+      "question": "您本人目前的年收入大概是多少？",
+      "why_needed": "本人收入决定身故 / 失能 / 重疾造成的收入损失规模，是残值风险的核心基数。"
+    },
+    "household_expense": {
+      "question": "家庭每年的固定生活开支大概是多少？",
+      "why_needed": "固定开支决定收入中断后家庭现金流能支撑多久，是后果持续性的关键。"
+    },
+    "assets": {
+      "question": "如果家庭主要收入来源中断，目前大概有多少可以随时动用的现金或金融资产？",
+      "why_needed": "用于判断家庭能否独立吸收收入中断带来的现金流冲击，决定残余风险高低。"
+    },
+    "cash_flow": {
+      "question": "家庭每年的结余（收入减支出）大概是多少？",
+      "why_needed": "结余水平决定家庭自我积累保障的能力，影响长期财务风险评估。"
+    },
+    "premium_budget": {
+      "question": "家庭每年可用于风险管理的预算大概是多少？",
+      "why_needed": "预算约束决定后续方案的可执行性，不影响风险本身但影响处理路径。"
+    },
+    "mortgage_balance": {
+      "question": "目前房贷 / 其他贷款的剩余本金大概是多少？",
+      "why_needed": "负债余额是家庭刚性责任的主要构成，直接放大身故与收入中断的后果。"
+    },
+    "liabilities": {
+      "question": "除房贷外，家庭是否还有其他负债（车贷、消费贷、私人借款等）？金额大概多少？",
+      "why_needed": "其他负债同样属于刚性支出，缺失会低估家庭责任规模。"
+    },
+    "children_education": {
+      "question": "子女未来教育大致规划与费用预期是怎样的？",
+      "why_needed": "教育支出是典型的长期刚性责任，决定身故 / 失能风险的持续时间与规模。"
+    },
+    "elderly_support": {
+      "question": "是否需要赡养父母？每月或每年的赡养支出大概是多少？",
+      "why_needed": "赡养责任属于长期刚性支出，会显著拉长家庭责任期限。"
+    },
+    "family_responsibility": {
+      "question": "目前家庭最主要的长期责任有哪些（房贷、子女教育、赡养父母等）？",
+      "why_needed": "长期责任是身故 / 收入中断风险的放大器，缺失则无法判断风险是否成立。"
+    },
+    "social_insurance_status": {
+      "question": "家庭成员目前的社保 / 医保参保情况如何？",
+      "why_needed": "社保是医疗支出的第一层保障，直接影响医疗风险的自付比例与残余风险。"
+    },
+    "existing_life_coverage": {
+      "question": "目前是否已经有人身寿险保障？保额大概是多少？",
+      "why_needed": "已有寿险是身故风险的直接对冲，缺失则无法计算残余风险。"
+    },
+    "existing_critical_illness_coverage": {
+      "question": "目前是否已有重大疾病保障？保额大概是多少？",
+      "why_needed": "已有重疾保障是重疾收入中断风险的直接对冲，决定残余风险规模。"
+    },
+    "existing_medical_coverage": {
+      "question": "除医保外，是否还有商业医疗保障（如住院医疗、意外医疗）？",
+      "why_needed": "商业医疗险是医保之外的主要支付来源，直接决定医疗支出的自付缺口。"
+    },
+    "existing_accident_coverage": {
+      "question": "目前是否有意外或伤残类保障？保额大概是多少？",
+      "why_needed": "已有意外 / 伤残保障是失能风险的直接对冲，缺失则无法判断残余风险。"
+    },
+    "employer_benefits": {
+      "question": "单位提供了哪些福利保障（补充医疗、团险、体检等）？",
+      "why_needed": "雇主福利是家庭现有保障的组成部分，忽略会高估保障缺口。"
+    },
+    "customer_health": {
+      "question": "目前的健康状况如何？近期体检有无异常？",
+      "why_needed": "健康状况是重疾与医疗风险可能性的主要输入，缺失时不得假设健康。"
+    },
+    "health_history": {
+      "question": "既往是否有住院、手术或慢性病病史？",
+      "why_needed": "既往病史直接影响重疾与医疗风险的可能性档位。"
+    },
+    "occupation": {
+      "question": "目前的职业与主要工作内容是什么？",
+      "why_needed": "职业类型决定意外与失能风险的暴露程度。"
+    },
+    "employment_type": {
+      "question": "目前的用工形态是？（全职 / 灵活就业 / 自雇 / 无固定职业）",
+      "why_needed": "用工形态决定收入稳定性与雇主保障的可得性。"
+    },
+    "income_stability": {
+      "question": "收入来源是否稳定？是否存在明显的波动或不确定性？",
+      "why_needed": "收入稳定性决定收入中断风险的现实暴露程度。"
+    }
   },
-
   "fallback_question_template": {
     "question": "请补充字段 {field} 的具体信息？",
     "why_needed": "该字段参与至少一个在范围内的风险域判定，缺失会降低结论置信度。"
+  },
+  "profile_names": [
+    "family_profile",
+    "financial_profile",
+    "responsibility_profile",
+    "existing_protection",
+    "health_profile",
+    "employment_profile"
+  ],
+  "documentation": {
+    "domain_status_rules": {
+      "CONFLICTING": "域内存在 conflict 字段",
+      "INSUFFICIENT": "存在未满足的 required 字段或 required group",
+      "SUFFICIENT": "required 全部满足且 score >= sufficient_score",
+      "PARTIAL": "required 全部满足但 score < sufficient_score"
+    },
+    "overall_status_rules": {
+      "CONFLICTING": "任一域 CONFLICTING",
+      "INSUFFICIENT": "无 CONFLICTING 且任一域 INSUFFICIENT",
+      "SUFFICIENT": "全域 SUFFICIENT",
+      "PARTIAL": "其他"
+    },
+    "note": "以下为人工阅读用的判定的语义说明，不被引擎消费（引擎逻辑以 thresholds / analysis_status_rules 为准）"
   }
 }

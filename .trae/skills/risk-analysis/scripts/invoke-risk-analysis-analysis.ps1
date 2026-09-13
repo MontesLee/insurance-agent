@@ -100,14 +100,18 @@ function Get-RaNum {
     return (ConvertTo-RaNumber -Value $fv.value -Units $script:units)
 }
 function Test-RaHealthAnomaly {
-    $tokens = @('异常', '病史', '结节', '三高', '糖尿病', '高血压', '亚健康', '住院', '手术')
+    # 判「键存在」而非「值非空」：Get-RaMember 对空数组会返回 $null（PS 函数返回空数组会被展开）
+    if (-not (@($rules.PSObject.Properties.Name) -contains 'health_anomaly_tokens')) {
+        throw "rules 缺 health_anomaly_tokens：不得回退硬编码词表（空数组合法，表示无加成词）"
+    }
+    $script:healthTokens = @(Get-RaStringArray -Value $rules.health_anomaly_tokens)
     foreach ($f in @('customer_health', 'health_history')) {
         $fv = Get-RaFactValue -Field $f
         if ($null -eq $fv) { continue }
         $s = [string]$fv.value
         if ([string]::IsNullOrWhiteSpace($s)) { continue }
         $sl = $s.ToLowerInvariant()
-        foreach ($t in $tokens) {
+        foreach ($t in $script:healthTokens) {
             if ($sl.Contains([string]$t.ToLowerInvariant())) { return $true }
         }
     }
@@ -163,9 +167,14 @@ $resRank = Get-RaMember -Object $rules -Name 'residual_rank'
 $sharedRules = (Get-Content -LiteralPath $SharedRulesPath -Raw -Encoding UTF8) | ConvertFrom-Json
 $templates = Get-RaMember -Object $sharedRules -Name 'question_templates'
 
+# 状态合并次序（单一真源：risk-sufficiency.rules.json#analysis_status_rules.precedence）
+$precedence = @(Get-RaStringArray -Value (Get-RaMember -Object $sharedRules.analysis_status_rules -Name 'precedence'))
+if (@($precedence).Count -eq 0) { throw "shared rules 缺 analysis_status_rules.precedence：不得回退硬编码" }
+
 # ------------------------------------------------------------------ field map
-$profileNames = @('family_profile', 'financial_profile', 'responsibility_profile',
-                  'existing_protection', 'health_profile', 'employment_profile')
+# 单一真源：risk-sufficiency.rules.json#profile_names（不允许本脚本自带一份）
+$profileNames = @(Get-RaStringArray -Value $sharedRules.profile_names)
+if (@($profileNames).Count -eq 0) { throw "shared rules 缺 profile_names：不得回退硬编码" }
 $script:fieldMap = @{}
 foreach ($pn in $profileNames) {
     $prof = Get-RaMember -Object $raInput.client_state -Name $pn
@@ -452,6 +461,10 @@ foreach ($did in $scope) {
         $prio = [string](Get-RaMember -Object (Get-RaMember -Object $prioMatrix -Name $severity) -Name $likelihood)
         if ([string]::IsNullOrWhiteSpace($prio)) { $prio = 'P3' }
         foreach ($ov in $prioOverrides) {
+            # 显式开关：每条 override 必须自带 enabled；漏写即抛错，禁止静默 no-op 复活
+            $ovEnabledProp = Get-RaMember -Object $ov -Name 'enabled'
+            if ($null -eq $ovEnabledProp) { throw "priority_overrides 项 '$(Get-RaMember -Object $ov -Name 'id')' 缺 enabled 字段（禁止隐式启用）" }
+            if ([string]$ovEnabledProp -eq 'False') { continue }
             $if = Get-RaMember -Object $ov -Name 'if'
             $match = $true
             if ($null -ne (Get-RaMember -Object $if -Name 'category')) { if ([string]$if.category -ne $did) { $match = $false } }
@@ -468,7 +481,8 @@ foreach ($did in $scope) {
                 }
                 if ($null -ne (Get-RaMember -Object $ov -Name 'min_priority')) {
                     $cur = [int](Get-RaMember -Object $prioRank -Name $prio); $mn = [int](Get-RaMember -Object $prioRank -Name ([string]$ov.min_priority))
-                    if ($cur -lt $mn) { $prio = [string]$ov.min_priority }
+                    # rank 越小越紧急：「至少 P_mn」= 当前更不紧急（rank 更大）时收紧
+                    if ($cur -gt $mn) { $prio = [string]$ov.min_priority }
                 }
             }
         }
@@ -657,8 +671,7 @@ if (-not [string]::IsNullOrWhiteSpace($SufficiencyJsonPath) -and (Test-Path -Lit
     }
 }
 
-# ------------------------------------------------------------------ analysis_status（precedence 合并）
-$precedence = @('FAILED', 'NEEDS_REVIEW', 'CONFLICTING_INFORMATION', 'NEED_MORE_INFORMATION', 'PRELIMINARY', 'FORMAL')
+# $precedence 已在上方（line ~168）由 shared rules 载入，此处不再硬编码
 function Get-RaPrecIndex { param([string]$S) $i = [array]::IndexOf($precedence, $S); if ($i -lt 0) { $i = 99 }; return $i }
 $analysisStatus = 'FORMAL'
 $discStatusIn = [string](Get-RaMember -Object $discDoc -Name 'analysis_status')

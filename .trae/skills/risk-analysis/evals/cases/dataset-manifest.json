@@ -1,0 +1,260 @@
+{
+  "manifest_version": "1.0",
+  "skill": "risk-analysis",
+  "stage": "dataset",
+  "description": "Phase 8 端到端数据集用例清单（单一真源）。run-risk-analysis-dataset.ps1 与 verify-contract.py §10 均读此文件；期望值按 CONTRACT 推理书写，不照抄引擎输出。",
+  "pipeline": [
+    "sufficiency",
+    "discovery",
+    "analysis",
+    "mutation(optional)",
+    "eval",
+    "repair"
+  ],
+  "dimensions": {
+    "completeness": ["completeness"],
+    "evidence_grounding": ["evidence_grounding"],
+    "reasoning_consistency": ["reasoning_consistency", "priority_consistency"],
+    "unknown_integrity": ["unknown_integrity"],
+    "product_boundary": ["separation", "anti_sales"]
+  },
+  "dimension_aggregation": {
+    "default": "avg",
+    "product_boundary": "min",
+    "note": "product_boundary 取 min：销售语言与产品泄漏任一发生即视为边界失守，不做平均掩盖。"
+  },
+  "cases": [
+    {
+      "case_id": "ds-001-complete-dual-income",
+      "category": "positive",
+      "archetype": "完整画像·双职工两孩有房贷",
+      "input": "ds-001-complete-dual-income.input.json",
+      "expect": {
+        "analysis_status": "FORMAL",
+        "risk_count": 5,
+        "discovery": { "R1": "IDENTIFIED", "R2": "IDENTIFIED", "R3": "IDENTIFIED", "R4": "IDENTIFIED", "R5": "IDENTIFIED" },
+        "risk_exists": { "R1": true, "R2": true, "R3": true, "R4": true, "R5": true },
+        "priority": { "R4": "P0", "R5": "P3" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "信息完整（5 域全 SUFFICIENT、无冲突、无未决）→ 契约 §7 判定 FORMAL；R4 唯一收入替代责任最重应为 P0；R5 受 R5_always_low 封顶 P3。"
+    },
+    {
+      "case_id": "ds-002-missing-assets",
+      "category": "positive",
+      "archetype": "资产缺失·部分分析",
+      "input": "ds-002-missing-assets.input.json",
+      "expect": {
+        "analysis_status": "PRELIMINARY",
+        "risk_count": 5,
+        "discovery": { "R1": "IDENTIFIED", "R2": "IDENTIFIED", "R3": "IDENTIFIED", "R4": "IDENTIFIED", "R5": "IDENTIFIED" },
+        "risk_exists": { "R1": true, "R2": true, "R3": true, "R4": true, "R5": true },
+        "priority": { "R5": "P3" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "缺 assets → R5 依赖 absorb_capacity 降为 PARTIAL，但契约 §7 允许部分分析，不得停摆；覆盖度不得退化为 0 风险。"
+    },
+    {
+      "case_id": "ds-003-single-no-dependents",
+      "category": "positive",
+      "archetype": "单身无抚养责任·消极结论",
+      "input": "ds-003-single-no-dependents.input.json",
+      "expect": {
+        "analysis_status": "PRELIMINARY",
+        "risk_count": 5,
+        "discovery": { "R4": "NOT_IDENTIFIED" },
+        "risk_exists": { "R1": true, "R2": true, "R3": true, "R4": false, "R5": true },
+        "priority": { "R4": "P3" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "无房贷/无负债/无子女/无需赡养 → R4 必须给出消极结论（NOT_IDENTIFIED，LOW/LOW/P3），且必须进 risks[] 以支撑复合 Eval，不得静默省略。"
+    },
+    {
+      "case_id": "ds-004-high-risk-occupation",
+      "category": "positive",
+      "archetype": "高危职业·意外域放大",
+      "input": "ds-004-high-risk-occupation.input.json",
+      "expect": {
+        "analysis_status": "FORMAL",
+        "risk_count": 5,
+        "discovery": { "R3": "IDENTIFIED", "R4": "IDENTIFIED" },
+        "risk_exists": { "R3": true, "R4": true },
+        "priority": { "R4": "P1" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "职业命中高风险关键词 → R3 必成立；家庭责任重且无寿险 → R4 应高于普通 P2。"
+    },
+    {
+      "case_id": "ds-005-retired-no-income",
+      "category": "positive",
+      "archetype": "退休无劳动收入·收入中断域不成立",
+      "input": "ds-005-retired-no-income.input.json",
+      "expect": {
+        "analysis_status": "FORMAL",
+        "risk_count": 5,
+        "discovery": { "R2": "NOT_IDENTIFIED", "R3": "NOT_IDENTIFIED", "R5": "IDENTIFIED" },
+        "risk_exists": { "R1": true, "R2": false, "R3": false, "R5": true },
+        "priority": { "R2": "P3", "R3": "P3" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "无可中断的劳动收入 → 收入中断/失能域不成立；不得因年龄大而断言收入风险。R4 因子女数量仍成立但金额为零、severity LOW。"
+    },
+    {
+      "case_id": "ds-006-all-unknown",
+      "category": "degraded",
+      "archetype": "全字段 UNKNOWN·禁止伪造",
+      "input": "ds-006-all-unknown.input.json",
+      "expect": {
+        "analysis_status": "NEED_MORE_INFORMATION",
+        "risk_count": 0,
+        "discovery": { "R1": "UNDETERMINED", "R2": "UNDETERMINED", "R3": "UNDETERMINED", "R4": "UNDETERMINED", "R5": "UNDETERMINED" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak", "fabricated_certainty"],
+      "why": "无任何事实时全部域判 UNDETERMINED，UNDETERMINED 不提升为 Risk → risks 必须为 0；Eval 仍 PASS（诚实不下结论不是缺陷）。"
+    },
+    {
+      "case_id": "ds-007-income-conflict",
+      "category": "degraded",
+      "archetype": "收入冲突·禁止择一",
+      "input": "ds-007-income-conflict.input.json",
+      "expect": {
+        "analysis_status": "CONFLICTING_INFORMATION",
+        "risk_count": 3,
+        "discovery": { "R2": "UNDETERMINED", "R3": "UNDETERMINED", "R1": "IDENTIFIED", "R4": "IDENTIFIED" },
+        "risk_exists": { "R1": true, "R4": true, "R5": true },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "收入两处陈述不一致 → 冲突字段保留 UNKNOWN，依赖收入的 R2/R3 判 UNDETERMINED 且不进 risks[]；不得择一后继续量化。"
+    },
+    {
+      "case_id": "ds-008-no-ra-upstream",
+      "category": "degraded",
+      "archetype": "缺少 requirement_analysis 上游",
+      "input": "ds-008-no-ra-upstream.input.json",
+      "expect": {
+        "analysis_status": "FORMAL",
+        "risk_count": 5,
+        "discovery": { "R1": "IDENTIFIED", "R2": "IDENTIFIED", "R3": "IDENTIFIED", "R4": "IDENTIFIED", "R5": "IDENTIFIED" },
+        "risk_exists": { "R1": true, "R2": true, "R3": true, "R4": true, "R5": true },
+        "missing_from_upstream_contains": ["requirements"],
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "上游缺失只降级登记 MISSING_FROM_UPSTREAM，不阻塞风险分析（事实层完整）；登记条目不得重复。"
+    },
+    {
+      "case_id": "ds-009-single-earner-large-mortgage",
+      "category": "positive",
+      "archetype": "单收入高房贷·责任最重",
+      "input": "ds-009-single-earner-large-mortgage.input.json",
+      "expect": {
+        "analysis_status": "FORMAL",
+        "risk_count": 5,
+        "discovery": { "R4": "IDENTIFIED" },
+        "risk_exists": { "R4": true },
+        "priority": { "R5": "P3" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "唯一收入者 + 房贷 300 万 + 两孩 + 赡养 → R4 必成立且金额应为全案最大；R5 仍受 always_low 封顶。"
+    },
+    {
+      "case_id": "ds-010-chinese-negative-tokens",
+      "category": "positive",
+      "archetype": "中文否定短语·消极结论",
+      "input": "ds-010-chinese-negative-tokens.input.json",
+      "expect": {
+        "analysis_status": "PRELIMINARY",
+        "risk_count": 5,
+        "discovery": { "R4": "NOT_IDENTIFIED" },
+        "risk_exists": { "R4": false },
+        "priority": { "R4": "P3" },
+        "eval_status": "PASS",
+        "repair_attempts": 0
+      },
+      "forbidden": ["product_leak"],
+      "why": "「无房贷 / 没有负债 / 无子女 / 不承担赡养」是整句式中文否定，必须识别为已知不存在而非未知；否则 R4 会被误判成立并给出数百万金额（Phase 8 实测缺陷 D1）。"
+    },
+    {
+      "case_id": "ds-mut-01-drop-risk",
+      "category": "mutation",
+      "archetype": "变异·删除应发现的风险",
+      "base_case": "ds-002-missing-assets",
+      "mutation": { "type": "drop_risk", "risk_id": "R4-001" },
+      "expect": {
+        "eval_status": "NEEDS_REVIEW",
+        "repair_attempts": 0,
+        "first_failed_codes": ["MISSING_RISK"]
+      },
+      "why": "缺风险属事实缺失，Repair 红线禁止补造 → 必须 NEEDS_REVIEW 且产物原样保留。"
+    },
+    {
+      "case_id": "ds-mut-02-bump-priority",
+      "category": "mutation",
+      "archetype": "变异·优先级抬高到与剩余风险矛盾",
+      "base_case": "ds-005-retired-no-income",
+      "mutation": { "type": "bump_priority", "risk_id": "R4-001", "priority": "P0" },
+      "expect": {
+        "eval_status": "PASS",
+        "repair_attempts": 1,
+        "first_failed_codes": ["PRIORITY_INCONSISTENT"]
+      },
+      "why": "R4-001 实际 severity=LOW / residual=MEDIUM（矩阵应为 P3），标 P0 属派生量算错 → AUTO RECOMPUTE_PRIORITY 一轮收敛到 PASS。注意：P0 配 residual=HIGH 只判 WARNING，构不成 BLOCKING，故须选 residual=MEDIUM 的风险做变异。"
+    },
+    {
+      "case_id": "ds-mut-03-sales-language",
+      "category": "mutation",
+      "archetype": "变异·恐吓话术",
+      "base_case": "ds-002-missing-assets",
+      "mutation": { "type": "append_conclusion", "risk_id": "R2-001", "text": "一旦确诊就会一病返贫，全家完蛋" },
+      "expect": {
+        "eval_status": "NEEDS_REVIEW",
+        "repair_attempts": 0,
+        "first_failed_codes": ["SALES_BIAS"]
+      },
+      "why": "恐吓话术（词典内 panic token：一病返贫 / 全家完蛋）属立场问题，禁止自动清洗文案 → NEEDS_REVIEW。"
+    },
+    {
+      "case_id": "ds-mut-04-unknown-as-known",
+      "category": "mutation",
+      "archetype": "变异·把未知当已知",
+      "base_case": "ds-002-missing-assets",
+      "mutation": { "type": "unknown_as_known", "risk_id": "R3-001" },
+      "expect": {
+        "eval_status": "NEEDS_REVIEW",
+        "repair_attempts": 0,
+        "first_failed_codes": ["UNKNOWN_AS_KNOWN"]
+      },
+      "why": "事实状态问题禁止自动降级 → 整体 NEEDS_REVIEW（避免半修复产物）。"
+    },
+    {
+      "case_id": "ds-mut-05-dangling-ref",
+      "category": "mutation",
+      "archetype": "变异·悬空证据锚点",
+      "base_case": "ds-002-missing-assets",
+      "mutation": { "type": "dangling_ref", "risk_id": "R1-001", "ref": "E999" },
+      "expect": {
+        "eval_status": "PASS",
+        "repair_attempts": 1,
+        "first_failed_codes": ["UNSUPPORTED_CONCLUSION"]
+      },
+      "why": "悬空锚点是派生引用错误 → AUTO DROP_DANGLING_REFS 一轮收敛。"
+    }
+  ]
+}

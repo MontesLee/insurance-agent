@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReportValidation",
+  "description": "Report Generation 校验结果契约。可被 validate_report.py 单独校验，也可作为 ReportGenerationResult.validation 的内嵌结构。",
+  "type": "object",
+  "required": ["passed", "errors", "warnings", "conflicts"],
+  "properties": {
+    "passed": { "type": "boolean" },
+    "errors": {
+      "type": "array",
+      "description": "结构或硬约束违反：含缺失章节、空章节、幻觉事实、上游冲突未标注等。errors 非空 => passed=false。",
+      "items": { "type": "string" }
+    },
+    "warnings": {
+      "type": "array",
+      "description": "软提示：缺失上游结果、信息缺口、建议补充项等。不阻断报告生成。",
+      "items": { "type": "string" }
+    },
+    "conflicts": {
+      "type": "array",
+      "description": "上游结论冲突（UPSTREAM_CONFLICT）：如需求优先级与风险优先级不一致。",
+      "items": { "type": "string" }
+    }
+  }
+}

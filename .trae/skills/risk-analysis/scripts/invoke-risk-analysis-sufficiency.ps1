@@ -73,9 +73,10 @@ $sufficientScore = [double](Get-RaMember -Object $rules.thresholds -Name 'suffic
 $groups          = Get-RaMember -Object $rules -Name 'groups'
 
 # ------------------------------------------------------------------ field map
-# field -> { field, profile, value, status, confidence, note }
-$profileNames = @('family_profile', 'financial_profile', 'responsibility_profile',
-                  'existing_protection', 'health_profile', 'employment_profile')
+# 单一真源：resources/config/risk-sufficiency.rules.json#profile_names
+# （Phase 9 Review：此前三个引擎各硬编码一份 profile 列表，规则文件另有 field_profile_index 未被消费）
+$profileNames = @(Get-RaStringArray -Value $rules.profile_names)
+if (@($profileNames).Count -eq 0) { throw "rules 缺 profile_names：不得回退硬编码（会造成规则外置假象）" }
 
 $fieldMap = @{}
 foreach ($pn in $profileNames) {
@@ -339,10 +340,12 @@ foreach ($c in $selected) {
 }
 
 # ------------------------------------------------------------------ missing_from_upstream
-$mfu = [System.Collections.Generic.List[object]]::new()
+# 上游与本阶段可能就同一缺失各记一条（如 requirement-analysis 未提供）→ 按 source+field 去重，
+# 避免下游读到重复条目后重复追问。
+$mfuRaw = [System.Collections.Generic.List[object]]::new()
 foreach ($m in @(Get-RaMember -Object $raInput.client_state -Name 'missing_from_upstream')) {
     if ($null -eq $m) { continue }
-    $mfu.Add([pscustomobject][ordered]@{
+    $mfuRaw.Add([pscustomobject][ordered]@{
         source = 'client-intake'
         field  = [string](Get-RaMember -Object $m -Name 'field')
         reason = [string](Get-RaMember -Object $m -Name 'reason')
@@ -350,7 +353,7 @@ foreach ($m in @(Get-RaMember -Object $raInput.client_state -Name 'missing_from_
 }
 $upCI = Get-RaMember -Object $raInput.upstream -Name 'client_intake'
 if ($null -ne $upCI -and -not [bool](Get-RaMember -Object $upCI -Name 'provided')) {
-    $mfu.Add([pscustomobject][ordered]@{
+    $mfuRaw.Add([pscustomobject][ordered]@{
         source = 'client-intake'
         field  = 'client_state'
         reason = 'MISSING_FROM_UPSTREAM: 未提供 client-intake CLIENT_PROFILE，ClientState 全字段降级为 UNKNOWN。'
@@ -358,11 +361,18 @@ if ($null -ne $upCI -and -not [bool](Get-RaMember -Object $upCI -Name 'provided'
 }
 $upRA = Get-RaMember -Object $raInput.upstream -Name 'requirement_analysis'
 if ($null -eq $upRA -or -not [bool](Get-RaMember -Object $upRA -Name 'provided')) {
-    $mfu.Add([pscustomobject][ordered]@{
+    $mfuRaw.Add([pscustomobject][ordered]@{
         source = 'requirement-analysis'
         field  = 'requirements'
         reason = 'MISSING_FROM_UPSTREAM: 未提供 requirement-analysis 输出，requirements 视为空；不阻塞风险分析（事实层仍完整）。'
     })
+}
+
+$mfu = [System.Collections.Generic.List[object]]::new()
+$mfuSeen = [System.Collections.Generic.HashSet[string]]::new()
+foreach ($m in $mfuRaw) {
+    $key = [string]$m.source + '|' + [string]$m.field
+    if ($mfuSeen.Add($key)) { $mfu.Add($m) }
 }
 
 # ------------------------------------------------------------------ emit

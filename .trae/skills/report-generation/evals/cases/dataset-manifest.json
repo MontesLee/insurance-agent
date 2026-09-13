@@ -1,0 +1,445 @@
+{
+  "skill": "report-generation",
+  "version": "0.1",
+  "description": "Single source of truth for Report Generation Eval. Each case embeds its full 5-upstream input; the runner executes the engine + validator and asserts against `expect`. Covers: structure / completeness / provenance / hallucination / consistency / conflict + the 4 required scenarios (complete, incomplete, conflict, recommendation-boundary) plus recommendation-missing and insufficient-input.",
+  "cases": [
+    {
+      "name": "complete_client",
+      "dimension": "structure|completeness|provenance",
+      "description": "完整客户：5 路上游齐全。期望 8 章节齐全、provenance 非空、无冲突、无幻觉。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": true },
+          "family_profile": {
+            "age": { "value": "32", "status": "KNOWN" },
+            "gender": { "value": "男", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" },
+            "family_members": { "value": "4人（夫妻+1孩+1父/母同住）", "status": "KNOWN" },
+            "children": { "value": "1孩（3岁）", "status": "KNOWN" },
+            "parent_support": { "value": "双方父母均需赡养", "status": "KNOWN" },
+            "housing": { "value": "自有住房，有房贷", "status": "KNOWN" },
+            "region": { "value": "一线城市", "status": "KNOWN" },
+            "education": { "value": "本科", "status": "KNOWN" }
+          },
+          "employment_profile": {
+            "occupation": { "value": "互联网行业产品经理", "status": "KNOWN" },
+            "employer": { "value": "某科技公司", "status": "KNOWN" },
+            "employment_status": { "value": "在职", "status": "KNOWN" }
+          },
+          "health_profile": {
+            "health_status": { "value": "良好，无重大既往病史", "status": "KNOWN" },
+            "smoking": { "value": "否", "status": "KNOWN" }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": { "value": "家庭主要经济支柱，配偶无收入", "status": "KNOWN" },
+            "dependents": { "value": "配偶及子女", "status": "KNOWN" }
+          },
+          "existing_protection": {
+            "social_security": { "value": "职工社保+医保", "status": "KNOWN" },
+            "commercial_insurance": { "value": "已购一份重疾险（保额50万）", "status": "KNOWN" },
+            "existing_insurance": { "value": "重疾险50万", "status": "KNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": "60万", "status": "KNOWN" },
+            "annual_expense": { "value": "25万", "status": "KNOWN" },
+            "assets": { "value": "350万", "status": "KNOWN" },
+            "liabilities": { "value": "210万", "status": "KNOWN" },
+            "mortgage": { "value": "200万", "status": "KNOWN" },
+            "financial_assets": { "value": "80万", "status": "KNOWN" },
+            "insurance_budget": { "value": "3万", "status": "KNOWN" }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院及大额医疗保障", "priority": "P0_CRITICAL" },
+            { "requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重大疾病保障", "priority": "P0_CRITICAL" },
+            { "requirement_id": "REQ-ACC", "requirement_type": "accident", "summary": "意外伤残保障", "priority": "P1_HIGH" },
+            { "requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任寿险", "priority": "P0_CRITICAL" },
+            { "requirement_id": "REQ-SAV", "requirement_type": "savings", "summary": "长期养老储蓄", "priority": "P2_MEDIUM" }
+          ],
+          "coverage_gaps": [
+            { "requirement_type": "savings", "gap_summary": "养老储蓄缺口，需中长期规划", "priority": "P2_MEDIUM", "evidence_refs": ["E030"] }
+          ],
+          "information_gaps": [
+            { "field": "spouse_income", "importance": "P2_MEDIUM", "impact": "影响家庭整体保障预算", "reason": "配偶收入未确认", "gap_type": "NOT_PROVIDED" }
+          ],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "HIGH", "priority": "P0", "severity": "HIGH", "likelihood": "HIGH", "trigger": { "event": "疾病或意外导致住院" }, "exposure": { "why_exposed": "家庭支柱，医疗支出敏感" }, "potential_impact": { "financial": "大额自付", "lifestyle": "中", "family_responsibility": "高" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "门诊及部分特药自付", "liquidity_constraint": "" }, "existing_protection": "社保+百万医疗", "conclusion": "医疗费用存在自付缺口", "reasoning_evidence_refs": ["E001"] },
+            { "risk_id": "R2-001", "risk_category": "R2", "risk_name": "重大疾病", "status": "KNOWN", "residual_risk": "HIGH", "priority": "P0", "severity": "HIGH", "likelihood": "MEDIUM", "trigger": { "event": "确诊重疾" }, "exposure": { "why_exposed": "家庭经济支柱" }, "potential_impact": { "financial": "收入中断+治疗费", "lifestyle": "高", "family_responsibility": "高" }, "coverage_assessment": { "protected_amount": 500000, "unprotected_amount": "治疗及康复缺口", "liquidity_constraint": "" }, "existing_protection": "已有重疾险50万", "conclusion": "重疾保额不足", "reasoning_evidence_refs": ["E002"] },
+            { "risk_id": "R3-001", "risk_category": "R3", "risk_name": "意外伤残", "status": "KNOWN", "residual_risk": "MEDIUM", "priority": "P1", "severity": "MEDIUM", "likelihood": "MEDIUM", "trigger": { "event": "意外导致伤残" }, "exposure": { "why_exposed": "通勤及差旅" }, "potential_impact": { "financial": "中", "lifestyle": "中", "family_responsibility": "中" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "伤残收入补偿缺口", "liquidity_constraint": "" }, "existing_protection": "基础意外险", "conclusion": "意外伤残保障一般", "reasoning_evidence_refs": ["E003"] },
+            { "risk_id": "R4-001", "risk_category": "R4", "risk_name": "家庭责任", "status": "KNOWN", "residual_risk": "HIGH", "priority": "P0", "severity": "HIGH", "likelihood": "LOW", "trigger": { "event": "身故/全残" }, "exposure": { "why_exposed": "主要收入来源" }, "potential_impact": { "financial": "高", "lifestyle": "高", "family_responsibility": "高" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "家庭责任缺口", "liquidity_constraint": "" }, "existing_protection": "仅有社保", "conclusion": "寿险保障严重不足", "reasoning_evidence_refs": ["E004"] },
+            { "risk_id": "R5-001", "risk_category": "R5", "risk_name": "养老储蓄", "status": "KNOWN", "residual_risk": "MEDIUM", "priority": "P2", "severity": "MEDIUM", "likelihood": "MEDIUM", "trigger": { "event": "退休收入下降" }, "exposure": { "why_exposed": "长期规划" }, "potential_impact": { "financial": "中", "lifestyle": "低", "family_responsibility": "低" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "养老储备缺口", "liquidity_constraint": "" }, "existing_protection": "无专项", "conclusion": "养老储蓄需规划", "reasoning_evidence_refs": ["E005"] }
+          ]
+        },
+        "knowledge_search": {
+          "status": "success", "conflict": false,
+          "results": [ { "chunk_id": "KB-001", "document_name": "百万医疗险条款", "content": "百万医疗险覆盖住院医疗", "score": 0.9 } ]
+        },
+        "recommendation": {
+          "status": "COMPLETE",
+          "primary_recommendation": { "candidate_id": "MED+CI", "fit": "strong_fit", "reason_codes": ["covers_high_priority_risk", "within_budget"], "provenance": [ { "type": "requirement", "ref": "REQ-MED" }, { "type": "risk", "ref": "R1-001" } ] },
+          "alternatives": [ { "candidate_id": "ACC", "fit": "good_fit", "tradeoff": "覆盖意外伤残" } ],
+          "not_recommended": [],
+          "evidence_refs": ["KB-001"],
+          "human_review_required": false
+        }
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "metadata_conflicts_nonempty": false,
+        "validation_conflicts_nonempty": false,
+        "rendered_forbids": ["百万医疗险（具体产品）"]
+      }
+    },
+    {
+      "name": "missing_financial_data",
+      "dimension": "completeness|hallucination",
+      "description": "财务关键字段（收入/资产/房贷/预算）缺失。期望这些字段渲染为待确认，不编造数字；并进入信息缺口与下一步行动。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": false },
+          "family_profile": {
+            "age": { "value": "35", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" },
+            "children": { "value": "2孩", "status": "KNOWN" }
+          },
+          "employment_profile": {
+            "occupation": { "value": "自由职业", "status": "KNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": null, "status": "UNKNOWN" },
+            "assets": { "value": null, "status": "UNKNOWN" },
+            "mortgage": { "value": null, "status": "UNKNOWN" },
+            "insurance_budget": { "value": null, "status": "UNKNOWN" }
+          },
+          "missing_from_upstream": [
+            { "field": "annual_income", "profile": "financial_profile", "reason": "客户未提供收入" },
+            { "field": "mortgage", "profile": "financial_profile", "reason": "房贷未确认" },
+            { "field": "insurance_budget", "profile": "financial_profile", "reason": "预算未确认" }
+          ],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "NEED_MORE_INFORMATION",
+          "information_sufficiency": { "sufficiency_status": "INSUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗保障", "priority": "P1_HIGH" }
+          ],
+          "coverage_gaps": [],
+          "information_gaps": [
+            { "field": "annual_income", "importance": "P0_CRITICAL", "impact": "影响预算边界", "reason": "家庭收入未确认", "gap_type": "NOT_PROVIDED" },
+            { "field": "mortgage", "importance": "P1_HIGH", "impact": "影响负债与保障设计", "reason": "房贷未确认", "gap_type": "NOT_PROVIDED" }
+          ],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "MEDIUM", "priority": "P1", "severity": "MEDIUM", "likelihood": "MEDIUM", "trigger": { "event": "疾病住院" }, "exposure": { "why_exposed": "基础" }, "potential_impact": { "financial": "中", "lifestyle": "低", "family_responsibility": "中" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": null, "liquidity_constraint": "" }, "existing_protection": "社保", "conclusion": "医疗基础保障", "reasoning_evidence_refs": ["E001"] }
+          ],
+          "next_information_needed": [
+            { "question": "家庭年度可接受保费预算是多少？", "why_needed": "判断保障配置边界", "affects_risks": ["R1", "R2", "R4"], "priority": "HIGH" }
+          ]
+        },
+        "knowledge_search": null,
+        "recommendation": null
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "information_gaps_contains": ["annual_income", "mortgage", "insurance_budget"],
+        "next_actions_contains": ["annual_income", "mortgage", "insurance_budget"],
+        "rendered_forbids": ["100万", "500万", "10万", "80万"],
+        "metadata_warnings_contains": ["MISSING_UPSTREAM_RESULT: recommendation", "MISSING_UPSTREAM_RESULT: knowledge_search"]
+      }
+    },
+    {
+      "name": "hallucination_guard",
+      "dimension": "hallucination",
+      "description": "仅提供客户30岁、已婚、一个孩子；不得生成年收入100万/房贷500万/保费10万等编造数字。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": false },
+          "family_profile": {
+            "age": { "value": "30", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" },
+            "children": { "value": "1孩", "status": "KNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": null, "status": "UNKNOWN" }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "PRELIMINARY",
+          "information_sufficiency": { "sufficiency_status": "PARTIAL" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "基础医疗保障", "priority": "P1_HIGH" }
+          ],
+          "coverage_gaps": [],
+          "information_gaps": [
+            { "field": "annual_income", "importance": "P0_CRITICAL", "impact": "影响预算", "reason": "未提供", "gap_type": "NOT_PROVIDED" }
+          ],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "MEDIUM", "priority": "P2", "severity": "MEDIUM", "likelihood": "LOW", "trigger": { "event": "疾病" }, "exposure": { "why_exposed": "基础" }, "potential_impact": { "financial": "低", "lifestyle": "低", "family_responsibility": "低" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": null, "liquidity_constraint": "" }, "existing_protection": "社保", "conclusion": "基础医疗", "reasoning_evidence_refs": ["E001"] }
+          ]
+        },
+        "knowledge_search": null,
+        "recommendation": null
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "rendered_forbids": ["100万", "500万", "10万", "80万", "200万"],
+        "metadata_warnings_contains": ["MISSING_UPSTREAM_RESULT: recommendation", "MISSING_UPSTREAM_RESULT: knowledge_search"]
+      }
+    },
+    {
+      "name": "upstream_conflict",
+      "dimension": "conflict|consistency",
+      "description": "需求侧医疗 P0_CRITICAL、风险侧 R1 P1（不一致），且风险首要域=重疾(R2)与需求首要域=医疗(R1)不同。期望检测到 UPSTREAM_CONFLICT，不自行裁决。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": true },
+          "family_profile": {
+            "age": { "value": "40", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": "50万", "status": "KNOWN" }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗保障", "priority": "P0_CRITICAL" },
+            { "requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重疾保障", "priority": "P1_HIGH" }
+          ],
+          "coverage_gaps": [],
+          "information_gaps": [],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "MEDIUM", "priority": "P1", "severity": "MEDIUM", "likelihood": "MEDIUM", "trigger": { "event": "疾病" }, "exposure": { "why_exposed": "基础" }, "potential_impact": { "financial": "中", "lifestyle": "低", "family_responsibility": "中" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": null, "liquidity_constraint": "" }, "existing_protection": "社保", "conclusion": "医疗中等", "reasoning_evidence_refs": ["E001"] },
+            { "risk_id": "R2-001", "risk_category": "R2", "risk_name": "重大疾病", "status": "KNOWN", "residual_risk": "HIGH", "priority": "P0", "severity": "HIGH", "likelihood": "HIGH", "trigger": { "event": "重疾" }, "exposure": { "why_exposed": "支柱" }, "potential_impact": { "financial": "高", "lifestyle": "高", "family_responsibility": "高" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "治疗缺口", "liquidity_constraint": "" }, "existing_protection": "无", "conclusion": "重疾高优先", "reasoning_evidence_refs": ["E002"] }
+          ]
+        },
+        "knowledge_search": null,
+        "recommendation": {
+          "status": "COMPLETE",
+          "primary_recommendation": { "candidate_id": "CI", "fit": "strong_fit", "reason_codes": ["covers_high_priority_risk"], "provenance": [ { "type": "risk", "ref": "R2-001" } ] },
+          "alternatives": [],
+          "not_recommended": [],
+          "evidence_refs": [],
+          "human_review_required": false
+        }
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "metadata_conflicts_nonempty": true,
+        "validation_conflicts_nonempty": true,
+        "rendered_forbids": []
+      }
+    },
+    {
+      "name": "recommendation_boundary",
+      "dimension": "recommendation-boundary",
+      "description": "Recommendation 仅给出候选方向 MED（无具体产品）。报告不得扩展为百万医疗险/重疾险/定寿/意外险等具体产品名。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": true },
+          "family_profile": {
+            "age": { "value": "33", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": "45万", "status": "KNOWN" }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗保障", "priority": "P0_CRITICAL" }
+          ],
+          "coverage_gaps": [],
+          "information_gaps": [],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "HIGH", "priority": "P0", "severity": "HIGH", "likelihood": "HIGH", "trigger": { "event": "疾病" }, "exposure": { "why_exposed": "基础" }, "potential_impact": { "financial": "高", "lifestyle": "中", "family_responsibility": "中" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "自付缺口", "liquidity_constraint": "" }, "existing_protection": "社保", "conclusion": "医疗高优先", "reasoning_evidence_refs": ["E001"] }
+          ]
+        },
+        "knowledge_search": null,
+        "recommendation": {
+          "status": "COMPLETE",
+          "primary_recommendation": { "candidate_id": "MED", "fit": "good_fit", "reason_codes": ["covers_high_priority_risk"], "provenance": [ { "type": "risk", "ref": "R1-001" }, { "type": "requirement", "ref": "REQ-MED" } ] },
+          "alternatives": [],
+          "not_recommended": [],
+          "evidence_refs": [],
+          "human_review_required": false
+        }
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "rendered_forbids": ["百万医疗险", "重疾险", "定期寿险", "意外险"]
+      }
+    },
+    {
+      "name": "recommendation_missing",
+      "dimension": "completeness|failure-handling",
+      "description": "缺少 Recommendation。期望 06 明确标注信息不足，metadata.warnings 含 MISSING_UPSTREAM_RESULT: recommendation，报告仍生成。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": true },
+          "family_profile": {
+            "age": { "value": "38", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": "55万", "status": "KNOWN" }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗保障", "priority": "P0_CRITICAL" }
+          ],
+          "coverage_gaps": [],
+          "information_gaps": [],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "HIGH", "priority": "P0", "severity": "HIGH", "likelihood": "HIGH", "trigger": { "event": "疾病" }, "exposure": { "why_exposed": "基础" }, "potential_impact": { "financial": "高", "lifestyle": "中", "family_responsibility": "中" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": "自付缺口", "liquidity_constraint": "" }, "existing_protection": "社保", "conclusion": "医疗高优先", "reasoning_evidence_refs": ["E001"] }
+          ]
+        },
+        "knowledge_search": null,
+        "recommendation": null
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "metadata_warnings_contains": ["MISSING_UPSTREAM_RESULT: recommendation"],
+        "rendered_forbids": []
+      }
+    },
+    {
+      "name": "information_gap_propagation",
+      "dimension": "completeness",
+      "description": "缺失配偶保险、预算、健康、父母责任。期望进入 07（required）并影响 08 下一步行动。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": { "origin_skill": "client-intake", "intake_complete": false },
+          "family_profile": {
+            "age": { "value": "36", "status": "KNOWN" },
+            "marital_status": { "value": "已婚", "status": "KNOWN" }
+          },
+          "health_profile": {
+            "health_status": { "value": null, "status": "UNKNOWN" }
+          },
+          "responsibility_profile": {
+            "parent_support": { "value": null, "status": "UNKNOWN" }
+          },
+          "financial_profile": {
+            "annual_income": { "value": "48万", "status": "KNOWN" },
+            "insurance_budget": { "value": null, "status": "UNKNOWN" }
+          },
+          "existing_protection": {
+            "spouse_insurance": { "value": null, "status": "UNKNOWN" }
+          },
+          "missing_from_upstream": [
+            { "field": "insurance_budget", "profile": "financial_profile", "reason": "预算未确认" },
+            { "field": "health_status", "profile": "health_profile", "reason": "健康告知未做" },
+            { "field": "parent_support", "profile": "responsibility_profile", "reason": "父母责任未确认" },
+            { "field": "spouse_insurance", "profile": "existing_protection", "reason": "配偶保单未收集" }
+          ],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "NEED_MORE_INFORMATION",
+          "information_sufficiency": { "sufficiency_status": "INSUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗保障", "priority": "P1_HIGH" }
+          ],
+          "coverage_gaps": [],
+          "information_gaps": [
+            { "field": "insurance_budget", "importance": "P0_CRITICAL", "impact": "影响预算边界", "reason": "预算未确认", "gap_type": "NOT_PROVIDED" },
+            { "field": "health_status", "importance": "P1_HIGH", "impact": "影响核保", "reason": "健康告知未做", "gap_type": "NOT_PROVIDED" }
+          ],
+          "next_actions": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risks": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "status": "KNOWN", "residual_risk": "MEDIUM", "priority": "P1", "severity": "MEDIUM", "likelihood": "MEDIUM", "trigger": { "event": "疾病" }, "exposure": { "why_exposed": "基础" }, "potential_impact": { "financial": "中", "lifestyle": "低", "family_responsibility": "中" }, "coverage_assessment": { "protected_amount": null, "unprotected_amount": null, "liquidity_constraint": "" }, "existing_protection": "社保", "conclusion": "医疗中等", "reasoning_evidence_refs": ["E001"] }
+          ],
+          "next_information_needed": [
+            { "question": "配偶现有保单具体保障内容？", "why_needed": "评估家庭整体保障", "affects_risks": ["R1", "R2", "R4"], "priority": "HIGH" },
+            { "question": "父母赡养责任具体金额？", "why_needed": "评估责任缺口", "affects_risks": ["R4", "R5"], "priority": "MEDIUM" }
+          ]
+        },
+        "knowledge_search": null,
+        "recommendation": null
+      },
+      "expect": {
+        "status": "success",
+        "provenance_nonempty": true,
+        "information_gaps_contains": ["insurance_budget", "health_status", "parent_support", "spouse_insurance"],
+        "next_actions_contains": ["insurance_budget", "health_status", "parent_support", "spouse_insurance"],
+        "metadata_warnings_contains": ["MISSING_UPSTREAM_RESULT: recommendation"]
+      }
+    },
+    {
+      "name": "insufficient_input",
+      "dimension": "failure-handling",
+      "description": "全部核心输入（client_profile / requirement_analysis / risk_analysis）缺失。期望 status=INSUFFICIENT_INPUT，不生成空洞报告。",
+      "input": {
+        "client_profile": null,
+        "requirement_analysis": null,
+        "risk_analysis": null,
+        "knowledge_search": null,
+        "recommendation": null
+      },
+      "expect": {
+        "status": "INSUFFICIENT_INPUT"
+      }
+    }
+  ]
+}

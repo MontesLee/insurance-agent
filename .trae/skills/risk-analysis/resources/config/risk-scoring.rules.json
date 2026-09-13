@@ -1,8 +1,6 @@
 {
   "scoring_version": "1.0",
   "scoring_method": "risk_scoring_v1",
-  "default_currency": "CNY",
-
   "number_units": {
     "亿": 100000000,
     "千万": 10000000,
@@ -12,9 +10,30 @@
     "k": 1000,
     "w": 10000
   },
-  "negative_tokens": ["无", "没有", "没", "无房贷", "无负债", "无贷款", "none", "no", "nil", "null", "暂无", "尚未", "未配置", "未投保", "没有配置"],
-  "negative_prefixes": ["无", "没有", "未", "暂无", "非"],
-
+  "negative_tokens": [
+    "无",
+    "没有",
+    "没",
+    "无房贷",
+    "无负债",
+    "无贷款",
+    "none",
+    "no",
+    "nil",
+    "null",
+    "暂无",
+    "尚未",
+    "未配置",
+    "未投保",
+    "没有配置"
+  ],
+  "negative_prefixes": [
+    "无",
+    "没有",
+    "未",
+    "暂无",
+    "非"
+  ],
   "field_labels": {
     "age": "年龄",
     "gender": "性别",
@@ -48,70 +67,226 @@
     "employment_type": "用工形态",
     "income_stability": "收入稳定性"
   },
-
-  "high_risk_occupation_tokens": ["高空", "建筑", "工地", "施工", "井下", "矿工", "司机", "驾驶", "货运", "外卖", "快递", "消防", "电焊", "焊工", "机械操作", "林业", "渔业", "电力作业", "搬运", "武警", "刑警", "救援"],
-
   "impact_parameters": {
     "medical_base_cost": 500000,
     "rehab_cost_per_event": 300000,
     "disability_factor": 0.7,
-    "income_replacement_years": { "R2": 3, "R3": 5, "R4": 10 },
+    "income_replacement_years": {
+      "R2": 3,
+      "R3": 5,
+      "R4": 10
+    },
     "r1_no_medical_insurance_addon": 200000,
     "r1_health_anomaly_addon": 150000,
     "r5_retirement_income_multiple": 10,
     "r5_education_target_default": 1000000
   },
-
   "severity_thresholds": {
     "LOW": 300000,
     "MEDIUM": 1000000,
     "HIGH": 3000000
   },
-
   "absorption": {
     "liquid_asset_field": "assets",
     "tier_caps": [
-      { "max_unprotected_ratio": 0.5, "cap": "MEDIUM" },
-      { "max_unprotected_ratio": 1.0, "cap": "HIGH" }
+      {
+        "max_unprotected_ratio": 0.5,
+        "cap": "MEDIUM"
+      },
+      {
+        "max_unprotected_ratio": 1.0,
+        "cap": "HIGH"
+      }
     ]
   },
-
   "likelihood_indicators": {
     "R1": {
       "base": "HIGH",
       "raise": [],
       "lower": [
-        { "to": "MEDIUM", "when": [ { "field": "age", "op": "numeric_lt", "value": 18 } ] }
+        {
+          "to": "MEDIUM",
+          "when": [
+            {
+              "field": "age",
+              "op": "numeric_lt",
+              "value": 18
+            }
+          ]
+        }
       ]
     },
     "R2": {
       "base": "MEDIUM",
       "raise": [
-        { "to": "HIGH", "when": [ { "field": "age", "op": "numeric_gte", "value": 50 } ] },
-        { "to": "HIGH", "when": [ { "field": "health_history", "op": "string_contains", "value": ["异常", "病史", "结节", "三高", "糖尿病", "高血压"] } ] },
-        { "to": "HIGH", "when": [ { "field": "customer_health", "op": "string_contains", "value": ["异常", "亚健康", "病史"] } ] }
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "age",
+              "op": "numeric_gte",
+              "value": 50
+            }
+          ]
+        },
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "health_history",
+              "op": "string_contains",
+              "value": [
+                "异常",
+                "病史",
+                "结节",
+                "三高",
+                "糖尿病",
+                "高血压"
+              ]
+            }
+          ]
+        },
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "customer_health",
+              "op": "string_contains",
+              "value": [
+                "异常",
+                "亚健康",
+                "病史"
+              ]
+            }
+          ]
+        }
       ],
       "lower": [
-        { "to": "LOW", "when": [ { "field": "age", "op": "numeric_lt", "value": 30 }, { "field": "health_history", "op": "status_absent" } ] }
+        {
+          "to": "LOW",
+          "when": [
+            {
+              "field": "age",
+              "op": "numeric_lt",
+              "value": 30
+            },
+            {
+              "field": "health_history",
+              "op": "status_absent"
+            }
+          ]
+        }
       ]
     },
     "R3": {
       "base": "MEDIUM",
       "raise": [
-        { "to": "HIGH", "when": [ { "field": "occupation", "op": "string_contains", "value": ["高空", "建筑", "工地", "施工", "井下", "矿工", "司机", "驾驶", "货运", "外卖", "快递", "消防", "电焊", "焊工", "机械操作", "林业", "渔业", "电力作业", "搬运"] } ] },
-        { "to": "HIGH", "when": [ { "field": "employment_type", "op": "string_contains", "value": ["临时", "灵活", "兼职", "个体", "自由职业", "不稳定"] } ] }
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "occupation",
+              "op": "string_contains",
+              "value": [
+                "高空",
+                "建筑",
+                "工地",
+                "施工",
+                "井下",
+                "矿工",
+                "司机",
+                "驾驶",
+                "货运",
+                "外卖",
+                "快递",
+                "消防",
+                "电焊",
+                "焊工",
+                "机械操作",
+                "林业",
+                "渔业",
+                "电力作业",
+                "搬运"
+              ]
+            }
+          ]
+        },
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "employment_type",
+              "op": "string_contains",
+              "value": [
+                "临时",
+                "灵活",
+                "兼职",
+                "个体",
+                "自由职业",
+                "不稳定"
+              ]
+            }
+          ]
+        }
       ],
       "lower": []
     },
     "R4": {
       "base": "LOW",
       "raise": [
-        { "to": "MEDIUM", "when": [ { "field": "age", "op": "numeric_gte", "value": 40 } ] },
-        { "to": "HIGH", "when": [ { "field": "age", "op": "numeric_gte", "value": 55 } ] },
-        { "to": "HIGH", "when": [ { "field": "health_history", "op": "string_contains", "value": ["异常", "病史", "结节", "三高", "糖尿病", "高血压"] } ] }
+        {
+          "to": "MEDIUM",
+          "when": [
+            {
+              "field": "age",
+              "op": "numeric_gte",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "age",
+              "op": "numeric_gte",
+              "value": 55
+            }
+          ]
+        },
+        {
+          "to": "HIGH",
+          "when": [
+            {
+              "field": "health_history",
+              "op": "string_contains",
+              "value": [
+                "异常",
+                "病史",
+                "结节",
+                "三高",
+                "糖尿病",
+                "高血压"
+              ]
+            }
+          ]
+        }
       ],
       "lower": [
-        { "to": "LOW", "when": [ { "field": "age", "op": "numeric_lt", "value": 35 }, { "field": "family_responsibility", "op": "status_absent" } ] }
+        {
+          "to": "LOW",
+          "when": [
+            {
+              "field": "age",
+              "op": "numeric_lt",
+              "value": 35
+            },
+            {
+              "field": "family_responsibility",
+              "op": "status_absent"
+            }
+          ]
+        }
       ]
     },
     "R5": {
@@ -120,23 +295,67 @@
       "lower": []
     }
   },
-
-  "residual_weights": { "severity": 0.6, "likelihood": 0.4 },
-  "residual_thresholds": { "MEDIUM": 1.2, "HIGH": 2.0, "CRITICAL": 3.0 },
-
-  "priority_matrix": {
-    "CRITICAL": { "HIGH": "P0", "MEDIUM": "P1", "LOW": "P2" },
-    "HIGH":     { "HIGH": "P1", "MEDIUM": "P2", "LOW": "P2" },
-    "MEDIUM":   { "HIGH": "P2", "MEDIUM": "P2", "LOW": "P3" },
-    "LOW":      { "HIGH": "P3", "MEDIUM": "P3", "LOW": "P3" }
+  "residual_weights": {
+    "severity": 0.6,
+    "likelihood": 0.4
   },
-
+  "residual_thresholds": {
+    "MEDIUM": 1.2,
+    "HIGH": 2.0,
+    "CRITICAL": 3.0
+  },
+  "priority_matrix": {
+    "CRITICAL": {
+      "HIGH": "P0",
+      "MEDIUM": "P1",
+      "LOW": "P2"
+    },
+    "HIGH": {
+      "HIGH": "P1",
+      "MEDIUM": "P2",
+      "LOW": "P2"
+    },
+    "MEDIUM": {
+      "HIGH": "P2",
+      "MEDIUM": "P2",
+      "LOW": "P3"
+    },
+    "LOW": {
+      "HIGH": "P3",
+      "MEDIUM": "P3",
+      "LOW": "P3"
+    }
+  },
   "priority_overrides": [
-    { "id": "R5_always_low", "if": { "category": "R5" }, "max_priority": "P3", "reason": "R5 常态存在但极少当下最紧急，优先级不高于 P3" },
-    { "id": "critical_residual_high_likelihood_p0", "if": { "residual": "CRITICAL", "likelihood": "HIGH" }, "min_priority": "P0", "reason": "剩余风险致命且发生概率高，须最高优先" },
-    { "id": "not_identified_p3", "if": { "risk_exists": false }, "max_priority": "P3", "reason": "已判定不成立的风险不提升优先级" }
+    {
+      "id": "R5_always_low",
+      "if": {
+        "category": "R5"
+      },
+      "max_priority": "P3",
+      "reason": "R5 常态存在但极少当下最紧急，优先级不高于 P3",
+      "enabled": true
+    },
+    {
+      "id": "critical_residual_high_likelihood_p0",
+      "if": {
+        "residual": "CRITICAL",
+        "likelihood": "HIGH"
+      },
+      "min_priority": "P0",
+      "reason": "剩余风险致命且发生概率高须最高优先；但启用会覆盖 R5_always_low（R5 可达 CRITICAL+HIGH），需产品裁决，故显式禁用（Phase 9 由静默 no-op 改为显式开关）",
+      "enabled": false
+    },
+    {
+      "id": "not_identified_p3",
+      "if": {
+        "risk_exists": false
+      },
+      "max_priority": "P3",
+      "reason": "已判定不成立的风险不提升优先级",
+      "enabled": true
+    }
   ],
-
   "coverage_map": {
     "R1": "existing_medical_coverage",
     "R2": "existing_critical_illness_coverage",
@@ -144,7 +363,6 @@
     "R4": "existing_life_coverage",
     "R5": null
   },
-
   "existing_resource_map": {
     "cash": "assets",
     "investments": null,
@@ -154,7 +372,6 @@
     "existing_insurance": "coverage_field",
     "family_support": null
   },
-
   "potential_impact_templates": {
     "R1": {
       "financial": "一次性自付医疗支出约 {amount} 元，含社保外用药与器材。",
@@ -182,22 +399,50 @@
       "family_responsibility": "长期储蓄被各类风险事件侵蚀，削弱代际支持能力。"
     }
   },
-
   "reasoning_templates": {
     "IDENTIFIED": "依据 {evidence_list}，{domain} 风险成立。经济后果测算约 {amount} 元（置信度 {confidence}）；现有相关保障约 {protected} 元，剩余暴露约 {unprotected} 元。现有缓冲（{absorption}）使严重度评定为 {severity}。",
     "NOT_IDENTIFIED": "依据 {evidence_list}，{domain} 风险不成立：关键暴露条件未满足。",
     "suffix_suggestion": "建议进一步评估该风险的收入替代与责任履行能力。"
   },
-
   "conclusion_templates": {
     "IDENTIFIED": "{domain} 剩余风险为 {residual}，优先级 {priority}。当前分析仅到风险层，不涉及具体产品配置。",
     "NOT_IDENTIFIED": "{domain} 当前证据不足以认定成立，不列入优先处理。"
   },
-
   "family_overview_template": "本次分析覆盖 {scopes}。已识别风险：{identified}；不成立：{not_identified}；信息不足待澄清：{undetermined}。整体分析状态：{status}。最高优先级风险：{top_priorities}。",
-
-  "priority_rank": { "P0": 0, "P1": 1, "P2": 2, "P3": 3 },
-  "severity_rank": { "LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4 },
-  "likelihood_rank": { "LOW": 1, "MEDIUM": 2, "HIGH": 3, "UNKNOWN": 2 },
-  "residual_rank": { "LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4, "UNKNOWN": 2 }
+  "priority_rank": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 2,
+    "P3": 3
+  },
+  "severity_rank": {
+    "LOW": 1,
+    "MEDIUM": 2,
+    "HIGH": 3,
+    "CRITICAL": 4
+  },
+  "likelihood_rank": {
+    "LOW": 1,
+    "MEDIUM": 2,
+    "HIGH": 3,
+    "UNKNOWN": 2
+  },
+  "residual_rank": {
+    "LOW": 1,
+    "MEDIUM": 2,
+    "HIGH": 3,
+    "CRITICAL": 4,
+    "UNKNOWN": 2
+  },
+  "health_anomaly_tokens": [
+    "异常",
+    "病史",
+    "结节",
+    "三高",
+    "糖尿病",
+    "高血压",
+    "亚健康",
+    "住院",
+    "手术"
+  ]
 }

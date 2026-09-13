@@ -1,0 +1,46 @@
+{
+  "version": "0.1",
+  "description": "Externalized deterministic rules for the Recommendation skill. The engine ONLY consumes these; it never invents weights or thresholds.",
+  "priority_weight": {
+    "P0_CRITICAL": 4,
+    "P1_HIGH": 3,
+    "P2_MEDIUM": 2,
+    "P3_LOW": 1
+  },
+  "risk_priority_weight": {
+    "P0": 4,
+    "P1": 3,
+    "P2": 2,
+    "P3": 1
+  },
+  "requirement_type_to_risk_category": {
+    "medical": "R1",
+    "critical_illness": "R2",
+    "accident": "R3",
+    "life": "R4",
+    "savings": "R5"
+  },
+  "fit_score_thresholds": {
+    "strong_fit_min": 0.80,
+    "good_fit_min": 0.60,
+    "partial_fit_min": 0.40,
+    "poor_fit_min": 0.20
+  },
+  "requirement_fit_weights": {
+    "matched": 1.0,
+    "partial": 0.5,
+    "unmet": 0.0
+  },
+  "hard_constraint_types": ["budget", "term", "liquidity"],
+  "evidence_required_for_primary": true,
+  "min_evidence_refs_for_supported": 1,
+  "tradeoff_impact_levels": ["low", "medium", "high"],
+  "recommendation_weights": {
+    "requirement_fit": 0.4,
+    "risk_fit": 0.4,
+    "evidence": 0.2
+  },
+  "residual_risk_major": ["HIGH", "CRITICAL"],
+  "risk_priority_major": ["P0", "P1"],
+  "fit_labels": ["strong_fit", "good_fit", "partial_fit", "poor_fit", "not_suitable", "insufficient_evidence"]
+}

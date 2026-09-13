@@ -1,0 +1,29 @@
+{
+  "knowledge_base": "evals/fixtures/kb",
+  "cases": [
+    {
+      "id": "q_medical_vs_critical",
+      "query": "百万医疗险和重疾险有什么区别？",
+      "expect_in_candidates": ["01_medical_insurance_003", "02_critical_illness_003"],
+      "expect_top": ["01_medical_insurance_003", "02_critical_illness_003"],
+      "expect_status": "success"
+    },
+    {
+      "id": "q_waiting_period",
+      "query": "什么是等待期？",
+      "expect_in_candidates": ["01_medical_insurance_004", "02_critical_illness_004"],
+      "expect_status": "success"
+    },
+    {
+      "id": "q_preexisting",
+      "query": "既往症怎么认定？",
+      "expect_in_candidates": ["01_medical_insurance_005", "06_claims_003"],
+      "expect_status": "success"
+    },
+    {
+      "id": "q_nonexistent",
+      "query": "石墨烯电池的循环寿命衰减曲线如何评估",
+      "expect_status": "insufficient_evidence"
+    }
+  ]
+}

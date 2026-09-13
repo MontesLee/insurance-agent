@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReportGenerationInput",
+  "description": "统一输入对象（单一真源）。Report Generation 只读这 5 路上游结构化产物的归一化结果；不得重新分析、重新评级或推荐。client_profile 接受 CanonicalClientState（client_state），也可接受 adapter 归一化后的等价结构。",
+  "type": "object",
+  "required": ["client_profile", "requirement_analysis", "risk_analysis"],
+  "properties": {
+    "client_profile": {
+      "type": "object",
+      "description": "CanonicalClientState（client_state）或等价归一化结构。提供 family_profile / financial_profile / responsibility_profile / existing_protection / health_profile / employment_profile。作为 01 客户画像 与 02 家庭财务情况 的唯一事实源。"
+    },
+    "requirement_analysis": {
+      "type": "object",
+      "description": "RequirementAnalysisOutput（requirement_analysis Skill 产物）。提供 requirements / priorities / coverage_gaps / information_gaps / next_actions。"
+    },
+    "risk_analysis": {
+      "type": "object",
+      "description": "RiskAnalysisOutput（risk-analysis Skill 产物）。提供 risks / risk_matrix / top_priorities / next_information_needed。风险域严格沿用 R1-R5 taxonomy。"
+    },
+    "knowledge_search": {
+      "type": ["object", "null"],
+      "description": "KnowledgeSearchOutput（knowledge-search Skill 产物，可选）。用于 06 推荐保障方向 的证据回链与冲突提示；缺失不影响报告生成。"
+    },
+    "recommendation": {
+      "type": ["object", "null"],
+      "description": "RecommendationOutput（recommendation Skill 产物，可选）。用于 06 推荐保障方向 的呈现。缺失时 06 明确标注信息不足，不自行生成推荐。"
+    }
+  },
+  "additionalProperties": false
+}

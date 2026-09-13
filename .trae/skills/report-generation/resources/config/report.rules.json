@@ -1,0 +1,60 @@
+{
+  "version": "0.1",
+  "description": "Externalized deterministic rules for the Report Generation skill. The engine ONLY consumes these; it never invents labels, thresholds, or mappings.",
+  "requirement_type_to_risk_category": {
+    "medical": "R1",
+    "critical_illness": "R2",
+    "accident": "R3",
+    "life": "R4",
+    "savings": "R5"
+  },
+  "risk_category_names": {
+    "R1": "医疗风险",
+    "R2": "重疾风险",
+    "R3": "意外风险",
+    "R4": "身故/家庭责任风险",
+    "R5": "长期储蓄/养老/财富规划风险"
+  },
+  "requirement_type_names": {
+    "medical": "医疗保障",
+    "critical_illness": "重疾保障",
+    "accident": "意外保障",
+    "life": "身故/家庭责任",
+    "savings": "长期储蓄/养老"
+  },
+  "priority_rank": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 2,
+    "P3": 3
+  },
+  "requirement_priority_to_label": {
+    "P0_CRITICAL": "必须优先解决",
+    "P1_HIGH": "建议尽快解决",
+    "P2_MEDIUM": "可以后续完善",
+    "P3_LOW": "长期规划"
+  },
+  "requirement_priority_to_short": {
+    "P0_CRITICAL": "P0",
+    "P1_HIGH": "P1",
+    "P2_MEDIUM": "P2",
+    "P3_LOW": "P3"
+  },
+  "importance_to_category": {
+    "P0_CRITICAL": "required",
+    "P1_HIGH": "required",
+    "P2_MEDIUM": "suggested",
+    "P3_LOW": "optional"
+  },
+  "unknown_status_token": "待确认",
+  "missing_section_note": "当前信息不足以生成该章节，建议经纪人在下一次沟通中补充。",
+  "missing_recommendation_note": "当前缺少 Recommendation 分析结果，暂不形成具体保障方向。",
+  "hallucination": {
+    "enable_money_scan": true,
+    "money_regex": "[0-9][0-9,]*(\\.[0-9]+)?\\s*(万元|元|万)",
+    "forbidden_product_names": [],
+    "forbidden_company_names": []
+  },
+  "report_title": "客户保险需求分析报告",
+  "report_version": "1.0"
+}

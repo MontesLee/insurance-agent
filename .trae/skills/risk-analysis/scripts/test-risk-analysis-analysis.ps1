@@ -62,7 +62,7 @@ function Invoke-RaDiscovery {
     return (Get-Content -LiteralPath $outPath -Raw -Encoding UTF8 | ConvertFrom-Json)
 }
 function Invoke-RaAnalysis {
-    param([string]$Fixture, [string]$DiscOut, [string]$OutName, [string]$Rules = '', [string]$SuffJson = '')
+    param([string]$Fixture, [string]$DiscOut, [string]$OutName, [string]$Rules = '', [string]$SuffJson = '', [string]$SharedRules = '')
     $inPath  = Join-Path $fxDisc $Fixture
     $discPath = Join-Path $tmp $DiscOut
     $outPath = Join-Path $tmp $OutName
@@ -70,6 +70,7 @@ function Invoke-RaAnalysis {
     $params = @{ InputJsonPath = $inPath; OutputJsonPath = $outPath; DiscoveryJsonPath = $discPath }
     if (-not [string]::IsNullOrWhiteSpace($Rules)) { $params.RulesPath = $Rules }
     if (-not [string]::IsNullOrWhiteSpace($SuffJson)) { $params.SufficiencyJsonPath = $SuffJson }
+    if (-not [string]::IsNullOrWhiteSpace($SharedRules)) { $params.SharedRulesPath = $SharedRules }
     & $anaEngine @params | Out-Null
     if (-not (Test-Path -LiteralPath $outPath)) { throw "analysis produced no output for $DiscOut" }
     return (Get-Content -LiteralPath $outPath -Raw -Encoding UTF8 | ConvertFrom-Json)
@@ -223,6 +224,78 @@ Run-Case 'integration-sufficiency: sufficiency NEED_MORE → analysis 继承' {
     $d = Invoke-RaDiscovery -Fixture 'case-dual-income-family.json' -OutName 'ana_int_disc.json'
     $o = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'ana_int_disc.json' -OutName 'ana_int.json' -SuffJson $suffPath
     Assert-Equal $o.analysis_status 'NEED_MORE_INFORMATION' 'sufficiency 的 NEED_MORE_INFORMATION 应被继承'
+}
+
+# ------------------------------------------------------------------ 用例 11–15：Phase 9 Review 新增（假外置治理 + override 开关）
+$suffRules = Join-Path $skillRoot 'resources'; $suffRules = Join-Path $suffRules 'config'; $suffRules = Join-Path $suffRules 'risk-sufficiency.rules.json'
+
+function Write-RulesCopy {
+    param([string]$Source, [string]$Name, [scriptblock]$Mutate)
+    $txt = Get-Content -LiteralPath $Source -Raw -Encoding UTF8
+    $obj = $txt | ConvertFrom-Json
+    & $Mutate $obj
+    $p = Join-Path $tmp $Name
+    ($obj | ConvertTo-Json -Depth 24) | Set-Content -LiteralPath $p -Encoding UTF8
+    return $p
+}
+
+# 11 profile_names 真外置
+Run-Case 'ext-profile-names: 收窄 profile_names → 字段读不到 → 结论改变' {
+    $base = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'ana_dual_disc.json' -OutName 'probe_pn_base.json'
+    $r2base = Get-RaRisk $base 'R2'
+    $sharedOff = Write-RulesCopy -Source $suffRules -Name 'pn_suff.rules.json' -Mutate { param($o) $o.profile_names = @('family_profile') }
+    $alt = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'ana_dual_disc.json' -OutName 'probe_pn_alt.json' -SharedRules $sharedOff
+    $r2alt = @($alt.risks | Where-Object { $_.risk_category -eq 'R2' })[0]
+    Assert-True ([double]$r2base.impact_estimate.amount -gt 0) '基线 R2 应有金额'
+    Assert-True ($null -eq $r2alt -or [double]$r2alt.impact_estimate.amount -lt [double]$r2base.impact_estimate.amount) `
+        ('收窄 profile_names 后 R2 金额必须下降（证明 profile 列表真外置，而非引擎硬编码）实际=' + $(if ($null -eq $r2alt) { 'null' } else { $r2alt.impact_estimate.amount }))
+}
+
+# 12 health_anomaly_tokens 真外置
+Run-Case 'ext-health-tokens: 清空 health_anomaly_tokens → R1 金额下降' {
+    $d = Invoke-RaDiscovery -Fixture 'case-retired-no-income.json' -OutName 'probe_ht_disc.json'
+    $base = Invoke-RaAnalysis -Fixture 'case-retired-no-income.json' -DiscOut 'probe_ht_disc.json' -OutName 'probe_ht_base.json'
+    $r1base = Get-RaRisk $base 'R1'
+    $scorOff = Write-RulesCopy -Source $scorRules -Name 'ht_scoring.rules.json' -Mutate { param($o) $o.health_anomaly_tokens = @() }
+    $alt = Invoke-RaAnalysis -Fixture 'case-retired-no-income.json' -DiscOut 'probe_ht_disc.json' -OutName 'probe_ht_alt.json' -Rules $scorOff
+    $r1alt = Get-RaRisk $alt 'R1'
+    Assert-True ([double]$r1alt.impact_estimate.amount -lt [double]$r1base.impact_estimate.amount) `
+        ('健康异常加成必须来自规则词表：清空后 R1 应下降，base=' + $r1base.impact_estimate.amount + ' alt=' + $r1alt.impact_estimate.amount)
+}
+
+# 13 precedence 真外置
+Run-Case 'ext-precedence: 反转 precedence → 状态合并结果翻转' {
+    $suffPath = Join-Path $tmp 'ana_suff_needmore.json'
+    $sharedOff = Write-RulesCopy -Source $suffRules -Name 'prec_suff.rules.json' -Mutate {
+        param($o) $o.analysis_status_rules.precedence = @('FORMAL', 'PRELIMINARY', 'NEED_MORE_INFORMATION', 'CONFLICTING_INFORMATION', 'NEEDS_REVIEW', 'FAILED')
+    }
+    $d = Invoke-RaDiscovery -Fixture 'case-dual-income-family.json' -OutName 'probe_prec_disc.json'
+    $base = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'probe_prec_disc.json' -OutName 'probe_prec_base.json' -SuffJson $suffPath
+    $alt = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'probe_prec_disc.json' -OutName 'probe_prec.json' -SuffJson $suffPath -SharedRules $sharedOff
+    Assert-Equal $base.analysis_status 'NEED_MORE_INFORMATION' '默认次序下充分性的 NEED_MORE_INFORMATION 应胜出（对照）'
+    Assert-Equal $alt.analysis_status 'PRELIMINARY' '次序反转后 FORMAL 变成最严、NEED_MORE 不再胜出 → 保留 discovery 的 PRELIMINARY（证明次序真外置）'
+}
+
+# 14 override enabled=false 不生效（默认）
+Run-Case 'override-switch: enabled=false → critical_residual_high_likelihood_p0 不生效' {
+    $o = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'ana_dual_disc.json' -OutName 'probe_ov_off.json'
+    $r5 = Get-RaRisk $o 'R5'
+    Assert-Equal $r5.residual_risk 'CRITICAL' 'R5 应为 CRITICAL 剩余风险（本用例前提）'
+    Assert-Equal $r5.likelihood 'HIGH' 'R5 应为 HIGH 概率（本用例前提）'
+    Assert-Equal $r5.priority 'P3' 'override 禁用时 R5 保持 R5_always_low 的 P3'
+}
+
+# 15 override enabled=true 生效（证明方向修复 + 暴露与 R5_always_low 的冲突）
+Run-Case 'override-switch: enabled=true → 同一 R5 被抬到 P0（冲突已显式化）' {
+    $scorOn = Write-RulesCopy -Source $scorRules -Name 'ov_on_scoring.rules.json' -Mutate {
+        param($o)
+        foreach ($ov in @($o.priority_overrides)) {
+            if ($ov.id -eq 'critical_residual_high_likelihood_p0') { $ov.enabled = $true }
+        }
+    }
+    $o = Invoke-RaAnalysis -Fixture 'case-dual-income-family.json' -DiscOut 'ana_dual_disc.json' -OutName 'probe_ov_on.json' -Rules $scorOn
+    $r5 = Get-RaRisk $o 'R5'
+    Assert-Equal $r5.priority 'P0' '启用后 min_priority=P0 必须真的生效（rank 越小越紧急，比较方向已修正）'
 }
 
 # ------------------------------------------------------------------ 汇总

@@ -3,7 +3,6 @@
   "taxonomy_version": "1.0",
   "method": "risk_dependency_graph_v1",
   "description": "risk-analysis 风险发现规则（R1–R5）。gate.any_of 逐信号求值 → MATCHED / ABSENT / UNRESOLVED；∃MATCHED=IDENTIFIED，∃UNRESOLVED=UNDETERMINED，∀ABSENT=NOT_IDENTIFIED。规则全部外置，引擎零业务判断、零 LLM。",
-
   "shared_sources": {
     "groups": "risk-sufficiency.rules.json",
     "question_templates": "risk-sufficiency.rules.json",
@@ -11,14 +10,50 @@
     "analysis_status_precedence": "risk-sufficiency.rules.json#analysis_status_rules.precedence",
     "note": "groups / question_templates / precedence 以充分性规则文件为单一真源；本文件的 groups 只补充 discovery 专有分组（person_facts），同名以本文件为准。"
   },
-
-  "status_satisfied": ["KNOWN", "ESTIMATED", "ASSUMED", "INFERRED"],
-  "status_unknown": "UNKNOWN",
-
-  "negative_tokens": ["无", "没有", "无房贷", "无负债", "无贷款", "无子女", "无赡养", "无其他", "不承担", "不适用", "未参保", "否", "none", "no", "n/a", "na"],
-  "negative_prefixes": ["无", "没有", "none", "no"],
-  "numeric_zero_is_absent_fields": ["children_count", "dependents", "mortgage_balance", "liabilities", "children_education", "elderly_support", "spouse_income", "annual_income", "household_income", "assets", "cash_flow", "premium_budget", "existing_life_coverage", "existing_critical_illness_coverage", "existing_medical_coverage", "existing_accident_coverage"],
-
+  "status_satisfied": [
+    "KNOWN",
+    "ESTIMATED",
+    "ASSUMED",
+    "INFERRED"
+  ],
+  "negative_tokens": [
+    "无",
+    "没有",
+    "无房贷",
+    "无负债",
+    "无贷款",
+    "无子女",
+    "无赡养",
+    "无其他",
+    "不承担",
+    "不适用",
+    "未参保",
+    "否",
+    "none",
+    "no",
+    "n/a",
+    "na"
+  ],
+  "negative_prefixes": [
+    "无",
+    "没有",
+    "none",
+    "no"
+  ],
+  "negative_substrings": [
+    "无需",
+    "无须",
+    "不需要",
+    "不用",
+    "暂无",
+    "尚未",
+    "不承担",
+    "无赡养",
+    "无贷款",
+    "无负债",
+    "无房贷",
+    "无子女"
+  ],
   "number_units": {
     "亿": 100000000,
     "千万": 10000000,
@@ -29,14 +64,18 @@
     "千": 1000,
     "k": 1000
   },
-
   "groups": {
     "person_facts": {
-      "any_of": ["age", "gender", "marital_status", "children_count", "city"],
+      "any_of": [
+        "age",
+        "gender",
+        "marital_status",
+        "children_count",
+        "city"
+      ],
       "description": "家庭成员基本事实。R1 普适暴露仍需要至少一条家庭事实支撑，避免对完全未知的客户直接断言风险成立。"
     }
   },
-
   "field_labels": {
     "age": "年龄",
     "gender": "性别",
@@ -70,7 +109,6 @@
     "employment_type": "用工形态",
     "income_stability": "收入稳定性"
   },
-
   "requirement_type_to_domain": {
     "medical": "R1",
     "critical_illness": "R2",
@@ -78,11 +116,6 @@
     "life": "R4",
     "savings": "R5"
   },
-
-  "high_risk_occupation_keywords": ["高空", "建筑", "工地", "施工", "井下", "矿工", "司机", "驾驶", "货运", "外卖", "快递", "消防", "电焊", "焊工", "机械操作", "林业", "渔业", "电力作业", "搬运"],
-  "health_abnormal_keywords": ["异常", "脂肪肝", "结节", "高血压", "糖尿病", "高血脂", "尿酸", "慢性", "息肉", "囊肿", "结石", "肝炎", "增生"],
-  "income_unstable_keywords": ["不稳定", "不稳", "波动", "自由职业", "灵活", "项目制", "提成", "季节性"],
-
   "text_templates": {
     "identified": "已确认暴露：{matched}。",
     "identified_amplifiers": "放大因素：{amplifiers}。",
@@ -91,25 +124,24 @@
     "requirement_attention": "需求层已提出 {requirement_type} 相关关注（{requirement_id}），但事实层缺少判定依据，不得据此认定风险成立。",
     "joiner": "；"
   },
-
   "unknown_reason_templates": {
     "unresolved": "判定 {domain} 是否成立需要该字段，当前状态为 UNKNOWN，不得推断、不得用默认值替代。",
     "conflict": "CONFLICT_UNRESOLVED：该字段存在不一致取值，澄清前不得用于判定风险是否成立。",
     "missing": "上游未提供该字段（status=UNKNOWN），风险暴露无法判定。"
   },
-
   "assumption_reason_default": "状态为 {status} 但未填写依据（note），unknown_integrity 检查将判定不合规。",
-
   "questioning": {
     "max_questions": 3,
     "spread_step": 0.5,
     "spread_cap": 2.0,
     "normalizer": 2.0,
-    "priority_thresholds": { "HIGH": 0.75, "MEDIUM": 0.45 },
+    "priority_thresholds": {
+      "HIGH": 0.75,
+      "MEDIUM": 0.45
+    },
     "formula": "resolution_value = min(weight * spread / normalizer, 1.0); spread = min(1 + step*(受影响域数-1), cap)",
     "note": "发现阶段的追问解决『这个风险到底成不成立』，与充分性阶段的『信息够不够量化』不同；已由充分性阶段问过的字段自动去重。"
   },
-
   "domains": {
     "R1": {
       "name": "Medical Risk",
@@ -118,26 +150,80 @@
       "trigger_event": "家庭成员发生疾病或意外受伤，产生需要家庭自行承担的医疗支出",
       "gate": {
         "any_of": [
-          { "id": "R1-G1", "group": "person_facts", "op": "group_status_satisfied", "weight": 1.0,
-            "description": "已掌握家庭成员基本事实，医疗支出风险对该家庭成立" }
+          {
+            "id": "R1-G1",
+            "group": "person_facts",
+            "op": "group_status_satisfied",
+            "weight": 1.0,
+            "description": "已掌握家庭成员基本事实，医疗支出风险对该家庭成立"
+          }
         ]
       },
       "amplifiers": [
-        { "id": "R1-A1", "field": "social_insurance_status", "op": "status_absent", "weight": 0.8,
-          "description": "社保/医保参保状态为无或未参保，医疗支出需更高比例自付" },
-        { "id": "R1-A2", "field": "existing_medical_coverage", "op": "numeric_eq", "value": 0, "absent_when_false": false, "weight": 0.8,
-          "description": "无商业医疗保障，医保之外的支出缺口需家庭自行承担" },
-        { "id": "R1-A3", "field": "customer_health", "op": "string_contains", "value": ["异常", "脂肪肝", "结节", "高血压", "糖尿病", "高血脂", "尿酸", "慢性", "息肉", "囊肿", "结石", "肝炎", "增生"], "absent_when_false": false, "weight": 0.7,
-          "description": "已知存在健康异常记录，医疗支出发生概率上升" },
-        { "id": "R1-A4", "field": "children_count", "op": "numeric_gt", "value": 0, "absent_when_false": false, "weight": 0.4,
-          "description": "家庭有未成年子女，医疗事件发生频率通常更高" },
-        { "id": "R1-A5", "field": "dependents", "op": "status_satisfied", "weight": 0.4,
-          "description": "存在其他需要照护的家庭成员" },
-        { "id": "R1-A6", "field": "employer_benefits", "op": "status_absent", "weight": 0.3,
-          "description": "单位未提供补充医疗福利，缺少第二层支付来源" }
+        {
+          "id": "R1-A1",
+          "field": "social_insurance_status",
+          "op": "status_absent",
+          "weight": 0.8,
+          "description": "社保/医保参保状态为无或未参保，医疗支出需更高比例自付"
+        },
+        {
+          "id": "R1-A2",
+          "field": "existing_medical_coverage",
+          "op": "numeric_eq",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.8,
+          "description": "无商业医疗保障，医保之外的支出缺口需家庭自行承担"
+        },
+        {
+          "id": "R1-A3",
+          "field": "customer_health",
+          "op": "string_contains",
+          "value": [
+            "异常",
+            "脂肪肝",
+            "结节",
+            "高血压",
+            "糖尿病",
+            "高血脂",
+            "尿酸",
+            "慢性",
+            "息肉",
+            "囊肿",
+            "结石",
+            "肝炎",
+            "增生"
+          ],
+          "absent_when_false": false,
+          "weight": 0.7,
+          "description": "已知存在健康异常记录，医疗支出发生概率上升"
+        },
+        {
+          "id": "R1-A4",
+          "field": "children_count",
+          "op": "numeric_gt",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.4,
+          "description": "家庭有未成年子女，医疗事件发生频率通常更高"
+        },
+        {
+          "id": "R1-A5",
+          "field": "dependents",
+          "op": "status_satisfied",
+          "weight": 0.4,
+          "description": "存在其他需要照护的家庭成员"
+        },
+        {
+          "id": "R1-A6",
+          "field": "employer_benefits",
+          "op": "status_absent",
+          "weight": 0.3,
+          "description": "单位未提供补充医疗福利，缺少第二层支付来源"
+        }
       ]
     },
-
     "R2": {
       "name": "Critical Illness Risk",
       "name_zh": "重疾收入中断风险",
@@ -145,26 +231,95 @@
       "trigger_event": "家庭主要收入者确诊重大疾病，治疗与康复期间无法正常工作",
       "gate": {
         "any_of": [
-          { "id": "R2-G1", "group": "income_anchor", "op": "group_numeric_gt", "value": 0, "absent_when_false": true, "weight": 1.0,
-            "description": "存在可被中断的收入来源（本人年收入或家庭年收入 > 0）" }
+          {
+            "id": "R2-G1",
+            "group": "income_anchor",
+            "op": "group_numeric_gt",
+            "value": 0,
+            "absent_when_false": true,
+            "weight": 1.0,
+            "description": "存在可被中断的收入来源（本人年收入或家庭年收入 > 0）"
+          }
         ]
       },
       "amplifiers": [
-        { "id": "R2-A1", "field": "existing_critical_illness_coverage", "op": "numeric_eq", "value": 0, "absent_when_false": false, "weight": 0.8,
-          "description": "无重疾保障，收入中断期缺少直接对冲" },
-        { "id": "R2-A2", "group": "responsibility_scale", "op": "group_status_satisfied", "weight": 0.7,
-          "description": "存在持续刚性责任（房贷/教育/赡养），收入中断后果被放大" },
-        { "id": "R2-A3", "field": "income_stability", "op": "string_contains", "value": ["不稳定", "不稳", "波动", "自由职业", "灵活", "项目制", "提成", "季节性"], "absent_when_false": false, "weight": 0.5,
-          "description": "收入稳定性偏低，中断缓冲更薄" },
-        { "id": "R2-A4", "field": "customer_health", "op": "string_contains", "value": ["异常", "脂肪肝", "结节", "高血压", "糖尿病", "高血脂", "尿酸", "慢性", "息肉", "囊肿", "结石", "肝炎", "增生"], "absent_when_false": false, "weight": 0.5,
-          "description": "已知存在健康异常记录" },
-        { "id": "R2-A5", "field": "assets", "op": "numeric_lt", "value": 100000, "absent_when_false": false, "weight": 0.4,
-          "description": "可动用金融资产有限，独立吸收收入中断的能力弱" },
-        { "id": "R2-A6", "field": "children_count", "op": "numeric_gt", "value": 0, "absent_when_false": false, "weight": 0.4,
-          "description": "有需要抚养的子女，责任期限拉长" }
+        {
+          "id": "R2-A1",
+          "field": "existing_critical_illness_coverage",
+          "op": "numeric_eq",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.8,
+          "description": "无重疾保障，收入中断期缺少直接对冲"
+        },
+        {
+          "id": "R2-A2",
+          "group": "responsibility_scale",
+          "op": "group_status_satisfied",
+          "weight": 0.7,
+          "description": "存在持续刚性责任（房贷/教育/赡养），收入中断后果被放大"
+        },
+        {
+          "id": "R2-A3",
+          "field": "income_stability",
+          "op": "string_contains",
+          "value": [
+            "不稳定",
+            "不稳",
+            "波动",
+            "自由职业",
+            "灵活",
+            "项目制",
+            "提成",
+            "季节性"
+          ],
+          "absent_when_false": false,
+          "weight": 0.5,
+          "description": "收入稳定性偏低，中断缓冲更薄"
+        },
+        {
+          "id": "R2-A4",
+          "field": "customer_health",
+          "op": "string_contains",
+          "value": [
+            "异常",
+            "脂肪肝",
+            "结节",
+            "高血压",
+            "糖尿病",
+            "高血脂",
+            "尿酸",
+            "慢性",
+            "息肉",
+            "囊肿",
+            "结石",
+            "肝炎",
+            "增生"
+          ],
+          "absent_when_false": false,
+          "weight": 0.5,
+          "description": "已知存在健康异常记录"
+        },
+        {
+          "id": "R2-A5",
+          "field": "assets",
+          "op": "numeric_lt",
+          "value": 100000,
+          "absent_when_false": false,
+          "weight": 0.4,
+          "description": "可动用金融资产有限，独立吸收收入中断的能力弱"
+        },
+        {
+          "id": "R2-A6",
+          "field": "children_count",
+          "op": "numeric_gt",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.4,
+          "description": "有需要抚养的子女，责任期限拉长"
+        }
       ]
     },
-
     "R3": {
       "name": "Accident / Disability Risk",
       "name_zh": "意外失能风险",
@@ -172,24 +327,89 @@
       "trigger_event": "意外或疾病导致伤残 / 失能，长期或永久丧失部分收入能力",
       "gate": {
         "any_of": [
-          { "id": "R3-G1", "group": "income_anchor", "op": "group_numeric_gt", "value": 0, "absent_when_false": true, "weight": 1.0,
-            "description": "存在可因伤残而丧失的收入能力" },
-          { "id": "R3-G2", "field": "occupation", "op": "string_contains", "value": ["高空", "建筑", "工地", "施工", "井下", "矿工", "司机", "驾驶", "货运", "外卖", "快递", "消防", "电焊", "焊工", "机械操作", "林业", "渔业", "电力作业", "搬运"], "absent_when_false": true, "weight": 1.0,
-            "description": "职业属于高风险作业类别，意外暴露显著高于平均水平" }
+          {
+            "id": "R3-G1",
+            "group": "income_anchor",
+            "op": "group_numeric_gt",
+            "value": 0,
+            "absent_when_false": true,
+            "weight": 1.0,
+            "description": "存在可因伤残而丧失的收入能力"
+          },
+          {
+            "id": "R3-G2",
+            "field": "occupation",
+            "op": "string_contains",
+            "value": [
+              "高空",
+              "建筑",
+              "工地",
+              "施工",
+              "井下",
+              "矿工",
+              "司机",
+              "驾驶",
+              "货运",
+              "外卖",
+              "快递",
+              "消防",
+              "电焊",
+              "焊工",
+              "机械操作",
+              "林业",
+              "渔业",
+              "电力作业",
+              "搬运"
+            ],
+            "absent_when_false": true,
+            "weight": 1.0,
+            "description": "职业属于高风险作业类别，意外暴露显著高于平均水平"
+          }
         ]
       },
       "amplifiers": [
-        { "id": "R3-A1", "field": "existing_accident_coverage", "op": "numeric_eq", "value": 0, "absent_when_false": false, "weight": 0.8,
-          "description": "无意外 / 伤残保障，失能后缺少直接对冲" },
-        { "id": "R3-A2", "field": "employment_type", "op": "string_in", "value": ["灵活就业", "自雇", "无固定职业", "自由职业", "临时工"], "absent_when_false": false, "weight": 0.6,
-          "description": "用工形态不稳定，失能后缺少制度性缓冲" },
-        { "id": "R3-A3", "group": "responsibility_scale", "op": "group_status_satisfied", "weight": 0.7,
-          "description": "存在持续刚性责任，失能后果被放大" },
-        { "id": "R3-A4", "field": "existing_medical_coverage", "op": "numeric_eq", "value": 0, "absent_when_false": false, "weight": 0.5,
-          "description": "无商业医疗保障，伤残相关的医疗与康复支出需自行承担" }
+        {
+          "id": "R3-A1",
+          "field": "existing_accident_coverage",
+          "op": "numeric_eq",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.8,
+          "description": "无意外 / 伤残保障，失能后缺少直接对冲"
+        },
+        {
+          "id": "R3-A2",
+          "field": "employment_type",
+          "op": "string_in",
+          "value": [
+            "灵活就业",
+            "自雇",
+            "无固定职业",
+            "自由职业",
+            "临时工"
+          ],
+          "absent_when_false": false,
+          "weight": 0.6,
+          "description": "用工形态不稳定，失能后缺少制度性缓冲"
+        },
+        {
+          "id": "R3-A3",
+          "group": "responsibility_scale",
+          "op": "group_status_satisfied",
+          "weight": 0.7,
+          "description": "存在持续刚性责任，失能后果被放大"
+        },
+        {
+          "id": "R3-A4",
+          "field": "existing_medical_coverage",
+          "op": "numeric_eq",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.5,
+          "description": "无商业医疗保障，伤残相关的医疗与康复支出需自行承担"
+        }
       ]
     },
-
     "R4": {
       "name": "Death / Family Responsibility Risk",
       "name_zh": "身故家庭责任风险",
@@ -197,26 +417,80 @@
       "trigger_event": "家庭主要收入者身故，其承担的长期责任无法继续履行",
       "gate": {
         "any_of": [
-          { "id": "R4-G1", "group": "responsibility_scale", "op": "group_status_satisfied", "weight": 1.0,
-            "description": "存在需要长期履行的家庭责任（房贷 / 负债 / 教育 / 赡养）" },
-          { "id": "R4-G2", "field": "children_count", "op": "numeric_gt", "value": 0, "absent_when_false": true, "weight": 1.0,
-            "description": "有需要抚养的子女" },
-          { "id": "R4-G3", "field": "dependents", "op": "status_satisfied", "weight": 1.0,
-            "description": "存在其他需要扶养的家庭成员" }
+          {
+            "id": "R4-G1",
+            "group": "responsibility_scale",
+            "op": "group_status_satisfied",
+            "weight": 1.0,
+            "description": "存在需要长期履行的家庭责任（房贷 / 负债 / 教育 / 赡养）"
+          },
+          {
+            "id": "R4-G2",
+            "field": "children_count",
+            "op": "numeric_gt",
+            "value": 0,
+            "absent_when_false": true,
+            "weight": 1.0,
+            "description": "有需要抚养的子女"
+          },
+          {
+            "id": "R4-G3",
+            "field": "dependents",
+            "op": "status_satisfied",
+            "weight": 1.0,
+            "description": "存在其他需要扶养的家庭成员"
+          }
         ]
       },
       "amplifiers": [
-        { "id": "R4-A1", "field": "existing_life_coverage", "op": "numeric_eq", "value": 0, "absent_when_false": false, "weight": 0.8,
-          "description": "无人身寿险保障，身故后缺少直接的资金来源替代" },
-        { "id": "R4-A2", "field": "spouse_income", "op": "numeric_eq", "value": 0, "absent_when_false": false, "weight": 0.6,
-          "description": "配偶无独立收入，家庭缺少第二收入来源" },
-        { "id": "R4-A3", "field": "children_info", "op": "string_contains", "value": ["岁", "幼儿园", "小学", "初中", "高中", "大学"], "absent_when_false": false, "weight": 0.5,
-          "description": "子女尚在受教育阶段，责任期限较长" },
-        { "id": "R4-A4", "field": "marital_status", "op": "string_in", "value": ["已婚", "再婚"], "absent_when_false": false, "weight": 0.3,
-          "description": "处于婚姻关系中，存在共同承担的家庭责任" }
+        {
+          "id": "R4-A1",
+          "field": "existing_life_coverage",
+          "op": "numeric_eq",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.8,
+          "description": "无人身寿险保障，身故后缺少直接的资金来源替代"
+        },
+        {
+          "id": "R4-A2",
+          "field": "spouse_income",
+          "op": "numeric_eq",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.6,
+          "description": "配偶无独立收入，家庭缺少第二收入来源"
+        },
+        {
+          "id": "R4-A3",
+          "field": "children_info",
+          "op": "string_contains",
+          "value": [
+            "岁",
+            "幼儿园",
+            "小学",
+            "初中",
+            "高中",
+            "大学"
+          ],
+          "absent_when_false": false,
+          "weight": 0.5,
+          "description": "子女尚在受教育阶段，责任期限较长"
+        },
+        {
+          "id": "R4-A4",
+          "field": "marital_status",
+          "op": "string_in",
+          "value": [
+            "已婚",
+            "再婚"
+          ],
+          "absent_when_false": false,
+          "weight": 0.3,
+          "description": "处于婚姻关系中，存在共同承担的家庭责任"
+        }
       ]
     },
-
     "R5": {
       "name": "Long-term Financial / Savings Risk",
       "name_zh": "长期财务风险",
@@ -224,24 +498,82 @@
       "trigger_event": "养老、子女教育或其他长期财务目标在既定时间内无法达成",
       "gate": {
         "any_of": [
-          { "id": "R5-G1", "group": "income_anchor", "op": "group_numeric_gt", "value": 0, "absent_when_false": true, "weight": 1.0,
-            "description": "存在可用于长期积累的收入基数" },
-          { "id": "R5-G2", "field": "age", "op": "numeric_gte", "value": 0, "absent_when_false": false, "weight": 0.8,
-            "description": "已知年龄，存在可衡量的长期时间跨度" },
-          { "id": "R5-G3", "field": "children_education", "op": "status_satisfied", "weight": 0.8,
-            "description": "存在明确的子女教育财务目标" }
+          {
+            "id": "R5-G1",
+            "group": "income_anchor",
+            "op": "group_numeric_gt",
+            "value": 0,
+            "absent_when_false": true,
+            "weight": 1.0,
+            "description": "存在可用于长期积累的收入基数"
+          },
+          {
+            "id": "R5-G2",
+            "field": "age",
+            "op": "numeric_gte",
+            "value": 0,
+            "absent_when_false": false,
+            "weight": 0.8,
+            "description": "已知年龄，存在可衡量的长期时间跨度"
+          },
+          {
+            "id": "R5-G3",
+            "field": "children_education",
+            "op": "status_satisfied",
+            "weight": 0.8,
+            "description": "存在明确的子女教育财务目标"
+          }
         ]
       },
       "amplifiers": [
-        { "id": "R5-A1", "field": "cash_flow", "op": "numeric_lte", "value": 0, "absent_when_false": false, "weight": 0.6,
-          "description": "年度结余有限，长期储蓄能力受限" },
-        { "id": "R5-A2", "field": "income_stability", "op": "string_contains", "value": ["不稳定", "不稳", "波动", "自由职业", "灵活", "项目制", "提成", "季节性"], "absent_when_false": false, "weight": 0.5,
-          "description": "收入不稳定，长期积累的可持续性存疑" },
-        { "id": "R5-A3", "field": "assets", "op": "numeric_lt", "value": 100000, "absent_when_false": false, "weight": 0.4,
-          "description": "可动用资产有限，长期目标的资金基础薄弱" },
-        { "id": "R5-A4", "field": "premium_budget", "op": "status_absent", "weight": 0.3,
-          "description": "尚未规划风险管理预算，长期安排的确定性不足" }
+        {
+          "id": "R5-A1",
+          "field": "cash_flow",
+          "op": "numeric_lte",
+          "value": 0,
+          "absent_when_false": false,
+          "weight": 0.6,
+          "description": "年度结余有限，长期储蓄能力受限"
+        },
+        {
+          "id": "R5-A2",
+          "field": "income_stability",
+          "op": "string_contains",
+          "value": [
+            "不稳定",
+            "不稳",
+            "波动",
+            "自由职业",
+            "灵活",
+            "项目制",
+            "提成",
+            "季节性"
+          ],
+          "absent_when_false": false,
+          "weight": 0.5,
+          "description": "收入不稳定，长期积累的可持续性存疑"
+        },
+        {
+          "id": "R5-A3",
+          "field": "assets",
+          "op": "numeric_lt",
+          "value": 100000,
+          "absent_when_false": false,
+          "weight": 0.4,
+          "description": "可动用资产有限，长期目标的资金基础薄弱"
+        },
+        {
+          "id": "R5-A4",
+          "field": "premium_budget",
+          "op": "status_absent",
+          "weight": 0.3,
+          "description": "尚未规划风险管理预算，长期安排的确定性不足"
+        }
       ]
     }
+  },
+  "documentation": {
+    "note": "顶层键均为引擎消费项；域内 keyword 列表写在 domains.<id>.gate/amplifiers 的 value 中，不在顶层重复。",
+    "zero_as_absent": "全字段一致：数值 0 与否定词均判「已知不存在」（契约 §4 五态语义），不做逐字段开关。"
   }
 }

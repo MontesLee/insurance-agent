@@ -1,0 +1,278 @@
+{
+  "skill": "recommendation",
+  "version": "0.1",
+  "description": "Single source of truth for Recommendation Eval. Each case embeds its full input; the runner executes the engine + validator and asserts against `expect`.",
+  "cases": [
+    {
+      "name": "normal_recommendation",
+      "dimension": "matching",
+      "description": "Two candidates, one clearly stronger on both requirement and risk fit, within budget.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" },
+            { "requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重疾保障", "priority": "P1_HIGH" }
+          ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" },
+            { "risk_id": "R2-001", "risk_category": "R2", "risk_name": "重大疾病", "residual_risk": "HIGH", "priority": "P0" }
+          ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "综合医疗+重疾方案", "coverage_structure": ["medical", "critical_illness"], "covers_risk_categories": ["R1", "R2"], "premium": { "annual": 8000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001", "KB-002"] },
+          { "candidate_id": "B", "solution_name": "纯医疗方案", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" }, { "chunk_id": "KB-002" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "COMPLETE", "primary_id": "A", "human_review_required": false, "not_recommended": [] }
+    },
+    {
+      "name": "partial_match",
+      "dimension": "matching",
+      "description": "Single candidate covers medical+accident but leaves life (a stated need) unmet -> partial requirement fit.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" },
+            { "requirement_id": "REQ-ACC", "requirement_type": "accident", "summary": "意外伤残", "priority": "P2_MEDIUM" },
+            { "requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "身故责任", "priority": "P0_CRITICAL" }
+          ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" },
+            { "risk_id": "R3-001", "risk_category": "R3", "risk_name": "意外伤残", "residual_risk": "HIGH", "priority": "P0" },
+            { "risk_id": "R4-001", "risk_category": "R4", "risk_name": "家庭责任", "residual_risk": "HIGH", "priority": "P0" }
+          ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "医疗+意外方案", "coverage_structure": ["medical", "accident"], "covers_risk_categories": ["R1", "R3"], "premium": { "annual": 10000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001", "KB-003"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" }, { "chunk_id": "KB-003" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "COMPLETE", "primary_id": "A", "human_review_required": false, "not_recommended": [], "expect_candidate_fit": { "A": "partial_fit" } }
+    },
+    {
+      "name": "budget_conflict",
+      "dimension": "matching",
+      "description": "Candidate A exceeds budget_max (hard constraint) -> not_recommended; B within budget -> primary.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "高端医疗", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 40000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] },
+          { "candidate_id": "B", "solution_name": "百万医疗", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "COMPLETE", "primary_id": "B", "human_review_required": false, "not_recommended": ["A"] }
+    },
+    {
+      "name": "requirement_conflict",
+      "dimension": "matching",
+      "description": "A P0 requirement (medical) is unmet by candidate A -> not_suitable -> not_recommended; B meets it -> primary.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P0_CRITICAL" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "纯意外方案", "coverage_structure": ["accident"], "covers_risk_categories": ["R3"], "premium": { "annual": 3000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-005"] },
+          { "candidate_id": "B", "solution_name": "医疗方案", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 4000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" }, { "chunk_id": "KB-005" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "COMPLETE", "primary_id": "B", "human_review_required": false, "not_recommended": ["A"] }
+    },
+    {
+      "name": "risk_gap",
+      "dimension": "completeness",
+      "description": "Chosen candidate leaves a major risk (critical illness R2) uncovered; engine must surface remaining_gaps.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" },
+            { "risk_id": "R2-001", "risk_category": "R2", "risk_name": "重大疾病", "residual_risk": "HIGH", "priority": "P0" }
+          ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "百万医疗", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "COMPLETE", "primary_id": "A", "human_review_required": false, "expect_candidate_risk_gaps": { "A": ["R2-001"] } }
+    },
+    {
+      "name": "evidence_insufficient",
+      "dimension": "evidence",
+      "description": "Candidate claims medical coverage but its source_refs do not match any knowledge chunk -> insufficient_evidence, no primary.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "未知医疗方案", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-999"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "INCOMPLETE_EVIDENCE", "primary_id": null, "human_review_required": true, "evidence_insufficient_candidates": ["A"] }
+    },
+    {
+      "name": "evidence_conflict",
+      "dimension": "evidence",
+      "description": "Knowledge search flags a source conflict -> candidate evidence=conflict -> insufficient_evidence path, human review.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "百万医疗", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": true, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "INCOMPLETE_EVIDENCE", "primary_id": null, "human_review_required": true, "evidence_insufficient_candidates": ["A"] }
+    },
+    {
+      "name": "close_call",
+      "dimension": "matching",
+      "description": "Two near-identical candidates; engine must pick one as primary and the other as alternative (none not_recommended).",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" },
+            { "requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重疾保障", "priority": "P1_HIGH" }
+          ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" },
+            { "risk_id": "R2-001", "risk_category": "R2", "risk_name": "重大疾病", "residual_risk": "HIGH", "priority": "P0" }
+          ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "综合方案A", "coverage_structure": ["medical", "critical_illness"], "covers_risk_categories": ["R1", "R2"], "premium": { "annual": 12000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001", "KB-002"] },
+          { "candidate_id": "B", "solution_name": "综合方案B", "coverage_structure": ["medical", "critical_illness"], "covers_risk_categories": ["R1", "R2"], "premium": { "annual": 12500 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001", "KB-002"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" }, { "chunk_id": "KB-002" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "COMPLETE", "primary_in": ["A", "B"], "human_review_required": false, "not_recommended": [] }
+    },
+    {
+      "name": "no_candidates",
+      "dimension": "scope",
+      "description": "Empty candidate_solutions -> NO_CANDIDATES, human review required.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "NO_CANDIDATES", "primary_id": null, "human_review_required": true }
+    },
+    {
+      "name": "human_review",
+      "dimension": "uncertainty",
+      "description": "Upstream requirement_analysis flagged NEED_MORE_INFORMATION -> best-effort primary but human_review_required + INCOMPLETE_EVIDENCE.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "NEED_MORE_INFORMATION",
+          "information_sufficiency": { "sufficiency_status": "INSUFFICIENT" },
+          "requirements": [ { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" } ],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "百万医疗", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "INCOMPLETE_EVIDENCE", "primary_id": "A", "human_review_required": true }
+    },
+    {
+      "name": "insufficient_input",
+      "dimension": "scope",
+      "description": "requirement_analysis missing entirely -> INSUFFICIENT_INPUT, no self-assumption of budget.",
+      "input": {
+        "risk_analysis": {
+          "risk_analysis": [ { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0" } ]
+        },
+        "candidate_solutions": [
+          { "candidate_id": "A", "solution_name": "百万医疗", "coverage_structure": ["medical"], "covers_risk_categories": ["R1"], "premium": { "annual": 5000 }, "term": { "years": 1 }, "liquidity_impact": "low", "source_refs": ["KB-001"] }
+        ],
+        "knowledge_search_results": { "status": "success", "conflict": false, "results": [ { "chunk_id": "KB-001" } ] },
+        "constraints": { "budget_max": 30000, "term_min_years": 1, "liquidity_required": false }
+      },
+      "expect": { "status": "INSUFFICIENT_INPUT", "primary_id": null, "human_review_required": true }
+    }
+  ]
+}

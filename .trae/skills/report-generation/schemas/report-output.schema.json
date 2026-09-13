@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReportGenerationResult",
+  "description": "Report Generation 输出契约（双层结构：structured_report 为核心数据结构，rendered_report 为 Markdown 渲染层）。事实来自上游，判断来自上游，推荐来自 Recommendation；本 Skill 只负责组织、表达、校验与交付。",
+  "type": "object",
+  "required": [
+    "skill", "version", "status", "structured_report",
+    "rendered_report", "validation", "metadata", "provenance"
+  ],
+  "properties": {
+    "skill": { "type": "string", "const": "report-generation" },
+    "version": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["success", "INSUFFICIENT_INPUT"]
+    },
+    "structured_report": {
+      "type": "object",
+      "required": [
+        "title", "version", "generated_at",
+        "client_profile", "financial_profile", "risk_exposure",
+        "coverage_gaps", "requirement_priorities",
+        "recommended_directions", "information_gaps", "next_actions"
+      ],
+      "properties": {
+        "title": { "type": "string" },
+        "version": { "type": "string" },
+        "generated_at": { "type": "string" },
+
+        "client_profile": {
+          "type": "object",
+          "required": ["fields", "note"],
+          "properties": {
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["label", "value", "status"],
+                "properties": {
+                  "label": { "type": "string" },
+                  "value": { "type": "string" },
+                  "status": { "type": "string", "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED", "ABSENT"] },
+                  "source": { "type": "string" }
+                }
+              }
+            },
+            "note": { "type": "string" }
+          }
+        },
+
+        "financial_profile": {
+          "type": "object",
+          "required": ["table", "note"],
+          "properties": {
+            "table": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["item", "value", "status"],
+                "properties": {
+                  "item": { "type": "string" },
+                  "value": { "type": "string" },
+                  "status": { "type": "string", "enum": ["KNOWN", "UNKNOWN", "ESTIMATED", "ASSUMED", "INFERRED", "ABSENT"] },
+                  "source": { "type": "string" }
+                }
+              }
+            },
+            "note": { "type": "string" }
+          }
+        },
+
+        "risk_exposure": {
+          "type": "object",
+          "required": ["R1", "R2", "R3", "R4", "R5"],
+          "properties": {
+            "R1": { "$ref": "#/definitions/riskExposure" },
+            "R2": { "$ref": "#/definitions/riskExposure" },
+            "R3": { "$ref": "#/definitions/riskExposure" },
+            "R4": { "$ref": "#/definitions/riskExposure" },
+            "R5": { "$ref": "#/definitions/riskExposure" }
+          }
+        },
+
+        "coverage_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["risk_category", "current_protection", "main_gap", "priority"],
+            "properties": {
+              "risk_category": { "type": "string", "enum": ["R1", "R2", "R3", "R4", "R5"] },
+              "current_protection": { "type": "string" },
+              "main_gap": { "type": "string" },
+              "priority": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+
+        "requirement_priorities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["requirement_id", "type", "summary", "priority", "priority_label"],
+            "properties": {
+              "requirement_id": { "type": "string" },
+              "type": { "type": "string" },
+              "summary": { "type": "string" },
+              "priority": { "type": "string" },
+              "priority_label": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+
+        "recommended_directions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rank", "candidate_id", "fit", "rationale", "source"],
+            "properties": {
+              "rank": { "type": "string", "enum": ["primary", "alternative"] },
+              "candidate_id": { "type": "string" },
+              "fit": { "type": "string" },
+              "rationale": { "type": "string" },
+              "covered_requirements": { "type": "array", "items": { "type": "string" } },
+              "covered_risks": { "type": "array", "items": { "type": "string" } },
+              "notes": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+
+        "information_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "importance", "category", "reason"],
+            "properties": {
+              "field": { "type": "string" },
+              "importance": { "type": "string" },
+              "category": { "type": "string", "enum": ["required", "suggested", "optional"] },
+              "reason": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+
+        "next_actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["action", "reason", "priority", "dependency"],
+            "properties": {
+              "action": { "type": "string" },
+              "reason": { "type": "string" },
+              "priority": { "type": "string" },
+              "dependency": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "rendered_report": { "type": "string" },
+
+    "validation": {
+      "type": "object",
+      "required": ["passed", "errors", "warnings", "conflicts"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "conflicts": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "metadata": {
+      "type": "object",
+      "required": ["source_skills", "upstream_status"],
+      "properties": {
+        "source_skills": { "type": "array", "items": { "type": "string" } },
+        "upstream_status": { "type": "object" },
+        "conflicts": { "type": "array", "items": { "type": "string" } },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "source", "confidence"],
+        "properties": {
+          "claim": { "type": "string" },
+          "source": { "type": "string" },
+          "confidence": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "riskExposure": {
+      "type": "object",
+      "required": ["present", "risk_category"],
+      "properties": {
+        "present": { "type": "boolean" },
+        "risk_category": { "type": "string", "enum": ["R1", "R2", "R3", "R4", "R5"] },
+        "risk_status": { "type": ["string", "null"] },
+        "risk_name": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "severity": { "type": ["string", "null"] },
+        "impact": { "type": ["string", "null"] },
+        "existing_protection": { "type": ["string", "null"] },
+        "coverage_gap": { "type": ["string", "null"] },
+        "conclusion": { "type": ["string", "null"] },
+        "source": { "type": ["string", "null"] },
+        "note": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

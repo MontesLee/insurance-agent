@@ -1,0 +1,71 @@
+{
+  "repair_version": "1.0",
+  "repair_method": "risk_repair_v1",
+
+  "max_attempts": 2,
+  "stop_on_no_change": true,
+
+  "principles": [
+    "只做确定性重算：从产物已有值按同一份规则重算派生量，绝不引入新事实。",
+    "只做降级与撤回：删除虚假溯源主张是安全的；把 UNKNOWN 升格为 KNOWN 一律禁止。",
+    "不可收敛即上报：修复不是掩盖，无法机检修复的项必须 NEEDS_REVIEW 并说明需人工确认什么。",
+    "修复后必须重跑 Eval；不得修完即信。"
+  ],
+
+  "actions": {
+    "CLAMP_NOT_IDENTIFIED_BANDS": {
+      "codes": ["LOGICAL_INCONSISTENCY"],
+      "mode": "AUTO",
+      "description": "risk_exists=false 时按契约强制 severity=LOW / residual_risk=LOW / priority=P3（CONTRACT §7 NOT_IDENTIFIED 置低档）。纯契约重算，不引入新事实。"
+    },
+    "RECOMPUTE_RESIDUAL": {
+      "codes": ["LOGICAL_INCONSISTENCY"],
+      "mode": "AUTO",
+      "description": "risk_exists=true 时按 residual_weights 与 residual_thresholds 重算 residual_risk = band(0.6*severity_rank + 0.4*likelihood_rank)。与 analysis 引擎同式同阈值。"
+    },
+    "RECOMPUTE_PRIORITY": {
+      "codes": ["PRIORITY_INCONSISTENT"],
+      "mode": "AUTO",
+      "description": "按 priority_matrix[severity][likelihood] 再遍历 priority_overrides 重算 priority（max_priority 取更宽松档、min_priority 取更紧急档）。与 analysis 引擎逐字一致。"
+    },
+    "DROP_DANGLING_REFS": {
+      "codes": ["UNSUPPORTED_CONCLUSION"],
+      "mode": "AUTO",
+      "description": "删除 reasoning_evidence_refs 中未出现在 evidence[] 的 E### 锚点（REQ-### 为跨 Skill 引用，不做本地校验、不删）。仅当删除后仍至少剩 1 个锚点时执行——删空会使 schema minItems=1 失效，此种情形转 REVIEW。删除虚假溯源主张属降级，安全。"
+    },
+
+    "ESCALATE_UNSUPPORTED": {
+      "codes": ["UNSUPPORTED_CONCLUSION"],
+      "mode": "REVIEW",
+      "review_reason": "结论无 evidence 支撑，或锚点删空后无剩余。修复需补充 evidence（等于补事实）或撤回结论（改变事实主张），二者都超出机检权限，须人工确认。"
+    },
+    "ESCALATE_MISSING_RISK": {
+      "codes": ["MISSING_RISK"],
+      "mode": "REVIEW",
+      "review_reason": "analysis 引擎本身是确定性的：域缺失说明无法从现有事实量化（或产物结构被破坏）。补齐需上游事实或引擎变更，禁止凭空生成 Risk 对象。"
+    },
+    "ESCALATE_UNKNOWN_AS_KNOWN": {
+      "codes": ["UNKNOWN_AS_KNOWN"],
+      "mode": "REVIEW",
+      "review_reason": "把 UNKNOWN 当 KNOWN 用不是计算错误，而是主张越界。降级 status 属语义判断、且不足以消除『金额>0 却无 KNOWN 类证据』的第二个 BLOCKING，故整体上报；须人工确认是补证据还是撤回量化。"
+    },
+    "ESCALATE_SALES_BIAS": {
+      "codes": ["SALES_BIAS"],
+      "mode": "REVIEW",
+      "review_reason": "恐吓/夸大话术是立场问题，不是数值错误。自动删句只会掩盖偏差、让产物看起来干净而立场未改，必须留痕由人工改写。"
+    },
+    "ESCALATE_PRODUCT_LEAK": {
+      "codes": ["PRODUCT_RECOMMENDATION_LEAK"],
+      "mode": "REVIEW",
+      "review_reason": "风险被写成产品需求，违反 FACT→REQUIREMENT 分层职责。自动清洗文本会抹掉越界证据，必须留痕并回到分层边界重述。"
+    },
+    "ESCALATE_INVALID_OUTPUT": {
+      "codes": ["INVALID_OUTPUT"],
+      "mode": "REVIEW",
+      "review_reason": "产物结构不合规（重复 risk_id / 非法枚举等）属引擎缺陷或人工篡改，不在修复权限内，须修引擎或回滚产物。"
+    }
+  },
+
+  "needs_review_note_template": "Repair Loop 未能收敛（attempts={attempts}/{max}）。剩余 BLOCKING：{codes}。无法可靠判断项：{reasons}。需人工确认：{ask}",
+  "needs_review_ask": "逐项确认是补充事实、撤回结论，还是调整判定规则；不得由机检代为选择。"
+}

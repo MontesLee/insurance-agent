@@ -387,7 +387,7 @@ Issue 结构：`{ "code": "…", "severity": "BLOCKING|WARNING", "risk_id": null
 
 ## 10. 风险分类 R1–R5（V1.0）
 
-放 `references/risk-taxonomy.md`，**不使用 overlay**。
+放 [`references/03-risk-taxonomy.md`](references/03-risk-taxonomy.md)，**不使用 overlay**。
 分类是**风险域**，不是产品分类：医疗风险 ≠ 百万医疗险，重疾风险 ≠ 重疾险，死亡风险 ≠ 定寿。
 
 | ID | 名称 | 说明 |
@@ -422,8 +422,32 @@ Issue 结构：`{ "code": "…", "severity": "BLOCKING|WARNING", "risk_id": null
 | `reasoning_consistency` residual 公式 | 仅对 `risk_exists=true` 复算 `0.6·sev_rank + 0.4·lik_rank` 分档；`risk_exists=false` 时引擎按契约置低档（LOW/LOW/P3）且 `likelihood` 保留域 base，公式不适用，只校验 LOW/LOW/P3 | 6 |
 | `completeness` 对 `amount ≤ 0` 的处置 | 记 `MISSING_RISK`(**WARNING** 而非 BLOCKING)：CONTRACT §7 允许部分分析，量化基础缺失时金额 0 是诚实中间态，应进 `next_information_needed` | 6 |
 | `EvalResult.failures` 语义 | **只含 BLOCKING issue**。曾误设为全量 issues，导致 `eval_status=PASS` 而 `failures` 非空，会误导 Repair 逻辑 | 6 |
+| Repair 红线 | 只做**确定性重算**与**降级撤回**：不发明事实、不把 UNKNOWN 升格、不清洗立场问题。判据＝派生量算错可自动修，事实/立场有问题一律上报 | 7 |
+| Repair 动作清单 | 外置 `resources/config/repair.rules.json`。AUTO：`CLAMP_NOT_IDENTIFIED_BANDS` / `RECOMPUTE_RESIDUAL` / `RECOMPUTE_PRIORITY` / `DROP_DANGLING_REFS`；REVIEW：`MISSING_RISK` / `UNKNOWN_AS_KNOWN` / `SALES_BIAS` / `PRODUCT_RECOMMENDATION_LEAK` / `INVALID_OUTPUT` / 无证据结论。判定细节见 `references/07-repair-loop.md` | 7 |
+| `UNKNOWN_AS_KNOWN` 不自动降级 status | 降级只消掉「status=KNOWN 但无 KNOWN 证据」，消不掉「amount>0 却无 KNOWN 类证据」，会留下半修复产物；整体 REVIEW | 7 |
+| Repair 终止条件 | 三个：收敛 / 无 AUTO 可做 / **不动点**（确定性修复若首轮无变化，次轮必然同样无变化）。`max_attempts=2` 是上限不是配额，不硬凑轮数 | 7 |
+| Repair 不得改动的事实面 | `evidence[]` 集合与 `impact_estimate.amount` 必须修复前后完全一致（契约 §9 两条红线断言） | 7 |
+| Dataset 用例集构成 | 15 例：7 个真实家庭原型（positive）+ 3 个降级场景（全 UNKNOWN / 取值冲突 / 上游缺失）+ 5 个单点变异；输入由 `scripts/gen-dataset-cases.py` 可复现生成，清单单一真源 `evals/cases/dataset-manifest.json` | 8 |
+| Dataset 五维评分口径 | 全部由 `EvalResult.checks` 换算，不另起主观打分：completeness / evidence_grounding / reasoning_consistency(= +priority_consistency 取均) / unknown_integrity / product_boundary(= separation 与 anti_sales 取 **min**，不可平均掩盖) | 8 |
+| Dataset 期望书写纪律 | 先按契约推理写期望再跑；失败先归因——引擎错改引擎并补单点单测，期望错改期望并在 manifest 的 `why` 写明原推理为何不成立；**禁止照抄引擎实际输出** | 8 |
+| 反橡皮图章探针 | 篡改规则副本注入（清空 `negative_substrings` / 改 `priority_matrix` / 清空 `panic_tokens`）后数据集**必须**失败；探针结束必须重跑基线恢复 `tmp/ds_<id>_*.json` | 8 |
+| 中文整句否定的识别 | 否定词表扩 `negative_substrings`（子串匹配），覆盖"无需固定赡养 / 不承担赡养"这类整句原话；整值匹配与前缀匹配都会漏判并导致消极事实被读成积极事实（Phase 8 实测缺陷 D1） | 8 |
+| `missing_from_upstream` 去重 | 同一缺失可能被上游与本阶段各记一条 → 按 `source+field` 去重（Phase 8 实测缺陷 D2） | 8 |
+| 发现阶段不得放宽状态 | 基线取充分性结论，发现阶段只能**加严**（未决→NEED_MORE、冲突→CONFLICTING），不得把 `FORMAL` 无端降为 `PRELIMINARY`（Phase 8 实测缺陷 D3，违反 §7） | 8 |
 
-### 未决（待后续 Phase）
+| 发现阶段不得放宽状态 | 基线取充分性结论，发现阶段只能**加严**（未决→NEED_MORE、冲突→CONFLICTING），不得把 `FORMAL` 无端降为 `PRELIMINARY`（Phase 8 实测缺陷 D3，违反 §7） | 8 |
+| profile 列表单一真源 | `risk-sufficiency.rules.json#profile_names`；三个引擎（sufficiency/discovery/analysis）一律读它，**缺键即抛错，不回退硬编码**（Phase 9 治理：此前三份硬编码 + 一份未消费的 `field_profile_index`） | 9 |
+| 健康异常词表外置 | `risk-scoring.rules.json#health_anomaly_tokens`（R1 加成的判定词）。键缺失抛错；空数组合法（表示无加成词）。判定"键存在"不能用 `Get-RaMember`（PS 函数返回空数组会被展开成 `$null`） | 9 |
+| 状态合并次序外置 | `risk-sufficiency.rules.json#analysis_status_rules.precedence`；analysis 与 discovery 同读一份，不得在引擎内自带 | 9 |
+| 规则文件不得有死顶层键 | 顶层键必须被至少一个脚本消费；纯说明性键收进 `documentation` 或列入守卫白名单（`rules_version` / `method` / `description` / `note` / `taxonomy_version` / `shared_sources` / `*_version` / `repair_method` / `principles`）。否则"改配置以为生效" = 假成功 | 9 |
+| `priority_overrides` 必须显式 `enabled` | 每条 override 自带 `enabled`；引擎缺字段即抛错。`critical_residual_high_likelihood_p0` 的比较方向已修正为 `-gt`（rank 越小越紧急），但因与 `R5_always_low` 冲突，**当前 `enabled=false`**，`reason` 已写明——打开它会把 `residual=CRITICAL + likelihood=HIGH` 的 R5 抬到 P0 | 9 |
+| 文档引用不得悬空 | md 中的相对路径引用必须存在；确实未实现的（如 `build-client-state.ps1`）必须在该行标 `⏳`，否则守卫判 FAIL | 9 |
+| 架构守卫 | `scripts/check-skill-anatomy.ps1`（A 骨架 12 项 + B 纪律 7 项）+ `scripts/test-risk-analysis-anatomy.ps1`（基线 PASS + 5 种污染必须 FAIL）。守卫产出 `tmp/anatomy_result.json`，契约校验 §11 独立复算一遍 | 9 |
+| 契约校验的扫描范围 | §6 扫 `tmp/ana_*.json`。**注入了篡改规则的探针产物必须用 `probe_*` 前缀命名**，否则会被当成基线产物校验 | 9 |
 
-- Repair Loop 的修复动作清单（哪些 FAIL 可自动修复、哪些必须 `NEEDS_REVIEW`） → Phase 7
-- `priority_overrides` 的 `critical_residual_high_likelihood_p0` 当前为实效 no-op（`min_priority` 比较方向为 `$cur -lt $mn`，rank≥0 永不触发）；若需"致命+高发生概率→P0"，须改 `-lt`→`-gt` 并显式豁免 R5（否则会覆盖 `R5_always_low`）→ 待架构确认
+### 未决（待后续 Phase / 产品裁决）
+
+- `critical_residual_high_likelihood_p0` 现为**显式禁用**（`enabled=false`）。是否允许"R5 致命 + 高概率"压过 `R5_always_low` 属产品裁决，改 `enabled=true` 即生效，无需改代码
+- 健康异常词表曾有两版（引擎用 9 词、规则里另有一份 13 词），已按"不静默改变评级"原则保留 9 词；是否扩充待产品确认
+- `build-client-state.ps1` / `build-risk-input.ps1` 未实现（标 ⏳）：v1 直接提供 `RiskAnalysisInput`，不影响可交付性
+- Markdown 渲染器未实现：渲染契约已定稿（`references/06-output-schema.md`）

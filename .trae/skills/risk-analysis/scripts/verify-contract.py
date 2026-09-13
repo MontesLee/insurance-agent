@@ -678,11 +678,405 @@ print()
 print("EVAL RESULT:", "ALL GREEN" if eval_err == 0 else f"PROBLEMS eval_err={eval_err}")
 
 # ============================================================================
-# 7. Aggregate exit-code（供 dev/CI 判定）
+# 9. repair stage outputs —— 消费 tmp/rpt_*.json（由 test-risk-analysis-repair.ps1 产出）
+#    除 schema 与清单断言外，加两条红线断言：
+#      · evidence 集合不得被修复改动（禁止补/删证据＝禁止发明事实）
+#      · impact_estimate.amount 不得被修复改动（禁止编造量化）
+# ============================================================================
+print()
+print("=== 9. repair stage outputs ===")
+
+REPAIR_MANIFEST = os.path.join(SKILL, "evals", "cases", "repair-manifest.json")
+
+rep_err = 0
+
+def _canon(obj):
+    return json.dumps(obj, sort_keys=True, ensure_ascii=False)
+
+def _risk_index(doc):
+    return {r.get("risk_id"): r for r in doc.get("risks", []) or []}
+
+try:
+    with open(REPAIR_MANIFEST, encoding="utf-8-sig") as fh:
+        rp_manifest = json.load(fh)
+    rp_cases = rp_manifest.get("cases", [])
+except Exception as e:
+    rp_cases = []
+    rep_err += 1
+    print(f"  ERROR cannot load repair-manifest.json ({e})")
+
+_fx_base = os.path.join(SKILL, "evals", "fixtures", "unit")
+
+for c in rp_cases:
+    name = c["name"]
+    dir_key = c.get("dir", "repair")
+    fixture = os.path.join(_fx_base, dir_key, c["fixture"])
+    ev_p = os.path.join(SKILL, "tmp", f"rpt_{name}_e.json")
+    an_p = os.path.join(SKILL, "tmp", f"rpt_{name}_a.json")
+
+    if not os.path.exists(ev_p) or not os.path.exists(an_p):
+        rep_err += 1
+        print(f"     {name}: MISSING repair output (run test-risk-analysis-repair.ps1 first)")
+        continue
+    if not os.path.exists(fixture):
+        rep_err += 1
+        print(f"     {name}: MISSING fixture {fixture}")
+        continue
+
+    with open(ev_p, encoding="utf-8-sig") as fh:
+        ev = json.load(fh)
+    with open(an_p, encoding="utf-8-sig") as fh:
+        rep = json.load(fh)
+    with open(fixture, encoding="utf-8-sig") as fh:
+        src = json.load(fh)
+
+    # (a) EvalResult schema 合规
+    errs = list(EVAL_V.iter_errors(ev))
+    rep_err += len(errs)
+    for e in errs[:3]:
+        print(f"     {name} eval schema at {list(e.path)}: {e.message[:110]}")
+
+    # (b) 修复后产物仍须契约合规：按 §6 同一口径逐条校验 risks[]（阶段产物非顶层 RiskAnalysisOutput）
+    for r in (rep.get("risks") or []):
+        errs = list(RISK_V.iter_errors(r))
+        rep_err += len(errs)
+        for e in errs[:2]:
+            print(f"     {name} repaired risk {r.get('risk_id')} schema at {list(e.path)}: {e.message[:110]}")
+
+    exp = c.get("expect", {})
+
+    # (c) 清单断言
+    if ev.get("eval_status") != exp.get("eval_status"):
+        rep_err += 1
+        print(f"     {name} eval_status expected {exp.get('eval_status')} got {ev.get('eval_status')!r}")
+    if ev.get("repair_attempts") != exp.get("repair_attempts"):
+        rep_err += 1
+        print(f"     {name} repair_attempts expected {exp.get('repair_attempts')} got {ev.get('repair_attempts')!r}")
+    if ev.get("max_repair_attempts") != 2:
+        rep_err += 1
+        print(f"     {name} max_repair_attempts must be 2, got {ev.get('max_repair_attempts')!r}")
+    if (ev.get("repair_attempts") or 0) > 2:
+        rep_err += 1
+        print(f"     {name} repair_attempts exceeds cap 2")
+
+    # (d) repair_log 条数 == repair_attempts
+    log = ev.get("repair_log", []) or []
+    if len(log) != (ev.get("repair_attempts") or 0):
+        rep_err += 1
+        print(f"     {name} repair_log len {len(log)} != repair_attempts {ev.get('repair_attempts')}")
+
+    # (e) NEEDS_REVIEW 必须给出说明；PASS 不得残留
+    note = ev.get("needs_review_note")
+    if exp.get("eval_status") == "PASS":
+        if note is not None:
+            rep_err += 1
+            print(f"     {name} PASS 不应残留 needs_review_note")
+    else:
+        if not note or "需人工确认" not in note:
+            rep_err += 1
+            print(f"     {name} NEEDS_REVIEW 的 needs_review_note 缺失或缺少『需人工确认』段")
+
+    # (f) 红线 1：evidence 集合不得被修复改动（禁止发明/删除事实）
+    si, ri = _risk_index(src), _risk_index(rep)
+    for rid, sr in si.items():
+        rr = ri.get(rid)
+        if rr is None:
+            rep_err += 1
+            print(f"     {name} repaired output 丢失 risk {rid}")
+            continue
+        se = sorted(str(x.get("evidence_id")) for x in (sr.get("evidence") or []))
+        re_ = sorted(str(x.get("evidence_id")) for x in (rr.get("evidence") or []))
+        if se != re_:
+            rep_err += 1
+            print(f"     {name} RED-LINE {rid}: evidence 集合被修复改动 {se} -> {re_}")
+
+    # (g) 红线 2：impact_estimate.amount 不得被修复改动（禁止编造量化）
+    for rid, sr in si.items():
+        rr = ri.get(rid)
+        if rr is None:
+            continue
+        sa = (((sr.get("impact_estimate") or {}).get("amount")), )
+        ra = (((rr.get("impact_estimate") or {}).get("amount")), )
+        if sa != ra:
+            rep_err += 1
+            print(f"     {name} RED-LINE {rid}: impact_estimate.amount 被修复改动 {sa} -> {ra}")
+
+    # (h) 不可自动修复类：产物必须原样保留（留痕，禁止清洗）
+    if exp.get("output_unchanged"):
+        if _canon(src) != _canon(rep):
+            rep_err += 1
+            print(f"     {name} 不可自动修复的用例不得改动产物")
+
+    # (i) 期望清除的锚点
+    absent = exp.get("absent_ref")
+    if absent:
+        for rr in (rep.get("risks") or []):
+            if absent in (rr.get("reasoning_evidence_refs") or []):
+                rep_err += 1
+                print(f"     {name} 修复后仍残留锚点 {absent} ({rr.get('risk_id')})")
+
+if not rp_cases:
+    print("  SKIP no repair cases")
+
+print()
+print("REPAIR RESULT:", "ALL GREEN" if rep_err == 0 else f"PROBLEMS repair_err={rep_err}")
+
+# ============================================================================
+# ============================================================================
+# 10. Dataset（Phase 8 端到端产物）
+#     - 清单完整性：每个用例必须有输入文件；dimensions 必须映射到真实 Eval 检查键
+#     - 逐用例：risks[] 严格符合 risk.schema.json；EvalResult 符合 eval-result.schema.json
+#     - 期望断言：analysis_status / discovery 三态 / risk_exists / priority / eval_status / repair_attempts
+#     - Repair 红线：evidence 集合与 impact_estimate.amount 修复前后必须完全一致
+# ============================================================================
+print()
+print("=== 10. dataset (phase 8) ===")
+
+ds_err = 0
+DS_CASES = os.path.join(SKILL, "evals", "cases", "dataset")
+DS_MANIFEST = os.path.join(SKILL, "evals", "cases", "dataset-manifest.json")
+TMP = os.path.join(SKILL, "tmp")
+
+if not os.path.isfile(DS_MANIFEST):
+    print("  SKIP no dataset manifest")
+    ds_cases = []
+else:
+    with open(DS_MANIFEST, encoding="utf-8") as fh:
+        ds_manifest = json.load(fh)
+    ds_cases = ds_manifest.get("cases") or []
+    check_keys = set((FILES["eval-result.schema.json"].get("properties", {})
+                      .get("checks", {}).get("properties", {}) or {}).keys())
+    if not check_keys:
+        # 退化：从实际 EvalResult 产物里取键
+        check_keys = {"completeness", "evidence_grounding", "reasoning_consistency",
+                      "separation", "unknown_integrity", "priority_consistency", "anti_sales"}
+    for dim, members in (ds_manifest.get("dimensions") or {}).items():
+        for m in members:
+            if m not in check_keys:
+                ds_err += 1
+                print(f"     dimension {dim} 引用了不存在的 Eval 检查键: {m}")
+    print(f"  manifest cases={len(ds_cases)}")
+
+    for c in ds_cases:
+        cid = c.get("case_id")
+        inp = c.get("input") or ((c.get("base_case") or "") + ".input.json")
+        if not os.path.isfile(os.path.join(DS_CASES, inp)):
+            ds_err += 1
+            print(f"     {cid} 输入文件缺失: {inp}")
+        if not c.get("expect"):
+            ds_err += 1
+            print(f"     {cid} 缺少 expect（期望是数据集的意义所在）")
+
+    ap = os.path.join(TMP, "ds_%s_a.json")
+    mp = os.path.join(TMP, "ds_%s_am.json")
+    dp = os.path.join(TMP, "ds_%s_d.json")
+    ep = os.path.join(TMP, "ds_%s_e.json")
+    rp_ = os.path.join(TMP, "ds_%s_ar.json")
+
+    def _load(path):
+        if not os.path.isfile(path):
+            return None
+        with open(path, encoding="utf-8-sig") as fh:
+            return json.load(fh)
+
+    for c in ds_cases:
+        cid = c.get("case_id")
+        a_doc = _load(ap % cid)
+        e_doc = _load(ep % cid)
+        if a_doc is None or e_doc is None:
+            print(f"  SKIP {cid} (no artifacts; run run-risk-analysis-dataset.ps1 first)")
+            continue
+
+        # --- schema
+        for r in (a_doc.get("risks") or []):
+            errs = sorted(RISK_V.iter_errors(r), key=lambda e: list(e.path))
+            if errs:
+                ds_err += 1
+                print(f"     {cid} risk {r.get('risk_id')} schema ERRORS={len(errs)}: {errs[0].message[:110]}")
+        e_errs = validate("eval-result.schema.json", e_doc)
+        if e_errs:
+            ds_err += 1
+            print(f"     {cid} EvalResult schema ERRORS={len(e_errs)}: {e_errs[0].message[:110]}")
+
+        # --- 期望
+        exp = c.get("expect") or {}
+        if exp.get("analysis_status") and a_doc.get("analysis_status") != exp["analysis_status"]:
+            ds_err += 1
+            print(f"     {cid} analysis_status {a_doc.get('analysis_status')} != {exp['analysis_status']}")
+        if exp.get("eval_status") and e_doc.get("eval_status") != exp["eval_status"]:
+            ds_err += 1
+            print(f"     {cid} eval_status {e_doc.get('eval_status')} != {exp['eval_status']}")
+        if exp.get("repair_attempts") is not None and e_doc.get("repair_attempts") != exp["repair_attempts"]:
+            ds_err += 1
+            print(f"     {cid} repair_attempts {e_doc.get('repair_attempts')} != {exp['repair_attempts']}")
+
+        risks = a_doc.get("risks") or []
+        if exp.get("risk_count") is not None and len(risks) != exp["risk_count"]:
+            ds_err += 1
+            print(f"     {cid} risk_count {len(risks)} != {exp['risk_count']}")
+        by_cat = {}
+        for r in risks:
+            by_cat.setdefault(r.get("risk_category"), r)
+
+        d_doc = _load(dp % cid)
+        if d_doc and exp.get("discovery"):
+            status_by_cat = {x.get("risk_category"): x.get("discovery_status")
+                             for x in (d_doc.get("risk_candidates") or [])}
+            for cat, want in exp["discovery"].items():
+                if status_by_cat.get(cat) != want:
+                    ds_err += 1
+                    print(f"     {cid} discovery {cat} {status_by_cat.get(cat)} != {want}")
+        for cat, want in (exp.get("risk_exists") or {}).items():
+            got = (by_cat.get(cat) or {}).get("risk_exists")
+            if got != want:
+                ds_err += 1
+                print(f"     {cid} risk_exists {cat} {got} != {want}")
+        for cat, want in (exp.get("priority") or {}).items():
+            got = (by_cat.get(cat) or {}).get("priority")
+            if got != want:
+                ds_err += 1
+                print(f"     {cid} priority {cat} {got} != {want}")
+
+        # --- Repair 红线（对有变异/修复产物的用例生效）
+        src_doc = _load(mp % cid) or a_doc
+        rep_doc = _load(rp_ % cid)
+        if rep_doc is not None:
+            si = {r.get("risk_id"): r for r in (src_doc.get("risks") or [])}
+            ri = {r.get("risk_id"): r for r in (rep_doc.get("risks") or [])}
+            for rid, s in si.items():
+                r2 = ri.get(rid)
+                if r2 is None:
+                    continue
+                if sorted(str(x.get("evidence_id")) for x in (s.get("evidence") or [])) != \
+                   sorted(str(x.get("evidence_id")) for x in (r2.get("evidence") or [])):
+                    ds_err += 1
+                    print(f"     {cid} RED-LINE {rid}: evidence 集合被修复改动")
+                sa = (s.get("impact_estimate") or {}).get("amount")
+                ra = (r2.get("impact_estimate") or {}).get("amount")
+                if sa != ra:
+                    ds_err += 1
+                    print(f"     {cid} RED-LINE {rid}: impact_estimate.amount {sa} -> {ra}")
+
+    # --- 数据集运行器汇总产物
+    res = _load(os.path.join(TMP, "dataset_result.json"))
+    if res is None:
+        print("  SKIP no dataset_result.json")
+    else:
+        if res.get("failed_cases"):
+            ds_err += 1
+            print(f"     dataset_result.json failed_cases={res.get('failed_cases')}")
+        if res.get("total_cases") and res.get("total_cases") != len(ds_cases):
+            ds_err += 1
+            print(f"     dataset_result.json 用例数 {res.get('total_cases')} 与清单 {len(ds_cases)} 不一致")
+
+if not ds_cases:
+    print("  SKIP no dataset cases")
+
+print()
+print("DATASET RESULT:", "ALL GREEN" if ds_err == 0 else f"PROBLEMS dataset_err={ds_err}")
+
+# ============================================================================
+# ============================================================================
+# 11. Anatomy / Review（架构守卫产物 + 独立于 PowerShell 的配置卫生复算）
+# ============================================================================
+print()
+print("=== 11. Anatomy / Review ===")
+
+SKILL_ROOT = r"D:\Workspace\insurance-agent\.trae\skills\risk-analysis"
+TMP_DIR = os.path.join(SKILL_ROOT, "tmp")
+an_err = 0
+
+# 11.1 守卫与其负向自检的产物必须存在且全绿
+for _art in ("anatomy_result.json", "anatomy_test_result.json"):
+    _p = os.path.join(TMP_DIR, _art)
+    if not os.path.exists(_p):
+        print(f"  FAIL missing artifact: {_art}（先跑 check-skill-anatomy.ps1 / test-risk-analysis-anatomy.ps1）")
+        an_err += 1
+        continue
+    with open(_p, encoding="utf-8-sig") as _fh:
+        _d = json.load(_fh)
+    _f = _d.get("fail", -1)
+    print(f"  {'OK  ' if _f == 0 else 'FAIL'} {_art} fail={_f}")
+    if _f != 0:
+        an_err += 1
+
+# 11.2 规则文件顶层键不得为死键（与守卫 B2 独立复算，防止单侧实现出错）
+_META = {
+    "rules_version", "taxonomy_version", "method", "description", "note", "shared_sources",
+    "anti_sales_version", "repair_version", "repair_method", "principles", "version",
+    "scoring_version", "scoring_method", "documentation",
+}
+_scripts_dir = os.path.join(SKILL_ROOT, "scripts")
+_script_text = ""
+for _fn in sorted(os.listdir(_scripts_dir)):
+    if _fn.endswith((".ps1", ".py")):
+        with open(os.path.join(_scripts_dir, _fn), encoding="utf-8-sig", errors="replace") as _fh:
+            _script_text += _fh.read()
+
+_dead = []
+for _cf in sorted(glob.glob(os.path.join(SKILL_ROOT, "resources", "config", "*.rules.json"))):
+    with open(_cf, encoding="utf-8-sig") as _fh:
+        _d = json.load(_fh)
+    for _k in _d:
+        if _k in _META:
+            continue
+        if _k not in _script_text:
+            _dead.append(f"{os.path.basename(_cf)}#{_k}")
+print(f"  {'OK  ' if not _dead else 'FAIL'} dead rule keys: {len(_dead)}")
+if _dead:
+    an_err += len(_dead)
+    print(f"       {_dead}")
+
+# 11.3 priority_overrides 必须显式 enabled
+with open(os.path.join(SKILL_ROOT, "resources", "config", "risk-scoring.rules.json"), encoding="utf-8-sig") as _fh:
+    _sc = json.load(_fh)
+_ov_bad = [o.get("id") for o in _sc.get("priority_overrides", []) if "enabled" not in o]
+print(f"  {'OK  ' if not _ov_bad else 'FAIL'} priority_overrides explicit enabled: missing={_ov_bad}")
+if _ov_bad:
+    an_err += len(_ov_bad)
+
+# 11.4 profile_names 必须是单一真源（三个引擎都读它，且不再硬编码 profile 列表）
+_engines = ["invoke-risk-analysis-sufficiency.ps1", "invoke-risk-analysis-discovery.ps1",
+            "invoke-risk-analysis-analysis.ps1"]
+_srcs = {}
+for _e in _engines:
+    with open(os.path.join(_scripts_dir, _e), encoding="utf-8-sig") as _fh:
+        _srcs[_e] = _fh.read()
+_pn_bad = [e for e in _engines if "profile_names" not in _srcs[e]]
+_hard = [e for e in _engines if "'family_profile', 'financial_profile'" in _srcs[e]]
+print(f"  {'OK  ' if not _pn_bad and not _hard else 'FAIL'} profile_names single source: not_read={_pn_bad} still_hardcoded={_hard}")
+an_err += len(_pn_bad) + len(_hard)
+
+# 11.5 文档引用不得悬空（未标 ⏳ 即视为假引用）
+_dangling = []
+_md = [os.path.join(SKILL_ROOT, f) for f in os.listdir(SKILL_ROOT) if f.endswith(".md")]
+for _sub in ("references", "resources", "evals"):
+    _d2 = os.path.join(SKILL_ROOT, _sub)
+    if os.path.isdir(_d2):
+        _md += [os.path.join(_d2, f) for f in os.listdir(_d2) if f.endswith(".md")]
+import re as _re
+for _f in _md:
+    with open(_f, encoding="utf-8-sig", errors="replace") as _fh:
+        for _i, _line in enumerate(_fh, 1):
+            for _m in _re.finditer(r"(?<![\w./-])((?:references|schemas|scripts|resources|evals)/[A-Za-z0-9._/-]+\.(?:md|json|ps1|py))", _line):
+                _rel = _m.group(1)
+                if ".." in _rel:
+                    continue
+                if not os.path.exists(os.path.join(SKILL_ROOT, _rel)) and "⏳" not in _line:
+                    _dangling.append(f"{os.path.basename(_f)}:{_i}->{_rel}")
+print(f"  {'OK  ' if not _dangling else 'FAIL'} dangling doc refs: {len(_dangling)}")
+if _dangling:
+    an_err += len(_dangling)
+    print(f"       {_dangling}")
+
+print("ANATOMY RESULT:", "ALL GREEN" if an_err == 0 else f"PROBLEMS anatomy_err={an_err}")
+
+# 11. Aggregate exit-code（供 dev/CI 判定）
+# ============================================================================
 # ============================================================================
 print()
 total_problems = (n_err + neg + stage_err + fx_err + disc_err + dfx_err
-                  + ana_err + eval_err)
+                  + ana_err + eval_err + rep_err + ds_err + an_err)
 print("=" * 60)
 print(f"  meta/instance : {n_err}")
 print(f"  negative      : {neg}")
@@ -690,6 +1084,9 @@ print(f"  sufficiency   : {stage_err} (stage) + {fx_err} (fixture)")
 print(f"  discovery     : {disc_err} (stage) + {dfx_err} (fixture)")
 print(f"  analysis      : {ana_err}")
 print(f"  eval          : {eval_err}")
+print(f"  repair        : {rep_err}")
+print(f"  dataset       : {ds_err}")
+print(f"  anatomy       : {an_err}")
 print("=" * 60)
 print("FINAL:", "ALL GREEN" if total_problems == 0 else f"PROBLEMS total={total_problems}")
 if total_problems:

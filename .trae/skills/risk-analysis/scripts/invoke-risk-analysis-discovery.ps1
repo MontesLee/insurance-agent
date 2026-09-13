@@ -74,7 +74,7 @@ function ConvertTo-RdNumber {
 }
 
 function Test-RdNegative {
-    param($Value, [string[]]$Tokens, [string[]]$Prefixes)
+    param($Value, [string[]]$Tokens, [string[]]$Prefixes, [string[]]$Substrings)
     if ($null -eq $Value) { return $false }
     $s = ([string]$Value).Trim().ToLowerInvariant()
     if ([string]::IsNullOrWhiteSpace($s)) { return $false }
@@ -85,6 +85,12 @@ function Test-RdNegative {
     foreach ($p in $Prefixes) {
         $pl = ([string]$p).ToLowerInvariant()
         if ($pl.Length -gt 0 -and $s.StartsWith($pl)) { return $true }
+    }
+    # 子串否定：客户原话常是整句（"父母有退休金，无需固定赡养" / "不承担赡养"），
+    # 整值匹配与前缀匹配都会漏判，导致把"已知不存在"读成"存在"而抬高风险等级。
+    foreach ($x in $Substrings) {
+        $xl = ([string]$x).ToLowerInvariant()
+        if ($xl.Length -gt 0 -and $s.Contains($xl)) { return $true }
     }
     return $false
 }
@@ -112,6 +118,7 @@ $raInput = (Get-Content -LiteralPath $InputJsonPath -Raw -Encoding UTF8) | Conve
 $satStatus    = Get-RdStringArray -Value $rules.status_satisfied
 $negTokens    = Get-RdStringArray -Value $rules.negative_tokens
 $negPrefixes  = Get-RdStringArray -Value $rules.negative_prefixes
+$negSubstr    = Get-RdStringArray -Value $rules.negative_substrings
 $units        = Get-RdMember -Object $rules -Name 'number_units'
 $labels       = Get-RdMember -Object $rules -Name 'field_labels'
 $tpl          = Get-RdMember -Object $rules -Name 'text_templates'
@@ -134,13 +141,12 @@ if ($null -ne $localGroups) {
 $templates       = Get-RdMember -Object $shared -Name 'question_templates'
 $fallbackTpl     = Get-RdMember -Object $shared -Name 'fallback_question_template'
 $precedence      = Get-RdStringArray -Value (Get-RdMember -Object $shared.analysis_status_rules -Name 'precedence')
-if (@($precedence).Count -eq 0) {
-    $precedence = @('FAILED', 'NEEDS_REVIEW', 'CONFLICTING_INFORMATION', 'NEED_MORE_INFORMATION', 'PRELIMINARY', 'FORMAL')
-}
+if (@($precedence).Count -eq 0) { throw "shared rules 缺 analysis_status_rules.precedence：不得回退硬编码" }
 
 # ------------------------------------------------------------------ field map
-$profileNames = @('family_profile', 'financial_profile', 'responsibility_profile',
-                  'existing_protection', 'health_profile', 'employment_profile')
+# 单一真源：risk-sufficiency.rules.json#profile_names（不允许本脚本自带一份）
+$profileNames = @(Get-RdStringArray -Value (Get-RdMember -Object $shared -Name 'profile_names'))
+if (@($profileNames).Count -eq 0) { throw "shared rules 缺 profile_names：不得回退硬编码" }
 
 $fieldMap = @{}
 foreach ($pn in $profileNames) {
@@ -250,7 +256,7 @@ function Get-RdFieldSignalState {
     if ($null -eq $v) { $res.unresolved_fields.Add($Field); return $res }
     if ($v -is [string] -and [string]::IsNullOrWhiteSpace([string]$v)) { $res.unresolved_fields.Add($Field); return $res }
 
-    $isNeg = Test-RdNegative -Value $v -Tokens $negTokens -Prefixes $negPrefixes
+    $isNeg = Test-RdNegative -Value $v -Tokens $negTokens -Prefixes $negPrefixes -Substrings $negSubstr
 
     switch -Regex ($op) {
         '^status_satisfied$' {
@@ -695,21 +701,32 @@ foreach ($c in @($qCands | Sort-Object -Property @{Expression = 'rv'; Descending
 }
 
 # ------------------------------------------------------------------ analysis_status
+# 基线取充分性阶段结论（未提供时退化为 PRELIMINARY）。
+# 早先这里把"无未决、无冲突"硬编码成 PRELIMINARY，导致信息完全充分的用例永远拿不到 FORMAL，
+# 与 CONTRACT §7「全部域 SUFFICIENT 且无 conflict → FORMAL」冲突。发现阶段只能**加严**，不能放宽。
 $discoveryStatus = 'PRELIMINARY'
-if (@($undet).Count -gt 0) { $discoveryStatus = 'NEED_MORE_INFORMATION' }
-if ($conflictFieldSet.Count -gt 0) { $discoveryStatus = 'CONFLICTING_INFORMATION' }
-
-$analysisStatus = $discoveryStatus
+$suffStatus = ''
 if (-not [string]::IsNullOrWhiteSpace($SufficiencyJsonPath) -and (Test-Path -LiteralPath $SufficiencyJsonPath)) {
     $suffStatus = [string](Get-RdMember -Object $suffDoc -Name 'analysis_status')
-    if (-not [string]::IsNullOrWhiteSpace($suffStatus)) {
-        $iSuff = [array]::IndexOf($precedence, $suffStatus)
-        $iDisc = [array]::IndexOf($precedence, $discoveryStatus)
-        if ($iSuff -ge 0 -and $iDisc -ge 0) {
-            if ($iSuff -lt $iDisc) { $analysisStatus = $suffStatus } else { $analysisStatus = $discoveryStatus }
-        } elseif ($iSuff -ge 0) { $analysisStatus = $suffStatus }
+    if (-not [string]::IsNullOrWhiteSpace($suffStatus) -and ([array]::IndexOf($precedence, $suffStatus) -ge 0)) {
+        $discoveryStatus = $suffStatus
+    } else {
+        $suffStatus = ''
     }
 }
+
+# 加严：存在未决域 → 至少 NEED_MORE_INFORMATION；存在冲突 → 至少 CONFLICTING_INFORMATION
+$iCur = [array]::IndexOf($precedence, $discoveryStatus)
+if (@($undet).Count -gt 0) {
+    $iNeed = [array]::IndexOf($precedence, 'NEED_MORE_INFORMATION')
+    if ($iNeed -ge 0 -and ($iCur -lt 0 -or $iNeed -lt $iCur)) { $discoveryStatus = 'NEED_MORE_INFORMATION'; $iCur = $iNeed }
+}
+if ($conflictFieldSet.Count -gt 0) {
+    $iConf = [array]::IndexOf($precedence, 'CONFLICTING_INFORMATION')
+    if ($iConf -ge 0 -and ($iCur -lt 0 -or $iConf -lt $iCur)) { $discoveryStatus = 'CONFLICTING_INFORMATION'; $iCur = $iConf }
+}
+
+$analysisStatus = $discoveryStatus
 
 # ------------------------------------------------------------------ emit
 $result = [ordered]@{

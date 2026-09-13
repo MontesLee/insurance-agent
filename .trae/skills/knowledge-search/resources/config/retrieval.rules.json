@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "description": "Knowledge Search 检索配置（外置，引擎只读）。改这里而非改代码。",
+  "candidate_k": 20,
+  "final_k": 5,
+  "min_relevance_score": 0.55,
+  "rrf_k": 60,
+  "dense_enabled": false,
+  "over_retrieval_factor": 4,
+  "default_filters": {},
+  "supported_source_types": ["official", "regulation", "product_document", "internal", "faq", "case"]
+}
