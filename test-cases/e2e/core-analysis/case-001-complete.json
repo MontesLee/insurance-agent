@@ -1,0 +1,86 @@
+{
+  "_comment": "Case 001: 完整客户 —— 30岁男性/已婚/0岁孩子/年收入50万/未来200万房贷/已有部分保险。期望 Client→Requirement→Risk→Gap→Solution 全链成功。",
+  "client_profile": {
+    "client_id": "C-001",
+    "profile": {
+      "age": 30,
+      "gender": "male",
+      "marital_status": "married",
+      "dependents": [{"relation": "child", "age": 0}],
+      "financial_profile": {
+        "annual_income": {"value": 500000, "status": "KNOWN", "source": "client_statement", "confidence": 0.9},
+        "mortgage": {"value": 2000000, "status": "KNOWN", "source": "client_statement", "confidence": 0.8}
+      }
+    },
+    "existing_protection": "客户自述：有社保；有一份百万医疗险（保额300万）；无定期寿险、无重疾险、无意外险"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-001", "requirement_type": "medical", "summary": "大额医疗支出保障", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-002", "requirement_type": "life", "summary": "家庭责任期收入替代保障", "priority": "P0_CRITICAL", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-003", "requirement_type": "critical_illness", "summary": "重疾收入补偿", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-004", "requirement_type": "accident", "summary": "意外伤残与意外医疗", "priority": "P2_MEDIUM", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "output_version": "1.0",
+    "layer": "risk_analysis",
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.85,
+    "risks": [
+      {
+        "risk_id": "R4-001",
+        "risk_category": "R4",
+        "risk_name": "主要收入者身故导致家庭现金流中断（含200万房贷）",
+        "priority": "P0",
+        "severity": "CRITICAL",
+        "likelihood": "MEDIUM",
+        "residual_risk": "HIGH",
+        "existing_protection": "无定期寿险",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 3000000, "confidence": 0.8},
+        "conclusion": "寿险无任何覆盖，家庭责任期敞口大",
+        "reasoning_evidence_refs": ["E-004"]
+      },
+      {
+        "risk_id": "R1-001",
+        "risk_category": "R1",
+        "risk_name": "大额医疗费用支出",
+        "priority": "P1",
+        "severity": "HIGH",
+        "likelihood": "HIGH",
+        "residual_risk": "LOW",
+        "existing_protection": "百万医疗险 保额300万",
+        "coverage_assessment": {"protected_amount": 3000000, "unprotected_amount": 0, "confidence": 0.9},
+        "conclusion": "医疗已有充分覆盖",
+        "reasoning_evidence_refs": ["E-001"]
+      },
+      {
+        "risk_id": "R2-001",
+        "risk_category": "R2",
+        "risk_name": "重大疾病收入中断",
+        "priority": "P1",
+        "severity": "HIGH",
+        "likelihood": "MEDIUM",
+        "residual_risk": "HIGH",
+        "existing_protection": "无重疾险",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 800000, "confidence": 0.7},
+        "conclusion": "重疾无覆盖",
+        "reasoning_evidence_refs": ["E-002"]
+      },
+      {
+        "risk_id": "R3-001",
+        "risk_category": "R3",
+        "risk_name": "意外伤残收入损失",
+        "priority": "P2",
+        "severity": "MEDIUM",
+        "likelihood": "MEDIUM",
+        "residual_risk": "MEDIUM",
+        "existing_protection": "无意外险",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 200000, "confidence": 0.7},
+        "conclusion": "意外无覆盖",
+        "reasoning_evidence_refs": ["E-003"]
+      }
+    ]
+  }
+}

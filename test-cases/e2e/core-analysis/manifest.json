@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "description": "Step 1 core-analysis E2E 用例清单（单一真源）。验证 Client -> Requirement -> Risk -> Coverage Gap -> Solution 数据链与可追溯性。上游 RequirementAnalysis / RiskAssessment 由各 Skill 自身 eval 保障，此处以 fixture 形式提供（本阶段不实现 Orchestrator）。",
+  "cases": [
+    {
+      "id": "case-001-complete",
+      "file": "case-001-complete.json",
+      "intent": "完整客户（30岁男性/已婚/0岁孩子/年收入50万/200万房贷/已有部分保险）：全链成功",
+      "expect_gap_status": ["COMPLETE"],
+      "expect_min_gaps": 3,
+      "expect_no_unknown_gap": true,
+      "expect_min_solutions": 1,
+      "expect_solution_status": ["COMPLETE"],
+      "expect_traceability": true,
+      "forbid_numbers": []
+    },
+    {
+      "id": "case-002-insufficient",
+      "file": "case-002-insufficient.json",
+      "intent": "信息不足（缺 existing protection）：必须为 UNKNOWN 缺口，禁止猜测已有保障",
+      "expect_gap_status": ["NEED_MORE_INFORMATION", "INSUFFICIENT_INFORMATION", "PRELIMINARY"],
+      "expect_min_gaps": 1,
+      "expect_unknown_gap": true,
+      "expect_min_solutions": 0,
+      "expect_solution_status": ["NEED_MORE_INFORMATION", "INSUFFICIENT_INFORMATION", "PRELIMINARY", "COMPLETE"],
+      "expect_traceability": true,
+      "forbid_numbers": []
+    },
+    {
+      "id": "case-003-conflicting",
+      "file": "case-003-conflicting.json",
+      "intent": "信息冲突（年收入50万 vs 80万）：保留 CONFLICTING_INFORMATION，禁止自行择一",
+      "expect_gap_status": ["NEED_MORE_INFORMATION", "INSUFFICIENT_INFORMATION", "PRELIMINARY"],
+      "expect_min_gaps": 1,
+      "expect_unknown_gap": true,
+      "expect_min_solutions": 0,
+      "expect_solution_status": ["NEED_MORE_INFORMATION", "INSUFFICIENT_INFORMATION", "PRELIMINARY", "COMPLETE"],
+      "expect_traceability": true,
+      "forbid_numbers": [500000, 800000]
+    }
+  ]
+}

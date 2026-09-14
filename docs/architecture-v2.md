@@ -64,6 +64,28 @@
 - 契约：`knowledge-query`（请求，含 purpose / related_artifact_ids）与 `knowledge-evidence`（结果，含 evidence_id / content / source / relevance / confidence / conflict）。
 - **Phase 4 已落地**为共享层 `evidence/`（`request.py` / `provider.py` / `loop.py`）；查询由 `(domain, purpose)` 模板生成，回环只读（`source_unchanged`），`knowledge-search` Skill 本身 0 改动。详见 `docs/evidence-provider.md`。
 
+### 3.4 四层语义必须区分（Step 1 验收要求）
+
+```text
+Requirement Gap Hint  ≠  Coverage Gap  ≠  Solution  ≠  Product Recommendation
+```
+
+| 层 | 载体 | 回答的问题 | 关键约束 |
+|---|---|---|---|
+| Requirement Gap Hint | `RequirementAnalysis.coverage_gaps` | 客户**自述需求**层面缺什么 | 只是 hint，**不是**最终缺口结论；保留不删除 |
+| Coverage Gap | `CoverageGapAnalysis.gaps[]` | 综合 Risk + Requirement + Existing Protection 后的**正式缺口判断** | 独立判断层；**不得**复制 severity/likelihood；**不得**编造金额 |
+| Solution | `SolutionPlan.solutions[]` | 应采用什么**解决策略** | 禁止具体产品名 / 保险公司名 |
+| Product Recommendation | `ProductRecommendation` | 用哪些**具体产品**实现策略 | Step 2 范围；Step 1 不实现 |
+
+> **禁止把 `RequirementAnalysis.coverage_gaps` 直接复制成最终 Gap。** 需求侧 hint 只是输入之一。
+
+**Coverage Gap 不允许编造金额**：缺口层**不携带任何金额字段**（无 `gap_amount` / `required_coverage` / `protected_amount`）。
+无法判断时输出 `current_coverage.status = UNKNOWN` + `payload.status = NEED_MORE_INFORMATION`，
+并登记 `information_gaps[]`。宁可 UNKNOWN，不得按年龄/收入/职业/家庭结构猜测客户未提供的金额。
+
+**验证**：`test-cases/e2e/core-analysis/`（3 例：完整客户 / 信息不足 / 信息冲突），
+运行 `python test-cases/e2e/core-analysis/run_core_analysis_e2e.py`（41/41）。
+
 ---
 
 ## 4. 关键断点根治（P1）

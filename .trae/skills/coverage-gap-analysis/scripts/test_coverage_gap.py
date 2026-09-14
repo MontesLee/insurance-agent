@@ -24,6 +24,16 @@ from coverage_gap_engine import analyze, load_rules  # noqa: E402
 # Risk-layer fields that MUST NOT appear in a CoverageGap artifact.
 FORBIDDEN_KEYS = {"severity", "likelihood", "residual_risk", "risk_priority"}
 
+# 金额类字段：缺口层一律不得出现（Step 1 规格 §6：不允许编造金额）。
+AMOUNT_KEYS = {
+    "gap_amount", "required_coverage", "protected_amount", "unprotected_amount",
+    "coverage_amount", "amount", "target_amount",
+}
+
+# 产品/保险公司泄漏的文本信号（Step 1 规格 §12-7：缺口层不得出现产品推荐）。
+PRODUCT_TEXT_SIGNALS = ["推荐购买", "股份有限公司", "保险公司", "产品名称"]
+PRODUCT_KEYS = {"product_name", "insurer", "company", "product_id"}
+
 
 def _walk_forbidden(obj, path=""):
     hits = []
@@ -36,6 +46,37 @@ def _walk_forbidden(obj, path=""):
         for i, v in enumerate(obj):
             hits.extend(_walk_forbidden(v, f"{path}[{i}]"))
     return hits
+
+
+def _all_keys(obj) -> set:
+    keys = set()
+
+    def _rec(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                keys.add(k)
+                _rec(v)
+        elif isinstance(o, list):
+            for v in o:
+                _rec(v)
+    _rec(obj)
+    return keys
+
+
+def _all_text(obj) -> str:
+    buf = []
+
+    def _rec(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                _rec(v)
+        elif isinstance(o, list):
+            for v in o:
+                _rec(v)
+        elif isinstance(o, str):
+            buf.append(o)
+    _rec(obj)
+    return "\n".join(buf)
 
 
 def run():
@@ -75,6 +116,26 @@ def run():
         for g in payload.get("gaps", []):
             if g["current_coverage"]["status"] == "SUFFICIENT":
                 fails.append(f"{g.get('gap_id')} produced a gap for SUFFICIENT coverage")
+
+        # Invariant 5 (Step 1 §12-2): every gap must have a requirement basis.
+        # 要求「非空」而非仅「存在」——空列表会让 any/all 平凡通过（假通过）。
+        for g in payload.get("gaps", []):
+            if not g.get("related_requirement_ids"):
+                fails.append(f"{g.get('gap_id')} has no related_requirement_ids (no requirement basis)")
+
+        # Invariant 6 (Step 1 §6 / §12-5): no amount fields at all -> no fabricated amounts.
+        amount_hits = sorted(_all_keys(payload) & AMOUNT_KEYS)
+        if amount_hits:
+            fails.append("amount-like keys present (fabricated-amount risk): " + ", ".join(amount_hits))
+
+        # Invariant 7 (Step 1 §12-7): no product / insurer recommendation leakage.
+        prod_keys = sorted(_all_keys(payload) & PRODUCT_KEYS)
+        if prod_keys:
+            fails.append("product-like keys present: " + ", ".join(prod_keys))
+        txt = _all_text(payload)
+        prod_txt = [s for s in PRODUCT_TEXT_SIGNALS if s in txt]
+        if prod_txt:
+            fails.append("product/insurer text signals present: " + ", ".join(prod_txt))
 
         tag = "PASS" if not fails else "FAIL"
         if fails:

@@ -1,0 +1,52 @@
+{
+  "_comment": "Case 003: 信息冲突 —— 年收入第一条50万、第二条80万。必须保留 CONFLICTING_INFORMATION（UNKNOWN + 候选值），禁止自行择一；下游不得出现被选定的数字。",
+  "client_profile": {
+    "client_id": "C-003",
+    "profile": {
+      "age": 30,
+      "gender": "male",
+      "marital_status": "married",
+      "financial_profile": {
+        "annual_income": {
+          "value": null,
+          "status": "UNKNOWN",
+          "conflict": "CONFLICTING_INFORMATION",
+          "candidates": [
+            {"value": 500000, "source": "客户第一次陈述"},
+            {"value": 800000, "source": "客户第二次陈述"}
+          ],
+          "note": "同一字段存在两个冲突取值，保留冲突不择一"
+        },
+        "mortgage": {"value": 2000000, "status": "KNOWN", "source": "client_statement", "confidence": 0.8}
+      }
+    },
+    "existing_protection": ""
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-002", "requirement_type": "life", "summary": "家庭责任期收入替代保障（额度待定，收入信息冲突）", "priority": "P0_CRITICAL", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "output_version": "1.0",
+    "layer": "risk_analysis",
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.3,
+    "risks": [
+      {
+        "risk_id": "R4-001",
+        "risk_category": "R4",
+        "risk_name": "主要收入者身故导致家庭现金流中断",
+        "priority": "P0",
+        "severity": "CRITICAL",
+        "likelihood": "MEDIUM",
+        "residual_risk": "HIGH",
+        "existing_protection": "",
+        "coverage_assessment": {"protected_amount": null, "unprotected_amount": null, "confidence": 0.2},
+        "conclusion": "收入信息存在冲突，无法量化保障缺口",
+        "reasoning_evidence_refs": ["E-004", "E-004B"]
+      }
+    ]
+  }
+}
