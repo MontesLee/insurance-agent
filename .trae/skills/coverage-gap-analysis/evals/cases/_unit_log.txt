@@ -1,0 +1,7 @@
+[PASS] case-01-basic
+[PASS] case-02-partial
+[PASS] case-03-no-coverage
+[PASS] case-04-unknown
+[PASS] case-05-preliminary
+
+RESULT: ALL GREEN

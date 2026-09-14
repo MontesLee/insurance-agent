@@ -1,0 +1,40 @@
+{
+  "coverage_gap_analysis": {
+    "gaps": [
+      {
+        "gap_id": "GAP-R4-001",
+        "domain": "life",
+        "subject": "主要收入者身故导致家庭现金流中断",
+        "related_requirement_ids": ["REQ-LIFE"],
+        "related_risk_ids": ["R4-001"],
+        "current_coverage": {"status": "NONE", "evidence_refs": ["coverage_assessment 显示无任何覆盖"]},
+        "target_coverage": {"direction": "补充寿险保障", "rationale": "家庭责任缺口"},
+        "gap_level": "CRITICAL",
+        "confidence": 0.9,
+        "evidence_refs": ["E004"]
+      }
+    ],
+    "priorities": [{"gap_id": "GAP-R4-001", "priority": "P0", "reason": "寿险保障无覆盖"}],
+    "information_gaps": [],
+    "status": "COMPLETE"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.9,
+    "risks": [
+      {
+        "risk_id": "R4-001",
+        "risk_category": "R4",
+        "risk_name": "主要收入者身故导致家庭现金流中断",
+        "priority": "P0",
+        "reasoning_evidence_refs": ["E004"]
+      }
+    ]
+  }
+}

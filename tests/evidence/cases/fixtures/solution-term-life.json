@@ -1,0 +1,18 @@
+{
+  "solution_id": "SOL-001",
+  "solution_type": "TERM_LIFE",
+  "objective": "建立家庭责任保障",
+  "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度，保障期限覆盖主要责任期",
+  "priority": "P0",
+  "constraints": [
+    {"constraint": "从零建立", "value": "当前无对应保障，需完整建立该方向保障", "source": "GAP-R4-001"}
+  ],
+  "trade_offs": [],
+  "rejected_directions": [
+    {"direction": "终身寿险", "reason": "保费占用预算较高且保障杠杆较低，优先以定期保障覆盖责任期"}
+  ],
+  "related_gap_ids": ["GAP-R4-001"],
+  "related_risk_ids": ["R4-001"],
+  "confidence": 0.9,
+  "evidence_refs": ["E004"]
+}

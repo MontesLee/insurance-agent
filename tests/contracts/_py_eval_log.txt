@@ -1,0 +1,28 @@
+=== report-generation (exit=0) ===
+PASS
+[PASS] recommendation_boundary
+[PASS] recommendation_missing
+[PASS] information_gap_propagation
+[PASS] insufficient_input
+
+DATASET RESULT: ALL GREEN
+
+=== recommendation (exit=0) ===
+PASS
+[PASS] close_call
+[PASS] no_candidates
+[PASS] human_review
+[PASS] insufficient_input
+
+DATASET RESULT: ALL GREEN
+
+=== knowledge-search (exit=0) ===
+PASS
+[PASS] conflict_detection: conflict=True n=2
+[PASS] source_priority: order=['S1', 'D1']
+[PASS] metadata_filter: returned=['M1']
+[PASS] abstention: status=insufficient_evidence n=0
+
+DATASET RESULT: ALL GREEN
+
+PY EVALS: ALL GREEN

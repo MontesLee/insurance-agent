@@ -1,0 +1,50 @@
+{
+  "risk_category_to_domain": {
+    "R1": "medical",
+    "R2": "critical_illness",
+    "R3": "accident",
+    "R4": "life",
+    "R5": "savings"
+  },
+  "domain_labels": {
+    "medical": "医疗",
+    "critical_illness": "重大疾病",
+    "accident": "意外",
+    "life": "寿险/家庭责任",
+    "savings": "储蓄/长期财务",
+    "general": "综合"
+  },
+  "domain_required_protection": {
+    "medical": {
+      "direction": "补充百万医疗险，覆盖社保外大额医疗支出与免赔额缺口",
+      "rationale": "弥补社保报销上限与免赔额带来的自付风险"
+    },
+    "critical_illness": {
+      "direction": "配置重疾险，保额覆盖 3-5 年家庭年收入",
+      "rationale": "弥补重疾期间的收入中断、治疗与康复支出"
+    },
+    "accident": {
+      "direction": "配置综合意外险（含意外医疗与伤残给付）",
+      "rationale": "覆盖意外导致的医疗与收入能力损失"
+    },
+    "life": {
+      "direction": "建立定期寿险，保额覆盖家庭责任（房贷+子女教育+赡养），期限覆盖责任期",
+      "rationale": "弥补主要收入者身故导致的家庭现金流中断"
+    },
+    "savings": {
+      "direction": "建立长期储蓄/年金规划，覆盖退休与子女教育刚性支出",
+      "rationale": "弥补长期现金流缺口"
+    }
+  },
+  "coverage_keywords": {
+    "positive": ["已有", "已配置", "已购", "保单", "社保", "百万医疗", "重疾", "寿险", "意外", "年金", "医疗险", "商业保险"],
+    "none": ["无", "没有", "未配置", "未购", "没有买", "暂未", "没买", "无保险"]
+  },
+  "gap_level_matrix": {
+    "P0": {"NONE": "CRITICAL", "PARTIAL": "HIGH", "SUFFICIENT": "LOW"},
+    "P1": {"NONE": "CRITICAL", "PARTIAL": "HIGH", "SUFFICIENT": "LOW"},
+    "P2": {"NONE": "HIGH", "PARTIAL": "MEDIUM", "SUFFICIENT": "LOW"},
+    "P3": {"NONE": "MEDIUM", "PARTIAL": "LOW", "SUFFICIENT": "LOW"}
+  },
+  "gap_level_rank": {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1, "UNKNOWN": 0}
+}

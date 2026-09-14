@@ -1,0 +1,3 @@
+generated D:\Workspace\insurance-agent\tests\e2e\fixtures\case-full-chain.json
+from D:\Workspace\insurance-agent\.trae\skills\report-generation\evals\cases\v2-dataset-manifest.json
+case=v2_full_chain

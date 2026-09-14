@@ -1,0 +1,29 @@
+{
+  "client_profile": {
+    "client_id": "C002",
+    "existing_protection": "客户有社保与多份商业险，但保额普遍偏低"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重疾", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-ACC", "requirement_type": "accident", "summary": "意外", "priority": "P2_MEDIUM", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "寿险", "priority": "P0_CRITICAL", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-SAV", "requirement_type": "savings", "summary": "储蓄", "priority": "P3_LOW", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "output_version": "1.0",
+    "layer": "risk_analysis",
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.8,
+    "risks": [
+      {"risk_id": "R1-001", "risk_category": "R1", "risk_name": "大额医疗费用", "priority": "P1", "severity": "HIGH", "likelihood": "HIGH", "residual_risk": "HIGH", "existing_protection": "百万医疗已配置", "coverage_assessment": {"protected_amount": 200000, "unprotected_amount": 300000, "confidence": 0.6}, "conclusion": "部分覆盖", "reasoning_evidence_refs": ["E001"]},
+      {"risk_id": "R2-001", "risk_category": "R2", "risk_name": "重疾收入中断", "priority": "P1", "severity": "HIGH", "likelihood": "MEDIUM", "residual_risk": "HIGH", "existing_protection": "重疾已配置", "coverage_assessment": {"protected_amount": 200000, "unprotected_amount": 800000, "confidence": 0.6}, "conclusion": "部分覆盖", "reasoning_evidence_refs": ["E002"]},
+      {"risk_id": "R3-001", "risk_category": "R3", "risk_name": "意外伤残", "priority": "P2", "severity": "MEDIUM", "likelihood": "MEDIUM", "residual_risk": "MEDIUM", "existing_protection": "意外已配置", "coverage_assessment": {"protected_amount": 50000, "unprotected_amount": 100000, "confidence": 0.6}, "conclusion": "部分覆盖", "reasoning_evidence_refs": ["E003"]},
+      {"risk_id": "R4-001", "risk_category": "R4", "risk_name": "身故责任", "priority": "P0", "severity": "CRITICAL", "likelihood": "MEDIUM", "residual_risk": "HIGH", "existing_protection": "寿险已配置", "coverage_assessment": {"protected_amount": 500000, "unprotected_amount": 1500000, "confidence": 0.6}, "conclusion": "部分覆盖", "reasoning_evidence_refs": ["E004"]},
+      {"risk_id": "R5-001", "risk_category": "R5", "risk_name": "退休缺口", "priority": "P3", "severity": "LOW", "likelihood": "MEDIUM", "residual_risk": "LOW", "existing_protection": "少量年金", "coverage_assessment": {"protected_amount": 30000, "unprotected_amount": 270000, "confidence": 0.5}, "conclusion": "部分覆盖", "reasoning_evidence_refs": ["E005"]}
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "coverage-gap-analysis/output.schema.json",
+  "title": "CoverageGapAnalysisOutput",
+  "description": "Alias of the Canonical Contract. Single source of truth: contracts/coverage-gap-analysis.schema.json (relative $ref).",
+  "$ref": "../../../../contracts/coverage-gap-analysis.schema.json"
+}

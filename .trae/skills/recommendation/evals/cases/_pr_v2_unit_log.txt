@@ -1,0 +1,14 @@
+product-recommendation V2 invariants
+
+[PASS] input_rejects_candidate_solutions
+[PASS] one_candidate_per_solution
+[PASS] no_fabricated_product_facts
+[PASS] empty_solutions_yields_no_candidate
+[PASS] risk_categories_from_real_data
+[PASS] evidence_ids_preserved
+[PASS] coverage_structure_from_rules
+[PASS] strategy_trace_present
+[PASS] no_brand_names_in_output
+[PASS] unverifiable_is_not_a_pass
+
+RESULT: ALL GREEN (10/10 passed)

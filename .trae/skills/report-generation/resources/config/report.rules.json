@@ -8,13 +8,60 @@
     "life": "R4",
     "savings": "R5"
   },
+  "domain_to_risk_category": {
+    "medical": "R1",
+    "critical_illness": "R2",
+    "accident": "R3",
+    "life": "R4",
+    "savings": "R5",
+    "general": "GENERAL"
+  },
   "risk_category_names": {
     "R1": "医疗风险",
     "R2": "重疾风险",
     "R3": "意外风险",
     "R4": "身故/家庭责任风险",
-    "R5": "长期储蓄/养老/财富规划风险"
+    "R5": "长期储蓄/养老/财富规划风险",
+    "GENERAL": "综合/其他保障"
   },
+  "coverage_status_names": {
+    "NONE": "无覆盖",
+    "PARTIAL": "部分覆盖",
+    "SUFFICIENT": "覆盖充分",
+    "UNKNOWN": "覆盖情况未知"
+  },
+  "gap_level_names": {
+    "CRITICAL": "极高",
+    "HIGH": "高",
+    "MEDIUM": "中",
+    "LOW": "低",
+    "UNKNOWN": "待确认"
+  },
+  "fit_names": {
+    "strong_fit": "高度匹配",
+    "good_fit": "较好匹配",
+    "partial_fit": "部分匹配",
+    "poor_fit": "匹配度低",
+    "not_suitable": "不适配",
+    "insufficient_evidence": "证据不足，暂不构成方向"
+  },
+  "solution_type_names": {
+    "TERM_LIFE": "定期寿险方向",
+    "MEDICAL": "医疗保障方向",
+    "CRITICAL_ILLNESS": "重疾保障方向",
+    "ACCIDENT": "意外保障方向",
+    "SAVINGS": "长期储蓄/养老方向",
+    "GENERAL": "综合保障方向"
+  },
+  "gap_derivation_warning": "GAP_SOURCE_DERIVED_NOT_CANONICAL：未提供 CoverageGapAnalysis，04 保障缺口由 risk_analysis / requirement_analysis 推导得出，非 Canonical 缺口判断结果。",
+  "gap_canonical_note": "本章节直接引用 CoverageGapAnalysis（Canonical 缺口判断），未重新计算缺口等级。",
+  "gap_derived_note": "本章节由 risk_analysis / requirement_analysis 推导（未提供 CoverageGapAnalysis），仅供过渡使用。",
+  "missing_solution_note": "当前缺少 SolutionPlan 分析结果，暂不呈现解决策略。",
+  "solution_section_note": "以上策略来自 SolutionPlan（解决策略层），不含具体产品与保险公司。",
+  "missing_evidence_note": "当前缺少 KnowledgeEvidence，暂无证据来源可列示。",
+  "evidence_section_note": "证据来自 KnowledgeEvidence；冲突已原样呈现，本报告不自行裁决。",
+  "evidence_conflict_note": "KnowledgeEvidence 存在冲突，需人工复核后再使用。",
+  "conflict_gap_vs_risk": "UPSTREAM_CONFLICT：CoverageGapAnalysis 判定 {domain}（{gap_id}）当前覆盖为 {gap_status}，但其关联风险 {risk_ids} 在上游存在已保障金额记载；两者不一致，建议经纪人核实，本报告不自行裁决。",
   "requirement_type_names": {
     "medical": "医疗保障",
     "critical_illness": "重疾保障",

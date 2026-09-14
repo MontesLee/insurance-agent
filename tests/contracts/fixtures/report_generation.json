@@ -1,0 +1,602 @@
+{
+  "skill": "report-generation",
+  "version": "0.1",
+  "status": "success",
+  "structured_report": {
+    "title": "客户保险需求分析报告",
+    "version": "1.0",
+    "generated_at": "2026-09-13T12:57:11Z",
+    "client_profile": {
+      "fields": [
+        {
+          "label": "年龄",
+          "value": "32",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.age"
+        },
+        {
+          "label": "性别",
+          "value": "男",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.gender"
+        },
+        {
+          "label": "婚姻状况",
+          "value": "已婚",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.marital_status"
+        },
+        {
+          "label": "家庭成员",
+          "value": "4人（夫妻+1孩+1父/母同住）",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.family_members"
+        },
+        {
+          "label": "子女情况",
+          "value": "1孩（3岁）",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.children"
+        },
+        {
+          "label": "父母赡养",
+          "value": "双方父母均需赡养",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.parent_support"
+        },
+        {
+          "label": "住房情况",
+          "value": "自有住房，有房贷",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.housing"
+        },
+        {
+          "label": "所在地区",
+          "value": "一线城市",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.region"
+        },
+        {
+          "label": "学历",
+          "value": "本科",
+          "status": "KNOWN",
+          "source": "client_state.family_profile.education"
+        },
+        {
+          "label": "职业",
+          "value": "互联网行业产品经理",
+          "status": "KNOWN",
+          "source": "client_state.employment_profile.occupation"
+        },
+        {
+          "label": "工作单位",
+          "value": "某科技公司",
+          "status": "KNOWN",
+          "source": "client_state.employment_profile.employer"
+        },
+        {
+          "label": "就业状态",
+          "value": "在职",
+          "status": "KNOWN",
+          "source": "client_state.employment_profile.employment_status"
+        },
+        {
+          "label": "健康状况",
+          "value": "良好，无重大既往病史",
+          "status": "KNOWN",
+          "source": "client_state.health_profile.health_status"
+        },
+        {
+          "label": "吸烟情况",
+          "value": "否",
+          "status": "KNOWN",
+          "source": "client_state.health_profile.smoking"
+        },
+        {
+          "label": "家庭经济责任",
+          "value": "家庭主要经济支柱，配偶无收入",
+          "status": "KNOWN",
+          "source": "client_state.responsibility_profile.economic_responsibility"
+        },
+        {
+          "label": "被抚养人",
+          "value": "配偶及子女",
+          "status": "KNOWN",
+          "source": "client_state.responsibility_profile.dependents"
+        },
+        {
+          "label": "社保情况",
+          "value": "职工社保+医保",
+          "status": "KNOWN",
+          "source": "client_state.existing_protection.social_security"
+        },
+        {
+          "label": "商业保险",
+          "value": "已购一份重疾险（保额50万）",
+          "status": "KNOWN",
+          "source": "client_state.existing_protection.commercial_insurance"
+        },
+        {
+          "label": "已有保险",
+          "value": "重疾险50万",
+          "status": "KNOWN",
+          "source": "client_state.existing_protection.existing_insurance"
+        }
+      ],
+      "note": "已知字段 19 项，待确认字段 0 项。"
+    },
+    "financial_profile": {
+      "table": [
+        {
+          "item": "家庭年收入",
+          "value": "60万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.annual_income"
+        },
+        {
+          "item": "家庭年支出",
+          "value": "25万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.annual_expense"
+        },
+        {
+          "item": "资产",
+          "value": "350万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.assets"
+        },
+        {
+          "item": "负债",
+          "value": "210万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.liabilities"
+        },
+        {
+          "item": "房贷余额",
+          "value": "200万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.mortgage"
+        },
+        {
+          "item": "金融资产",
+          "value": "80万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.financial_assets"
+        },
+        {
+          "item": "保险预算",
+          "value": "3万",
+          "status": "KNOWN",
+          "source": "client_state.financial_profile.insurance_budget"
+        }
+      ],
+      "note": "财务信息以上游 ClientState.financial_profile 为准；缺失项已标注待确认。"
+    },
+    "risk_exposure": {
+      "R1": {
+        "present": true,
+        "risk_category": "R1",
+        "risk_status": "HIGH",
+        "risk_name": "医疗费用",
+        "description": "疾病或意外导致住院；家庭支柱，医疗支出敏感",
+        "severity": "HIGH",
+        "impact": "大额自付；中；高",
+        "existing_protection": "社保+百万医疗",
+        "coverage_gap": "门诊及部分特药自付",
+        "conclusion": "医疗费用存在自付缺口",
+        "source": "risk-analysis.R1-001"
+      },
+      "R2": {
+        "present": true,
+        "risk_category": "R2",
+        "risk_status": "HIGH",
+        "risk_name": "重大疾病",
+        "description": "确诊重疾；家庭经济支柱",
+        "severity": "HIGH",
+        "impact": "收入中断+治疗费；高；高",
+        "existing_protection": "已有重疾险50万",
+        "coverage_gap": "治疗及康复缺口",
+        "conclusion": "重疾保额不足",
+        "source": "risk-analysis.R2-001"
+      },
+      "R3": {
+        "present": true,
+        "risk_category": "R3",
+        "risk_status": "MEDIUM",
+        "risk_name": "意外伤残",
+        "description": "意外导致伤残；通勤及差旅",
+        "severity": "MEDIUM",
+        "impact": "中；中；中",
+        "existing_protection": "基础意外险",
+        "coverage_gap": "伤残收入补偿缺口",
+        "conclusion": "意外伤残保障一般",
+        "source": "risk-analysis.R3-001"
+      },
+      "R4": {
+        "present": true,
+        "risk_category": "R4",
+        "risk_status": "HIGH",
+        "risk_name": "家庭责任",
+        "description": "身故/全残；主要收入来源",
+        "severity": "HIGH",
+        "impact": "高；高；高",
+        "existing_protection": "仅有社保",
+        "coverage_gap": "家庭责任缺口",
+        "conclusion": "寿险保障严重不足",
+        "source": "risk-analysis.R4-001"
+      },
+      "R5": {
+        "present": true,
+        "risk_category": "R5",
+        "risk_status": "MEDIUM",
+        "risk_name": "养老储蓄",
+        "description": "退休收入下降；长期规划",
+        "severity": "MEDIUM",
+        "impact": "中；低；低",
+        "existing_protection": "无专项",
+        "coverage_gap": "养老储备缺口",
+        "conclusion": "养老储蓄需规划",
+        "source": "risk-analysis.R5-001"
+      }
+    },
+    "coverage_gaps": [
+      {
+        "risk_category": "R1",
+        "current_protection": "社保+百万医疗",
+        "main_gap": "门诊及部分特药自付",
+        "priority": "P0",
+        "source": "risk-analysis.R1-001"
+      },
+      {
+        "risk_category": "R2",
+        "current_protection": "已有重疾险50万",
+        "main_gap": "治疗及康复缺口",
+        "priority": "P0",
+        "source": "risk-analysis.R2-001"
+      },
+      {
+        "risk_category": "R4",
+        "current_protection": "仅有社保",
+        "main_gap": "家庭责任缺口",
+        "priority": "P0",
+        "source": "risk-analysis.R4-001"
+      },
+      {
+        "risk_category": "R5",
+        "current_protection": "需进一步评估",
+        "main_gap": "养老储蓄缺口，需中长期规划",
+        "priority": "P2",
+        "source": "requirement-analysis:E030"
+      }
+    ],
+    "requirement_priorities": [
+      {
+        "requirement_id": "REQ-MED",
+        "type": "医疗保障",
+        "summary": "住院及大额医疗保障",
+        "priority": "P0",
+        "priority_label": "必须优先解决",
+        "source": "requirement-analysis.REQ-MED"
+      },
+      {
+        "requirement_id": "REQ-CI",
+        "type": "重疾保障",
+        "summary": "重大疾病保障",
+        "priority": "P0",
+        "priority_label": "必须优先解决",
+        "source": "requirement-analysis.REQ-CI"
+      },
+      {
+        "requirement_id": "REQ-LIFE",
+        "type": "身故/家庭责任",
+        "summary": "家庭责任寿险",
+        "priority": "P0",
+        "priority_label": "必须优先解决",
+        "source": "requirement-analysis.REQ-LIFE"
+      },
+      {
+        "requirement_id": "REQ-ACC",
+        "type": "意外保障",
+        "summary": "意外伤残保障",
+        "priority": "P1",
+        "priority_label": "建议尽快解决",
+        "source": "requirement-analysis.REQ-ACC"
+      },
+      {
+        "requirement_id": "REQ-SAV",
+        "type": "长期储蓄/养老",
+        "summary": "长期养老储蓄",
+        "priority": "P2",
+        "priority_label": "可以后续完善",
+        "source": "requirement-analysis.REQ-SAV"
+      }
+    ],
+    "recommended_directions": [
+      {
+        "rank": "primary",
+        "candidate_id": "MED+CI",
+        "fit": "strong_fit",
+        "rationale": "覆盖高优先级风险；在预算范围内",
+        "covered_requirements": [
+          "REQ-MED"
+        ],
+        "covered_risks": [
+          "R1-001"
+        ],
+        "notes": "",
+        "source": "recommendation.primary_recommendation"
+      },
+      {
+        "rank": "alternative",
+        "candidate_id": "ACC",
+        "fit": "good_fit",
+        "rationale": "覆盖意外伤残",
+        "covered_requirements": [],
+        "covered_risks": [],
+        "notes": "",
+        "source": "recommendation.alternatives"
+      }
+    ],
+    "information_gaps": [
+      {
+        "field": "spouse_income",
+        "importance": "P2_MEDIUM",
+        "category": "suggested",
+        "reason": "配偶收入未确认",
+        "source": "requirement-analysis"
+      }
+    ],
+    "next_actions": [
+      {
+        "action": "确认/收集：spouse_income",
+        "reason": "配偶收入未确认",
+        "priority": "P1",
+        "dependency": "requirement-analysis"
+      },
+      {
+        "action": "基于补充信息重新评估保障缺口与风险结论",
+        "reason": "当前缺口与风险结论依赖未确认信息",
+        "priority": "P1",
+        "dependency": "Risk Analysis"
+      },
+      {
+        "action": "进入保障方案设计与产品匹配",
+        "reason": "先补齐关键事实，再形成可执行方案",
+        "priority": "P2",
+        "dependency": "Recommendation"
+      }
+    ]
+  },
+  "rendered_report": "# 客户保险需求分析报告\n\n> 生成时间：2026-09-13T12:57:11Z  ｜  报告版本：1.0\n\n> 本报告由上游结构化分析结果汇总生成。事实来自 ClientState / Requirement Analysis / Risk Analysis，推荐方向来自 Recommendation。报告不包含任何自主保险判断或产品推销语句。\n\n## 01 客户画像\n\n- **年龄**：32（来源：client_state.family_profile.age）\n- **性别**：男（来源：client_state.family_profile.gender）\n- **婚姻状况**：已婚（来源：client_state.family_profile.marital_status）\n- **家庭成员**：4人（夫妻+1孩+1父/母同住）（来源：client_state.family_profile.family_members）\n- **子女情况**：1孩（3岁）（来源：client_state.family_profile.children）\n- **父母赡养**：双方父母均需赡养（来源：client_state.family_profile.parent_support）\n- **住房情况**：自有住房，有房贷（来源：client_state.family_profile.housing）\n- **所在地区**：一线城市（来源：client_state.family_profile.region）\n- **学历**：本科（来源：client_state.family_profile.education）\n- **职业**：互联网行业产品经理（来源：client_state.employment_profile.occupation）\n- **工作单位**：某科技公司（来源：client_state.employment_profile.employer）\n- **就业状态**：在职（来源：client_state.employment_profile.employment_status）\n- **健康状况**：良好，无重大既往病史（来源：client_state.health_profile.health_status）\n- **吸烟情况**：否（来源：client_state.health_profile.smoking）\n- **家庭经济责任**：家庭主要经济支柱，配偶无收入（来源：client_state.responsibility_profile.economic_responsibility）\n- **被抚养人**：配偶及子女（来源：client_state.responsibility_profile.dependents）\n- **社保情况**：职工社保+医保（来源：client_state.existing_protection.social_security）\n- **商业保险**：已购一份重疾险（保额50万）（来源：client_state.existing_protection.commercial_insurance）\n- **已有保险**：重疾险50万（来源：client_state.existing_protection.existing_insurance）\n\n_已知字段 19 项，待确认字段 0 项。_\n\n## 02 家庭财务情况\n\n| 项目 | 情况 | 来源 |\n| --- | --- | --- |\n| 家庭年收入 | 60万 | client_state.financial_profile.annual_income |\n| 家庭年支出 | 25万 | client_state.financial_profile.annual_expense |\n| 资产 | 350万 | client_state.financial_profile.assets |\n| 负债 | 210万 | client_state.financial_profile.liabilities |\n| 房贷余额 | 200万 | client_state.financial_profile.mortgage |\n| 金融资产 | 80万 | client_state.financial_profile.financial_assets |\n| 保险预算 | 3万 | client_state.financial_profile.insurance_budget |\n\n_财务信息以上游 ClientState.financial_profile 为准；缺失项已标注待确认。_\n\n## 03 风险暴露\n\n### R1 医疗风险\n- 风险状态：HIGH\n- 风险描述：疾病或意外导致住院；家庭支柱，医疗支出敏感\n- 严重程度：HIGH\n- 主要影响：大额自付；中；高\n- 现有保障：社保+百万医疗\n- 保障不足：门诊及部分特药自付\n- 风险结论：医疗费用存在自付缺口\n- 来源：risk-analysis.R1-001\n\n### R2 重疾风险\n- 风险状态：HIGH\n- 风险描述：确诊重疾；家庭经济支柱\n- 严重程度：HIGH\n- 主要影响：收入中断+治疗费；高；高\n- 现有保障：已有重疾险50万\n- 保障不足：治疗及康复缺口\n- 风险结论：重疾保额不足\n- 来源：risk-analysis.R2-001\n\n### R3 意外风险\n- 风险状态：MEDIUM\n- 风险描述：意外导致伤残；通勤及差旅\n- 严重程度：MEDIUM\n- 主要影响：中；中；中\n- 现有保障：基础意外险\n- 保障不足：伤残收入补偿缺口\n- 风险结论：意外伤残保障一般\n- 来源：risk-analysis.R3-001\n\n### R4 身故/家庭责任风险\n- 风险状态：HIGH\n- 风险描述：身故/全残；主要收入来源\n- 严重程度：HIGH\n- 主要影响：高；高；高\n- 现有保障：仅有社保\n- 保障不足：家庭责任缺口\n- 风险结论：寿险保障严重不足\n- 来源：risk-analysis.R4-001\n\n### R5 长期储蓄/养老/财富规划风险\n- 风险状态：MEDIUM\n- 风险描述：退休收入下降；长期规划\n- 严重程度：MEDIUM\n- 主要影响：中；低；低\n- 现有保障：无专项\n- 保障不足：养老储备缺口\n- 风险结论：养老储蓄需规划\n- 来源：risk-analysis.R5-001\n\n## 04 保障缺口\n\n| 风险领域 | 当前保障 | 主要缺口 | 优先级 | 来源 |\n| --- | --- | --- | --- | --- |\n| 医疗风险 | 社保+百万医疗 | 门诊及部分特药自付 | P0 | risk-analysis.R1-001 |\n| 重疾风险 | 已有重疾险50万 | 治疗及康复缺口 | P0 | risk-analysis.R2-001 |\n| 身故/家庭责任风险 | 仅有社保 | 家庭责任缺口 | P0 | risk-analysis.R4-001 |\n| 长期储蓄/养老/财富规划风险 | 需进一步评估 | 养老储蓄缺口，需中长期规划 | P2 | requirement-analysis:E030 |\n\n## 05 需求优先级\n\n- **P0（必须优先解决）**：医疗保障 —— 住院及大额医疗保障（requirement-analysis.REQ-MED）\n- **P0（必须优先解决）**：重疾保障 —— 重大疾病保障（requirement-analysis.REQ-CI）\n- **P0（必须优先解决）**：身故/家庭责任 —— 家庭责任寿险（requirement-analysis.REQ-LIFE）\n- **P1（建议尽快解决）**：意外保障 —— 意外伤残保障（requirement-analysis.REQ-ACC）\n- **P2（可以后续完善）**：长期储蓄/养老 —— 长期养老储蓄（requirement-analysis.REQ-SAV）\n\n## 06 推荐保障方向\n\n### 首选：MED+CI\n- 匹配度：strong_fit\n- 推荐原因：覆盖高优先级风险；在预算范围内\n- 解决的需求：REQ-MED\n- 解决的风险：R1-001\n- 来源：recommendation.primary_recommendation\n\n### 备选：ACC\n- 匹配度：good_fit\n- 推荐原因：覆盖意外伤残\n- 来源：recommendation.alternatives\n\n## 07 信息缺口\n\n### 建议补充\n- **spouse_income**（P2_MEDIUM）：配偶收入未确认（来源：requirement-analysis）\n\n## 08 经纪人下一步行动\n\n1. **确认/收集：spouse_income**  \n   - 原因：配偶收入未确认\n   - 优先级：P1  ｜  依赖：requirement-analysis\n2. **基于补充信息重新评估保障缺口与风险结论**  \n   - 原因：当前缺口与风险结论依赖未确认信息\n   - 优先级：P1  ｜  依赖：Risk Analysis\n3. **进入保障方案设计与产品匹配**  \n   - 原因：先补齐关键事实，再形成可执行方案\n   - 优先级：P2  ｜  依赖：Recommendation\n",
+  "validation": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "conflicts": []
+  },
+  "metadata": {
+    "source_skills": [
+      "client-intake",
+      "requirement-analysis",
+      "risk-analysis",
+      "knowledge-search",
+      "recommendation"
+    ],
+    "upstream_status": {
+      "client_state": "present",
+      "requirement_analysis": "present",
+      "risk_analysis": "present",
+      "knowledge_search": "present",
+      "recommendation": "present"
+    },
+    "conflicts": [],
+    "warnings": []
+  },
+  "provenance": [
+    {
+      "claim": "客户画像-年龄: 32",
+      "source": "client_state.family_profile.age",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-性别: 男",
+      "source": "client_state.family_profile.gender",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-婚姻状况: 已婚",
+      "source": "client_state.family_profile.marital_status",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-家庭成员: 4人（夫妻+1孩+1父/母同住）",
+      "source": "client_state.family_profile.family_members",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-子女情况: 1孩（3岁）",
+      "source": "client_state.family_profile.children",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-父母赡养: 双方父母均需赡养",
+      "source": "client_state.family_profile.parent_support",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-住房情况: 自有住房，有房贷",
+      "source": "client_state.family_profile.housing",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-所在地区: 一线城市",
+      "source": "client_state.family_profile.region",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-学历: 本科",
+      "source": "client_state.family_profile.education",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-职业: 互联网行业产品经理",
+      "source": "client_state.employment_profile.occupation",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-工作单位: 某科技公司",
+      "source": "client_state.employment_profile.employer",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-就业状态: 在职",
+      "source": "client_state.employment_profile.employment_status",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-健康状况: 良好，无重大既往病史",
+      "source": "client_state.health_profile.health_status",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-吸烟情况: 否",
+      "source": "client_state.health_profile.smoking",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-家庭经济责任: 家庭主要经济支柱，配偶无收入",
+      "source": "client_state.responsibility_profile.economic_responsibility",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-被抚养人: 配偶及子女",
+      "source": "client_state.responsibility_profile.dependents",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-社保情况: 职工社保+医保",
+      "source": "client_state.existing_protection.social_security",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-商业保险: 已购一份重疾险（保额50万）",
+      "source": "client_state.existing_protection.commercial_insurance",
+      "confidence": "medium"
+    },
+    {
+      "claim": "客户画像-已有保险: 重疾险50万",
+      "source": "client_state.existing_protection.existing_insurance",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-家庭年收入: 60万",
+      "source": "client_state.financial_profile.annual_income",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-家庭年支出: 25万",
+      "source": "client_state.financial_profile.annual_expense",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-资产: 350万",
+      "source": "client_state.financial_profile.assets",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-负债: 210万",
+      "source": "client_state.financial_profile.liabilities",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-房贷余额: 200万",
+      "source": "client_state.financial_profile.mortgage",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-金融资产: 80万",
+      "source": "client_state.financial_profile.financial_assets",
+      "confidence": "medium"
+    },
+    {
+      "claim": "财务-保险预算: 3万",
+      "source": "client_state.financial_profile.insurance_budget",
+      "confidence": "medium"
+    },
+    {
+      "claim": "R1 风险暴露：医疗费用（残余风险 HIGH）",
+      "source": "risk-analysis.R1-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R2 风险暴露：重大疾病（残余风险 HIGH）",
+      "source": "risk-analysis.R2-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R3 风险暴露：意外伤残（残余风险 MEDIUM）",
+      "source": "risk-analysis.R3-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R4 风险暴露：家庭责任（残余风险 HIGH）",
+      "source": "risk-analysis.R4-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R5 风险暴露：养老储蓄（残余风险 MEDIUM）",
+      "source": "risk-analysis.R5-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R1 保障缺口",
+      "source": "risk-analysis.R1-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R2 保障缺口",
+      "source": "risk-analysis.R2-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R4 保障缺口",
+      "source": "risk-analysis.R4-001",
+      "confidence": "high"
+    },
+    {
+      "claim": "R5 保障缺口（需求侧）",
+      "source": "requirement-analysis",
+      "confidence": "high"
+    },
+    {
+      "claim": "需求REQ-MED（医疗保障）优先级 P0",
+      "source": "requirement-analysis.REQ-MED",
+      "confidence": "high"
+    },
+    {
+      "claim": "需求REQ-CI（重疾保障）优先级 P0",
+      "source": "requirement-analysis.REQ-CI",
+      "confidence": "high"
+    },
+    {
+      "claim": "需求REQ-ACC（意外保障）优先级 P1",
+      "source": "requirement-analysis.REQ-ACC",
+      "confidence": "high"
+    },
+    {
+      "claim": "需求REQ-LIFE（身故/家庭责任）优先级 P0",
+      "source": "requirement-analysis.REQ-LIFE",
+      "confidence": "high"
+    },
+    {
+      "claim": "需求REQ-SAV（长期储蓄/养老）优先级 P2",
+      "source": "requirement-analysis.REQ-SAV",
+      "confidence": "high"
+    },
+    {
+      "claim": "首选推荐方向：MED+CI",
+      "source": "recommendation",
+      "confidence": "high"
+    }
+  ]
+}

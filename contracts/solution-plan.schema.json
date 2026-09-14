@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "solution-plan Canonical Contract",
+  "description": "Solution STRATEGY layer (Gap -> Solution). No concrete product / insurer names. Implemented in Phase 3 (skill: solution). payload.solutions[] carries one strategy per gap; the top-level objective/coverage_direction/priority/solution_type are DERIVED from solutions[0] (single source of truth).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "skill",
+    "legacy_skill",
+    "schema_version",
+    "generated_at",
+    "payload",
+    "provenance"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "enum": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment",
+        "coverage-gap-analysis",
+        "solution-plan",
+        "knowledge-query",
+        "knowledge-evidence",
+        "product-recommendation",
+        "insurance-report"
+      ]
+    },
+    "skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical skill id (kebab-case)."
+    },
+    "legacy_skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Legacy / physical skill directory name (may be snake_case)."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp."
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "objective",
+        "coverage_direction",
+        "priority"
+      ],
+      "properties": {
+        "solution_type": {
+          "type": "string",
+          "description": "Strategy class, e.g. TERM_LIFE. NOT a concrete product."
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "description": "解决目标."
+        },
+        "coverage_direction": {
+          "type": "string",
+          "minLength": 1,
+          "description": "保障方向 / 额度与期限逻辑。禁止具体产品名 / 保险公司名。"
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "trade_offs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "rejected_directions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "direction": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "related_gap_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "solutions": {
+          "type": "array",
+          "description": "One strategy per coverage gap. Ordered by priority then gap severity. solutions[0] is the primary.",
+          "items": {
+            "type": "object",
+            "required": [
+              "solution_id",
+              "solution_type",
+              "objective",
+              "coverage_direction",
+              "priority"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "solution_id": {
+                "type": "string"
+              },
+              "solution_type": {
+                "type": "string",
+                "description": "Strategy class (e.g. TERM_LIFE). NOT a concrete product."
+              },
+              "objective": {
+                "type": "string",
+                "minLength": 1
+              },
+              "coverage_direction": {
+                "type": "string",
+                "minLength": 1,
+                "description": "保障方向 / 额度与期限逻辑。禁止具体产品名 / 保险公司名。"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              },
+              "constraints": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "constraint": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "trade_offs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "axis": {
+                      "type": "string"
+                    },
+                    "option_a": {
+                      "type": "string"
+                    },
+                    "option_b": {
+                      "type": "string"
+                    },
+                    "chosen": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "rejected_directions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "direction": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "related_gap_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "related_risk_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "confidence": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "information_gaps": {
+          "type": "array",
+          "description": "Gaps whose coverage status is UNKNOWN -> strategy cannot be fixed yet.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "gap_id": {
+                "type": "string"
+              },
+              "domain": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "COMPLETE",
+            "PRELIMINARY",
+            "NEED_MORE_INFORMATION",
+            "INSUFFICIENT_INFORMATION",
+            "FAILED"
+          ]
+        }
+      },
+      "description": "Solution STRATEGY, not product recommendation. No concrete product / insurer names."
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_type",
+          "source_id",
+          "confidence"
+        ],
+        "properties": {
+          "source_type": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "status": "COMPLETE",
+  "primary_recommendation": {
+    "candidate_id": "MED+CI",
+    "fit": "strong_fit",
+    "reason_codes": [
+      "covers_high_priority_risk",
+      "within_budget"
+    ],
+    "provenance": [
+      {
+        "type": "requirement",
+        "ref": "REQ-MED"
+      },
+      {
+        "type": "risk",
+        "ref": "R1-001"
+      }
+    ]
+  },
+  "alternatives": [
+    {
+      "candidate_id": "ACC",
+      "fit": "good_fit",
+      "tradeoff": "覆盖意外伤残"
+    }
+  ],
+  "not_recommended": [],
+  "evidence_refs": [
+    "KB-001"
+  ],
+  "human_review_required": false
+}

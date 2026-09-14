@@ -1,0 +1,21 @@
+{
+  "coverage_gap_analysis": {
+    "gaps": [],
+    "priorities": [],
+    "information_gaps": [],
+    "status": "COMPLETE"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "大额医疗支出保障", "priority": "P1_HIGH", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.8,
+    "risks": [
+      {"risk_id": "R1-001", "risk_category": "R1", "risk_name": "大额医疗费用支出", "priority": "P1", "reasoning_evidence_refs": ["E001"]}
+    ]
+  }
+}

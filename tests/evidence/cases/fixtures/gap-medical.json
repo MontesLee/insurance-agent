@@ -1,0 +1,15 @@
+{
+  "gap_id": "GAP-R1-001",
+  "domain": "medical",
+  "subject": "大额医疗费用支出",
+  "related_requirement_ids": ["REQ-MED"],
+  "related_risk_ids": ["R1-001"],
+  "current_coverage": {
+    "status": "NONE",
+    "evidence_refs": ["coverage_assessment 显示无任何覆盖"]
+  },
+  "target_coverage": {"direction": "补充对应保障", "rationale": ""},
+  "gap_level": "CRITICAL",
+  "confidence": 0.7,
+  "evidence_refs": ["E001"]
+}

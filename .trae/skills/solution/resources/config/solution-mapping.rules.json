@@ -1,0 +1,196 @@
+{
+  "version": "1.0",
+  "description": "Solution STRATEGY layer rules (Gap -> Solution). All emitted text comes from these templates so no concrete product / insurer name can be produced. Engine never invents quantities.",
+
+  "domain_to_solution_type": {
+    "medical": "MEDICAL",
+    "critical_illness": "CRITICAL_ILLNESS",
+    "accident": "ACCIDENT",
+    "life": "TERM_LIFE",
+    "savings": "SAVINGS",
+    "general": "GENERAL"
+  },
+
+  "domain_objective": {
+    "life": "建立家庭责任保障",
+    "medical": "建立大额医疗支出保障",
+    "critical_illness": "建立重疾收入补偿保障",
+    "accident": "建立意外伤残与意外医疗保障",
+    "savings": "建立长期确定性现金流储备",
+    "general": "补充对应保障"
+  },
+
+  "domain_coverage_direction": {
+    "life": "以家庭责任（房贷、子女抚养、赡养）与收入替代缺口确定保障额度，保障期限覆盖主要责任期",
+    "medical": "以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+    "critical_illness": "以收入替代与康复期支出确定保额，覆盖治疗及康复期间的家庭固定开支",
+    "accident": "以伤残等级对应的收入损失与意外医疗支出确定保额",
+    "savings": "以长期现金流目标与风险承受能力确定储蓄方向与期限",
+    "general": "根据缺口性质确定对应保障方向与保障期限"
+  },
+
+  "coverage_status_prefix": {
+    "NONE": "当前无覆盖，需",
+    "PARTIAL": "当前部分覆盖，需",
+    "UNKNOWN": "当前覆盖情况未知，待明确后",
+    "SUFFICIENT": "当前已充分覆盖，无需"
+  },
+
+  "gap_level_to_priority": {
+    "CRITICAL": "P0",
+    "HIGH": "P1",
+    "MEDIUM": "P2",
+    "LOW": "P3",
+    "UNKNOWN": "P3"
+  },
+
+  "priority_rank": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 2,
+    "P3": 3
+  },
+
+  "gap_level_rank": {
+    "CRITICAL": 4,
+    "HIGH": 3,
+    "MEDIUM": 2,
+    "LOW": 1,
+    "UNKNOWN": 0
+  },
+
+  "domain_trade_offs": {
+    "life": [
+      {
+        "axis": "保障期限",
+        "option_a": "终身",
+        "option_b": "定期（覆盖责任期）",
+        "chosen": "定期（覆盖责任期）",
+        "reason": "预算约束下优先覆盖家庭责任期，提高保障杠杆"
+      }
+    ],
+    "medical": [
+      {
+        "axis": "保障范围",
+        "option_a": "仅社保目录内",
+        "option_b": "含目录外与免赔额以上",
+        "chosen": "含目录外与免赔额以上",
+        "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+      }
+    ],
+    "critical_illness": [
+      {
+        "axis": "赔付方式",
+        "option_a": "费用报销型",
+        "option_b": "确诊给付型",
+        "chosen": "确诊给付型",
+        "reason": "重疾的主要敞口是收入中断与康复期支出，而非医疗费用本身"
+      }
+    ],
+    "accident": [
+      {
+        "axis": "保障责任",
+        "option_a": "仅意外身故",
+        "option_b": "含伤残分级与意外医疗",
+        "chosen": "含伤残分级与意外医疗",
+        "reason": "意外的主要敞口是伤残导致的收入损失，而非身故"
+      }
+    ],
+    "savings": [
+      {
+        "axis": "确定性",
+        "option_a": "浮动收益",
+        "option_b": "确定给付",
+        "chosen": "确定给付",
+        "reason": "长期现金流目标优先保证确定性，避免波动侵蚀目标"
+      }
+    ],
+    "general": [
+      {
+        "axis": "保障范围",
+        "option_a": "单一责任",
+        "option_b": "综合责任",
+        "chosen": "综合责任",
+        "reason": "缺口性质尚未细化，先以综合责任覆盖再逐步拆分"
+      }
+    ]
+  },
+
+  "domain_rejected_directions": {
+    "life": [
+      {"direction": "终身寿险", "reason": "保费占用预算较高且保障杠杆较低，优先以定期保障覆盖责任期"},
+      {"direction": "以储蓄型产品替代保障", "reason": "保障额度与预算不匹配，无法覆盖责任期内的风险敞口"}
+    ],
+    "medical": [
+      {"direction": "仅依赖社保", "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"}
+    ],
+    "critical_illness": [
+      {"direction": "以医疗险替代重疾保障", "reason": "医疗险按费用报销，无法覆盖收入中断与康复期支出"}
+    ],
+    "accident": [
+      {"direction": "仅配置意外身故责任", "reason": "无法覆盖伤残导致的收入损失与意外医疗支出"}
+    ],
+    "savings": [
+      {"direction": "以高波动投资替代储蓄型保障", "reason": "与长期确定性现金流目标不匹配"}
+    ],
+    "general": [
+      {"direction": "暂不处理", "reason": "缺口已识别但性质未明确，需补充信息后再定策略"}
+    ]
+  },
+
+  "default_constraints": {
+    "PARTIAL": {
+      "constraint": "增量补差",
+      "value": "在现有保障基础上补足差额，避免重复配置"
+    },
+    "NONE": {
+      "constraint": "从零建立",
+      "value": "当前无对应保障，需完整建立该方向保障"
+    },
+    "UNKNOWN": {
+      "constraint": "信息前置",
+      "value": "需先明确现有保障情况，再确定补差额度"
+    },
+    "SUFFICIENT": {
+      "constraint": "维持现状",
+      "value": "当前保障已充分，无需新增配置"
+    }
+  },
+
+  "forbidden_terms": [
+    "中国人寿",
+    "平安人寿",
+    "平安保险",
+    "太平洋保险",
+    "太平洋人寿",
+    "友邦保险",
+    "友邦人寿",
+    "泰康人寿",
+    "泰康保险",
+    "新华保险",
+    "新华人寿",
+    "人保寿险",
+    "人保财险",
+    "PICC",
+    "太平人寿",
+    "阳光保险",
+    "阳光人寿",
+    "中意人寿",
+    "招商信诺",
+    "中信保诚",
+    "工银安盛",
+    "大都会人寿",
+    "安联保险",
+    "中德安联",
+    "中宏保险",
+    "恒安标准",
+    "长生人寿",
+    "信美相互"
+  ],
+
+  "placeholders": {
+    "no_gap_objective": "（当前无待解决的保障缺口，暂无解决策略）",
+    "no_gap_coverage_direction": "（无可执行缺口，无需确定保障方向）",
+    "no_gap_priority": "P3"
+  }
+}

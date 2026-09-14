@@ -1,0 +1,221 @@
+{
+  "case_id": "CASE-E2E-001",
+  "description": "E2E seed: the three dialogue-driven upstream artifacts (ClientProfile / RequirementAnalysis / RiskAssessment), sourced from the report-generation V2 manifest's v2_full_chain case. The orchestrator seeds these as `provided` stages and then runs coverage-gap -> solution -> product-recommendation -> report.",
+  "provided_by": "upstream-dialogue",
+  "artifacts": {
+    "client-profile": {
+      "client_state_version": "1.0",
+      "source": {
+        "origin_skill": "client-intake",
+        "intake_complete": true
+      },
+      "family_profile": {
+        "age": {
+          "value": "35",
+          "status": "KNOWN"
+        },
+        "gender": {
+          "value": "男",
+          "status": "KNOWN"
+        },
+        "marital_status": {
+          "value": "已婚",
+          "status": "KNOWN"
+        },
+        "children": {
+          "value": "1孩（6岁）",
+          "status": "KNOWN"
+        },
+        "housing": {
+          "value": "自有住房，有房贷",
+          "status": "KNOWN"
+        }
+      },
+      "employment_profile": {
+        "occupation": {
+          "value": "企业中层管理",
+          "status": "KNOWN"
+        }
+      },
+      "responsibility_profile": {
+        "economic_responsibility": {
+          "value": "家庭主要收入来源",
+          "status": "KNOWN"
+        }
+      },
+      "existing_protection": {
+        "social_security": {
+          "value": "职工社保+医保",
+          "status": "KNOWN"
+        },
+        "existing_insurance": {
+          "value": "一份百万医疗险",
+          "status": "KNOWN"
+        }
+      },
+      "financial_profile": {
+        "annual_income": {
+          "value": "80万",
+          "status": "KNOWN"
+        },
+        "annual_expense": {
+          "value": "36万",
+          "status": "KNOWN"
+        },
+        "mortgage": {
+          "value": "200万",
+          "status": "KNOWN"
+        },
+        "insurance_budget": {
+          "value": "3万",
+          "status": "KNOWN"
+        }
+      },
+      "missing_from_upstream": [],
+      "conflicts": []
+    },
+    "requirement-analysis": {
+      "analysis_status": "COMPLETE",
+      "requirements": [
+        {
+          "requirement_id": "REQ-MED",
+          "requirement_type": "medical",
+          "summary": "大额医疗支出保障",
+          "priority": "P1_HIGH",
+          "boundary": "requirement_only"
+        },
+        {
+          "requirement_id": "REQ-CI",
+          "requirement_type": "critical_illness",
+          "summary": "重疾收入补偿",
+          "priority": "P1_HIGH",
+          "boundary": "requirement_only"
+        },
+        {
+          "requirement_id": "REQ-ACC",
+          "requirement_type": "accident",
+          "summary": "意外医疗",
+          "priority": "P2_MEDIUM",
+          "boundary": "requirement_only"
+        },
+        {
+          "requirement_id": "REQ-LIFE",
+          "requirement_type": "life",
+          "summary": "家庭责任保障",
+          "priority": "P0_CRITICAL",
+          "boundary": "requirement_only"
+        },
+        {
+          "requirement_id": "REQ-SAV",
+          "requirement_type": "savings",
+          "summary": "长期储蓄",
+          "priority": "P3_LOW",
+          "boundary": "requirement_only"
+        }
+      ]
+    },
+    "risk-assessment": {
+      "output_version": "1.0",
+      "layer": "risk_analysis",
+      "analysis_status": "FORMAL",
+      "overall_confidence": 0.85,
+      "risks": [
+        {
+          "risk_id": "R4-001",
+          "risk_category": "R4",
+          "risk_name": "主要收入者身故导致家庭现金流中断",
+          "priority": "P0",
+          "severity": "CRITICAL",
+          "likelihood": "MEDIUM",
+          "residual_risk": "HIGH",
+          "existing_protection": "已有定期寿险 200 万",
+          "coverage_assessment": {
+            "protected_amount": 2000000,
+            "unprotected_amount": 0,
+            "confidence": 0.9
+          },
+          "conclusion": "寿险已充分覆盖家庭责任",
+          "reasoning_evidence_refs": [
+            "E004"
+          ]
+        },
+        {
+          "risk_id": "R1-001",
+          "risk_category": "R1",
+          "risk_name": "大额医疗费用支出",
+          "priority": "P1",
+          "severity": "HIGH",
+          "likelihood": "HIGH",
+          "residual_risk": "HIGH",
+          "existing_protection": "无",
+          "coverage_assessment": {
+            "protected_amount": 0,
+            "unprotected_amount": 500000,
+            "confidence": 0.7
+          },
+          "conclusion": "医疗风险无任何商业保障",
+          "reasoning_evidence_refs": [
+            "E001"
+          ]
+        },
+        {
+          "risk_id": "R2-001",
+          "risk_category": "R2",
+          "risk_name": "重大疾病收入中断",
+          "priority": "P1",
+          "severity": "HIGH",
+          "likelihood": "MEDIUM",
+          "residual_risk": "HIGH",
+          "existing_protection": "部分重疾保障",
+          "coverage_assessment": {
+            "protected_amount": 300000,
+            "unprotected_amount": 700000,
+            "confidence": 0.6
+          },
+          "conclusion": "重疾保额不足",
+          "reasoning_evidence_refs": [
+            "E002"
+          ]
+        },
+        {
+          "risk_id": "R3-001",
+          "risk_category": "R3",
+          "risk_name": "意外伤残收入损失",
+          "priority": "P2",
+          "severity": "MEDIUM",
+          "likelihood": "MEDIUM",
+          "residual_risk": "MEDIUM",
+          "existing_protection": "已有意外险",
+          "coverage_assessment": {
+            "protected_amount": 100000,
+            "unprotected_amount": 50000,
+            "confidence": 0.6
+          },
+          "conclusion": "意外保障部分覆盖",
+          "reasoning_evidence_refs": [
+            "E003"
+          ]
+        },
+        {
+          "risk_id": "R5-001",
+          "risk_category": "R5",
+          "risk_name": "退休现金流缺口",
+          "priority": "P3",
+          "severity": "LOW",
+          "likelihood": "MEDIUM",
+          "residual_risk": "LOW",
+          "existing_protection": "无",
+          "coverage_assessment": {
+            "protected_amount": 0,
+            "unprotected_amount": 300000,
+            "confidence": 0.5
+          },
+          "conclusion": "无长期储蓄规划",
+          "reasoning_evidence_refs": [
+            "E005"
+          ]
+        }
+      ]
+    }
+  }
+}

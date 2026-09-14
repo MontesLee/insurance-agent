@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "solution/output.schema.json",
+  "title": "SolutionPlanOutput",
+  "description": "Alias of the Canonical Contract. Single source of truth: contracts/solution-plan.schema.json (relative $ref).",
+  "$ref": "../../../../contracts/solution-plan.schema.json"
+}

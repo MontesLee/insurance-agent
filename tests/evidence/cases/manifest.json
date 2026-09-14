@@ -1,0 +1,71 @@
+{
+  "dataset": "evidence-unit",
+  "layer": "evidence (shared Evidence Provider)",
+  "schema_version": "1.0",
+  "description": "Evidence layer unit dataset. Single source of truth for cases; the runner and the invariant test both read this file. Proves Knowledge Search is a SHARED PROVIDER reachable from any skill, not a fixed workflow step.",
+  "cases": [
+    {
+      "case_id": "case-01-solution-validation",
+      "intent": "solution 侧发起 Evidence Request：domain 由 solution_type 推导，purpose 默认 SOLUTION_VALIDATION，request/evidence 双双通过契约校验",
+      "source_kind": "solution",
+      "fixture": "fixtures/solution-term-life.json",
+      "engine": "real",
+      "checks": {
+        "expected_domain": "life",
+        "expected_purpose": "SOLUTION_VALIDATION",
+        "expect_related_contains": ["SOL-001", "GAP-R4-001"],
+        "source_unchanged": true,
+        "require_query_valid": true
+      }
+    },
+    {
+      "case_id": "case-02-gap-policy-fact",
+      "intent": "coverage-gap 侧发起 Evidence Request：domain 取 gap.domain，purpose 默认 POLICY_FACT",
+      "source_kind": "gap",
+      "fixture": "fixtures/gap-medical.json",
+      "engine": "real",
+      "checks": {
+        "expected_domain": "medical",
+        "expected_purpose": "POLICY_FACT",
+        "expect_related_contains": ["GAP-R1-001", "R1-001"],
+        "source_unchanged": true,
+        "require_query_valid": true
+      }
+    },
+    {
+      "case_id": "case-03-abstention",
+      "intent": "检索无结果：必须诚实返回 insufficient_evidence 且 evidence 为空，绝不编造证据",
+      "source_kind": "text",
+      "fixture": "fixtures/text-abstain.json",
+      "engine": "real",
+      "checks": {
+        "expected_status": "insufficient_evidence",
+        "deny_evidence": true,
+        "source_unchanged": true
+      }
+    },
+    {
+      "case_id": "case-04-no-mutation",
+      "intent": "受控回环不得修改请求方 Artifact（只读消费）",
+      "source_kind": "solution",
+      "fixture": "fixtures/solution-term-life.json",
+      "engine": "real",
+      "checks": {
+        "source_unchanged": true,
+        "require_query_valid": true
+      }
+    },
+    {
+      "case_id": "case-05-conflict-propagation",
+      "intent": "来源冲突：engine 返回 conflict=true 时必须原样透传到 KnowledgeEvidence（保留双方证据，不自动合并）",
+      "source_kind": "gap",
+      "fixture": "fixtures/gap-medical.json",
+      "engine": "fake_conflict",
+      "checks": {
+        "expected_conflict": true,
+        "require_evidence": true,
+        "source_unchanged": true
+      }
+    }
+  ]
+}

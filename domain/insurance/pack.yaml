@@ -1,0 +1,169 @@
+# Domain Pack Manifest — insurance
+#
+# 这是「保险」领域包的单一事实源（single source of truth）。
+# 它把原本散落在各 Skill 核心、knowledge-search 测试夹具、evidence-request 规则里的
+# 险种分类与证据类型，下沉到一个版本化、可审计、可被 rag 摄取的共享层。
+#
+# 设计原则（见 AGENTS.md §8 / Lawgent domain pack 思想）：
+#   - 基础领域模型直接写进 references/，并带 version / effective_date；
+#   - overlay 默认不使用（见本文件 overlays 段）；
+#   - 本包是「知识提供层」，不修改任何 8 个 Specialist Skill 的逻辑。
+#
+# 本文件不存放业务判断，只声明领域元数据与映射；权威知识正文在 references/。
+
+pack_id: insurance
+domain: insurance
+version: "1.0"
+schema_version: "1.0"
+created_at: "2026-09-14"
+effective_date: "2026-09-14"
+owner: domain-pack
+description: >
+  保险领域包：险种分类（canonical taxonomy）、证据类型、来源等级、rag 摄取配置与 overlay 策略。
+  作为 knowledge-search / evidence provider 的权威生产语料与分类注册表。
+
+# ---------------------------------------------------------------------------
+# 1. 险种分类注册表（canonical taxonomy）
+#
+# 这是全工程唯一的险种分类真相来源，用于消除「evidence 层用 critical_illness、
+# rag 层用 critical」这类命名漂移。
+#
+# 字段：
+#   code            —— rag / store / engine 内部使用的 product_type 代码（与 rag/store.PRODUCT_BY_PREFIX 对齐）
+#   evidence_alias  —— evidence-request.rules.json 查询模板使用的 domain 别名（可能不同于 code）
+#   display         —— 中文展名
+#   kb_prefix       —— references/ 下对应语料文件的编号前缀（用于自动推导 product_type）
+#   description     —— 一句话定位
+# ---------------------------------------------------------------------------
+product_types:
+  - code: medical
+    evidence_alias: medical
+    display: 百万医疗险
+    kb_prefix: "01"
+    description: 报销型医疗费用补偿，关注免赔额、社保目录内外、续保。
+  - code: critical
+    evidence_alias: critical_illness
+    display: 重大疾病保险（重疾险）
+    kb_prefix: "02"
+    description: 给付型，达到约定重疾状态即按保额赔付，关注等待期、轻中症。
+  - code: accident
+    evidence_alias: accident
+    display: 意外险
+    kb_prefix: "03"
+    description: 意外伤残分级给付与意外医疗，关注意外定义、伤残评定标准。
+  - code: life
+    evidence_alias: life
+    display: 定期寿险
+    kb_prefix: "04"
+    description: 身故/全残给付，关注保障期限、保额与家庭责任匹配。
+  - code: health
+    evidence_alias: null
+    display: 核保 / 健康告知 / 既往症
+    kb_prefix: "05"
+    description: 投保前的健康核保与告知规则，跨险种通用。
+  - code: claims
+    evidence_alias: null
+    display: 理赔
+    kb_prefix: "06"
+    description: 出险后的理赔时效、材料与争议处理，跨险种通用。
+  - code: savings
+    evidence_alias: savings
+    display: 年金险
+    kb_prefix: null
+    description: 储蓄/现金流型，确定给付，关注现金流与领取方式。
+  - code: general
+    evidence_alias: general
+    display: 通用保险知识
+    kb_prefix: null
+    description: 不属于单一险种的通用概念（如保障、责任、等待期通识）。
+
+# 别名解析表（code 视角）：evidence_alias -> code。
+# 下游（evidence / knowledge-search）查询时若用别名，应映射到 code 再进 rag 过滤。
+alias_to_code:
+  medical: medical
+  critical_illness: critical
+  accident: accident
+  life: life
+  savings: savings
+  general: general
+
+# ---------------------------------------------------------------------------
+# 2. 证据类型注册表（与 evidence-request.rules.json 对齐，作为权威声明）
+# ---------------------------------------------------------------------------
+evidence_types:
+  - code: STRATEGY_FACT
+    purpose: SOLUTION_VALIDATION
+    owner_stage: solution
+    description: 验证解决策略适用性的事实。
+  - code: PRODUCT_FACT
+    purpose: PRODUCT_VALIDATION
+    owner_stage: product-recommendation
+    description: 产品责任/对比事实。
+  - code: POLICY_FACT
+    purpose: POLICY_FACT
+    owner_stage: coverage-gap-analysis
+    description: 条款约定事实。
+  - code: MEDICAL_FACT
+    purpose: MEDICAL_FACT
+    owner_stage: risk-analysis
+    description: 医学定义事实（如重疾定义）。
+  - code: REGULATORY_FACT
+    purpose: REGULATORY_FACT
+    owner_stage: any
+    description: 监管规定事实。
+  - code: COMPARISON_FACT
+    purpose: COMPARISON
+    owner_stage: any
+    description: 险种/产品对比事实。
+  - code: GENERAL_FACT
+    purpose: OTHER
+    owner_stage: any
+    description: 通用事实。
+
+# ---------------------------------------------------------------------------
+# 3. 来源等级（source_level）定义
+# 与 knowledge-search references/02-source-policy.md 对齐，作为权威声明。
+# ---------------------------------------------------------------------------
+source_levels:
+  S: 监管/法规/官方条款原文，最高权威。
+  A: 保险公司官方产品条款/说明书。
+  B: 内部整理的行业通识（本包 references 默认等级）。
+  C: 第三方评测/科普，需交叉验证。
+  D: 未经验证的用户/网络来源，一般不入生产库。
+
+# ---------------------------------------------------------------------------
+# 4. rag 摄取配置（seed_rag.py 消费）
+# references/ 下的 .md 经 rag.store.chunk_markdown 摄取。
+# 文件名前缀（见 product_types.kb_prefix）自动推导 product_type；无前缀的归 general。
+# ---------------------------------------------------------------------------
+rag_seed:
+  references_dir: references
+  default_source_type: internal
+  default_source_level: B
+  default_version: "1.0"
+  # 摄取时对文件头 metadata 的覆盖优先级：文件内 frontmatter > 本配置 > rag 默认
+  chunk_by: heading
+  ingest_patterns: ["*.md"]
+  # 生成的生产知识库 SQLite 路径（由 seed_rag.py 产出，属运行产物，不计入基线）
+  output_db: kb/insurance_kb.sqlite
+
+# ---------------------------------------------------------------------------
+# 5. overlay 策略（默认不使用，见 AGENTS.md §8）
+# 仅当「同一套基础规则需要按地区/客群/公司业务规则做增量覆盖」时才引入。
+# 引入时在此登记，并放到 overlays/<name>/。
+# ---------------------------------------------------------------------------
+overlays:
+  enabled: false
+  policy: >
+    默认不使用 overlay。基础领域模型直接写进 references/。
+    仅在确证存在 Context-specific modification（地区/客群/公司规则）时，
+    新建 overlays/<name>/ 并在本清单登记；overlay = Base + 增量覆盖。
+  available: []
+
+# ---------------------------------------------------------------------------
+# 6. 消费方（声明本包被哪些能力消费；均为只读消费，不改 Skill 逻辑）
+# ---------------------------------------------------------------------------
+consumers:
+  - knowledge-search        # 可经 --kb <references_dir> 指向本包作为生产语料
+  - evidence-provider      # evidence/ 回环检索时消费本包语料
+  - all-specialist-skills  # 各 Skill 的 references 可引用本包的 taxonomy/evidence_types 作为规范

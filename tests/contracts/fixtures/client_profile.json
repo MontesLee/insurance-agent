@@ -1,0 +1,125 @@
+{
+  "client_state_version": "1.0",
+  "source": {
+    "origin_skill": "client-intake",
+    "intake_complete": true
+  },
+  "family_profile": {
+    "age": {
+      "value": "32",
+      "status": "KNOWN"
+    },
+    "gender": {
+      "value": "男",
+      "status": "KNOWN"
+    },
+    "marital_status": {
+      "value": "已婚",
+      "status": "KNOWN"
+    },
+    "family_members": {
+      "value": "4人（夫妻+1孩+1父/母同住）",
+      "status": "KNOWN"
+    },
+    "children": {
+      "value": "1孩（3岁）",
+      "status": "KNOWN"
+    },
+    "parent_support": {
+      "value": "双方父母均需赡养",
+      "status": "KNOWN"
+    },
+    "housing": {
+      "value": "自有住房，有房贷",
+      "status": "KNOWN"
+    },
+    "region": {
+      "value": "一线城市",
+      "status": "KNOWN"
+    },
+    "education": {
+      "value": "本科",
+      "status": "KNOWN"
+    }
+  },
+  "employment_profile": {
+    "occupation": {
+      "value": "互联网行业产品经理",
+      "status": "KNOWN"
+    },
+    "employer": {
+      "value": "某科技公司",
+      "status": "KNOWN"
+    },
+    "employment_status": {
+      "value": "在职",
+      "status": "KNOWN"
+    }
+  },
+  "health_profile": {
+    "health_status": {
+      "value": "良好，无重大既往病史",
+      "status": "KNOWN"
+    },
+    "smoking": {
+      "value": "否",
+      "status": "KNOWN"
+    }
+  },
+  "responsibility_profile": {
+    "economic_responsibility": {
+      "value": "家庭主要经济支柱，配偶无收入",
+      "status": "KNOWN"
+    },
+    "dependents": {
+      "value": "配偶及子女",
+      "status": "KNOWN"
+    }
+  },
+  "existing_protection": {
+    "social_security": {
+      "value": "职工社保+医保",
+      "status": "KNOWN"
+    },
+    "commercial_insurance": {
+      "value": "已购一份重疾险（保额50万）",
+      "status": "KNOWN"
+    },
+    "existing_insurance": {
+      "value": "重疾险50万",
+      "status": "KNOWN"
+    }
+  },
+  "financial_profile": {
+    "annual_income": {
+      "value": "60万",
+      "status": "KNOWN"
+    },
+    "annual_expense": {
+      "value": "25万",
+      "status": "KNOWN"
+    },
+    "assets": {
+      "value": "350万",
+      "status": "KNOWN"
+    },
+    "liabilities": {
+      "value": "210万",
+      "status": "KNOWN"
+    },
+    "mortgage": {
+      "value": "200万",
+      "status": "KNOWN"
+    },
+    "financial_assets": {
+      "value": "80万",
+      "status": "KNOWN"
+    },
+    "insurance_budget": {
+      "value": "3万",
+      "status": "KNOWN"
+    }
+  },
+  "missing_from_upstream": [],
+  "conflicts": []
+}

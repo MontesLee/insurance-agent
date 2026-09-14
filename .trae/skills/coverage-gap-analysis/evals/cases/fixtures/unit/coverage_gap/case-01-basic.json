@@ -1,0 +1,89 @@
+{
+  "client_profile": {
+    "client_id": "C001",
+    "existing_protection": "客户自述：有社保，有一份百万医疗险，未提及其他保单"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "大额医疗支出保障", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重疾收入补偿", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-ACC", "requirement_type": "accident", "summary": "意外医疗", "priority": "P2_MEDIUM", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-SAV", "requirement_type": "savings", "summary": "长期储蓄", "priority": "P3_LOW", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "output_version": "1.0",
+    "layer": "risk_analysis",
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.85,
+    "risks": [
+      {
+        "risk_id": "R4-001",
+        "risk_category": "R4",
+        "risk_name": "主要收入者身故导致家庭现金流中断",
+        "priority": "P0",
+        "severity": "CRITICAL",
+        "likelihood": "MEDIUM",
+        "residual_risk": "HIGH",
+        "existing_protection": "已有定期寿险 200 万",
+        "coverage_assessment": {"protected_amount": 2000000, "unprotected_amount": 0, "confidence": 0.9},
+        "conclusion": "寿险已充分覆盖家庭责任",
+        "reasoning_evidence_refs": ["E004"]
+      },
+      {
+        "risk_id": "R1-001",
+        "risk_category": "R1",
+        "risk_name": "大额医疗费用支出",
+        "priority": "P1",
+        "severity": "HIGH",
+        "likelihood": "HIGH",
+        "residual_risk": "HIGH",
+        "existing_protection": "无",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 500000, "confidence": 0.7},
+        "conclusion": "医疗风险无任何商业保障",
+        "reasoning_evidence_refs": ["E001"]
+      },
+      {
+        "risk_id": "R2-001",
+        "risk_category": "R2",
+        "risk_name": "重大疾病收入中断",
+        "priority": "P1",
+        "severity": "HIGH",
+        "likelihood": "MEDIUM",
+        "residual_risk": "HIGH",
+        "existing_protection": "部分重疾保障",
+        "coverage_assessment": {"protected_amount": 300000, "unprotected_amount": 700000, "confidence": 0.6},
+        "conclusion": "重疾保额不足",
+        "reasoning_evidence_refs": ["E002"]
+      },
+      {
+        "risk_id": "R3-001",
+        "risk_category": "R3",
+        "risk_name": "意外伤残收入损失",
+        "priority": "P2",
+        "severity": "MEDIUM",
+        "likelihood": "MEDIUM",
+        "residual_risk": "MEDIUM",
+        "existing_protection": "已有意外险",
+        "coverage_assessment": {"protected_amount": 100000, "unprotected_amount": 50000, "confidence": 0.6},
+        "conclusion": "意外保障部分覆盖",
+        "reasoning_evidence_refs": ["E003"]
+      },
+      {
+        "risk_id": "R5-001",
+        "risk_category": "R5",
+        "risk_name": "退休现金流缺口",
+        "priority": "P3",
+        "severity": "LOW",
+        "likelihood": "MEDIUM",
+        "residual_risk": "LOW",
+        "existing_protection": "无",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 300000, "confidence": 0.5},
+        "conclusion": "无长期储蓄规划",
+        "reasoning_evidence_refs": ["E005"]
+      }
+    ]
+  }
+}

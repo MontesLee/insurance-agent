@@ -1,0 +1,34 @@
+{
+  "coverage_gap_analysis": {
+    "gaps": [
+      {
+        "gap_id": "GAP-R1-001",
+        "domain": "medical",
+        "subject": "大额医疗费用支出",
+        "related_requirement_ids": ["REQ-MED"],
+        "related_risk_ids": ["R1-001"],
+        "current_coverage": {"status": "NONE", "evidence_refs": ["现有保障描述含否定词「无」"]},
+        "target_coverage": {"direction": "补充对应保障", "rationale": ""},
+        "gap_level": "CRITICAL",
+        "confidence": 0.5,
+        "evidence_refs": ["from:R1-001"]
+      }
+    ],
+    "priorities": [{"gap_id": "GAP-R1-001", "priority": "P1", "reason": "医疗保障无覆盖"}],
+    "information_gaps": [],
+    "status": "PRELIMINARY"
+  },
+  "requirement_analysis": {
+    "analysis_status": "PRELIMINARY",
+    "requirements": [
+      {"requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "大额医疗支出保障", "priority": "P1_HIGH", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "analysis_status": "PRELIMINARY",
+    "overall_confidence": 0.5,
+    "risks": [
+      {"risk_id": "R1-001", "risk_category": "R1", "risk_name": "大额医疗费用支出", "priority": "P1", "reasoning_evidence_refs": ["E001"]}
+    ]
+  }
+}

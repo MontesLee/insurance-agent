@@ -1,0 +1,80 @@
+{
+  "coverage_gap_analysis": {
+    "gaps": [
+      {
+        "gap_id": "GAP-R1-001",
+        "domain": "medical",
+        "subject": "大额医疗费用支出",
+        "related_requirement_ids": ["REQ-MED"],
+        "related_risk_ids": ["R1-001"],
+        "current_coverage": {"status": "NONE", "evidence_refs": ["coverage_assessment 显示无任何覆盖"]},
+        "target_coverage": {"direction": "补充对应保障", "rationale": ""},
+        "gap_level": "CRITICAL",
+        "confidence": 0.7,
+        "evidence_refs": ["E001"]
+      },
+      {
+        "gap_id": "GAP-R2-001",
+        "domain": "critical_illness",
+        "subject": "重大疾病收入中断",
+        "related_requirement_ids": ["REQ-CI"],
+        "related_risk_ids": ["R2-001"],
+        "current_coverage": {"status": "PARTIAL", "evidence_refs": ["coverage_assessment 显示部分覆盖"]},
+        "target_coverage": {"direction": "补充对应保障", "rationale": ""},
+        "gap_level": "HIGH",
+        "confidence": 0.6,
+        "evidence_refs": ["E002"]
+      },
+      {
+        "gap_id": "GAP-R3-001",
+        "domain": "accident",
+        "subject": "意外伤残收入损失",
+        "related_requirement_ids": ["REQ-ACC"],
+        "related_risk_ids": ["R3-001"],
+        "current_coverage": {"status": "PARTIAL", "evidence_refs": ["coverage_assessment 显示部分覆盖"]},
+        "target_coverage": {"direction": "补充对应保障", "rationale": ""},
+        "gap_level": "MEDIUM",
+        "confidence": 0.6,
+        "evidence_refs": ["E003"]
+      },
+      {
+        "gap_id": "GAP-R5-001",
+        "domain": "savings",
+        "subject": "退休现金流缺口",
+        "related_requirement_ids": ["REQ-SAV"],
+        "related_risk_ids": ["R5-001"],
+        "current_coverage": {"status": "NONE", "evidence_refs": ["coverage_assessment 显示无任何覆盖"]},
+        "target_coverage": {"direction": "补充对应保障", "rationale": ""},
+        "gap_level": "LOW",
+        "confidence": 0.5,
+        "evidence_refs": ["E005"]
+      }
+    ],
+    "priorities": [
+      {"gap_id": "GAP-R1-001", "priority": "P1", "reason": "医疗保障无覆盖"},
+      {"gap_id": "GAP-R2-001", "priority": "P1", "reason": "重疾保障部分覆盖"}
+    ],
+    "information_gaps": [],
+    "status": "COMPLETE"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "大额医疗支出保障", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-CI", "requirement_type": "critical_illness", "summary": "重疾收入补偿", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-ACC", "requirement_type": "accident", "summary": "意外医疗", "priority": "P2_MEDIUM", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-SAV", "requirement_type": "savings", "summary": "长期储蓄", "priority": "P3_LOW", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.85,
+    "risks": [
+      {"risk_id": "R1-001", "risk_category": "R1", "risk_name": "大额医疗费用支出", "priority": "P1", "reasoning_evidence_refs": ["E001"]},
+      {"risk_id": "R2-001", "risk_category": "R2", "risk_name": "重大疾病收入中断", "priority": "P1", "reasoning_evidence_refs": ["E002"]},
+      {"risk_id": "R3-001", "risk_category": "R3", "risk_name": "意外伤残收入损失", "priority": "P2", "reasoning_evidence_refs": ["E003"]},
+      {"risk_id": "R5-001", "risk_category": "R5", "risk_name": "退休现金流缺口", "priority": "P3", "reasoning_evidence_refs": ["E005"]}
+    ]
+  }
+}

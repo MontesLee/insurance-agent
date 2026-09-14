@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "knowledge-evidence Canonical Contract",
+  "description": "Evidence returned by Knowledge Search. Evidence != Recommendation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "skill",
+    "legacy_skill",
+    "schema_version",
+    "generated_at",
+    "payload",
+    "provenance"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "enum": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment",
+        "coverage-gap-analysis",
+        "solution-plan",
+        "knowledge-query",
+        "knowledge-evidence",
+        "product-recommendation",
+        "insurance-report"
+      ]
+    },
+    "skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical skill id (kebab-case)."
+    },
+    "legacy_skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Legacy / physical skill directory name (may be snake_case)."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp."
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "status",
+        "evidence",
+        "conflict"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "partial_evidence",
+            "insufficient_evidence",
+            "retrieval_error"
+          ]
+        },
+        "query": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "evidence_id",
+              "content",
+              "source",
+              "relevance",
+              "confidence"
+            ],
+            "properties": {
+              "evidence_id": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "source_type": {
+                "type": "string"
+              },
+              "relevance": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "confidence": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "provenance": {
+                "type": "array"
+              },
+              "conflict": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "conflict": {
+          "type": "boolean"
+        }
+      },
+      "description": "KnowledgeEvidence != Recommendation. Knowledge Search must not carry final decisions."
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_type",
+          "source_id",
+          "confidence"
+        ],
+        "properties": {
+          "source_type": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    }
+  }
+}

@@ -32,6 +32,13 @@
     "unmet": 0.0
   },
   "hard_constraint_types": ["budget", "term", "liquidity"],
+  "known_liquidity_impacts": ["low", "medium", "high"],
+  "unverifiable_constraint_detail": {
+    "budget": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+    "term": "candidate term unknown (strategy layer carries no product term); term constraint not verifiable",
+    "liquidity": "candidate liquidity impact unknown (strategy layer carries no product data); liquidity constraint not verifiable"
+  },
+  "blocking_uncertainty_types": ["insufficient_evidence", "evidence_conflict", "missing_information"],
   "evidence_required_for_primary": true,
   "min_evidence_refs_for_supported": 1,
   "tradeoff_impact_levels": ["low", "medium", "high"],

@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProductRecommendationInput (V2)",
+  "description": "Phase 5 V2 input contract for product-recommendation (legacy skill dir: recommendation). Closes the Phase-0 P1 break: `candidate_solutions` had NO producer in V1. In V2 the SolutionPlan is the canonical source of candidate solutions, so candidate_solutions is FORBIDDEN as an input and derived at the adapter boundary by scripts/solution_to_candidates.py.",
+  "type": "object",
+  "required": [
+    "requirement_analysis",
+    "risk_assessment",
+    "coverage_gap_analysis",
+    "solution_plan"
+  ],
+  "not": {
+    "required": [
+      "candidate_solutions"
+    ],
+    "description": "P1 guard: V2 input must NOT carry candidate_solutions. It is derived from solution_plan."
+  },
+  "properties": {
+    "requirement_analysis": {
+      "type": "object",
+      "description": "Canonical RequirementAnalysis (envelope or raw payload)."
+    },
+    "risk_assessment": {
+      "type": "object",
+      "description": "Canonical RiskAssessment (envelope or raw payload)."
+    },
+    "coverage_gap_analysis": {
+      "type": "object",
+      "description": "Canonical CoverageGapAnalysis (envelope or raw payload)."
+    },
+    "solution_plan": {
+      "type": "object",
+      "description": "Canonical SolutionPlan (envelope or raw payload). THE canonical source of candidate solutions."
+    },
+    "knowledge_evidence": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Canonical KnowledgeEvidence, obtained via the shared Evidence Provider (Phase 4)."
+    },
+    "constraints": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Hard/soft constraints resolved by the orchestrator. If supplied and a candidate lacks product-level data (premium/term/liquidity), the constraint is reported as UNVERIFIABLE, never as a pass.",
+      "properties": {
+        "budget_max": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "term_min_years": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "liquidity_required": {
+          "type": "boolean"
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "description": "Phase 5: SolutionPlan -> candidate_solutions translation rules. SolutionPlan is the CANONICAL source of candidate solutions (it replaces the phantom `candidate_solutions` input that had no producer). All mapping is externalized here; the translator never invents product facts.",
+
+  "solution_type_to_requirement_types": {
+    "MEDICAL": ["medical"],
+    "CRITICAL_ILLNESS": ["critical_illness"],
+    "ACCIDENT": ["accident"],
+    "TERM_LIFE": ["life"],
+    "SAVINGS": ["savings"],
+    "GENERAL": []
+  },
+
+  "solution_type_to_risk_categories": {
+    "MEDICAL": ["R1"],
+    "CRITICAL_ILLNESS": ["R2"],
+    "ACCIDENT": ["R3"],
+    "TERM_LIFE": ["R4"],
+    "SAVINGS": ["R5"],
+    "GENERAL": []
+  },
+
+  "liquidity_impact_by_solution_type": {
+    "MEDICAL": "unknown",
+    "CRITICAL_ILLNESS": "unknown",
+    "ACCIDENT": "unknown",
+    "TERM_LIFE": "unknown",
+    "SAVINGS": "unknown",
+    "GENERAL": "unknown",
+    "__default__": "unknown"
+  },
+
+  "risk_category_from_id_pattern": "^([A-Z]+[0-9]+)",
+
+  "candidate_id_prefix": "SOL",
+
+  "strategy_name_from": "objective",
+
+  "no_action_objective_markers": [
+    "（当前无待解决的保障缺口，暂无解决策略）"
+  ],
+
+  "product_level_fields": {
+    "premium": null,
+    "term": null,
+    "insurer": null,
+    "product_name": null
+  },
+
+  "unverifiable_constraint_policy": {
+    "mode": "surface",
+    "description": "Unverifiable is NOT a violation and NOT a pass. A strategy cannot be checked against product-level constraints without product data, so the constraint is surfaced as an uncertainty and forces human review.",
+    "uncertainty_type": "constraint_unverifiable",
+    "detail_by_type": {
+      "budget": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+      "term": "candidate term unknown (strategy layer carries no product term); term constraint not verifiable",
+      "liquidity": "candidate liquidity impact unknown (strategy layer carries no product data); liquidity constraint not verifiable"
+    }
+  },
+
+  "evidence_status_to_ks_status": {
+    "success": "success",
+    "partial_evidence": "success",
+    "insufficient_evidence": "insufficient_evidence",
+    "retrieval_error": "insufficient_evidence"
+  },
+
+  "notes": [
+    "premium / term / insurer / product_name are deliberately NOT derived from the strategy. Inventing them would be fabricating product facts.",
+    "coverage_structure comes from solution_type only. Partial coverage is expressed by the gap, not by downgrading the strategy's coverage claim."
+  ]
+}

@@ -1,29 +1,45 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ReportGenerationInput",
-  "description": "统一输入对象（单一真源）。Report Generation 只读这 5 路上游结构化产物的归一化结果；不得重新分析、重新评级或推荐。client_profile 接受 CanonicalClientState（client_state），也可接受 adapter 归一化后的等价结构。",
+  "description": "统一输入对象（单一真源）。Report Generation 只读上游结构化产物的归一化结果；不得重新分析、重新评级或推荐。V2 接受 7 路 Canonical Artifact：ClientProfile / RequirementAnalysis / RiskAssessment / CoverageGapAnalysis / SolutionPlan / KnowledgeEvidence / ProductRecommendation。为向后兼容，knowledge_search 与 recommendation 作为 legacy 别名保留（等价于 knowledge_evidence / product_recommendation）。coverage_gap_analysis 与 solution_plan 既可接受 Canonical 信封（{payload:...}），也可接受 Skill 原生输出。",
   "type": "object",
   "required": ["client_profile", "requirement_analysis", "risk_analysis"],
   "properties": {
     "client_profile": {
-      "type": "object",
+      "type": ["object", "null"],
       "description": "CanonicalClientState（client_state）或等价归一化结构。提供 family_profile / financial_profile / responsibility_profile / existing_protection / health_profile / employment_profile。作为 01 客户画像 与 02 家庭财务情况 的唯一事实源。"
     },
     "requirement_analysis": {
-      "type": "object",
-      "description": "RequirementAnalysisOutput（requirement_analysis Skill 产物）。提供 requirements / priorities / coverage_gaps / information_gaps / next_actions。"
+      "type": ["object", "null"],
+      "description": "RequirementAnalysisOutput（requirement_analysis Skill 产物）。提供 requirements / priorities / coverage_gaps / information_gaps / next_actions。注意：其 coverage_gaps 是 requirement-level gap hint，不是最终 CoverageGap。"
     },
     "risk_analysis": {
-      "type": "object",
+      "type": ["object", "null"],
       "description": "RiskAnalysisOutput（risk-analysis Skill 产物）。提供 risks / risk_matrix / top_priorities / next_information_needed。风险域严格沿用 R1-R5 taxonomy。"
+    },
+    "coverage_gap_analysis": {
+      "type": ["object", "null"],
+      "description": "CoverageGapAnalysis（coverage-gap-analysis Skill 产物，V2 新增）。当提供时，它是 04 保障缺口 的唯一事实源，Report 不再从 risk/requirement 推导缺口；缺失时回退到既有推导并显式标注 derivation=derived。"
+    },
+    "solution_plan": {
+      "type": ["object", "null"],
+      "description": "SolutionPlan（solution Skill 产物，V2 新增）。解决策略层：objective / coverage_direction / priority / constraints / trade_offs / rejected_directions。不含具体产品名或保险公司名。"
+    },
+    "knowledge_evidence": {
+      "type": ["object", "null"],
+      "description": "KnowledgeEvidence（Canonical，V2 新增）。用于证据回链与冲突提示；缺失不影响报告生成。"
     },
     "knowledge_search": {
       "type": ["object", "null"],
-      "description": "KnowledgeSearchOutput（knowledge-search Skill 产物，可选）。用于 06 推荐保障方向 的证据回链与冲突提示；缺失不影响报告生成。"
+      "description": "[legacy 别名，等价 knowledge_evidence] KnowledgeSearchOutput（knowledge-search Skill 原生产物）。保留以兼容 V1 数据集与调用方。"
+    },
+    "product_recommendation": {
+      "type": ["object", "null"],
+      "description": "ProductRecommendation（Canonical，V2 新增）。用于 06 推荐保障方向 的呈现。缺失时 06 明确标注信息不足，不自行生成推荐。"
     },
     "recommendation": {
       "type": ["object", "null"],
-      "description": "RecommendationOutput（recommendation Skill 产物，可选）。用于 06 推荐保障方向 的呈现。缺失时 06 明确标注信息不足，不自行生成推荐。"
+      "description": "[legacy 别名，等价 product_recommendation] RecommendationOutput（recommendation Skill 原生产物）。保留以兼容 V1 数据集与调用方。"
     }
   },
   "additionalProperties": false

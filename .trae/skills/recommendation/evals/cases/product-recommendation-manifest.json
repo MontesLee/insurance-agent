@@ -1,0 +1,283 @@
+{
+  "skill": "product-recommendation",
+  "legacy_skill": "recommendation",
+  "version": "2.0",
+  "description": "Phase 5 V2 eval: product-recommendation consumes canonical artifacts. candidate_solutions is NEVER supplied as input -- it is derived from solution_plan. Each case embeds its full composite input; the runner wraps artifacts into canonical envelopes, runs the V2 entrypoint and asserts against `expect`.",
+  "cases": [
+    {
+      "name": "v2_term_life_happy_path",
+      "dimension": "pipeline",
+      "description": "Single TERM_LIFE strategy with matching requirement, risk and evidence -> COMPLETE with SOL-001 as primary, no human review.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL" }
+          ],
+          "priorities": ["P0_CRITICAL"],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_assessment": {
+          "risks": [
+            { "risk_id": "R4-001", "risk_category": "R4", "risk_name": "家庭责任", "residual_risk": "HIGH", "priority": "P0", "status": "IDENTIFIED" }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "status": "COMPLETE",
+          "gaps": [
+            { "gap_id": "GAP-LIFE-001", "domain": "life", "gap_level": "CRITICAL",
+              "current_coverage": { "status": "NONE", "evidence_refs": [] },
+              "related_risk_ids": ["R4-001"], "related_requirement_ids": ["REQ-LIFE"] }
+          ],
+          "priorities": [],
+          "information_gaps": []
+        },
+        "solution_plan": {
+          "status": "COMPLETE",
+          "solution_type": "TERM_LIFE",
+          "objective": "建立家庭责任保障",
+          "coverage_direction": "当前无覆盖，需以家庭责任（房贷、子女抚养、赡养）与收入替代缺口确定保障额度，保障期限覆盖主要责任期",
+          "priority": "P0",
+          "solutions": [
+            { "solution_id": "SOL-001", "solution_type": "TERM_LIFE",
+              "objective": "建立家庭责任保障",
+              "coverage_direction": "当前无覆盖，需以家庭责任（房贷、子女抚养、赡养）与收入替代缺口确定保障额度，保障期限覆盖主要责任期",
+              "priority": "P0",
+              "related_gap_ids": ["GAP-LIFE-001"], "related_risk_ids": ["R4-001"],
+              "evidence_refs": ["EVD-001"] }
+          ],
+          "information_gaps": []
+        },
+        "knowledge_evidence": {
+          "status": "success",
+          "conflict": false,
+          "evidence": [
+            { "evidence_id": "EVD-001", "content": "定期寿险以被保险人身故或全残为给付条件，用于覆盖家庭责任期内的经济风险", "source": "kb://life/term-basics", "relevance": 0.91, "confidence": 0.8 }
+          ]
+        }
+      },
+      "expect": {
+        "status": "COMPLETE",
+        "primary_id": "SOL-001",
+        "human_review_required": false,
+        "not_recommended": [],
+        "candidate_count": 1
+      }
+    },
+    {
+      "name": "v2_multi_solution_ranking",
+      "dimension": "ranking",
+      "description": "Two strategies (life P0 + medical P1). Life covers the higher-weighted requirement, so SOL-001 wins; SOL-002 must survive as an alternative, not be discarded.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL" },
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" }
+          ],
+          "priorities": ["P0_CRITICAL", "P1_HIGH"],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_assessment": {
+          "risks": [
+            { "risk_id": "R4-001", "risk_category": "R4", "risk_name": "家庭责任", "residual_risk": "HIGH", "priority": "P0", "status": "IDENTIFIED" },
+            { "risk_id": "R1-001", "risk_category": "R1", "risk_name": "医疗费用", "residual_risk": "HIGH", "priority": "P0", "status": "IDENTIFIED" }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "status": "COMPLETE",
+          "gaps": [
+            { "gap_id": "GAP-LIFE-001", "domain": "life", "gap_level": "CRITICAL", "current_coverage": { "status": "NONE", "evidence_refs": [] }, "related_risk_ids": ["R4-001"], "related_requirement_ids": ["REQ-LIFE"] },
+            { "gap_id": "GAP-MED-001", "domain": "medical", "gap_level": "HIGH", "current_coverage": { "status": "PARTIAL", "evidence_refs": [] }, "related_risk_ids": ["R1-001"], "related_requirement_ids": ["REQ-MED"] }
+          ],
+          "priorities": [],
+          "information_gaps": []
+        },
+        "solution_plan": {
+          "status": "COMPLETE",
+          "solution_type": "TERM_LIFE",
+          "objective": "建立家庭责任保障",
+          "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度",
+          "priority": "P0",
+          "solutions": [
+            { "solution_id": "SOL-001", "solution_type": "TERM_LIFE", "objective": "建立家庭责任保障",
+              "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度", "priority": "P0",
+              "related_gap_ids": ["GAP-LIFE-001"], "related_risk_ids": ["R4-001"], "evidence_refs": ["EVD-001"] },
+            { "solution_id": "SOL-002", "solution_type": "MEDICAL", "objective": "建立大额医疗支出保障",
+              "coverage_direction": "当前部分覆盖，需以大额医疗支出敞口确定保额", "priority": "P1",
+              "related_gap_ids": ["GAP-MED-001"], "related_risk_ids": ["R1-001"], "evidence_refs": ["EVD-002"] }
+          ],
+          "information_gaps": []
+        },
+        "knowledge_evidence": {
+          "status": "success",
+          "conflict": false,
+          "evidence": [
+            { "evidence_id": "EVD-001", "content": "定期寿险用于覆盖家庭责任期内的经济风险", "source": "kb://life/term-basics", "relevance": 0.91, "confidence": 0.8 },
+            { "evidence_id": "EVD-002", "content": "百万医疗险覆盖住院大额支出，通常设免赔额", "source": "kb://medical/million-basics", "relevance": 0.88, "confidence": 0.8 }
+          ]
+        }
+      },
+      "expect": {
+        "status": "COMPLETE",
+        "primary_id": "SOL-001",
+        "alternatives_include": ["SOL-002"],
+        "not_recommended": [],
+        "candidate_count": 2
+      }
+    },
+    {
+      "name": "v2_no_actionable_solution",
+      "dimension": "scope",
+      "description": "SolutionPlan carries no strategy (no actionable gap) -> no candidates are derived -> NO_CANDIDATES, human review required. Must NOT fabricate a candidate.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "住院医疗保障", "priority": "P1_HIGH" }
+          ],
+          "priorities": [],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_assessment": { "risks": [] },
+        "coverage_gap_analysis": { "status": "COMPLETE", "gaps": [], "priorities": [], "information_gaps": [] },
+        "solution_plan": {
+          "status": "COMPLETE",
+          "solution_type": "GENERAL",
+          "objective": "（当前无待解决的保障缺口，暂无解决策略）",
+          "coverage_direction": "（无可执行缺口，无需确定保障方向）",
+          "priority": "P3",
+          "solutions": [],
+          "information_gaps": []
+        },
+        "knowledge_evidence": { "status": "success", "conflict": false, "evidence": [] }
+      },
+      "expect": {
+        "status": "NO_CANDIDATES",
+        "primary_id": null,
+        "human_review_required": true,
+        "candidate_count": 0
+      }
+    },
+    {
+      "name": "v2_evidence_insufficient",
+      "dimension": "evidence",
+      "description": "Strategy cites an evidence id that the KnowledgeEvidence set does not contain -> evidence insufficient -> no primary, INCOMPLETE_EVIDENCE. Proves the V2 path does not rubber-stamp evidence.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL" }
+          ],
+          "priorities": [],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_assessment": {
+          "risks": [
+            { "risk_id": "R4-001", "risk_category": "R4", "risk_name": "家庭责任", "residual_risk": "HIGH", "priority": "P0", "status": "IDENTIFIED" }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "status": "COMPLETE",
+          "gaps": [
+            { "gap_id": "GAP-LIFE-001", "domain": "life", "gap_level": "CRITICAL", "current_coverage": { "status": "NONE", "evidence_refs": [] }, "related_risk_ids": ["R4-001"], "related_requirement_ids": ["REQ-LIFE"] }
+          ],
+          "priorities": [],
+          "information_gaps": []
+        },
+        "solution_plan": {
+          "status": "COMPLETE",
+          "solution_type": "TERM_LIFE",
+          "objective": "建立家庭责任保障",
+          "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度",
+          "priority": "P0",
+          "solutions": [
+            { "solution_id": "SOL-001", "solution_type": "TERM_LIFE", "objective": "建立家庭责任保障",
+              "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度", "priority": "P0",
+              "related_gap_ids": ["GAP-LIFE-001"], "related_risk_ids": ["R4-001"], "evidence_refs": ["EVD-MISSING"] }
+          ],
+          "information_gaps": []
+        },
+        "knowledge_evidence": {
+          "status": "success",
+          "conflict": false,
+          "evidence": [
+            { "evidence_id": "EVD-001", "content": "定期寿险用于覆盖家庭责任期内的经济风险", "source": "kb://life/term-basics", "relevance": 0.91, "confidence": 0.8 }
+          ]
+        }
+      },
+      "expect": {
+        "status": "INCOMPLETE_EVIDENCE",
+        "primary_id": null,
+        "human_review_required": true,
+        "evidence_insufficient_candidates": ["SOL-001"]
+      }
+    },
+    {
+      "name": "v2_unverifiable_constraints",
+      "dimension": "honesty",
+      "description": "Hard constraints are supplied but the strategy carries no premium/term/liquidity data. The engine must report all three as UNVERIFIABLE, force human review, and must NOT claim within_budget / meets_term. Status stays COMPLETE because nothing is wrong with the evidence.",
+      "input": {
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "information_sufficiency": { "sufficiency_status": "SUFFICIENT" },
+          "requirements": [
+            { "requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "家庭责任保障", "priority": "P0_CRITICAL" }
+          ],
+          "priorities": [],
+          "coverage_gaps": [],
+          "guardrails": { "product_recommendation_included": false }
+        },
+        "risk_assessment": {
+          "risks": [
+            { "risk_id": "R4-001", "risk_category": "R4", "risk_name": "家庭责任", "residual_risk": "HIGH", "priority": "P0", "status": "IDENTIFIED" }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "status": "COMPLETE",
+          "gaps": [
+            { "gap_id": "GAP-LIFE-001", "domain": "life", "gap_level": "CRITICAL", "current_coverage": { "status": "NONE", "evidence_refs": [] }, "related_risk_ids": ["R4-001"], "related_requirement_ids": ["REQ-LIFE"] }
+          ],
+          "priorities": [],
+          "information_gaps": []
+        },
+        "solution_plan": {
+          "status": "COMPLETE",
+          "solution_type": "TERM_LIFE",
+          "objective": "建立家庭责任保障",
+          "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度",
+          "priority": "P0",
+          "solutions": [
+            { "solution_id": "SOL-001", "solution_type": "TERM_LIFE", "objective": "建立家庭责任保障",
+              "coverage_direction": "当前无覆盖，需以家庭责任与收入替代缺口确定保障额度", "priority": "P0",
+              "related_gap_ids": ["GAP-LIFE-001"], "related_risk_ids": ["R4-001"], "evidence_refs": ["EVD-001"] }
+          ],
+          "information_gaps": []
+        },
+        "knowledge_evidence": {
+          "status": "success",
+          "conflict": false,
+          "evidence": [
+            { "evidence_id": "EVD-001", "content": "定期寿险用于覆盖家庭责任期内的经济风险", "source": "kb://life/term-basics", "relevance": 0.91, "confidence": 0.8 }
+          ]
+        },
+        "constraints": { "budget_max": 30000, "term_min_years": 10, "liquidity_required": true }
+      },
+      "expect": {
+        "status": "COMPLETE",
+        "primary_id": "SOL-001",
+        "human_review_required": true,
+        "unverifiable_constraints": ["budget", "term", "liquidity"],
+        "reason_codes_exclude": ["within_budget", "meets_term"]
+      }
+    }
+  ]
+}

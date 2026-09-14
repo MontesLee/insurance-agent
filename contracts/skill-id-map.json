@@ -1,0 +1,13 @@
+{
+  "description": "Canonical skill id -> legacy physical skill name. Phase 1 does NOT rename directories; the map decouples canonical ids from legacy snake_case dirs.",
+  "canonical_to_legacy": {
+    "client-intake": "client-intake",
+    "requirement-analysis": "requirement_analysis",
+    "risk-analysis": "risk-analysis",
+    "coverage-gap-analysis": null,
+    "solution": null,
+    "knowledge-search": "knowledge-search",
+    "product-recommendation": "recommendation",
+    "report-generation": "report-generation"
+  }
+}

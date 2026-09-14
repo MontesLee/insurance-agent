@@ -1,0 +1,11 @@
+built:
+  - client-profile.schema.json
+  - requirement-analysis.schema.json
+  - risk-assessment.schema.json
+  - coverage-gap-analysis.schema.json
+  - solution-plan.schema.json
+  - knowledge-query.schema.json
+  - knowledge-evidence.schema.json
+  - product-recommendation.schema.json
+  - insurance-report.schema.json
+  - skill-id-map.json

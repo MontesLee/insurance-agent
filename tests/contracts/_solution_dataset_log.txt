@@ -1,0 +1,9 @@
+SOLUTION DATASET: 5 cases
+
+[PASS] case-01-multi-gap | 多缺口完整场景：应为每个 Gap 产出一条策略，按 gap_level 降序排列，Primary 取最高优先级
+[PASS] case-02-life-only | 单一寿险缺口：产出 TERM_LIFE 策略，拒绝终身寿险方向，含保障期限 trade-off
+[PASS] case-03-unknown | 覆盖情况未知：未知缺口降为 P3，整体 NEED_MORE_INFORMATION 并登记 information_gaps
+[PASS] case-04-no-actionable-gap | 无可执行缺口：不产出策略，使用占位值且 status=COMPLETE，不伪造 objective
+[PASS] case-05-preliminary | 上游为 PRELIMINARY：产出策略但整体标记 PRELIMINARY，不加严为 COMPLETE
+
+RESULT: ALL GREEN

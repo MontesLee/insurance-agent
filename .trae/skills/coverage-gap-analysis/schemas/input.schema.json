@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CoverageGapAnalysisInput",
+  "description": "Composite input of three Canonical Artifacts (each an envelope or raw legacy dict). Upstream structure is guaranteed by the producing skills + adapters; this input is intentionally permissive.",
+  "type": "object",
+  "required": ["risk_assessment"],
+  "properties": {
+    "client_profile": {
+      "type": "object",
+      "description": "ClientProfile artifact or raw ClientState. Used for supplementary existing_protection evidence."
+    },
+    "requirement_analysis": {
+      "type": "object",
+      "description": "RequirementAnalysis artifact or raw RequirementAnalysisOutput."
+    },
+    "risk_assessment": {
+      "type": "object",
+      "description": "RiskAssessment artifact or raw RiskAnalysisOutput (authoritative risk layer)."
+    }
+  },
+  "additionalProperties": false
+}

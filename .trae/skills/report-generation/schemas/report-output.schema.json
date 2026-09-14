@@ -85,13 +85,69 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["risk_category", "current_protection", "main_gap", "priority"],
+            "required": ["risk_category", "current_protection", "main_gap", "priority", "derivation"],
             "properties": {
-              "risk_category": { "type": "string", "enum": ["R1", "R2", "R3", "R4", "R5"] },
+              "risk_category": { "type": "string", "enum": ["R1", "R2", "R3", "R4", "R5", "GENERAL"] },
               "current_protection": { "type": "string" },
               "main_gap": { "type": "string" },
               "priority": { "type": "string" },
+              "source": { "type": "string" },
+              "derivation": {
+                "type": "string",
+                "enum": ["canonical", "derived"],
+                "description": "canonical = copied from CoverageGapAnalysis; derived = fallback derived from risk/requirement when no canonical artifact was supplied."
+              },
+              "gap_id": { "type": ["string", "null"] },
+              "gap_level": { "type": ["string", "null"] },
+              "coverage_status": { "type": ["string", "null"] },
+              "target_direction": { "type": ["string", "null"] },
+              "related_risk_ids": { "type": "array", "items": { "type": "string" } },
+              "related_requirement_ids": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+
+        "coverage_gap_derivation": {
+          "type": "string",
+          "enum": ["canonical", "derived"],
+          "description": "Which source produced section 04. Present so a downstream consumer can never mistake a derived gap for a canonical one."
+        },
+
+        "solution_strategies": {
+          "type": "array",
+          "description": "Verbatim from SolutionPlan (strategy layer). Contains no product or insurer names.",
+          "items": {
+            "type": "object",
+            "required": ["solution_type", "objective", "coverage_direction"],
+            "properties": {
+              "solution_id": { "type": ["string", "null"] },
+              "solution_type": { "type": "string" },
+              "objective": { "type": ["string", "null"] },
+              "coverage_direction": { "type": ["string", "null"] },
+              "priority": { "type": ["string", "null"] },
+              "constraints": { "type": "array" },
+              "trade_offs": { "type": "array" },
+              "rejected_directions": { "type": "array" },
+              "related_gap_ids": { "type": "array", "items": { "type": "string" } },
+              "related_risk_ids": { "type": "array", "items": { "type": "string" } },
               "source": { "type": "string" }
+            }
+          }
+        },
+
+        "evidence_summary": {
+          "type": "array",
+          "description": "Verbatim from KnowledgeEvidence. Listed, never weighed into a conclusion.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "evidence_id": { "type": ["string", "null"] },
+              "content": { "type": ["string", "null"] },
+              "source": { "type": ["string", "null"] },
+              "source_type": { "type": ["string", "null"] },
+              "relevance": { "type": ["number", "null"] },
+              "confidence": { "type": ["number", "null"] },
+              "conflict": { "type": ["boolean", "null"] }
             }
           }
         },

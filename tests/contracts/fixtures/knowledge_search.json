@@ -1,0 +1,76 @@
+{
+  "status": "success",
+  "query": "百万医疗险 保障范围 免赔额",
+  "normalized_query": "百万医疗险 保障范围 免赔额",
+  "results": [
+    {
+      "chunk_id": "01_medical_insurance_002",
+      "document_id": "01_medical_insurance",
+      "document_name": "01_medical_insurance",
+      "source_type": "internal",
+      "source_level": "B",
+      "section": "2. 赔付方式",
+      "content": "百万医疗险以费用报销为主要赔付方式，凭医疗费用票据按约定比例报销，一般设有免赔额（常见 1 万元）与报销上限。",
+      "score": 0.9125,
+      "retrieval_score": 5.7448,
+      "rerank_score": 0.9125,
+      "final_score": 0.9125,
+      "metadata": {
+        "product_type": "medical",
+        "topic": ""
+      }
+    },
+    {
+      "chunk_id": "01_medical_insurance_005",
+      "document_id": "01_medical_insurance",
+      "document_name": "01_medical_insurance",
+      "source_type": "internal",
+      "source_level": "B",
+      "section": "5. 既往症",
+      "content": "百万医疗险对既往症通常不予赔付，投保前已患疾病一般属于责任免除范围。",
+      "score": 0.7707,
+      "retrieval_score": 4.6941,
+      "rerank_score": 0.7707,
+      "final_score": 0.7707,
+      "metadata": {
+        "product_type": "medical",
+        "topic": ""
+      }
+    },
+    {
+      "chunk_id": "01_medical_insurance_004",
+      "document_id": "01_medical_insurance",
+      "document_name": "01_medical_insurance",
+      "source_type": "internal",
+      "source_level": "B",
+      "section": "4. 等待期",
+      "content": "百万医疗险常见等待期为 30 天，等待期内出险一般不予赔付（意外伤害通常无等待期）。",
+      "score": 0.7227,
+      "retrieval_score": 4.3384,
+      "rerank_score": 0.7227,
+      "final_score": 0.7227,
+      "metadata": {
+        "product_type": "medical",
+        "topic": ""
+      }
+    }
+  ],
+  "conflict": false,
+  "reason": "",
+  "retrieval_metadata": {
+    "candidate_count": 8,
+    "returned_count": 3,
+    "retrieval_method": "sparse_rrf",
+    "reranker": "default",
+    "candidate_chunk_ids": [
+      "01_medical_insurance_002",
+      "01_medical_insurance_005",
+      "01_medical_insurance_004",
+      "01_medical_insurance_001",
+      "01_medical_insurance_003",
+      "02_critical_illness_003",
+      "03_accident_insurance_001",
+      "03_accident_insurance_002"
+    ]
+  }
+}

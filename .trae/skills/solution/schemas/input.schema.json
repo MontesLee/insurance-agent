@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "solution/input.schema.json",
+  "title": "SolutionInput",
+  "description": "Composite input for the solution (strategy) layer. Each artifact may be supplied either as a Canonical Contract envelope ({\"payload\": ...}) or as the raw legacy dict. Deliberately permissive: the authoritative shapes live in contracts/, and the upstream skills' own eval suites guarantee their internal shape. This schema guards the COMPOSITION (which artifacts are required), not their internals.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["coverage_gap_analysis"],
+  "properties": {
+    "coverage_gap_analysis": {
+      "description": "CoverageGapAnalysis — authoritative driver. Each gap needs gap_id / domain / current_coverage.status / gap_level.",
+      "type": ["object", "null"]
+    },
+    "requirement_analysis": {
+      "description": "RequirementAnalysis — supplies constraints (stated priorities, analysis boundary, analysis_status).",
+      "type": ["object", "null"]
+    },
+    "risk_assessment": {
+      "description": "RiskAssessment — referenced only (traceability). Never recomputed here.",
+      "type": ["object", "null"]
+    },
+    "client_profile": {
+      "description": "ClientProfile — accepted for traceability; not required by the strategy layer.",
+      "type": ["object", "null"]
+    }
+  }
+}

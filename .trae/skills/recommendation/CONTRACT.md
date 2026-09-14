@@ -2,7 +2,13 @@
 
 ## 边界
 
-- **输入**：`requirement_analysis` + `risk_analysis` + `candidate_solutions` + `knowledge_search_results`（可选 `constraints`）
+- **输入（V2，Phase 5 起默认）**：`requirement_analysis` + `risk_assessment` +
+  `coverage_gap_analysis` + `solution_plan` + `knowledge_evidence`（可选 `constraints`）。
+  见 `schemas/product-recommendation-input.schema.json`。
+  **`candidate_solutions` 不是输入，且被契约 `not: {required: [...]}` 明确禁止**；
+  候选由 `solution_to_candidates.py` 从 `solution_plan.solutions[]` 派生。
+- **输入（V1 legacy）**：`requirement_analysis` + `risk_analysis` + `candidate_solutions` +
+  `knowledge_search_results`（可选 `constraints`）。仅保留用于既有 11 case 回归基线。
 - **输出**：结构化 `evidence-backed recommendation`（见 `schemas/recommendation-output.schema.json`）
 - **不**：重新做客户访谈 / 重新做 Risk Analysis / 修改上游 Skill / 推荐具体产品条款凭记忆 / 生成销售话术 / 代表保险公司做承保决定
 

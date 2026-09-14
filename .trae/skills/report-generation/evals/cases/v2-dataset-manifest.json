@@ -1,0 +1,3496 @@
+{
+  "skill": "report-generation",
+  "version": "2.0",
+  "description": "V2 dataset: report-generation consuming 7 Canonical Artifacts. Fixtures for the canonical layers are produced by the real coverage-gap-analysis / solution / product-recommendation engines and the evidence provider, not hand-written.",
+  "cases": [
+    {
+      "name": "v2_full_chain",
+      "dimension": "structure|completeness|provenance|canonical-source",
+      "description": "V2 全链路：7 路 Canonical Artifact 齐备。期望 04 缺口 derivation=canonical、策略与证据章节非空、无幻觉、无未裁决冲突。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": {
+            "origin_skill": "client-intake",
+            "intake_complete": true
+          },
+          "family_profile": {
+            "age": {
+              "value": "35",
+              "status": "KNOWN"
+            },
+            "gender": {
+              "value": "男",
+              "status": "KNOWN"
+            },
+            "marital_status": {
+              "value": "已婚",
+              "status": "KNOWN"
+            },
+            "children": {
+              "value": "1孩（6岁）",
+              "status": "KNOWN"
+            },
+            "housing": {
+              "value": "自有住房，有房贷",
+              "status": "KNOWN"
+            }
+          },
+          "employment_profile": {
+            "occupation": {
+              "value": "企业中层管理",
+              "status": "KNOWN"
+            }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": {
+              "value": "家庭主要收入来源",
+              "status": "KNOWN"
+            }
+          },
+          "existing_protection": {
+            "social_security": {
+              "value": "职工社保+医保",
+              "status": "KNOWN"
+            },
+            "existing_insurance": {
+              "value": "一份百万医疗险",
+              "status": "KNOWN"
+            }
+          },
+          "financial_profile": {
+            "annual_income": {
+              "value": "80万",
+              "status": "KNOWN"
+            },
+            "annual_expense": {
+              "value": "36万",
+              "status": "KNOWN"
+            },
+            "mortgage": {
+              "value": "200万",
+              "status": "KNOWN"
+            },
+            "insurance_budget": {
+              "value": "3万",
+              "status": "KNOWN"
+            }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "requirements": [
+            {
+              "requirement_id": "REQ-MED",
+              "requirement_type": "medical",
+              "summary": "大额医疗支出保障",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-CI",
+              "requirement_type": "critical_illness",
+              "summary": "重疾收入补偿",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-ACC",
+              "requirement_type": "accident",
+              "summary": "意外医疗",
+              "priority": "P2_MEDIUM",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-LIFE",
+              "requirement_type": "life",
+              "summary": "家庭责任保障",
+              "priority": "P0_CRITICAL",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-SAV",
+              "requirement_type": "savings",
+              "summary": "长期储蓄",
+              "priority": "P3_LOW",
+              "boundary": "requirement_only"
+            }
+          ]
+        },
+        "risk_analysis": {
+          "output_version": "1.0",
+          "layer": "risk_analysis",
+          "analysis_status": "FORMAL",
+          "overall_confidence": 0.85,
+          "risks": [
+            {
+              "risk_id": "R4-001",
+              "risk_category": "R4",
+              "risk_name": "主要收入者身故导致家庭现金流中断",
+              "priority": "P0",
+              "severity": "CRITICAL",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "已有定期寿险 200 万",
+              "coverage_assessment": {
+                "protected_amount": 2000000,
+                "unprotected_amount": 0,
+                "confidence": 0.9
+              },
+              "conclusion": "寿险已充分覆盖家庭责任",
+              "reasoning_evidence_refs": [
+                "E004"
+              ]
+            },
+            {
+              "risk_id": "R1-001",
+              "risk_category": "R1",
+              "risk_name": "大额医疗费用支出",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "HIGH",
+              "residual_risk": "HIGH",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 500000,
+                "confidence": 0.7
+              },
+              "conclusion": "医疗风险无任何商业保障",
+              "reasoning_evidence_refs": [
+                "E001"
+              ]
+            },
+            {
+              "risk_id": "R2-001",
+              "risk_category": "R2",
+              "risk_name": "重大疾病收入中断",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "部分重疾保障",
+              "coverage_assessment": {
+                "protected_amount": 300000,
+                "unprotected_amount": 700000,
+                "confidence": 0.6
+              },
+              "conclusion": "重疾保额不足",
+              "reasoning_evidence_refs": [
+                "E002"
+              ]
+            },
+            {
+              "risk_id": "R3-001",
+              "risk_category": "R3",
+              "risk_name": "意外伤残收入损失",
+              "priority": "P2",
+              "severity": "MEDIUM",
+              "likelihood": "MEDIUM",
+              "residual_risk": "MEDIUM",
+              "existing_protection": "已有意外险",
+              "coverage_assessment": {
+                "protected_amount": 100000,
+                "unprotected_amount": 50000,
+                "confidence": 0.6
+              },
+              "conclusion": "意外保障部分覆盖",
+              "reasoning_evidence_refs": [
+                "E003"
+              ]
+            },
+            {
+              "risk_id": "R5-001",
+              "risk_category": "R5",
+              "risk_name": "退休现金流缺口",
+              "priority": "P3",
+              "severity": "LOW",
+              "likelihood": "MEDIUM",
+              "residual_risk": "LOW",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 300000,
+                "confidence": 0.5
+              },
+              "conclusion": "无长期储蓄规划",
+              "reasoning_evidence_refs": [
+                "E005"
+              ]
+            }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "artifact_type": "coverage-gap-analysis",
+          "skill": "coverage-gap-analysis",
+          "legacy_skill": "coverage-gap-analysis",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068361+00:00",
+          "payload": {
+            "gaps": [
+              {
+                "gap_id": "GAP-R1-001",
+                "domain": "medical",
+                "subject": "大额医疗费用支出",
+                "related_requirement_ids": [
+                  "REQ-MED"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "补充百万医疗险，覆盖社保外大额医疗支出与免赔额缺口",
+                  "rationale": "弥补社保报销上限与免赔额带来的自付风险"
+                },
+                "gap_level": "CRITICAL",
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001"
+                ]
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "domain": "critical_illness",
+                "subject": "重大疾病收入中断",
+                "related_requirement_ids": [
+                  "REQ-CI"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置重疾险，保额覆盖 3-5 年家庭年收入",
+                  "rationale": "弥补重疾期间的收入中断、治疗与康复支出"
+                },
+                "gap_level": "HIGH",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002"
+                ]
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "domain": "accident",
+                "subject": "意外伤残收入损失",
+                "related_requirement_ids": [
+                  "REQ-ACC"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置综合意外险（含意外医疗与伤残给付）",
+                  "rationale": "覆盖意外导致的医疗与收入能力损失"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003"
+                ]
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "domain": "savings",
+                "subject": "退休现金流缺口",
+                "related_requirement_ids": [
+                  "REQ-SAV"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "建立长期储蓄/年金规划，覆盖退休与子女教育刚性支出",
+                  "rationale": "弥补长期现金流缺口"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005"
+                ]
+              }
+            ],
+            "priorities": [
+              {
+                "gap_id": "GAP-R1-001",
+                "priority": "P1",
+                "reason": "医疗保障无覆盖"
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "priority": "P1",
+                "reason": "重大疾病保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "priority": "P2",
+                "reason": "意外保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "priority": "P3",
+                "reason": "储蓄/长期财务保障无覆盖"
+              }
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE"
+          },
+          "provenance": []
+        },
+        "solution_plan": {
+          "artifact_type": "solution-plan",
+          "skill": "solution",
+          "legacy_skill": "solution",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068721+00:00",
+          "payload": {
+            "solutions": [
+              {
+                "solution_id": "SOL-001",
+                "solution_type": "MEDICAL",
+                "objective": "建立大额医疗支出保障",
+                "coverage_direction": "当前无覆盖，需以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+                "priority": "P0",
+                "constraints": [
+                  {
+                    "constraint": "从零建立",
+                    "value": "当前无对应保障，需完整建立该方向保障",
+                    "source": "GAP-R1-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-MED"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P1_HIGH",
+                    "source": "REQ-MED"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "保障范围",
+                    "option_a": "仅社保目录内",
+                    "option_b": "含目录外与免赔额以上",
+                    "chosen": "含目录外与免赔额以上",
+                    "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "仅依赖社保",
+                    "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R1-001"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001",
+                  "from:GAP-R1-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-002",
+                "solution_type": "CRITICAL_ILLNESS",
+                "objective": "建立重疾收入补偿保障",
+                "coverage_direction": "当前部分覆盖，需以收入替代与康复期支出确定保额，覆盖治疗及康复期间的家庭固定开支",
+                "priority": "P1",
+                "constraints": [
+                  {
+                    "constraint": "增量补差",
+                    "value": "在现有保障基础上补足差额，避免重复配置",
+                    "source": "GAP-R2-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-CI"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P1_HIGH",
+                    "source": "REQ-CI"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "赔付方式",
+                    "option_a": "费用报销型",
+                    "option_b": "确诊给付型",
+                    "chosen": "确诊给付型",
+                    "reason": "重疾的主要敞口是收入中断与康复期支出，而非医疗费用本身"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "以医疗险替代重疾保障",
+                    "reason": "医疗险按费用报销，无法覆盖收入中断与康复期支出"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R2-001"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002",
+                  "from:GAP-R2-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-003",
+                "solution_type": "ACCIDENT",
+                "objective": "建立意外伤残与意外医疗保障",
+                "coverage_direction": "当前部分覆盖，需以伤残等级对应的收入损失与意外医疗支出确定保额",
+                "priority": "P2",
+                "constraints": [
+                  {
+                    "constraint": "增量补差",
+                    "value": "在现有保障基础上补足差额，避免重复配置",
+                    "source": "GAP-R3-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-ACC"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P2_MEDIUM",
+                    "source": "REQ-ACC"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "保障责任",
+                    "option_a": "仅意外身故",
+                    "option_b": "含伤残分级与意外医疗",
+                    "chosen": "含伤残分级与意外医疗",
+                    "reason": "意外的主要敞口是伤残导致的收入损失，而非身故"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "仅配置意外身故责任",
+                    "reason": "无法覆盖伤残导致的收入损失与意外医疗支出"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R3-001"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003",
+                  "from:GAP-R3-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-004",
+                "solution_type": "SAVINGS",
+                "objective": "建立长期确定性现金流储备",
+                "coverage_direction": "当前无覆盖，需以长期现金流目标与风险承受能力确定储蓄方向与期限",
+                "priority": "P2",
+                "constraints": [
+                  {
+                    "constraint": "从零建立",
+                    "value": "当前无对应保障，需完整建立该方向保障",
+                    "source": "GAP-R5-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-SAV"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P3_LOW",
+                    "source": "REQ-SAV"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "确定性",
+                    "option_a": "浮动收益",
+                    "option_b": "确定给付",
+                    "chosen": "确定给付",
+                    "reason": "长期现金流目标优先保证确定性，避免波动侵蚀目标"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "以高波动投资替代储蓄型保障",
+                    "reason": "与长期确定性现金流目标不匹配"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R5-001"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005",
+                  "from:GAP-R5-001"
+                ]
+              }
+            ],
+            "objective": "建立大额医疗支出保障",
+            "coverage_direction": "当前无覆盖，需以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+            "priority": "P0",
+            "constraints": [
+              {
+                "constraint": "从零建立",
+                "value": "当前无对应保障，需完整建立该方向保障",
+                "source": "GAP-R1-001"
+              },
+              {
+                "constraint": "需求分析边界",
+                "value": "requirement_only",
+                "source": "REQ-MED"
+              },
+              {
+                "constraint": "客户已声明的需求优先级",
+                "value": "P1_HIGH",
+                "source": "REQ-MED"
+              }
+            ],
+            "trade_offs": [
+              {
+                "axis": "保障范围",
+                "option_a": "仅社保目录内",
+                "option_b": "含目录外与免赔额以上",
+                "chosen": "含目录外与免赔额以上",
+                "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+              }
+            ],
+            "rejected_directions": [
+              {
+                "direction": "仅依赖社保",
+                "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"
+              }
+            ],
+            "related_gap_ids": [
+              "GAP-R1-001",
+              "GAP-R2-001",
+              "GAP-R3-001",
+              "GAP-R5-001"
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE",
+            "solution_type": "MEDICAL"
+          },
+          "provenance": []
+        },
+        "knowledge_evidence": {
+          "artifact_type": "knowledge-evidence",
+          "skill": "knowledge-search",
+          "legacy_skill": "knowledge-search",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.273266+00:00",
+          "payload": {
+            "status": "success",
+            "query": "百万医疗险 保障范围 免赔额 社保目录外 适用性 策略验证",
+            "evidence": [
+              {
+                "evidence_id": "01_medical_insurance_002",
+                "content": "百万医疗险以费用报销为主要赔付方式，凭医疗费用票据按约定比例报销，一般设有免赔额（常见 1 万元）与报销上限。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.9125,
+                "confidence": 0.9125,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_005",
+                "content": "百万医疗险对既往症通常不予赔付，投保前已患疾病一般属于责任免除范围。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.7707,
+                "confidence": 0.7707,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_004",
+                "content": "百万医疗险常见等待期为 30 天，等待期内出险一般不予赔付（意外伤害通常无等待期）。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.7227,
+                "confidence": 0.7227,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_001",
+                "content": "百万医疗险主要解决大额医疗费用支出风险，通常提供高额住院医疗报销额度（常见百万级别）。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.7013,
+                "confidence": 0.7013,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_003",
+                "content": "百万医疗险与重疾险的赔付逻辑不同：前者报销医疗费用，后者达到约定重大疾病状态即给付约定金额。两者可互补，不冲突。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.6243,
+                "confidence": 0.6243,
+                "provenance": [],
+                "conflict": false
+              }
+            ],
+            "conflict": false
+          },
+          "provenance": [
+            {
+              "source_type": "KNOWLEDGE_SEARCH",
+              "source_id": "knowledge-search",
+              "confidence": null
+            }
+          ]
+        },
+        "product_recommendation": {
+          "artifact_type": "product-recommendation",
+          "skill": "product-recommendation",
+          "legacy_skill": "recommendation",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.244871+00:00",
+          "payload": {
+            "skill": "recommendation",
+            "version": "0.1",
+            "status": "INCOMPLETE_EVIDENCE",
+            "decision_context": {
+              "priority_goals": [
+                {
+                  "requirement_id": "REQ-MED",
+                  "requirement_type": "medical",
+                  "priority": "P1_HIGH",
+                  "weight": 3
+                },
+                {
+                  "requirement_id": "REQ-CI",
+                  "requirement_type": "critical_illness",
+                  "priority": "P1_HIGH",
+                  "weight": 3
+                },
+                {
+                  "requirement_id": "REQ-ACC",
+                  "requirement_type": "accident",
+                  "priority": "P2_MEDIUM",
+                  "weight": 2
+                },
+                {
+                  "requirement_id": "REQ-LIFE",
+                  "requirement_type": "life",
+                  "priority": "P0_CRITICAL",
+                  "weight": 4
+                },
+                {
+                  "requirement_id": "REQ-SAV",
+                  "requirement_type": "savings",
+                  "priority": "P3_LOW",
+                  "weight": 1
+                }
+              ],
+              "risk_gaps": [
+                {
+                  "risk_id": "R4-001",
+                  "risk_category": "R4",
+                  "priority": "P0"
+                },
+                {
+                  "risk_id": "R1-001",
+                  "risk_category": "R1",
+                  "priority": "P1"
+                },
+                {
+                  "risk_id": "R2-001",
+                  "risk_category": "R2",
+                  "priority": "P1"
+                }
+              ],
+              "hard_constraints": [
+                {
+                  "type": "budget",
+                  "value": 30000.0
+                }
+              ],
+              "constraints_raw": {
+                "budget_max": 30000
+              },
+              "uncertainties": []
+            },
+            "candidate_evaluations": [
+              {
+                "candidate_id": "SOL-001",
+                "requirement_fit": {
+                  "overall": "poor_fit",
+                  "score": 0.2308,
+                  "matched": [
+                    "REQ-MED"
+                  ],
+                  "partial": [],
+                  "unmet": [
+                    "REQ-CI",
+                    "REQ-ACC",
+                    "REQ-LIFE",
+                    "REQ-SAV"
+                  ]
+                },
+                "risk_fit": {
+                  "overall": "poor_fit",
+                  "score": 0.3333,
+                  "covered_risks": [
+                    "R1-001"
+                  ],
+                  "remaining_gaps": [
+                    "R4-001",
+                    "R2-001"
+                  ]
+                },
+                "constraint_fit": {
+                  "hard_constraints": [],
+                  "soft_constraints": [],
+                  "violations": [],
+                  "unverifiable_constraints": [
+                    {
+                      "type": "budget",
+                      "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                      "severity": "unverifiable"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "status": "insufficient",
+                  "refs": [
+                    "from:GAP-R1-001",
+                    "E001"
+                  ],
+                  "missing_evidence": [
+                    "medical"
+                  ]
+                },
+                "tradeoffs": [
+                  {
+                    "advantage": "covers high-priority risk(s)",
+                    "cost": "premium n/a",
+                    "impact": "medium"
+                  }
+                ],
+                "uncertainties": [
+                  {
+                    "type": "insufficient_evidence",
+                    "detail": "coverage ['medical'] lacks knowledge backing",
+                    "candidate_id": "SOL-001"
+                  },
+                  {
+                    "type": "constraint_unverifiable",
+                    "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                    "candidate_id": "SOL-001",
+                    "constraint": "budget"
+                  }
+                ],
+                "recommendation_status": "insufficient_evidence",
+                "provenance": [
+                  {
+                    "type": "requirement",
+                    "ref": "REQ-MED"
+                  },
+                  {
+                    "type": "risk",
+                    "ref": "R1-001"
+                  }
+                ],
+                "_composite": 0.22564
+              },
+              {
+                "candidate_id": "SOL-002",
+                "requirement_fit": {
+                  "overall": "poor_fit",
+                  "score": 0.2308,
+                  "matched": [
+                    "REQ-CI"
+                  ],
+                  "partial": [],
+                  "unmet": [
+                    "REQ-MED",
+                    "REQ-ACC",
+                    "REQ-LIFE",
+                    "REQ-SAV"
+                  ]
+                },
+                "risk_fit": {
+                  "overall": "poor_fit",
+                  "score": 0.3333,
+                  "covered_risks": [
+                    "R2-001"
+                  ],
+                  "remaining_gaps": [
+                    "R4-001",
+                    "R1-001"
+                  ]
+                },
+                "constraint_fit": {
+                  "hard_constraints": [],
+                  "soft_constraints": [],
+                  "violations": [],
+                  "unverifiable_constraints": [
+                    {
+                      "type": "budget",
+                      "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                      "severity": "unverifiable"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "status": "insufficient",
+                  "refs": [
+                    "from:GAP-R2-001",
+                    "E002"
+                  ],
+                  "missing_evidence": [
+                    "critical_illness"
+                  ]
+                },
+                "tradeoffs": [
+                  {
+                    "advantage": "covers high-priority risk(s)",
+                    "cost": "premium n/a",
+                    "impact": "medium"
+                  }
+                ],
+                "uncertainties": [
+                  {
+                    "type": "insufficient_evidence",
+                    "detail": "coverage ['critical_illness'] lacks knowledge backing",
+                    "candidate_id": "SOL-002"
+                  },
+                  {
+                    "type": "constraint_unverifiable",
+                    "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                    "candidate_id": "SOL-002",
+                    "constraint": "budget"
+                  }
+                ],
+                "recommendation_status": "insufficient_evidence",
+                "provenance": [
+                  {
+                    "type": "requirement",
+                    "ref": "REQ-CI"
+                  },
+                  {
+                    "type": "risk",
+                    "ref": "R2-001"
+                  }
+                ],
+                "_composite": 0.22564
+              },
+              {
+                "candidate_id": "SOL-003",
+                "requirement_fit": {
+                  "overall": "not_suitable",
+                  "score": 0.1538,
+                  "matched": [
+                    "REQ-ACC"
+                  ],
+                  "partial": [],
+                  "unmet": [
+                    "REQ-MED",
+                    "REQ-CI",
+                    "REQ-LIFE",
+                    "REQ-SAV"
+                  ]
+                },
+                "risk_fit": {
+                  "overall": "not_suitable",
+                  "score": 0.0,
+                  "covered_risks": [],
+                  "remaining_gaps": [
+                    "R4-001",
+                    "R1-001",
+                    "R2-001"
+                  ]
+                },
+                "constraint_fit": {
+                  "hard_constraints": [],
+                  "soft_constraints": [],
+                  "violations": [],
+                  "unverifiable_constraints": [
+                    {
+                      "type": "budget",
+                      "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                      "severity": "unverifiable"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "status": "insufficient",
+                  "refs": [
+                    "from:GAP-R3-001",
+                    "E003"
+                  ],
+                  "missing_evidence": [
+                    "accident"
+                  ]
+                },
+                "tradeoffs": [
+                  {
+                    "advantage": "-",
+                    "cost": "leaves gap(s): R4-001, R1-001, R2-001",
+                    "impact": "high"
+                  }
+                ],
+                "uncertainties": [
+                  {
+                    "type": "insufficient_evidence",
+                    "detail": "coverage ['accident'] lacks knowledge backing",
+                    "candidate_id": "SOL-003"
+                  },
+                  {
+                    "type": "constraint_unverifiable",
+                    "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                    "candidate_id": "SOL-003",
+                    "constraint": "budget"
+                  }
+                ],
+                "recommendation_status": "insufficient_evidence",
+                "provenance": [
+                  {
+                    "type": "requirement",
+                    "ref": "REQ-ACC"
+                  }
+                ],
+                "_composite": 0.06152
+              },
+              {
+                "candidate_id": "SOL-004",
+                "requirement_fit": {
+                  "overall": "not_suitable",
+                  "score": 0.0769,
+                  "matched": [
+                    "REQ-SAV"
+                  ],
+                  "partial": [],
+                  "unmet": [
+                    "REQ-MED",
+                    "REQ-CI",
+                    "REQ-ACC",
+                    "REQ-LIFE"
+                  ]
+                },
+                "risk_fit": {
+                  "overall": "not_suitable",
+                  "score": 0.0,
+                  "covered_risks": [],
+                  "remaining_gaps": [
+                    "R4-001",
+                    "R1-001",
+                    "R2-001"
+                  ]
+                },
+                "constraint_fit": {
+                  "hard_constraints": [],
+                  "soft_constraints": [],
+                  "violations": [],
+                  "unverifiable_constraints": [
+                    {
+                      "type": "budget",
+                      "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                      "severity": "unverifiable"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "status": "insufficient",
+                  "refs": [
+                    "from:GAP-R5-001",
+                    "E005"
+                  ],
+                  "missing_evidence": [
+                    "savings"
+                  ]
+                },
+                "tradeoffs": [
+                  {
+                    "advantage": "-",
+                    "cost": "leaves gap(s): R4-001, R1-001, R2-001",
+                    "impact": "high"
+                  }
+                ],
+                "uncertainties": [
+                  {
+                    "type": "insufficient_evidence",
+                    "detail": "coverage ['savings'] lacks knowledge backing",
+                    "candidate_id": "SOL-004"
+                  },
+                  {
+                    "type": "constraint_unverifiable",
+                    "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                    "candidate_id": "SOL-004",
+                    "constraint": "budget"
+                  }
+                ],
+                "recommendation_status": "insufficient_evidence",
+                "provenance": [
+                  {
+                    "type": "requirement",
+                    "ref": "REQ-SAV"
+                  }
+                ],
+                "_composite": 0.03076
+              }
+            ],
+            "primary_recommendation": null,
+            "alternatives": [],
+            "not_recommended": [
+              {
+                "candidate_id": "SOL-001",
+                "reason": "insufficient_evidence (no knowledge backing)",
+                "exception": false
+              },
+              {
+                "candidate_id": "SOL-002",
+                "reason": "insufficient_evidence (no knowledge backing)",
+                "exception": false
+              },
+              {
+                "candidate_id": "SOL-003",
+                "reason": "insufficient_evidence (no knowledge backing)",
+                "exception": false
+              },
+              {
+                "candidate_id": "SOL-004",
+                "reason": "insufficient_evidence (no knowledge backing)",
+                "exception": false
+              }
+            ],
+            "tradeoffs": [
+              {
+                "advantage": "covers high-priority risk(s)",
+                "cost": "premium n/a",
+                "impact": "medium"
+              },
+              {
+                "advantage": "covers high-priority risk(s)",
+                "cost": "premium n/a",
+                "impact": "medium"
+              },
+              {
+                "advantage": "-",
+                "cost": "leaves gap(s): R4-001, R1-001, R2-001",
+                "impact": "high"
+              },
+              {
+                "advantage": "-",
+                "cost": "leaves gap(s): R4-001, R1-001, R2-001",
+                "impact": "high"
+              }
+            ],
+            "uncertainties": [
+              {
+                "type": "insufficient_evidence",
+                "detail": "coverage ['medical'] lacks knowledge backing",
+                "candidate_id": "SOL-001"
+              },
+              {
+                "type": "constraint_unverifiable",
+                "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                "candidate_id": "SOL-001",
+                "constraint": "budget"
+              },
+              {
+                "type": "insufficient_evidence",
+                "detail": "coverage ['critical_illness'] lacks knowledge backing",
+                "candidate_id": "SOL-002"
+              },
+              {
+                "type": "constraint_unverifiable",
+                "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                "candidate_id": "SOL-002",
+                "constraint": "budget"
+              },
+              {
+                "type": "insufficient_evidence",
+                "detail": "coverage ['accident'] lacks knowledge backing",
+                "candidate_id": "SOL-003"
+              },
+              {
+                "type": "constraint_unverifiable",
+                "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                "candidate_id": "SOL-003",
+                "constraint": "budget"
+              },
+              {
+                "type": "insufficient_evidence",
+                "detail": "coverage ['savings'] lacks knowledge backing",
+                "candidate_id": "SOL-004"
+              },
+              {
+                "type": "constraint_unverifiable",
+                "detail": "candidate premium unknown (strategy layer carries no product quote); budget constraint not verifiable",
+                "candidate_id": "SOL-004",
+                "constraint": "budget"
+              }
+            ],
+            "evidence_refs": [
+              "E001",
+              "E002",
+              "E003",
+              "E005",
+              "from:GAP-R1-001",
+              "from:GAP-R2-001",
+              "from:GAP-R3-001",
+              "from:GAP-R5-001"
+            ],
+            "human_review_required": true,
+            "strategy_trace": [
+              {
+                "candidate_id": "SOL-001",
+                "solution_type": "MEDICAL",
+                "related_gap_ids": [
+                  "GAP-R1-001"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "strategy_priority": "P0"
+              },
+              {
+                "candidate_id": "SOL-002",
+                "solution_type": "CRITICAL_ILLNESS",
+                "related_gap_ids": [
+                  "GAP-R2-001"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "strategy_priority": "P1"
+              },
+              {
+                "candidate_id": "SOL-003",
+                "solution_type": "ACCIDENT",
+                "related_gap_ids": [
+                  "GAP-R3-001"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "strategy_priority": "P2"
+              },
+              {
+                "candidate_id": "SOL-004",
+                "solution_type": "SAVINGS",
+                "related_gap_ids": [
+                  "GAP-R5-001"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "strategy_priority": "P2"
+              }
+            ],
+            "candidate_source": "solution_plan",
+            "derivation": {
+              "candidate_solutions_supplied_as_input": false,
+              "candidate_solutions_derived_from": "solution_plan.solutions[]"
+            }
+          },
+          "provenance": [
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "E001",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "E002",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "E003",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "E005",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "from:GAP-R1-001",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "from:GAP-R2-001",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "from:GAP-R3-001",
+              "confidence": null
+            },
+            {
+              "source_type": "EVIDENCE_REF",
+              "source_id": "from:GAP-R5-001",
+              "confidence": null
+            }
+          ]
+        }
+      },
+      "expect": {
+        "status": "success",
+        "coverage_gap_derivation": "canonical",
+        "solution_strategies_nonempty": true,
+        "evidence_summary_nonempty": true,
+        "provenance_nonempty": true,
+        "metadata_warnings_contains": [],
+        "rendered_forbids": [
+          "平安",
+          "国寿",
+          "太平洋"
+        ]
+      }
+    },
+    {
+      "name": "v2_canonical_gap_suppresses_derivation",
+      "dimension": "no-business-judgment",
+      "description": "CoverageGapAnalysis 仅报 1 个 life 缺口，但 risk_analysis 中 R1/R2 为 HIGH 残余风险。期望 04 只呈现 canonical 缺口，不混入 risk 推导条目。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": {
+            "origin_skill": "client-intake",
+            "intake_complete": true
+          },
+          "family_profile": {
+            "age": {
+              "value": "35",
+              "status": "KNOWN"
+            },
+            "gender": {
+              "value": "男",
+              "status": "KNOWN"
+            },
+            "marital_status": {
+              "value": "已婚",
+              "status": "KNOWN"
+            },
+            "children": {
+              "value": "1孩（6岁）",
+              "status": "KNOWN"
+            },
+            "housing": {
+              "value": "自有住房，有房贷",
+              "status": "KNOWN"
+            }
+          },
+          "employment_profile": {
+            "occupation": {
+              "value": "企业中层管理",
+              "status": "KNOWN"
+            }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": {
+              "value": "家庭主要收入来源",
+              "status": "KNOWN"
+            }
+          },
+          "existing_protection": {
+            "social_security": {
+              "value": "职工社保+医保",
+              "status": "KNOWN"
+            },
+            "existing_insurance": {
+              "value": "一份百万医疗险",
+              "status": "KNOWN"
+            }
+          },
+          "financial_profile": {
+            "annual_income": {
+              "value": "80万",
+              "status": "KNOWN"
+            },
+            "annual_expense": {
+              "value": "36万",
+              "status": "KNOWN"
+            },
+            "mortgage": {
+              "value": "200万",
+              "status": "KNOWN"
+            },
+            "insurance_budget": {
+              "value": "3万",
+              "status": "KNOWN"
+            }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "requirements": [
+            {
+              "requirement_id": "REQ-MED",
+              "requirement_type": "medical",
+              "summary": "大额医疗支出保障",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-CI",
+              "requirement_type": "critical_illness",
+              "summary": "重疾收入补偿",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-ACC",
+              "requirement_type": "accident",
+              "summary": "意外医疗",
+              "priority": "P2_MEDIUM",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-LIFE",
+              "requirement_type": "life",
+              "summary": "家庭责任保障",
+              "priority": "P0_CRITICAL",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-SAV",
+              "requirement_type": "savings",
+              "summary": "长期储蓄",
+              "priority": "P3_LOW",
+              "boundary": "requirement_only"
+            }
+          ]
+        },
+        "risk_analysis": {
+          "output_version": "1.0",
+          "layer": "risk_analysis",
+          "analysis_status": "FORMAL",
+          "overall_confidence": 0.85,
+          "risks": [
+            {
+              "risk_id": "R4-001",
+              "risk_category": "R4",
+              "risk_name": "主要收入者身故导致家庭现金流中断",
+              "priority": "P0",
+              "severity": "CRITICAL",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "已有定期寿险 200 万",
+              "coverage_assessment": {
+                "protected_amount": 2000000,
+                "unprotected_amount": 0,
+                "confidence": 0.9
+              },
+              "conclusion": "寿险已充分覆盖家庭责任",
+              "reasoning_evidence_refs": [
+                "E004"
+              ]
+            },
+            {
+              "risk_id": "R1-001",
+              "risk_category": "R1",
+              "risk_name": "大额医疗费用支出",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "HIGH",
+              "residual_risk": "HIGH",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 500000,
+                "confidence": 0.7
+              },
+              "conclusion": "医疗风险无任何商业保障",
+              "reasoning_evidence_refs": [
+                "E001"
+              ]
+            },
+            {
+              "risk_id": "R2-001",
+              "risk_category": "R2",
+              "risk_name": "重大疾病收入中断",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "部分重疾保障",
+              "coverage_assessment": {
+                "protected_amount": 300000,
+                "unprotected_amount": 700000,
+                "confidence": 0.6
+              },
+              "conclusion": "重疾保额不足",
+              "reasoning_evidence_refs": [
+                "E002"
+              ]
+            },
+            {
+              "risk_id": "R3-001",
+              "risk_category": "R3",
+              "risk_name": "意外伤残收入损失",
+              "priority": "P2",
+              "severity": "MEDIUM",
+              "likelihood": "MEDIUM",
+              "residual_risk": "MEDIUM",
+              "existing_protection": "已有意外险",
+              "coverage_assessment": {
+                "protected_amount": 100000,
+                "unprotected_amount": 50000,
+                "confidence": 0.6
+              },
+              "conclusion": "意外保障部分覆盖",
+              "reasoning_evidence_refs": [
+                "E003"
+              ]
+            },
+            {
+              "risk_id": "R5-001",
+              "risk_category": "R5",
+              "risk_name": "退休现金流缺口",
+              "priority": "P3",
+              "severity": "LOW",
+              "likelihood": "MEDIUM",
+              "residual_risk": "LOW",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 300000,
+                "confidence": 0.5
+              },
+              "conclusion": "无长期储蓄规划",
+              "reasoning_evidence_refs": [
+                "E005"
+              ]
+            }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "artifact_type": "coverage-gap-analysis",
+          "skill": "coverage-gap-analysis",
+          "legacy_skill": "coverage-gap-analysis",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068361+00:00",
+          "payload": {
+            "gaps": [
+              {
+                "gap_id": "GAP-R1-001",
+                "domain": "medical",
+                "subject": "大额医疗费用支出",
+                "related_requirement_ids": [
+                  "REQ-MED"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "补充百万医疗险，覆盖社保外大额医疗支出与免赔额缺口",
+                  "rationale": "弥补社保报销上限与免赔额带来的自付风险"
+                },
+                "gap_level": "CRITICAL",
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001"
+                ]
+              }
+            ],
+            "priorities": [
+              {
+                "gap_id": "GAP-R1-001",
+                "priority": "P1",
+                "reason": "医疗保障无覆盖"
+              }
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE"
+          },
+          "provenance": []
+        }
+      },
+      "expect": {
+        "status": "success",
+        "coverage_gap_derivation": "canonical",
+        "coverage_gaps_len": 1,
+        "coverage_gaps_all_canonical": true,
+        "provenance_nonempty": true
+      }
+    },
+    {
+      "name": "v2_derived_fallback_warning",
+      "dimension": "backward-compat|honesty",
+      "description": "未提供 CoverageGapAnalysis。期望回退到 risk/requirement 推导，derivation=derived，并给出 GAP_SOURCE_DERIVED_NOT_CANONICAL 警告。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": {
+            "origin_skill": "client-intake",
+            "intake_complete": true
+          },
+          "family_profile": {
+            "age": {
+              "value": "35",
+              "status": "KNOWN"
+            },
+            "gender": {
+              "value": "男",
+              "status": "KNOWN"
+            },
+            "marital_status": {
+              "value": "已婚",
+              "status": "KNOWN"
+            },
+            "children": {
+              "value": "1孩（6岁）",
+              "status": "KNOWN"
+            },
+            "housing": {
+              "value": "自有住房，有房贷",
+              "status": "KNOWN"
+            }
+          },
+          "employment_profile": {
+            "occupation": {
+              "value": "企业中层管理",
+              "status": "KNOWN"
+            }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": {
+              "value": "家庭主要收入来源",
+              "status": "KNOWN"
+            }
+          },
+          "existing_protection": {
+            "social_security": {
+              "value": "职工社保+医保",
+              "status": "KNOWN"
+            },
+            "existing_insurance": {
+              "value": "一份百万医疗险",
+              "status": "KNOWN"
+            }
+          },
+          "financial_profile": {
+            "annual_income": {
+              "value": "80万",
+              "status": "KNOWN"
+            },
+            "annual_expense": {
+              "value": "36万",
+              "status": "KNOWN"
+            },
+            "mortgage": {
+              "value": "200万",
+              "status": "KNOWN"
+            },
+            "insurance_budget": {
+              "value": "3万",
+              "status": "KNOWN"
+            }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "requirements": [
+            {
+              "requirement_id": "REQ-MED",
+              "requirement_type": "medical",
+              "summary": "大额医疗支出保障",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-CI",
+              "requirement_type": "critical_illness",
+              "summary": "重疾收入补偿",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-ACC",
+              "requirement_type": "accident",
+              "summary": "意外医疗",
+              "priority": "P2_MEDIUM",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-LIFE",
+              "requirement_type": "life",
+              "summary": "家庭责任保障",
+              "priority": "P0_CRITICAL",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-SAV",
+              "requirement_type": "savings",
+              "summary": "长期储蓄",
+              "priority": "P3_LOW",
+              "boundary": "requirement_only"
+            }
+          ]
+        },
+        "risk_analysis": {
+          "output_version": "1.0",
+          "layer": "risk_analysis",
+          "analysis_status": "FORMAL",
+          "overall_confidence": 0.85,
+          "risks": [
+            {
+              "risk_id": "R4-001",
+              "risk_category": "R4",
+              "risk_name": "主要收入者身故导致家庭现金流中断",
+              "priority": "P0",
+              "severity": "CRITICAL",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "已有定期寿险 200 万",
+              "coverage_assessment": {
+                "protected_amount": 2000000,
+                "unprotected_amount": 0,
+                "confidence": 0.9
+              },
+              "conclusion": "寿险已充分覆盖家庭责任",
+              "reasoning_evidence_refs": [
+                "E004"
+              ]
+            },
+            {
+              "risk_id": "R1-001",
+              "risk_category": "R1",
+              "risk_name": "大额医疗费用支出",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "HIGH",
+              "residual_risk": "HIGH",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 500000,
+                "confidence": 0.7
+              },
+              "conclusion": "医疗风险无任何商业保障",
+              "reasoning_evidence_refs": [
+                "E001"
+              ]
+            },
+            {
+              "risk_id": "R2-001",
+              "risk_category": "R2",
+              "risk_name": "重大疾病收入中断",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "部分重疾保障",
+              "coverage_assessment": {
+                "protected_amount": 300000,
+                "unprotected_amount": 700000,
+                "confidence": 0.6
+              },
+              "conclusion": "重疾保额不足",
+              "reasoning_evidence_refs": [
+                "E002"
+              ]
+            },
+            {
+              "risk_id": "R3-001",
+              "risk_category": "R3",
+              "risk_name": "意外伤残收入损失",
+              "priority": "P2",
+              "severity": "MEDIUM",
+              "likelihood": "MEDIUM",
+              "residual_risk": "MEDIUM",
+              "existing_protection": "已有意外险",
+              "coverage_assessment": {
+                "protected_amount": 100000,
+                "unprotected_amount": 50000,
+                "confidence": 0.6
+              },
+              "conclusion": "意外保障部分覆盖",
+              "reasoning_evidence_refs": [
+                "E003"
+              ]
+            },
+            {
+              "risk_id": "R5-001",
+              "risk_category": "R5",
+              "risk_name": "退休现金流缺口",
+              "priority": "P3",
+              "severity": "LOW",
+              "likelihood": "MEDIUM",
+              "residual_risk": "LOW",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 300000,
+                "confidence": 0.5
+              },
+              "conclusion": "无长期储蓄规划",
+              "reasoning_evidence_refs": [
+                "E005"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "status": "success",
+        "coverage_gap_derivation": "derived",
+        "coverage_gaps_all_derived": true,
+        "metadata_warnings_contains": [
+          "GAP_SOURCE_DERIVED_NOT_CANONICAL",
+          "MISSING_UPSTREAM_RESULT: knowledge_evidence",
+          "MISSING_UPSTREAM_RESULT: product_recommendation"
+        ]
+      }
+    },
+    {
+      "name": "v2_solution_without_product",
+      "dimension": "failure-handling|boundary",
+      "description": "提供 SolutionPlan 但无 ProductRecommendation。期望策略章节呈现、推荐方向为空且明确标注不足，不自行生成产品方向。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": {
+            "origin_skill": "client-intake",
+            "intake_complete": true
+          },
+          "family_profile": {
+            "age": {
+              "value": "35",
+              "status": "KNOWN"
+            },
+            "gender": {
+              "value": "男",
+              "status": "KNOWN"
+            },
+            "marital_status": {
+              "value": "已婚",
+              "status": "KNOWN"
+            },
+            "children": {
+              "value": "1孩（6岁）",
+              "status": "KNOWN"
+            },
+            "housing": {
+              "value": "自有住房，有房贷",
+              "status": "KNOWN"
+            }
+          },
+          "employment_profile": {
+            "occupation": {
+              "value": "企业中层管理",
+              "status": "KNOWN"
+            }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": {
+              "value": "家庭主要收入来源",
+              "status": "KNOWN"
+            }
+          },
+          "existing_protection": {
+            "social_security": {
+              "value": "职工社保+医保",
+              "status": "KNOWN"
+            },
+            "existing_insurance": {
+              "value": "一份百万医疗险",
+              "status": "KNOWN"
+            }
+          },
+          "financial_profile": {
+            "annual_income": {
+              "value": "80万",
+              "status": "KNOWN"
+            },
+            "annual_expense": {
+              "value": "36万",
+              "status": "KNOWN"
+            },
+            "mortgage": {
+              "value": "200万",
+              "status": "KNOWN"
+            },
+            "insurance_budget": {
+              "value": "3万",
+              "status": "KNOWN"
+            }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "requirements": [
+            {
+              "requirement_id": "REQ-MED",
+              "requirement_type": "medical",
+              "summary": "大额医疗支出保障",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-CI",
+              "requirement_type": "critical_illness",
+              "summary": "重疾收入补偿",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-ACC",
+              "requirement_type": "accident",
+              "summary": "意外医疗",
+              "priority": "P2_MEDIUM",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-LIFE",
+              "requirement_type": "life",
+              "summary": "家庭责任保障",
+              "priority": "P0_CRITICAL",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-SAV",
+              "requirement_type": "savings",
+              "summary": "长期储蓄",
+              "priority": "P3_LOW",
+              "boundary": "requirement_only"
+            }
+          ]
+        },
+        "risk_analysis": {
+          "output_version": "1.0",
+          "layer": "risk_analysis",
+          "analysis_status": "FORMAL",
+          "overall_confidence": 0.85,
+          "risks": [
+            {
+              "risk_id": "R4-001",
+              "risk_category": "R4",
+              "risk_name": "主要收入者身故导致家庭现金流中断",
+              "priority": "P0",
+              "severity": "CRITICAL",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "已有定期寿险 200 万",
+              "coverage_assessment": {
+                "protected_amount": 2000000,
+                "unprotected_amount": 0,
+                "confidence": 0.9
+              },
+              "conclusion": "寿险已充分覆盖家庭责任",
+              "reasoning_evidence_refs": [
+                "E004"
+              ]
+            },
+            {
+              "risk_id": "R1-001",
+              "risk_category": "R1",
+              "risk_name": "大额医疗费用支出",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "HIGH",
+              "residual_risk": "HIGH",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 500000,
+                "confidence": 0.7
+              },
+              "conclusion": "医疗风险无任何商业保障",
+              "reasoning_evidence_refs": [
+                "E001"
+              ]
+            },
+            {
+              "risk_id": "R2-001",
+              "risk_category": "R2",
+              "risk_name": "重大疾病收入中断",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "部分重疾保障",
+              "coverage_assessment": {
+                "protected_amount": 300000,
+                "unprotected_amount": 700000,
+                "confidence": 0.6
+              },
+              "conclusion": "重疾保额不足",
+              "reasoning_evidence_refs": [
+                "E002"
+              ]
+            },
+            {
+              "risk_id": "R3-001",
+              "risk_category": "R3",
+              "risk_name": "意外伤残收入损失",
+              "priority": "P2",
+              "severity": "MEDIUM",
+              "likelihood": "MEDIUM",
+              "residual_risk": "MEDIUM",
+              "existing_protection": "已有意外险",
+              "coverage_assessment": {
+                "protected_amount": 100000,
+                "unprotected_amount": 50000,
+                "confidence": 0.6
+              },
+              "conclusion": "意外保障部分覆盖",
+              "reasoning_evidence_refs": [
+                "E003"
+              ]
+            },
+            {
+              "risk_id": "R5-001",
+              "risk_category": "R5",
+              "risk_name": "退休现金流缺口",
+              "priority": "P3",
+              "severity": "LOW",
+              "likelihood": "MEDIUM",
+              "residual_risk": "LOW",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 300000,
+                "confidence": 0.5
+              },
+              "conclusion": "无长期储蓄规划",
+              "reasoning_evidence_refs": [
+                "E005"
+              ]
+            }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "artifact_type": "coverage-gap-analysis",
+          "skill": "coverage-gap-analysis",
+          "legacy_skill": "coverage-gap-analysis",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068361+00:00",
+          "payload": {
+            "gaps": [
+              {
+                "gap_id": "GAP-R1-001",
+                "domain": "medical",
+                "subject": "大额医疗费用支出",
+                "related_requirement_ids": [
+                  "REQ-MED"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "补充百万医疗险，覆盖社保外大额医疗支出与免赔额缺口",
+                  "rationale": "弥补社保报销上限与免赔额带来的自付风险"
+                },
+                "gap_level": "CRITICAL",
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001"
+                ]
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "domain": "critical_illness",
+                "subject": "重大疾病收入中断",
+                "related_requirement_ids": [
+                  "REQ-CI"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置重疾险，保额覆盖 3-5 年家庭年收入",
+                  "rationale": "弥补重疾期间的收入中断、治疗与康复支出"
+                },
+                "gap_level": "HIGH",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002"
+                ]
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "domain": "accident",
+                "subject": "意外伤残收入损失",
+                "related_requirement_ids": [
+                  "REQ-ACC"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置综合意外险（含意外医疗与伤残给付）",
+                  "rationale": "覆盖意外导致的医疗与收入能力损失"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003"
+                ]
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "domain": "savings",
+                "subject": "退休现金流缺口",
+                "related_requirement_ids": [
+                  "REQ-SAV"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "建立长期储蓄/年金规划，覆盖退休与子女教育刚性支出",
+                  "rationale": "弥补长期现金流缺口"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005"
+                ]
+              }
+            ],
+            "priorities": [
+              {
+                "gap_id": "GAP-R1-001",
+                "priority": "P1",
+                "reason": "医疗保障无覆盖"
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "priority": "P1",
+                "reason": "重大疾病保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "priority": "P2",
+                "reason": "意外保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "priority": "P3",
+                "reason": "储蓄/长期财务保障无覆盖"
+              }
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE"
+          },
+          "provenance": []
+        },
+        "solution_plan": {
+          "artifact_type": "solution-plan",
+          "skill": "solution",
+          "legacy_skill": "solution",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068721+00:00",
+          "payload": {
+            "solutions": [
+              {
+                "solution_id": "SOL-001",
+                "solution_type": "MEDICAL",
+                "objective": "建立大额医疗支出保障",
+                "coverage_direction": "当前无覆盖，需以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+                "priority": "P0",
+                "constraints": [
+                  {
+                    "constraint": "从零建立",
+                    "value": "当前无对应保障，需完整建立该方向保障",
+                    "source": "GAP-R1-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-MED"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P1_HIGH",
+                    "source": "REQ-MED"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "保障范围",
+                    "option_a": "仅社保目录内",
+                    "option_b": "含目录外与免赔额以上",
+                    "chosen": "含目录外与免赔额以上",
+                    "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "仅依赖社保",
+                    "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R1-001"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001",
+                  "from:GAP-R1-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-002",
+                "solution_type": "CRITICAL_ILLNESS",
+                "objective": "建立重疾收入补偿保障",
+                "coverage_direction": "当前部分覆盖，需以收入替代与康复期支出确定保额，覆盖治疗及康复期间的家庭固定开支",
+                "priority": "P1",
+                "constraints": [
+                  {
+                    "constraint": "增量补差",
+                    "value": "在现有保障基础上补足差额，避免重复配置",
+                    "source": "GAP-R2-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-CI"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P1_HIGH",
+                    "source": "REQ-CI"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "赔付方式",
+                    "option_a": "费用报销型",
+                    "option_b": "确诊给付型",
+                    "chosen": "确诊给付型",
+                    "reason": "重疾的主要敞口是收入中断与康复期支出，而非医疗费用本身"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "以医疗险替代重疾保障",
+                    "reason": "医疗险按费用报销，无法覆盖收入中断与康复期支出"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R2-001"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002",
+                  "from:GAP-R2-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-003",
+                "solution_type": "ACCIDENT",
+                "objective": "建立意外伤残与意外医疗保障",
+                "coverage_direction": "当前部分覆盖，需以伤残等级对应的收入损失与意外医疗支出确定保额",
+                "priority": "P2",
+                "constraints": [
+                  {
+                    "constraint": "增量补差",
+                    "value": "在现有保障基础上补足差额，避免重复配置",
+                    "source": "GAP-R3-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-ACC"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P2_MEDIUM",
+                    "source": "REQ-ACC"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "保障责任",
+                    "option_a": "仅意外身故",
+                    "option_b": "含伤残分级与意外医疗",
+                    "chosen": "含伤残分级与意外医疗",
+                    "reason": "意外的主要敞口是伤残导致的收入损失，而非身故"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "仅配置意外身故责任",
+                    "reason": "无法覆盖伤残导致的收入损失与意外医疗支出"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R3-001"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003",
+                  "from:GAP-R3-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-004",
+                "solution_type": "SAVINGS",
+                "objective": "建立长期确定性现金流储备",
+                "coverage_direction": "当前无覆盖，需以长期现金流目标与风险承受能力确定储蓄方向与期限",
+                "priority": "P2",
+                "constraints": [
+                  {
+                    "constraint": "从零建立",
+                    "value": "当前无对应保障，需完整建立该方向保障",
+                    "source": "GAP-R5-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-SAV"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P3_LOW",
+                    "source": "REQ-SAV"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "确定性",
+                    "option_a": "浮动收益",
+                    "option_b": "确定给付",
+                    "chosen": "确定给付",
+                    "reason": "长期现金流目标优先保证确定性，避免波动侵蚀目标"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "以高波动投资替代储蓄型保障",
+                    "reason": "与长期确定性现金流目标不匹配"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R5-001"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005",
+                  "from:GAP-R5-001"
+                ]
+              }
+            ],
+            "objective": "建立大额医疗支出保障",
+            "coverage_direction": "当前无覆盖，需以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+            "priority": "P0",
+            "constraints": [
+              {
+                "constraint": "从零建立",
+                "value": "当前无对应保障，需完整建立该方向保障",
+                "source": "GAP-R1-001"
+              },
+              {
+                "constraint": "需求分析边界",
+                "value": "requirement_only",
+                "source": "REQ-MED"
+              },
+              {
+                "constraint": "客户已声明的需求优先级",
+                "value": "P1_HIGH",
+                "source": "REQ-MED"
+              }
+            ],
+            "trade_offs": [
+              {
+                "axis": "保障范围",
+                "option_a": "仅社保目录内",
+                "option_b": "含目录外与免赔额以上",
+                "chosen": "含目录外与免赔额以上",
+                "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+              }
+            ],
+            "rejected_directions": [
+              {
+                "direction": "仅依赖社保",
+                "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"
+              }
+            ],
+            "related_gap_ids": [
+              "GAP-R1-001",
+              "GAP-R2-001",
+              "GAP-R3-001",
+              "GAP-R5-001"
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE",
+            "solution_type": "MEDICAL"
+          },
+          "provenance": []
+        }
+      },
+      "expect": {
+        "status": "success",
+        "coverage_gap_derivation": "canonical",
+        "solution_strategies_nonempty": true,
+        "metadata_warnings_contains": [
+          "MISSING_UPSTREAM_RESULT: product_recommendation"
+        ],
+        "rendered_contains": [
+          "解决策略（SolutionPlan）"
+        ],
+        "rendered_forbids": [
+          "平安",
+          "国寿"
+        ]
+      }
+    },
+    {
+      "name": "v2_evidence_conflict",
+      "dimension": "conflict|honesty",
+      "description": "KnowledgeEvidence 携带冲突。期望冲突原样呈现（元数据警告 + 证据表冲突列），本报告不自行裁决。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": {
+            "origin_skill": "client-intake",
+            "intake_complete": true
+          },
+          "family_profile": {
+            "age": {
+              "value": "35",
+              "status": "KNOWN"
+            },
+            "gender": {
+              "value": "男",
+              "status": "KNOWN"
+            },
+            "marital_status": {
+              "value": "已婚",
+              "status": "KNOWN"
+            },
+            "children": {
+              "value": "1孩（6岁）",
+              "status": "KNOWN"
+            },
+            "housing": {
+              "value": "自有住房，有房贷",
+              "status": "KNOWN"
+            }
+          },
+          "employment_profile": {
+            "occupation": {
+              "value": "企业中层管理",
+              "status": "KNOWN"
+            }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": {
+              "value": "家庭主要收入来源",
+              "status": "KNOWN"
+            }
+          },
+          "existing_protection": {
+            "social_security": {
+              "value": "职工社保+医保",
+              "status": "KNOWN"
+            },
+            "existing_insurance": {
+              "value": "一份百万医疗险",
+              "status": "KNOWN"
+            }
+          },
+          "financial_profile": {
+            "annual_income": {
+              "value": "80万",
+              "status": "KNOWN"
+            },
+            "annual_expense": {
+              "value": "36万",
+              "status": "KNOWN"
+            },
+            "mortgage": {
+              "value": "200万",
+              "status": "KNOWN"
+            },
+            "insurance_budget": {
+              "value": "3万",
+              "status": "KNOWN"
+            }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "requirements": [
+            {
+              "requirement_id": "REQ-MED",
+              "requirement_type": "medical",
+              "summary": "大额医疗支出保障",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-CI",
+              "requirement_type": "critical_illness",
+              "summary": "重疾收入补偿",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-ACC",
+              "requirement_type": "accident",
+              "summary": "意外医疗",
+              "priority": "P2_MEDIUM",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-LIFE",
+              "requirement_type": "life",
+              "summary": "家庭责任保障",
+              "priority": "P0_CRITICAL",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-SAV",
+              "requirement_type": "savings",
+              "summary": "长期储蓄",
+              "priority": "P3_LOW",
+              "boundary": "requirement_only"
+            }
+          ]
+        },
+        "risk_analysis": {
+          "output_version": "1.0",
+          "layer": "risk_analysis",
+          "analysis_status": "FORMAL",
+          "overall_confidence": 0.85,
+          "risks": [
+            {
+              "risk_id": "R4-001",
+              "risk_category": "R4",
+              "risk_name": "主要收入者身故导致家庭现金流中断",
+              "priority": "P0",
+              "severity": "CRITICAL",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "已有定期寿险 200 万",
+              "coverage_assessment": {
+                "protected_amount": 2000000,
+                "unprotected_amount": 0,
+                "confidence": 0.9
+              },
+              "conclusion": "寿险已充分覆盖家庭责任",
+              "reasoning_evidence_refs": [
+                "E004"
+              ]
+            },
+            {
+              "risk_id": "R1-001",
+              "risk_category": "R1",
+              "risk_name": "大额医疗费用支出",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "HIGH",
+              "residual_risk": "HIGH",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 500000,
+                "confidence": 0.7
+              },
+              "conclusion": "医疗风险无任何商业保障",
+              "reasoning_evidence_refs": [
+                "E001"
+              ]
+            },
+            {
+              "risk_id": "R2-001",
+              "risk_category": "R2",
+              "risk_name": "重大疾病收入中断",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "部分重疾保障",
+              "coverage_assessment": {
+                "protected_amount": 300000,
+                "unprotected_amount": 700000,
+                "confidence": 0.6
+              },
+              "conclusion": "重疾保额不足",
+              "reasoning_evidence_refs": [
+                "E002"
+              ]
+            },
+            {
+              "risk_id": "R3-001",
+              "risk_category": "R3",
+              "risk_name": "意外伤残收入损失",
+              "priority": "P2",
+              "severity": "MEDIUM",
+              "likelihood": "MEDIUM",
+              "residual_risk": "MEDIUM",
+              "existing_protection": "已有意外险",
+              "coverage_assessment": {
+                "protected_amount": 100000,
+                "unprotected_amount": 50000,
+                "confidence": 0.6
+              },
+              "conclusion": "意外保障部分覆盖",
+              "reasoning_evidence_refs": [
+                "E003"
+              ]
+            },
+            {
+              "risk_id": "R5-001",
+              "risk_category": "R5",
+              "risk_name": "退休现金流缺口",
+              "priority": "P3",
+              "severity": "LOW",
+              "likelihood": "MEDIUM",
+              "residual_risk": "LOW",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 300000,
+                "confidence": 0.5
+              },
+              "conclusion": "无长期储蓄规划",
+              "reasoning_evidence_refs": [
+                "E005"
+              ]
+            }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "artifact_type": "coverage-gap-analysis",
+          "skill": "coverage-gap-analysis",
+          "legacy_skill": "coverage-gap-analysis",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068361+00:00",
+          "payload": {
+            "gaps": [
+              {
+                "gap_id": "GAP-R1-001",
+                "domain": "medical",
+                "subject": "大额医疗费用支出",
+                "related_requirement_ids": [
+                  "REQ-MED"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "补充百万医疗险，覆盖社保外大额医疗支出与免赔额缺口",
+                  "rationale": "弥补社保报销上限与免赔额带来的自付风险"
+                },
+                "gap_level": "CRITICAL",
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001"
+                ]
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "domain": "critical_illness",
+                "subject": "重大疾病收入中断",
+                "related_requirement_ids": [
+                  "REQ-CI"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置重疾险，保额覆盖 3-5 年家庭年收入",
+                  "rationale": "弥补重疾期间的收入中断、治疗与康复支出"
+                },
+                "gap_level": "HIGH",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002"
+                ]
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "domain": "accident",
+                "subject": "意外伤残收入损失",
+                "related_requirement_ids": [
+                  "REQ-ACC"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置综合意外险（含意外医疗与伤残给付）",
+                  "rationale": "覆盖意外导致的医疗与收入能力损失"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003"
+                ]
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "domain": "savings",
+                "subject": "退休现金流缺口",
+                "related_requirement_ids": [
+                  "REQ-SAV"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "建立长期储蓄/年金规划，覆盖退休与子女教育刚性支出",
+                  "rationale": "弥补长期现金流缺口"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005"
+                ]
+              }
+            ],
+            "priorities": [
+              {
+                "gap_id": "GAP-R1-001",
+                "priority": "P1",
+                "reason": "医疗保障无覆盖"
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "priority": "P1",
+                "reason": "重大疾病保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "priority": "P2",
+                "reason": "意外保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "priority": "P3",
+                "reason": "储蓄/长期财务保障无覆盖"
+              }
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE"
+          },
+          "provenance": []
+        },
+        "solution_plan": {
+          "artifact_type": "solution-plan",
+          "skill": "solution",
+          "legacy_skill": "solution",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068721+00:00",
+          "payload": {
+            "solutions": [
+              {
+                "solution_id": "SOL-001",
+                "solution_type": "MEDICAL",
+                "objective": "建立大额医疗支出保障",
+                "coverage_direction": "当前无覆盖，需以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+                "priority": "P0",
+                "constraints": [
+                  {
+                    "constraint": "从零建立",
+                    "value": "当前无对应保障，需完整建立该方向保障",
+                    "source": "GAP-R1-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-MED"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P1_HIGH",
+                    "source": "REQ-MED"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "保障范围",
+                    "option_a": "仅社保目录内",
+                    "option_b": "含目录外与免赔额以上",
+                    "chosen": "含目录外与免赔额以上",
+                    "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "仅依赖社保",
+                    "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R1-001"
+                ],
+                "related_risk_ids": [
+                  "R1-001"
+                ],
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001",
+                  "from:GAP-R1-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-002",
+                "solution_type": "CRITICAL_ILLNESS",
+                "objective": "建立重疾收入补偿保障",
+                "coverage_direction": "当前部分覆盖，需以收入替代与康复期支出确定保额，覆盖治疗及康复期间的家庭固定开支",
+                "priority": "P1",
+                "constraints": [
+                  {
+                    "constraint": "增量补差",
+                    "value": "在现有保障基础上补足差额，避免重复配置",
+                    "source": "GAP-R2-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-CI"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P1_HIGH",
+                    "source": "REQ-CI"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "赔付方式",
+                    "option_a": "费用报销型",
+                    "option_b": "确诊给付型",
+                    "chosen": "确诊给付型",
+                    "reason": "重疾的主要敞口是收入中断与康复期支出，而非医疗费用本身"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "以医疗险替代重疾保障",
+                    "reason": "医疗险按费用报销，无法覆盖收入中断与康复期支出"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R2-001"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002",
+                  "from:GAP-R2-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-003",
+                "solution_type": "ACCIDENT",
+                "objective": "建立意外伤残与意外医疗保障",
+                "coverage_direction": "当前部分覆盖，需以伤残等级对应的收入损失与意外医疗支出确定保额",
+                "priority": "P2",
+                "constraints": [
+                  {
+                    "constraint": "增量补差",
+                    "value": "在现有保障基础上补足差额，避免重复配置",
+                    "source": "GAP-R3-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-ACC"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P2_MEDIUM",
+                    "source": "REQ-ACC"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "保障责任",
+                    "option_a": "仅意外身故",
+                    "option_b": "含伤残分级与意外医疗",
+                    "chosen": "含伤残分级与意外医疗",
+                    "reason": "意外的主要敞口是伤残导致的收入损失，而非身故"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "仅配置意外身故责任",
+                    "reason": "无法覆盖伤残导致的收入损失与意外医疗支出"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R3-001"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003",
+                  "from:GAP-R3-001"
+                ]
+              },
+              {
+                "solution_id": "SOL-004",
+                "solution_type": "SAVINGS",
+                "objective": "建立长期确定性现金流储备",
+                "coverage_direction": "当前无覆盖，需以长期现金流目标与风险承受能力确定储蓄方向与期限",
+                "priority": "P2",
+                "constraints": [
+                  {
+                    "constraint": "从零建立",
+                    "value": "当前无对应保障，需完整建立该方向保障",
+                    "source": "GAP-R5-001"
+                  },
+                  {
+                    "constraint": "需求分析边界",
+                    "value": "requirement_only",
+                    "source": "REQ-SAV"
+                  },
+                  {
+                    "constraint": "客户已声明的需求优先级",
+                    "value": "P3_LOW",
+                    "source": "REQ-SAV"
+                  }
+                ],
+                "trade_offs": [
+                  {
+                    "axis": "确定性",
+                    "option_a": "浮动收益",
+                    "option_b": "确定给付",
+                    "chosen": "确定给付",
+                    "reason": "长期现金流目标优先保证确定性，避免波动侵蚀目标"
+                  }
+                ],
+                "rejected_directions": [
+                  {
+                    "direction": "以高波动投资替代储蓄型保障",
+                    "reason": "与长期确定性现金流目标不匹配"
+                  }
+                ],
+                "related_gap_ids": [
+                  "GAP-R5-001"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005",
+                  "from:GAP-R5-001"
+                ]
+              }
+            ],
+            "objective": "建立大额医疗支出保障",
+            "coverage_direction": "当前无覆盖，需以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+            "priority": "P0",
+            "constraints": [
+              {
+                "constraint": "从零建立",
+                "value": "当前无对应保障，需完整建立该方向保障",
+                "source": "GAP-R1-001"
+              },
+              {
+                "constraint": "需求分析边界",
+                "value": "requirement_only",
+                "source": "REQ-MED"
+              },
+              {
+                "constraint": "客户已声明的需求优先级",
+                "value": "P1_HIGH",
+                "source": "REQ-MED"
+              }
+            ],
+            "trade_offs": [
+              {
+                "axis": "保障范围",
+                "option_a": "仅社保目录内",
+                "option_b": "含目录外与免赔额以上",
+                "chosen": "含目录外与免赔额以上",
+                "reason": "大额医疗支出的主要敞口位于目录外与免赔额以上部分"
+              }
+            ],
+            "rejected_directions": [
+              {
+                "direction": "仅依赖社保",
+                "reason": "社保目录外与起付线以上部分无法覆盖大额支出敞口"
+              }
+            ],
+            "related_gap_ids": [
+              "GAP-R1-001",
+              "GAP-R2-001",
+              "GAP-R3-001",
+              "GAP-R5-001"
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE",
+            "solution_type": "MEDICAL"
+          },
+          "provenance": []
+        },
+        "knowledge_evidence": {
+          "artifact_type": "knowledge-evidence",
+          "skill": "knowledge-search",
+          "legacy_skill": "knowledge-search",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.273266+00:00",
+          "payload": {
+            "status": "success",
+            "query": "百万医疗险 保障范围 免赔额 社保目录外 适用性 策略验证",
+            "evidence": [
+              {
+                "evidence_id": "01_medical_insurance_002",
+                "content": "百万医疗险以费用报销为主要赔付方式，凭医疗费用票据按约定比例报销，一般设有免赔额（常见 1 万元）与报销上限。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.9125,
+                "confidence": 0.9125,
+                "provenance": [],
+                "conflict": true
+              },
+              {
+                "evidence_id": "01_medical_insurance_005",
+                "content": "百万医疗险对既往症通常不予赔付，投保前已患疾病一般属于责任免除范围。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.7707,
+                "confidence": 0.7707,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_004",
+                "content": "百万医疗险常见等待期为 30 天，等待期内出险一般不予赔付（意外伤害通常无等待期）。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.7227,
+                "confidence": 0.7227,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_001",
+                "content": "百万医疗险主要解决大额医疗费用支出风险，通常提供高额住院医疗报销额度（常见百万级别）。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.7013,
+                "confidence": 0.7013,
+                "provenance": [],
+                "conflict": false
+              },
+              {
+                "evidence_id": "01_medical_insurance_003",
+                "content": "百万医疗险与重疾险的赔付逻辑不同：前者报销医疗费用，后者达到约定重大疾病状态即给付约定金额。两者可互补，不冲突。",
+                "source": "01_medical_insurance",
+                "source_type": "internal",
+                "relevance": 0.6243,
+                "confidence": 0.6243,
+                "provenance": [],
+                "conflict": false
+              }
+            ],
+            "conflict": true
+          },
+          "provenance": [
+            {
+              "source_type": "KNOWLEDGE_SEARCH",
+              "source_id": "knowledge-search",
+              "confidence": null
+            }
+          ]
+        }
+      },
+      "expect": {
+        "status": "success",
+        "evidence_summary_nonempty": true,
+        "evidence_has_conflict": true,
+        "metadata_warnings_contains": [
+          "KnowledgeEvidence 存在冲突"
+        ]
+      }
+    },
+    {
+      "name": "v2_gap_vs_risk_conflict",
+      "dimension": "conflict|consistency",
+      "description": "CoverageGapAnalysis 判定该缺口为 NONE（无覆盖），但其 related_risk_ids 指向的风险在上游 coverage_assessment 中记载了已保障金额。期望检测到跨 Artifact 冲突并原样呈现，本报告不自行裁决。",
+      "input": {
+        "client_profile": {
+          "client_state_version": "1.0",
+          "source": {
+            "origin_skill": "client-intake",
+            "intake_complete": true
+          },
+          "family_profile": {
+            "age": {
+              "value": "35",
+              "status": "KNOWN"
+            },
+            "gender": {
+              "value": "男",
+              "status": "KNOWN"
+            },
+            "marital_status": {
+              "value": "已婚",
+              "status": "KNOWN"
+            },
+            "children": {
+              "value": "1孩（6岁）",
+              "status": "KNOWN"
+            },
+            "housing": {
+              "value": "自有住房，有房贷",
+              "status": "KNOWN"
+            }
+          },
+          "employment_profile": {
+            "occupation": {
+              "value": "企业中层管理",
+              "status": "KNOWN"
+            }
+          },
+          "responsibility_profile": {
+            "economic_responsibility": {
+              "value": "家庭主要收入来源",
+              "status": "KNOWN"
+            }
+          },
+          "existing_protection": {
+            "social_security": {
+              "value": "职工社保+医保",
+              "status": "KNOWN"
+            },
+            "existing_insurance": {
+              "value": "一份百万医疗险",
+              "status": "KNOWN"
+            }
+          },
+          "financial_profile": {
+            "annual_income": {
+              "value": "80万",
+              "status": "KNOWN"
+            },
+            "annual_expense": {
+              "value": "36万",
+              "status": "KNOWN"
+            },
+            "mortgage": {
+              "value": "200万",
+              "status": "KNOWN"
+            },
+            "insurance_budget": {
+              "value": "3万",
+              "status": "KNOWN"
+            }
+          },
+          "missing_from_upstream": [],
+          "conflicts": []
+        },
+        "requirement_analysis": {
+          "analysis_status": "COMPLETE",
+          "requirements": [
+            {
+              "requirement_id": "REQ-MED",
+              "requirement_type": "medical",
+              "summary": "大额医疗支出保障",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-CI",
+              "requirement_type": "critical_illness",
+              "summary": "重疾收入补偿",
+              "priority": "P1_HIGH",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-ACC",
+              "requirement_type": "accident",
+              "summary": "意外医疗",
+              "priority": "P2_MEDIUM",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-LIFE",
+              "requirement_type": "life",
+              "summary": "家庭责任保障",
+              "priority": "P0_CRITICAL",
+              "boundary": "requirement_only"
+            },
+            {
+              "requirement_id": "REQ-SAV",
+              "requirement_type": "savings",
+              "summary": "长期储蓄",
+              "priority": "P3_LOW",
+              "boundary": "requirement_only"
+            }
+          ]
+        },
+        "risk_analysis": {
+          "output_version": "1.0",
+          "layer": "risk_analysis",
+          "analysis_status": "FORMAL",
+          "overall_confidence": 0.85,
+          "risks": [
+            {
+              "risk_id": "R4-001",
+              "risk_category": "R4",
+              "risk_name": "主要收入者身故导致家庭现金流中断",
+              "priority": "P0",
+              "severity": "CRITICAL",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "已有定期寿险 200 万",
+              "coverage_assessment": {
+                "protected_amount": 2000000,
+                "unprotected_amount": 0,
+                "confidence": 0.9
+              },
+              "conclusion": "寿险已充分覆盖家庭责任",
+              "reasoning_evidence_refs": [
+                "E004"
+              ]
+            },
+            {
+              "risk_id": "R1-001",
+              "risk_category": "R1",
+              "risk_name": "大额医疗费用支出",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "HIGH",
+              "residual_risk": "HIGH",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 500000,
+                "confidence": 0.7
+              },
+              "conclusion": "医疗风险无任何商业保障",
+              "reasoning_evidence_refs": [
+                "E001"
+              ]
+            },
+            {
+              "risk_id": "R2-001",
+              "risk_category": "R2",
+              "risk_name": "重大疾病收入中断",
+              "priority": "P1",
+              "severity": "HIGH",
+              "likelihood": "MEDIUM",
+              "residual_risk": "HIGH",
+              "existing_protection": "部分重疾保障",
+              "coverage_assessment": {
+                "protected_amount": 300000,
+                "unprotected_amount": 700000,
+                "confidence": 0.6
+              },
+              "conclusion": "重疾保额不足",
+              "reasoning_evidence_refs": [
+                "E002"
+              ]
+            },
+            {
+              "risk_id": "R3-001",
+              "risk_category": "R3",
+              "risk_name": "意外伤残收入损失",
+              "priority": "P2",
+              "severity": "MEDIUM",
+              "likelihood": "MEDIUM",
+              "residual_risk": "MEDIUM",
+              "existing_protection": "已有意外险",
+              "coverage_assessment": {
+                "protected_amount": 100000,
+                "unprotected_amount": 50000,
+                "confidence": 0.6
+              },
+              "conclusion": "意外保障部分覆盖",
+              "reasoning_evidence_refs": [
+                "E003"
+              ]
+            },
+            {
+              "risk_id": "R5-001",
+              "risk_category": "R5",
+              "risk_name": "退休现金流缺口",
+              "priority": "P3",
+              "severity": "LOW",
+              "likelihood": "MEDIUM",
+              "residual_risk": "LOW",
+              "existing_protection": "无",
+              "coverage_assessment": {
+                "protected_amount": 0,
+                "unprotected_amount": 300000,
+                "confidence": 0.5
+              },
+              "conclusion": "无长期储蓄规划",
+              "reasoning_evidence_refs": [
+                "E005"
+              ]
+            }
+          ]
+        },
+        "coverage_gap_analysis": {
+          "artifact_type": "coverage-gap-analysis",
+          "skill": "coverage-gap-analysis",
+          "legacy_skill": "coverage-gap-analysis",
+          "schema_version": "1.0",
+          "generated_at": "2026-09-13T16:27:16.068361+00:00",
+          "payload": {
+            "gaps": [
+              {
+                "gap_id": "GAP-R1-001",
+                "domain": "medical",
+                "subject": "大额医疗费用支出",
+                "related_requirement_ids": [
+                  "REQ-MED"
+                ],
+                "related_risk_ids": [
+                  "R4-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "补充百万医疗险，覆盖社保外大额医疗支出与免赔额缺口",
+                  "rationale": "弥补社保报销上限与免赔额带来的自付风险"
+                },
+                "gap_level": "CRITICAL",
+                "confidence": 0.7,
+                "evidence_refs": [
+                  "E001"
+                ]
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "domain": "critical_illness",
+                "subject": "重大疾病收入中断",
+                "related_requirement_ids": [
+                  "REQ-CI"
+                ],
+                "related_risk_ids": [
+                  "R2-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置重疾险，保额覆盖 3-5 年家庭年收入",
+                  "rationale": "弥补重疾期间的收入中断、治疗与康复支出"
+                },
+                "gap_level": "HIGH",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E002"
+                ]
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "domain": "accident",
+                "subject": "意外伤残收入损失",
+                "related_requirement_ids": [
+                  "REQ-ACC"
+                ],
+                "related_risk_ids": [
+                  "R3-001"
+                ],
+                "current_coverage": {
+                  "status": "PARTIAL",
+                  "evidence_refs": [
+                    "coverage_assessment 显示部分覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "配置综合意外险（含意外医疗与伤残给付）",
+                  "rationale": "覆盖意外导致的医疗与收入能力损失"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.6,
+                "evidence_refs": [
+                  "E003"
+                ]
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "domain": "savings",
+                "subject": "退休现金流缺口",
+                "related_requirement_ids": [
+                  "REQ-SAV"
+                ],
+                "related_risk_ids": [
+                  "R5-001"
+                ],
+                "current_coverage": {
+                  "status": "NONE",
+                  "evidence_refs": [
+                    "coverage_assessment 显示无任何覆盖"
+                  ]
+                },
+                "target_coverage": {
+                  "direction": "建立长期储蓄/年金规划，覆盖退休与子女教育刚性支出",
+                  "rationale": "弥补长期现金流缺口"
+                },
+                "gap_level": "MEDIUM",
+                "confidence": 0.5,
+                "evidence_refs": [
+                  "E005"
+                ]
+              }
+            ],
+            "priorities": [
+              {
+                "gap_id": "GAP-R1-001",
+                "priority": "P1",
+                "reason": "医疗保障无覆盖"
+              },
+              {
+                "gap_id": "GAP-R2-001",
+                "priority": "P1",
+                "reason": "重大疾病保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R3-001",
+                "priority": "P2",
+                "reason": "意外保障部分覆盖"
+              },
+              {
+                "gap_id": "GAP-R5-001",
+                "priority": "P3",
+                "reason": "储蓄/长期财务保障无覆盖"
+              }
+            ],
+            "information_gaps": [],
+            "status": "COMPLETE"
+          },
+          "provenance": []
+        }
+      },
+      "expect": {
+        "status": "success",
+        "metadata_conflicts_nonempty": true
+      }
+    }
+  ]
+}

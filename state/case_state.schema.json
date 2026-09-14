@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "case-state.schema.json",
+  "title": "CaseState",
+  "description": "Orchestration state for ONE client case across the 8-skill insurance pipeline (V2 Phase 7). CaseState is the single source of truth: every stage reads its inputs from `artifacts` and writes exactly one artifact back. It records stage status, provenance of each artifact, and an append-only event log. It contains NO business judgment.",
+  "type": "object",
+  "required": ["case_id", "workflow", "stage_order", "stages", "artifacts"],
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Stable identifier for the client case."
+    },
+    "workflow": {
+      "type": "string",
+      "description": "Workflow id this case is being run against (e.g. insurance-analysis)."
+    },
+    "workflow_version": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "stage_order": {
+      "type": "array",
+      "description": "Canonical linear stage order. Derived from the workflow definition, never hand-edited.",
+      "items": { "type": "string" }
+    },
+    "current_stage": {
+      "type": ["string", "null"],
+      "description": "Last stage entered (or null before the first stage runs)."
+    },
+    "stages": {
+      "type": "object",
+      "description": "Per-stage bookkeeping keyed by canonical skill id.",
+      "additionalProperties": { "$ref": "#/definitions/stage" }
+    },
+    "artifacts": {
+      "type": "object",
+      "description": "Canonical artifacts keyed by artifact_type. A stage writes only its own declared artifact.",
+      "additionalProperties": { "type": "object" }
+    },
+    "services": {
+      "type": "object",
+      "description": "Non-linear shared services (e.g. knowledge-search Evidence Provider) keyed by skill id.",
+      "additionalProperties": { "$ref": "#/definitions/service_record" }
+    },
+    "events": {
+      "type": "array",
+      "description": "Append-only event log.",
+      "items": { "$ref": "#/definitions/event" }
+    }
+  },
+  "definitions": {
+    "stage": {
+      "type": "object",
+      "required": ["index", "skill", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "skill": { "type": "string" },
+        "produces": { "type": ["string", "null"] },
+        "consumes": { "type": "array", "items": { "type": "string" } },
+        "gate": { "enum": ["auto", "human_review"] },
+        "executor": { "enum": ["python", "provided", "service"] },
+        "status": {
+          "enum": ["PENDING", "RUNNING", "COMPLETED", "NEEDS_REVIEW", "FAILED", "SKIPPED"]
+        },
+        "provided_by": {
+          "type": ["string", "null"],
+          "description": "When executor=provided: how the artifact entered the case (e.g. upstream-dialogue)."
+        },
+        "started_at": { "type": ["string", "null"] },
+        "completed_at": { "type": ["string", "null"] },
+        "attempts": { "type": "integer", "minimum": 0 },
+        "artifact_fingerprint": {
+          "type": ["string", "null"],
+          "description": "sha256 of the produced canonical artifact; used to detect post-hoc mutation."
+        },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "service_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "skill": { "type": "string" },
+        "provides": { "type": "string" },
+        "calls": { "type": "integer", "minimum": 0 },
+        "last_requester": { "type": ["string", "null"] },
+        "last_at": { "type": ["string", "null"] },
+        "source_unchanged": { "type": ["boolean", "null"] }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["at", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "at": { "type": "string" },
+        "type": {
+          "type": "string",
+          "description": "STAGE_START | STAGE_COMPLETED | STAGE_NEEDS_REVIEW | STAGE_FAILED | STAGE_SKIPPED | ARTIFACT_STORED | SERVICE_CALLED | APPROVED | GUARD_REJECTED | CASE_CREATED"
+        },
+        "stage": { "type": ["string", "null"] },
+        "detail": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+[PASS] case-01-solution-validation
+[PASS] case-02-gap-policy-fact
+[PASS] case-03-abstention
+[PASS] case-04-no-mutation
+[PASS] case-05-conflict-propagation
+[PASS] query-determinism
+        POLICY_FACT='百万医疗险 保障范围 免赔额 社保目录外 条款 约定' | COMPARISON='百万医疗险 保障范围 免赔额 社保目录外 区别 对比'
+
+RESULT: ALL GREEN

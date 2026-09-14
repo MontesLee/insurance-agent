@@ -1,0 +1,9 @@
+COVERAGE-GAP DATASET: 5 cases
+
+[PASS] case-01-basic | 混合覆盖：寿险已充分（跳过），其余部分/无覆盖
+[PASS] case-02-partial | 全部部分覆盖：应为 HIGH/MEDIUM/LOW，无 CRITICAL/UNKNOWN
+[PASS] case-03-no-coverage | 全部无覆盖：应为 CRITICAL/HIGH/MEDIUM
+[PASS] case-04-unknown | 身故保障未知：应出现 UNKNOWN 缺口且整体 NEED_MORE_INFORMATION
+[PASS] case-05-preliminary | 风险分析为 PRELIMINARY：整体状态应为 PRELIMINARY，寿险已充分跳过
+
+RESULT: ALL GREEN

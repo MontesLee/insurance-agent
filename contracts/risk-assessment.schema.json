@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "risk-assessment Canonical Contract",
+  "description": "Risk identification. Origin: risk-analysis. Legacy coverage_assessment is an auxiliary risk-level coverage judgment, NOT the final CoverageGap Artifact (owned by coverage-gap-analysis).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "skill",
+    "legacy_skill",
+    "schema_version",
+    "generated_at",
+    "payload",
+    "provenance"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "enum": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment",
+        "coverage-gap-analysis",
+        "solution-plan",
+        "knowledge-query",
+        "knowledge-evidence",
+        "product-recommendation",
+        "insurance-report"
+      ]
+    },
+    "skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical skill id (kebab-case)."
+    },
+    "legacy_skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Legacy / physical skill directory name (may be snake_case)."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Phase-1 permissive payload: legacy skill output is wrapped as-is. Internal shape is already governed by the skill's own output schema + eval suite."
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_type",
+          "source_id",
+          "confidence"
+        ],
+        "properties": {
+          "source_type": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    }
+  }
+}

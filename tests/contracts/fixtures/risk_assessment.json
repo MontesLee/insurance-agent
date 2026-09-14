@@ -1,0 +1,58 @@
+{
+  "output_version": "1.0",
+  "layer": "risk_analysis",
+  "upstream": "requirement_analysis",
+  "analysis_status": "FORMAL",
+  "overall_confidence": 0.85,
+  "family_risk_overview": "家庭主要经济支柱，医疗与身故责任风险偏高。",
+  "risks": [
+    {
+      "risk_id": "R1-001",
+      "risk_category": "R1",
+      "risk_name": "医疗费用",
+      "status": "KNOWN",
+      "residual_risk": "HIGH",
+      "severity": "HIGH",
+      "likelihood": "HIGH",
+      "priority": "P0",
+      "conclusion": "医疗费用存在自付缺口"
+    },
+    {
+      "risk_id": "R4-001",
+      "risk_category": "R4",
+      "risk_name": "家庭责任",
+      "status": "KNOWN",
+      "residual_risk": "HIGH",
+      "severity": "HIGH",
+      "likelihood": "LOW",
+      "priority": "P0",
+      "conclusion": "寿险保障严重不足"
+    }
+  ],
+  "risk_matrix": [
+    {
+      "risk_id": "R1-001",
+      "risk_category": "R1",
+      "severity": "HIGH",
+      "likelihood": "HIGH",
+      "residual_risk": "HIGH",
+      "priority": "P0"
+    }
+  ],
+  "top_priorities": [
+    {
+      "risk_id": "R1-001",
+      "priority": "P0",
+      "reason": "高发生高影响"
+    }
+  ],
+  "unknowns": [],
+  "assumptions": [],
+  "next_information_needed": [],
+  "missing_from_upstream": [],
+  "guardrails": {
+    "product_recommendation_included": false,
+    "sales_language_detected": false,
+    "layer_note": "风险层不推荐产品"
+  }
+}

@@ -2,8 +2,14 @@
 
 This is Skill 6 (Report Generation). It consumes the structured outputs of upstream
 skills (client-intake via ClientState, requirement-analysis, risk-analysis,
-knowledge-search, recommendation) and assembles a fixed 8-section report. It does
-NOT re-analyze, re-rate, re-recommend, or fabricate facts.
+coverage-gap-analysis, solution, knowledge-search, product-recommendation) and
+assembles a fixed 8-section report (+ evidence appendix). It does NOT re-analyze,
+re-rate, re-recommend, or fabricate facts.
+
+Section 04 (保障缺口) is canonical-first: when CoverageGapAnalysis is supplied it is
+the sole source and is copied verbatim (derivation="canonical"); only when it is
+absent does the legacy risk/requirement derivation run, tagged derivation="derived"
+and flagged with a warning, so the two can never be confused downstream.
 
 Design principles (mirrors AGENTS.md + Lawgent):
   * Single responsibility: only organize / express / validate / deliver.
@@ -16,10 +22,14 @@ Design principles (mirrors AGENTS.md + Lawgent):
 
 Consumed upstream shapes (see schemas + upstream-results-adapter.py):
   * client_profile         -> CanonicalClientState (client_state)
-  * requirement_analysis    -> RequirementAnalysisOutput
-  * risk_analysis           -> RiskAnalysisOutput
-  * knowledge_search        -> KnowledgeSearchOutput (optional)
-  * recommendation          -> RecommendationOutput (optional)
+  * requirement_analysis   -> RequirementAnalysisOutput
+  * risk_analysis          -> RiskAnalysisOutput
+  * coverage_gap_analysis  -> CoverageGapAnalysis   [V2, canonical source for 04]
+  * solution_plan          -> SolutionPlan          [V2, strategy layer]
+  * knowledge_evidence     -> KnowledgeEvidence     [V2 canonical]
+  * knowledge_search       -> KnowledgeSearchOutput [legacy alias]
+  * product_recommendation -> ProductRecommendation [V2 canonical]
+  * recommendation         -> RecommendationOutput  [legacy alias]
 """
 from __future__ import annotations
 
@@ -105,6 +115,107 @@ def _cat_name(rules, rc):
 
 def _req_type_name(rules, rt):
     return rules.get("requirement_type_names", {}).get(rt, rt)
+
+
+def _domain_to_cat(rules, domain):
+    return rules.get("domain_to_risk_category", {}).get(domain, "GENERAL")
+
+
+def _status_name(rules, status):
+    return rules.get("coverage_status_names", {}).get(status, status or "待确认")
+
+
+def _gap_level_name(rules, level):
+    return rules.get("gap_level_names", {}).get(level, level or "待确认")
+
+
+def _as_text(v):
+    """Stringify a scalar for the rendering contract; leave None as None."""
+    if v is None or isinstance(v, str):
+        return v
+    if isinstance(v, bool):
+        return str(v).lower()
+    if isinstance(v, (int, float)):
+        return str(v)
+    return v
+
+
+def _solution_type_name(rules, st):
+    return rules.get("solution_type_names", {}).get(st, st or "保障方向")
+
+
+def _fit_name(rules, fit):
+    """Map a recommendation fit token to its rendered label (rules-externalized)."""
+    return rules.get("fit_names", {}).get(fit, fit or "")
+
+
+def _kv_text(d):
+    """Fallback renderer for an object with unexpected keys.
+
+    Never falls back to ``str(dict)``: that would leak a Python repr into the
+    rendered report. Scalar values are stringified; nested values are JSON-encoded
+    verbatim (still no reformatting, no invention).
+    """
+    parts = []
+    for k, v in d.items():
+        if v is None:
+            continue
+        if isinstance(v, (dict, list)):
+            v = json.dumps(v, ensure_ascii=False)
+        parts.append(f"{k}：{v}")
+    return "，".join(parts)
+
+
+def _fmt_constraint(c):
+    """SolutionPlan constraint ``{constraint, value, source}`` -> one readable phrase."""
+    if not isinstance(c, dict):
+        return str(c)
+    name, val, src = c.get("constraint"), c.get("value"), c.get("source")
+    if name is None and val is None:
+        return _kv_text(c)
+    if name is None:
+        out = str(val)
+    elif val is None:
+        out = str(name)
+    else:
+        out = f"{name}：{val}"
+    if src:
+        out += f"（来源 {src}）"
+    return out
+
+
+def _fmt_tradeoff(t):
+    """SolutionPlan trade-off ``{axis, option_a, option_b, chosen, reason}``."""
+    if not isinstance(t, dict):
+        return str(t)
+    axis, a, b = t.get("axis"), t.get("option_a"), t.get("option_b")
+    chosen, reason = t.get("chosen"), t.get("reason")
+    if axis is None and chosen is None and a is None and b is None:
+        return _kv_text(t)
+    seg = []
+    if axis:
+        seg.append(f"在「{axis}」上")
+    if a is not None and b is not None:
+        seg.append(f"权衡「{a}」与「{b}」")
+    if chosen is not None:
+        seg.append(f"选择「{chosen}」")
+    out = "，".join(seg)
+    if reason:
+        out += f"；理由：{reason}"
+    return out
+
+
+def _fmt_rejected(r):
+    """SolutionPlan rejected direction ``{direction, reason}``."""
+    if not isinstance(r, dict):
+        return str(r)
+    d, reason = r.get("direction"), r.get("reason")
+    if d is None and reason is None:
+        return _kv_text(r)
+    out = str(d) if d is not None else ""
+    if reason:
+        out += f"（理由：{reason}）" if out else f"理由：{reason}"
+    return out
 
 
 def _fmt_value(fact_value):
@@ -205,6 +316,7 @@ def build_risk_exposure(rk, rules, prov):
         cov = e.get("coverage_assessment") or {}
         prot = e.get("existing_protection")
         gap = cov.get("unprotected_amount") if cov.get("unprotected_amount") is not None else cov.get("liquidity_constraint")
+        gap = _as_text(gap)
         src = f"risk-analysis.{e.get('risk_id')}"
         desc = "；".join([s for s in [e.get("trigger_event"), e.get("why_exposed")] if s])
         out[rc] = {
@@ -219,10 +331,49 @@ def build_risk_exposure(rk, rules, prov):
     return out
 
 
-def build_coverage_gaps(rk, ra, rules, prov):
+def build_coverage_gaps(cga, rk, ra, rules, prov):
+    """Section 04 保障缺口.
+
+    Canonical-first: when CoverageGapAnalysis is supplied it is the ONLY source for
+    this section. The report copies gap_id / gap_level / coverage status / target
+    direction verbatim and never recomputes, re-ranks, or merges in risk-derived
+    entries — merging the two would silently produce a third, unreviewed judgment.
+
+    When it is absent, the legacy risk/requirement derivation is retained for
+    backward compatibility, but every emitted item is tagged derivation="derived"
+    and a warning is raised, so a downstream consumer can never mistake it for a
+    canonical gap judgment.
+    """
     gaps = []
+    if not cga.get("missing"):
+        prio_by_gap = {p.get("gap_id"): p.get("priority")
+                       for p in cga.get("priorities", []) if isinstance(p, dict)}
+        for g in cga.get("gaps", []):
+            cat = _domain_to_cat(rules, g.get("domain"))
+            gap_id = g.get("gap_id")
+            # priority comes from the artifact's own priorities[]; absent -> gap_level verbatim.
+            prio = prio_by_gap.get(gap_id) or g.get("gap_level") or "UNKNOWN"
+            gaps.append({
+                "risk_category": cat,
+                "current_protection": _status_name(rules, g.get("current_coverage_status")),
+                "main_gap": g.get("target_direction") or _gap_level_name(rules, g.get("gap_level")),
+                "priority": prio,
+                "source": f"coverage-gap-analysis.{gap_id}",
+                "derivation": "canonical",
+                "gap_id": gap_id,
+                "gap_level": g.get("gap_level"),
+                "coverage_status": g.get("current_coverage_status"),
+                "target_direction": g.get("target_direction"),
+                "related_risk_ids": list(g.get("related_risk_ids") or []),
+                "related_requirement_ids": list(g.get("related_requirement_ids") or []),
+            })
+            prov.append({"claim": f"{cat} 保障缺口（{gap_id}，等级 {g.get('gap_level')}）",
+                         "source": f"coverage-gap-analysis.{gap_id}", "confidence": "high"})
+        return gaps, "canonical"
+
+    # ---- legacy derivation fallback (no canonical artifact supplied) ----
     if rk.get("missing") and ra.get("missing"):
-        return gaps
+        return gaps, "derived"
     # from risk_analysis: high/critical residual risks
     for r in rk.get("risks", []):
         residual = r.get("residual_risk")
@@ -234,9 +385,10 @@ def build_coverage_gaps(rk, ra, rules, prov):
             gaps.append({
                 "risk_category": cat,
                 "current_protection": prot if prot else "需进一步评估",
-                "main_gap": gap if gap else "需进一步评估",
+                "main_gap": _as_text(gap) if gap else "需进一步评估",
                 "priority": r.get("priority"),
                 "source": f"risk-analysis.{r.get('risk_id')}",
+                "derivation": "derived",
             })
             prov.append({"claim": f"{cat} 保障缺口", "source": f"risk-analysis.{r.get('risk_id')}", "confidence": "high"})
     # from requirement_analysis coverage_gaps
@@ -253,9 +405,61 @@ def build_coverage_gaps(rk, ra, rules, prov):
             "main_gap": cg.get("gap_summary"),
             "priority": _priority_short(rules, cg.get("priority")),
             "source": f"requirement-analysis:{','.join(cg.get('evidence_refs', []) or [])}",
+            "derivation": "derived",
         })
         prov.append({"claim": f"{cat} 保障缺口（需求侧）", "source": "requirement-analysis", "confidence": "high"})
-    return gaps
+    return gaps, "derived"
+
+
+def build_solution_strategies(sp, rules, prov):
+    """Section 06a 解决策略 — verbatim from SolutionPlan.
+
+    The report copies objective / coverage_direction / priority / constraints /
+    trade_offs / rejected_directions without rewording. A paraphrased strategy is a
+    different strategy, and the report has no mandate to write one.
+    """
+    if sp.get("missing"):
+        return []
+    out = []
+    for s in sp.get("solutions", []):
+        out.append({
+            "solution_id": s.get("solution_id"),
+            "solution_type": _solution_type_name(rules, s.get("solution_type")),
+            "objective": s.get("objective"),
+            "coverage_direction": s.get("coverage_direction"),
+            "priority": s.get("priority"),
+            "constraints": list(s.get("constraints") or []),
+            "trade_offs": list(s.get("trade_offs") or []),
+            "rejected_directions": list(s.get("rejected_directions") or []),
+            "related_gap_ids": list(s.get("related_gap_ids") or []),
+            "related_risk_ids": list(s.get("related_risk_ids") or []),
+            "source": f"solution.{s.get('solution_id')}",
+        })
+        prov.append({"claim": f"解决策略 {s.get('solution_id')}：{s.get('objective')}",
+                     "source": f"solution.{s.get('solution_id')}", "confidence": "high"})
+    return out
+
+
+def build_evidence_summary(ke, rules):
+    """Appendix A 证据来源 — verbatim from KnowledgeEvidence.
+
+    Evidence is listed, never weighed into a conclusion. Conflicts are carried
+    through as-is so the broker sees them.
+    """
+    if ke.get("missing"):
+        return []
+    out = []
+    for e in ke.get("evidence", []):
+        out.append({
+            "evidence_id": e.get("evidence_id"),
+            "content": e.get("content"),
+            "source": e.get("source"),
+            "source_type": e.get("source_type"),
+            "relevance": e.get("relevance"),
+            "confidence": e.get("confidence"),
+            "conflict": e.get("conflict"),
+        })
+    return out
 
 
 def build_requirement_priorities(ra, rules, prov):
@@ -315,14 +519,14 @@ def build_recommended_directions(rec, rules, prov):
         # use string placeholders (never null) to stay schema-valid and avoid fabrication.
         note = ("Recommendation 未产出具体方向（status=%s）。" % status) if status else ""
         out.append({"rank": "primary", "candidate_id": "(暂无确定方向)",
-                    "fit": status or "insufficient_evidence",
+                    "fit": "insufficient_evidence",
                     "rationale": note or "上游 Recommendation 未给出具体保障方向，待补充信息后重新评估。",
                     "covered_requirements": [], "covered_risks": [],
                     "notes": "", "source": "recommendation"})
     return out
 
 
-def build_information_gaps(ra, rk, cs, rules):
+def build_information_gaps(ra, rk, cs, rules, cga=None):
     gaps = {}
     cat_rank = {"required": 0, "suggested": 1, "optional": 2}
 
@@ -345,6 +549,13 @@ def build_information_gaps(ra, rk, cs, rules):
     # client_state missing_from_upstream
     for m in cs.get("missing_from_upstream", []):
         add(m.get("field"), "P0_CRITICAL", "required", m.get("reason"), "client-intake")
+    # coverage_gap_analysis information_gaps (canonical gap layer)
+    if cga and not cga.get("missing"):
+        for g in cga.get("information_gaps", []):
+            if not isinstance(g, dict):
+                continue
+            add(g.get("field"), g.get("importance") or "P2_MEDIUM", None,
+                g.get("reason") or g.get("detail"), "coverage-gap-analysis")
 
     ordered = sorted(gaps.values(), key=lambda x: cat_rank.get(x["category"], 9))
     return ordered
@@ -372,10 +583,34 @@ def build_next_actions(gaps, rules):
 # --------------------------------------------------------------------------- #
 # Conflict detection (UPSTREAM_CONFLICT)
 # --------------------------------------------------------------------------- #
-def detect_conflicts(ra, rk, rec, rules):
+def detect_conflicts(ra, rk, rec, rules, cga=None):
     conflicts = []
     rank = rules["priority_rank"]
     type_to_cat = rules["requirement_type_to_risk_category"]
+
+    # (3) cross-artifact: canonical gap says NONE but the linked risk carries a
+    #     protected_amount. Surfaced, never adjudicated — the report has no authority
+    #     to decide which upstream layer is right.
+    if cga and not cga.get("missing"):
+        risk_by_id = {r.get("risk_id"): r for r in rk.get("risks", []) if isinstance(r, dict)}
+        for g in cga.get("gaps", []):
+            if g.get("current_coverage_status") != "NONE":
+                continue
+            tpl = rules.get("conflict_gap_vs_risk")
+            if not tpl:
+                continue
+            hits = []
+            for rid in (g.get("related_risk_ids") or []):
+                cov = (risk_by_id.get(rid) or {}).get("coverage_assessment") or {}
+                amt = cov.get("protected_amount")
+                if isinstance(amt, (int, float)) and amt > 0:
+                    hits.append(rid)
+            if hits:
+                conflicts.append(tpl.format(
+                    domain=_cat_name(rules, _domain_to_cat(rules, g.get("domain"))),
+                    gap_id=g.get("gap_id"),
+                    gap_status="NONE（无覆盖）",
+                    risk_ids="、".join(hits)))
 
     # (1) intra: same risk_category priority differs between requirement & risk
     req_by_cat = {}
@@ -440,7 +675,8 @@ def render_markdown(report, metadata, validation, rules):
     lines.append(f"> 生成时间：{report['generated_at']}  ｜  报告版本：{report['version']}")
     lines.append("")
     lines.append("> 本报告由上游结构化分析结果汇总生成。事实来自 ClientState / Requirement Analysis / "
-                 "Risk Analysis，推荐方向来自 Recommendation。报告不包含任何自主保险判断或产品推销语句。")
+                 "Risk Analysis / Coverage Gap Analysis，解决策略来自 SolutionPlan，推荐方向来自 "
+                 "Product Recommendation，证据来自 Knowledge Evidence。报告不包含任何自主保险判断或产品推销语句。")
     lines.append("")
 
     # 01
@@ -491,12 +727,24 @@ def render_markdown(report, metadata, validation, rules):
     # 04
     lines.append("## 04 保障缺口")
     lines.append("")
-    if report["coverage_gaps"]:
+    if report.get("coverage_gaps"):
+        # Be explicit about where this section's judgment came from.
+        if report.get("coverage_gap_derivation") == "canonical":
+            lines.append(f"_{rules.get('gap_canonical_note', '')}_")
+        else:
+            lines.append(f"_{rules.get('gap_derived_note', '')}_")
+        lines.append("")
         lines.append("| 风险领域 | 当前保障 | 主要缺口 | 优先级 | 来源 |")
         lines.append("| --- | --- | --- | --- | --- |")
         for g in report["coverage_gaps"]:
             lines.append(f"| {_cat_name(rules, g['risk_category'])} | {g['current_protection']} | "
                          f"{g['main_gap']} | {g['priority']} | {g['source']} |")
+        if report.get("coverage_gap_derivation") == "canonical":
+            lines.append("")
+            for g in report["coverage_gaps"]:
+                if g.get("gap_id"):
+                    lines.append(f"- `{g['gap_id']}` 缺口等级：**{_gap_level_name(rules, g.get('gap_level'))}**"
+                                 f"（{g.get('gap_level')}）")
     else:
         lines.append("当前未识别到明确的保障缺口；具体金额类缺口需结合补充信息进一步评估（本报告不自行测算保额）。")
     lines.append("")
@@ -514,13 +762,42 @@ def render_markdown(report, metadata, validation, rules):
     # 06
     lines.append("## 06 推荐保障方向")
     lines.append("")
+
+    # 06A 解决策略（SolutionPlan）— strategy layer, never product names
+    strategies = report.get("solution_strategies") or []
+    if strategies:
+        lines.append("### 解决策略（SolutionPlan）")
+        lines.append("")
+        for s in strategies:
+            title = s.get("objective") or s.get("solution_id") or "（未命名策略）"
+            lines.append(f"#### {title}")
+            lines.append(f"- 策略类别：{s.get('solution_type')}")
+            lines.append(f"- 优先级：{s.get('priority')}")
+            lines.append(f"- 保障方向：{s.get('coverage_direction') or '待确认'}")
+            if s.get("constraints"):
+                lines.append(f"- 约束：{'；'.join(_fmt_constraint(c) for c in s['constraints'])}")
+            if s.get("trade_offs"):
+                lines.append(f"- 取舍：{'；'.join(_fmt_tradeoff(t) for t in s['trade_offs'])}")
+            if s.get("rejected_directions"):
+                lines.append(f"- 未采用方向：{'；'.join(_fmt_rejected(r) for r in s['rejected_directions'])}")
+            lines.append(f"- 来源：{s.get('source')}")
+            lines.append("")
+        lines.append(f"_{rules.get('solution_section_note', '')}_")
+        lines.append("")
+    else:
+        lines.append(f"_{rules.get('missing_solution_note', '')}_")
+        lines.append("")
+
+    # 06B 产品/方向推荐
+    lines.append("### 推荐方向（Product Recommendation）")
+    lines.append("")
     if report["recommended_directions"]:
         for d in report["recommended_directions"]:
             tag = "首选" if d["rank"] == "primary" else "备选"
             cid = d["candidate_id"] or "（未指定具体方案）"
-            lines.append(f"### {tag}：{cid}")
+            lines.append(f"#### {tag}：{cid}")
             if d["fit"]:
-                lines.append(f"- 匹配度：{d['fit']}")
+                lines.append(f"- 匹配度：{_fit_name(rules, d['fit'])}")
             lines.append(f"- 推荐原因：{d['rationale']}")
             if d["covered_requirements"]:
                 lines.append(f"- 解决的需求：{', '.join(d['covered_requirements'])}")
@@ -552,6 +829,25 @@ def render_markdown(report, metadata, validation, rules):
         lines.append(f"{i}. **{a['action']}**  ")
         lines.append(f"   - 原因：{a['reason']}")
         lines.append(f"   - 优先级：{a['priority']}  ｜  依赖：{a['dependency']}")
+    lines.append("")
+
+    # 附录 A 证据来源
+    lines.append("---")
+    lines.append("## 附录 A 证据来源")
+    lines.append("")
+    ev = report.get("evidence_summary") or []
+    if ev:
+        lines.append("| 证据 ID | 内容 | 来源 | 相关性 | 置信度 | 冲突 |")
+        lines.append("| --- | --- | --- | --- | --- | --- |")
+        for e in ev:
+            lines.append(f"| {e.get('evidence_id') or '—'} | {e.get('content') or '—'} | "
+                         f"{e.get('source') or '—'} | {e.get('relevance') if e.get('relevance') is not None else '—'} | "
+                         f"{e.get('confidence') if e.get('confidence') is not None else '—'} | "
+                         f"{'是' if e.get('conflict') else '否'} |")
+        lines.append("")
+        lines.append(f"_{rules.get('evidence_section_note', '')}_")
+    else:
+        lines.append(rules.get("missing_evidence_note", ""))
     lines.append("")
 
     if validation.get("conflicts"):
@@ -662,14 +958,19 @@ def generate_report(input_dict, rules=None):
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "client_profile": {"fields": [], "note": rules["missing_section_note"]},
             "financial_profile": {"table": [], "note": rules["missing_section_note"]},
-            "risk_exposure": empty_risk, "coverage_gaps": [], "requirement_priorities": [],
-            "recommended_directions": [], "information_gaps": [], "next_actions": [],
+            "risk_exposure": empty_risk, "coverage_gaps": [], "coverage_gap_derivation": "derived",
+            "requirement_priorities": [], "solution_strategies": [],
+            "recommended_directions": [], "evidence_summary": [],
+            "information_gaps": [], "next_actions": [],
         }
         validation = {"passed": True, "errors": [],
                       "warnings": ["INSUFFICIENT_INPUT: 缺少全部核心上游输入（client_profile / requirement_analysis / risk_analysis），无法生成完整报告"],
                       "conflicts": []}
-        metadata = {"source_skills": [], "upstream_status": {k: ("missing" if norm[k]["missing"] else "present")
-                                                            for k in ["client_state", "requirement_analysis", "risk_analysis", "knowledge_search", "recommendation"]},
+        metadata = {"source_skills": [],
+                    "upstream_status": {k: "missing" for k in [
+                        "client-profile", "requirement-analysis", "risk-assessment",
+                        "coverage-gap-analysis", "solution-plan",
+                        "knowledge-evidence", "product-recommendation"]},
                     "conflicts": [], "warnings": []}
         return {
             "skill": "report-generation", "version": "0.1", "status": "INSUFFICIENT_INPUT",
@@ -679,40 +980,59 @@ def generate_report(input_dict, rules=None):
 
     cs, ra, rk, ks, rec = (norm["client_state"], norm["requirement_analysis"],
                            norm["risk_analysis"], norm["knowledge_search"], norm["recommendation"])
+    cga, sp = norm["coverage_gap_analysis"], norm["solution_plan"]
 
     client_profile = build_client_profile(cs, rules, prov)
     financial_profile = build_financial_profile(cs, rules, prov, set())
     risk_exposure = build_risk_exposure(rk, rules, prov)
-    coverage_gaps = build_coverage_gaps(rk, ra, rules, prov)
+    coverage_gaps, gap_derivation = build_coverage_gaps(cga, rk, ra, rules, prov)
     requirement_priorities = build_requirement_priorities(ra, rules, prov)
+    solution_strategies = build_solution_strategies(sp, rules, prov)
     recommended_directions = build_recommended_directions(rec, rules, prov)
-    information_gaps = build_information_gaps(ra, rk, cs, rules)
+    evidence_summary = build_evidence_summary(ks, rules)
+    information_gaps = build_information_gaps(ra, rk, cs, rules, cga)
     next_actions = build_next_actions(information_gaps, rules)
 
-    conflicts = detect_conflicts(ra, rk, rec, rules)
+    conflicts = detect_conflicts(ra, rk, rec, rules, cga)
 
     structured = {
         "title": rules["report_title"], "version": rules["report_version"],
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "client_profile": client_profile, "financial_profile": financial_profile,
         "risk_exposure": risk_exposure, "coverage_gaps": coverage_gaps,
+        "coverage_gap_derivation": gap_derivation,
         "requirement_priorities": requirement_priorities,
+        "solution_strategies": solution_strategies,
         "recommended_directions": recommended_directions,
+        "evidence_summary": evidence_summary,
         "information_gaps": information_gaps, "next_actions": next_actions,
     }
 
     # metadata + warnings
     warnings = []
+    if gap_derivation == "derived" and (not rk.get("missing") or not ra.get("missing")):
+        warnings.append(rules["gap_derivation_warning"])
     for key, label in [("client_state", "client_profile"), ("requirement_analysis", "requirement_analysis"),
-                       ("risk_analysis", "risk_analysis"), ("knowledge_search", "knowledge_search"),
-                       ("recommendation", "recommendation")]:
+                       ("risk_analysis", "risk_analysis")]:
         if norm[key].get("missing"):
             warnings.append(f"MISSING_UPSTREAM_RESULT: {label}")
+    # name the artifact the caller actually asked for (V1 key -> V1 warning text)
+    if ks.get("missing"):
+        warnings.append(f"MISSING_UPSTREAM_RESULT: {norm['supplied_keys']['knowledge_evidence']}")
     if rec.get("missing"):
-        warnings.append("MISSING_UPSTREAM_RESULT: recommendation")
+        warnings.append(f"MISSING_UPSTREAM_RESULT: {norm['supplied_keys']['product_recommendation']}")
+    if ks.get("conflict"):
+        warnings.append(rules.get("evidence_conflict_note", ""))
     source_skills = [s for s, k in [("client-intake", "client_state"), ("requirement-analysis", "requirement_analysis"),
-                                    ("risk-analysis", "risk_analysis"), ("knowledge-search", "knowledge_search"),
-                                    ("recommendation", "recommendation")] if not norm[k].get("missing")]
+                                    ("risk-analysis", "risk_analysis")] if not norm[k].get("missing")]
+    if not cga.get("missing"):
+        source_skills.append("coverage-gap-analysis")
+    if not sp.get("missing"):
+        source_skills.append("solution")
+    if not ks.get("missing"):
+        source_skills.append("knowledge-search")
+    if not rec.get("missing"):
+        source_skills.append("product-recommendation")
 
     rendered = render_markdown(structured, {"source_skills": source_skills}, {}, rules)
     validation = validate_report({"status": "success", "structured_report": structured,
@@ -724,8 +1044,15 @@ def generate_report(input_dict, rules=None):
 
     metadata = {
         "source_skills": source_skills,
-        "upstream_status": {k: ("missing" if norm[k]["missing"] else "present")
-                            for k in ["client_state", "requirement_analysis", "risk_analysis", "knowledge_search", "recommendation"]},
+        "upstream_status": {
+            "client-profile": "missing" if norm["client_state"].get("missing") else "present",
+            "requirement-analysis": "missing" if norm["requirement_analysis"].get("missing") else "present",
+            "risk-assessment": "missing" if norm["risk_analysis"].get("missing") else "present",
+            "coverage-gap-analysis": "missing" if cga.get("missing") else "present",
+            "solution-plan": "missing" if sp.get("missing") else "present",
+            "knowledge-evidence": "missing" if ks.get("missing") else "present",
+            "product-recommendation": "missing" if rec.get("missing") else "present",
+        },
         "conflicts": conflicts,
         "warnings": warnings,
     }

@@ -259,27 +259,46 @@ def evaluate_candidate(cand, ctx, ks, rules):
     risk_overall = classify_fit(risk_score, rules) if major else "strong_fit"
 
     # --- constraint fit (hard) ---
-    violations, hard_pass = [], []
+    # Phase 5 honesty guard: when the candidate lacks the product-level field a hard
+    # constraint needs, the constraint is UNVERIFIABLE -- it is neither a violation nor a
+    # pass. Previously an absent premium/term fell into the `else` branch and was recorded
+    # as a hard PASS, which fabricated a "within_budget"/"meets_term" assurance for
+    # strategy-level candidates that carry no product quote.
+    violations, hard_pass, unverifiable = [], [], []
     budget = _candidate_num(cand, "premium", "annual")
     term = _candidate_num(cand, "term", "years")
-    liq = cand.get("liquidity_impact", "low")
+    liq = cand.get("liquidity_impact")
+    known_liq = liq in rules.get("known_liquidity_impacts", ["low", "medium", "high"])
+    unc_detail = rules.get("unverifiable_constraint_detail", {})
     for hc in ctx["hard_constraints"]:
         if hc["type"] == "budget":
-            if budget is not None and hc["value"] is not None and budget > hc["value"]:
+            if budget is None:
+                unverifiable.append({"type": "budget",
+                                     "detail": unc_detail.get("budget", "premium unknown"),
+                                     "severity": "unverifiable"})
+            elif hc["value"] is not None and budget > hc["value"]:
                 violations.append({"type": "budget",
                                    "detail": f"premium {budget:g} > budget_max {hc['value']:g}",
                                    "severity": "hard"})
             else:
                 hard_pass.append("budget")
         elif hc["type"] == "term":
-            if term is not None and hc["value"] is not None and term < hc["value"]:
+            if term is None:
+                unverifiable.append({"type": "term",
+                                     "detail": unc_detail.get("term", "term unknown"),
+                                     "severity": "unverifiable"})
+            elif hc["value"] is not None and term < hc["value"]:
                 violations.append({"type": "term",
                                    "detail": f"term {term:g} < term_min {hc['value']:g}",
                                    "severity": "hard"})
             else:
                 hard_pass.append("term")
         elif hc["type"] == "liquidity":
-            if liq == "high":
+            if not known_liq:
+                unverifiable.append({"type": "liquidity",
+                                     "detail": unc_detail.get("liquidity", "liquidity impact unknown"),
+                                     "severity": "unverifiable"})
+            elif liq == "high":
                 violations.append({"type": "liquidity",
                                    "detail": "candidate has high liquidity impact",
                                    "severity": "hard"})
@@ -343,6 +362,11 @@ def evaluate_candidate(cand, ctx, ks, rules):
         candidate_uncs.append({"type": "evidence_conflict",
                                "detail": "knowledge conflict on this candidate",
                                "candidate_id": cid})
+    for u in unverifiable:
+        candidate_uncs.append({"type": "constraint_unverifiable",
+                               "detail": u["detail"],
+                               "candidate_id": cid,
+                               "constraint": u["type"]})
 
     return {
         "candidate_id": cid,
@@ -356,6 +380,7 @@ def evaluate_candidate(cand, ctx, ks, rules):
         },
         "constraint_fit": {
             "hard_constraints": hard_pass, "soft_constraints": [], "violations": violations,
+            "unverifiable_constraints": unverifiable,
         },
         "evidence": {
             "status": ev_status, "refs": list(refs),
@@ -499,13 +524,20 @@ def generate_recommendation(input_dict, rules=None):
 
     human_review = bool(uncertainties) or (primary is None)
 
+    # Status: only EVIDENCE/information problems downgrade to INCOMPLETE_EVIDENCE.
+    # Phase 5: a `constraint_unverifiable` uncertainty means "needs a human to verify a
+    # constraint against real product data" -- the recommendation itself is complete, so
+    # mislabeling it INCOMPLETE_EVIDENCE would misrepresent what is actually uncertain.
+    blocking_types = set(rules.get("blocking_uncertainty_types",
+                                   ["insufficient_evidence", "evidence_conflict", "missing_information"]))
+    blocking = [u for u in uncertainties if u.get("type") in blocking_types]
     status = "COMPLETE"
     if primary is None:
         status = "INCOMPLETE_EVIDENCE" if any(e["evidence"]["status"] != "supported" for e in evals) else "NO_CANDIDATES"
-    elif uncertainties:
+    elif blocking:
         status = "INCOMPLETE_EVIDENCE"
 
-    return {
+    out = {
         "skill": "recommendation",
         "version": "0.1",
         "status": status,
@@ -519,6 +551,11 @@ def generate_recommendation(input_dict, rules=None):
         "evidence_refs": sorted(all_refs),
         "human_review_required": human_review,
     }
+    # Phase 5: carry the SolutionPlan->candidate provenance so downstream can trace every
+    # evaluated candidate back to the strategy (and hence the gap/risk) it came from.
+    if input_dict.get("_strategy_trace"):
+        out["strategy_trace"] = input_dict["_strategy_trace"]
+    return out
 
 
 def main():

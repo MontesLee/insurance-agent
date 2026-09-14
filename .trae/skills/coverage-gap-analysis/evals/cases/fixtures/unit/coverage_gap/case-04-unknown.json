@@ -1,0 +1,23 @@
+{
+  "client_profile": {
+    "client_id": "C004",
+    "existing_protection": "客户未提供保单信息"
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-MED", "requirement_type": "medical", "summary": "医疗", "priority": "P1_HIGH", "boundary": "requirement_only"},
+      {"requirement_id": "REQ-LIFE", "requirement_type": "life", "summary": "寿险", "priority": "P0_CRITICAL", "boundary": "requirement_only"}
+    ]
+  },
+  "risk_assessment": {
+    "output_version": "1.0",
+    "layer": "risk_analysis",
+    "analysis_status": "FORMAL",
+    "overall_confidence": 0.6,
+    "risks": [
+      {"risk_id": "R1-001", "risk_category": "R1", "risk_name": "大额医疗费用", "priority": "P1", "severity": "HIGH", "likelihood": "HIGH", "residual_risk": "HIGH", "existing_protection": "无", "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 500000, "confidence": 0.7}, "conclusion": "无覆盖", "reasoning_evidence_refs": ["E001"]},
+      {"risk_id": "R4-001", "risk_category": "R4", "risk_name": "身故责任", "priority": "P0", "severity": "CRITICAL", "likelihood": "MEDIUM", "residual_risk": "HIGH", "existing_protection": "", "coverage_assessment": {"protected_amount": null, "unprotected_amount": null, "confidence": 0.3}, "conclusion": "现有保障未知，需补充保单信息", "reasoning_evidence_refs": ["E004"]}
+    ]
+  }
+}

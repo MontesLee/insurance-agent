@@ -1,0 +1,71 @@
+{
+  "dataset": "solution-unit",
+  "skill": "solution",
+  "schema_version": "1.0",
+  "description": "Solution (strategy layer) unit dataset. Single source of truth for cases; the runner and the contract-validation script both read this file.",
+  "cases": [
+    {
+      "case_id": "case-01-multi-gap",
+      "intent": "多缺口完整场景：应为每个 Gap 产出一条策略，按 gap_level 降序排列，Primary 取最高优先级",
+      "fixture": "fixtures/unit/solution/case-01-multi-gap.json",
+      "checks": {
+        "expected_status": "COMPLETE",
+        "min_solutions": 4,
+        "expect_solution_types": ["MEDICAL", "CRITICAL_ILLNESS", "ACCIDENT", "SAVINGS"],
+        "expect_priorities": ["P0", "P1", "P2", "P3"],
+        "primary_solution_type": "MEDICAL",
+        "deny_information_gaps": true
+      }
+    },
+    {
+      "case_id": "case-02-life-only",
+      "intent": "单一寿险缺口：产出 TERM_LIFE 策略，拒绝终身寿险方向，含保障期限 trade-off",
+      "fixture": "fixtures/unit/solution/case-02-life-only.json",
+      "checks": {
+        "expected_status": "COMPLETE",
+        "min_solutions": 1,
+        "expect_solution_types": ["TERM_LIFE"],
+        "expect_priorities": ["P0"],
+        "primary_solution_type": "TERM_LIFE",
+        "expect_rejected_direction_contains": "终身寿险",
+        "expect_trade_off_axis": "保障期限",
+        "deny_information_gaps": true
+      }
+    },
+    {
+      "case_id": "case-03-unknown",
+      "intent": "覆盖情况未知：未知缺口降为 P3，整体 NEED_MORE_INFORMATION 并登记 information_gaps",
+      "fixture": "fixtures/unit/solution/case-03-unknown.json",
+      "checks": {
+        "expected_status": "NEED_MORE_INFORMATION",
+        "min_solutions": 2,
+        "expect_solution_types": ["CRITICAL_ILLNESS", "MEDICAL"],
+        "expect_priorities": ["P1", "P3"],
+        "require_information_gaps": true
+      }
+    },
+    {
+      "case_id": "case-04-no-actionable-gap",
+      "intent": "无可执行缺口：不产出策略，使用占位值且 status=COMPLETE，不伪造 objective",
+      "fixture": "fixtures/unit/solution/case-04-no-actionable-gap.json",
+      "checks": {
+        "expected_status": "COMPLETE",
+        "max_solutions": 0,
+        "expect_solution_types": [],
+        "deny_information_gaps": true
+      }
+    },
+    {
+      "case_id": "case-05-preliminary",
+      "intent": "上游为 PRELIMINARY：产出策略但整体标记 PRELIMINARY，不加严为 COMPLETE",
+      "fixture": "fixtures/unit/solution/case-05-preliminary.json",
+      "checks": {
+        "expected_status": "PRELIMINARY",
+        "min_solutions": 1,
+        "expect_solution_types": ["MEDICAL"],
+        "expect_priorities": ["P0"],
+        "deny_information_gaps": true
+      }
+    }
+  ]
+}

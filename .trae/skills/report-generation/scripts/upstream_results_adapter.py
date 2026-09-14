@@ -1,19 +1,32 @@
 """Upstream Results Adapter for Skill 6 Report Generation.
 
-Normalizes the five upstream Skill outputs into a single unified intermediate
+Normalizes the upstream Skill outputs into a single unified intermediate
 (`NormalizedInput`) that the report engine consumes. The adapter is READ-ONLY:
 it never mutates upstream objects and degrades gracefully (MISSING_FROM_UPSTREAM)
 when an upstream result is absent or malformed.
 
-Upstream shapes consumed (see AGENTS.md + upstream schemas):
+V2 upstream shapes consumed (see AGENTS.md + contracts/):
   * client_profile         -> CanonicalClientState (client_state) or equivalent
-  * requirement_analysis    -> RequirementAnalysisOutput
-  * risk_analysis           -> RiskAnalysisOutput (risks under risk_analysis[] or risks[])
-  * knowledge_search        -> KnowledgeSearchOutput (optional)
-  * recommendation          -> RecommendationOutput (optional)
+  * requirement_analysis   -> RequirementAnalysisOutput
+  * risk_analysis          -> RiskAnalysisOutput (risks under risk_analysis[] or risks[])
+  * coverage_gap_analysis  -> CoverageGapAnalysis   [V2, canonical source for section 04]
+  * solution_plan          -> SolutionPlan          [V2, strategy layer]
+  * knowledge_evidence     -> KnowledgeEvidence     [V2 canonical]
+  * knowledge_search       -> KnowledgeSearchOutput [legacy alias of knowledge_evidence]
+  * product_recommendation -> ProductRecommendation [V2 canonical]
+  * recommendation         -> RecommendationOutput  [legacy alias of product_recommendation]
+
+Alias rule: a canonical key wins over its legacy alias; if only the legacy key is
+supplied it is used and recorded in `aliases` so the report can be explicit about
+which name the data arrived under.
+
+Canonical envelope rule: artifacts produced through `adapters/` carry
+`{artifact_type, skill, payload, provenance, ...}`. Consumers unwrap `payload`
+when present so the same code handles both canonical and raw Skill output.
 
 Design mirrors Skill 5 (recommendation) adapters: tolerant, provenance-preserving,
-no upstream mutation.
+no upstream mutation, and NO business judgment (the adapter never computes a gap,
+a level, or a strategy — it only reshapes what upstream already decided).
 """
 from __future__ import annotations
 
@@ -42,6 +55,19 @@ def _as_list(v):
     if isinstance(v, list):
         return v
     return [v]
+
+
+def _payload(obj):
+    """Unwrap a Canonical envelope ({..., payload: {...}}) when present.
+
+    Canonical artifacts always carry `payload`; raw Skill outputs do not. Returning
+    the inner payload lets downstream code read one shape. Non-dict input -> {}.
+    """
+    if not isinstance(obj, dict):
+        return {}
+    if isinstance(obj.get("payload"), dict):
+        return obj["payload"]
+    return obj
 
 
 # --------------------------------------------------------------------------- #
@@ -104,6 +130,7 @@ def adapt_risk_analysis(rk, rules):
             "missing": True, "risks": [], "top_priorities": [],
             "next_information_needed": [], "missing_from_upstream": [], "unknowns": [],
         }
+    rk = _payload(rk)
     raw = rk.get("risk_analysis")
     if raw is None and "risks" in rk:
         raw = rk["risks"]
@@ -113,6 +140,8 @@ def adapt_risk_analysis(rk, rules):
         raw = []
     risks = []
     for r in raw:
+        if not isinstance(r, dict):
+            continue
         risks.append({
             "risk_id": r.get("risk_id"),
             "risk_category": r.get("risk_category"),
@@ -141,21 +170,133 @@ def adapt_risk_analysis(rk, rules):
 
 
 # --------------------------------------------------------------------------- #
-# knowledge_search adapter
+# coverage_gap_analysis adapter  [V2]
 # --------------------------------------------------------------------------- #
-def adapt_knowledge_search(ks):
-    if not ks or not isinstance(ks, dict):
-        return {"missing": True, "status": None, "results": [], "conflict": False}
+def adapt_coverage_gap_analysis(cga, rules):
+    """CoverageGapAnalysis -> normalized gap layer.
+
+    Pure reshape. gap_level / current_coverage.status / target_coverage.direction
+    are copied verbatim; the adapter never recomputes or re-ranks them.
+    """
+    empty = {
+        "missing": True, "status": None, "gaps": [],
+        "priorities": [], "information_gaps": [],
+    }
+    if not cga or not isinstance(cga, dict):
+        return empty
+    p = _payload(cga)
+    gaps = []
+    for g in _as_list(p.get("gaps")):
+        if not isinstance(g, dict):
+            continue
+        cur = g.get("current_coverage") or {}
+        tgt = g.get("target_coverage") or {}
+        gaps.append({
+            "gap_id": g.get("gap_id"),
+            "domain": g.get("domain"),
+            "subject": g.get("subject"),
+            "current_coverage_status": cur.get("status"),
+            "current_coverage_evidence_refs": _as_list(cur.get("evidence_refs")),
+            "target_direction": tgt.get("direction"),
+            "target_rationale": tgt.get("rationale"),
+            "gap_level": g.get("gap_level"),
+            "confidence": g.get("confidence"),
+            "related_requirement_ids": _as_list(g.get("related_requirement_ids")),
+            "related_risk_ids": _as_list(g.get("related_risk_ids")),
+            "evidence_refs": _as_list(g.get("evidence_refs")),
+        })
     return {
         "missing": False,
-        "status": ks.get("status"),
-        "results": _as_list(ks.get("results")),
-        "conflict": bool(ks.get("conflict", False)),
+        "status": p.get("status"),
+        "gaps": gaps,
+        "priorities": _as_list(p.get("priorities")),
+        "information_gaps": _as_list(p.get("information_gaps")),
     }
 
 
 # --------------------------------------------------------------------------- #
-# recommendation adapter
+# solution_plan adapter  [V2]
+# --------------------------------------------------------------------------- #
+def adapt_solution_plan(sp, rules):
+    """SolutionPlan -> normalized strategy layer.
+
+    Pure reshape. objective / coverage_direction / priority / trade_offs /
+    rejected_directions are copied verbatim — the report must never paraphrase a
+    strategy, because paraphrasing is where a strategy would silently become a
+    different strategy.
+    """
+    empty = {"missing": True, "status": None, "solutions": []}
+    if not sp or not isinstance(sp, dict):
+        return empty
+    p = _payload(sp)
+    sols = []
+    raw = _as_list(p.get("solutions"))
+    if not raw and p.get("objective"):
+        # Degenerate envelope: top-level triple only.
+        raw = [p]
+    for s in raw:
+        if not isinstance(s, dict):
+            continue
+        sols.append({
+            "solution_id": s.get("solution_id"),
+            "solution_type": s.get("solution_type"),
+            "objective": s.get("objective"),
+            "coverage_direction": s.get("coverage_direction"),
+            "priority": s.get("priority"),
+            "constraints": _as_list(s.get("constraints")),
+            "trade_offs": _as_list(s.get("trade_offs")),
+            "rejected_directions": _as_list(s.get("rejected_directions")),
+            "related_gap_ids": _as_list(s.get("related_gap_ids")),
+            "related_risk_ids": _as_list(s.get("related_risk_ids")),
+            "status": s.get("status"),
+        })
+    return {"missing": False, "status": p.get("status"), "solutions": sols}
+
+
+# --------------------------------------------------------------------------- #
+# knowledge_evidence adapter  [V2]  (+ legacy knowledge_search alias)
+# --------------------------------------------------------------------------- #
+def adapt_knowledge_evidence(ke):
+    """KnowledgeEvidence (canonical) or KnowledgeSearchOutput (legacy) -> evidence layer.
+
+    Canonical payload: {status, query, evidence[], conflict}.
+    Legacy output:     {status, results[], conflict}.
+    Both are accepted; `shape` records which one was read.
+    """
+    empty = {"missing": True, "status": None, "query": None, "evidence": [],
+             "conflict": False, "shape": None}
+    if not ke or not isinstance(ke, dict):
+        return empty
+    p = _payload(ke)
+    if isinstance(p.get("evidence"), list):
+        items, shape = p.get("evidence"), "canonical"
+    else:
+        items, shape = _as_list(p.get("results")), "legacy"
+    ev = []
+    for e in items:
+        if not isinstance(e, dict):
+            continue
+        ev.append({
+            "evidence_id": e.get("evidence_id") or e.get("chunk_id") or e.get("id"),
+            "content": e.get("content"),
+            "source": e.get("source") or e.get("document_name") or e.get("source_id"),
+            "source_type": e.get("source_type"),
+            "relevance": e.get("relevance") if e.get("relevance") is not None else e.get("score"),
+            "confidence": e.get("confidence"),
+            "conflict": e.get("conflict"),
+        })
+    return {
+        "missing": False,
+        "status": p.get("status"),
+        "query": p.get("query"),
+        "evidence": ev,
+        "conflict": bool(p.get("conflict", False)),
+        "shape": shape,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# product_recommendation adapter  [V2]  (+ legacy recommendation alias)
 # --------------------------------------------------------------------------- #
 def adapt_recommendation(rec, rules):
     if not rec or not isinstance(rec, dict):
@@ -164,6 +305,7 @@ def adapt_recommendation(rec, rules):
             "not_recommended": [], "tradeoffs": [], "uncertainties": [],
             "evidence_refs": [], "human_review_required": None, "candidate_evaluations": [],
         }
+    rec = _payload(rec)
     return {
         "missing": False,
         "status": rec.get("status"),
@@ -181,15 +323,53 @@ def adapt_recommendation(rec, rules):
 # --------------------------------------------------------------------------- #
 # Unified normalization
 # --------------------------------------------------------------------------- #
+def _pick(input_dict, canonical_key, legacy_key):
+    """Canonical key wins; fall back to legacy alias. Returns (value, used_key, alias_used)."""
+    v = input_dict.get(canonical_key)
+    if v is not None:
+        return v, canonical_key, False
+    v = input_dict.get(legacy_key)
+    if v is not None:
+        return v, legacy_key, True
+    return None, canonical_key, False
+
+
+def _supplied(input_dict, canonical_key, legacy_key):
+    """Which key did the caller actually name (even if its value is null)?
+
+    Used so a MISSING_UPSTREAM_RESULT warning names the artifact the caller asked
+    for. V1 callers name `recommendation`; V2 callers name `product_recommendation`.
+    Reporting the caller's own key keeps V1 warning text byte-identical.
+    """
+    if canonical_key in input_dict:
+        return canonical_key
+    if legacy_key in input_dict:
+        return legacy_key
+    # Neither named: default to the canonical name. A V2 caller that simply omits
+    # the artifact should be told the canonical name, not the deprecated one.
+    return canonical_key
+
+
 def normalize_input(input_dict, rules=None):
     if rules is None:
         from report_generation_engine import load_rules  # local import to avoid cycle
         rules = load_rules()
+
     cs = adapt_client_state(input_dict.get("client_profile"))
     ra = adapt_requirement_analysis(input_dict.get("requirement_analysis"), rules)
     rk = adapt_risk_analysis(input_dict.get("risk_analysis"), rules)
-    ks = adapt_knowledge_search(input_dict.get("knowledge_search"))
-    rec = adapt_recommendation(input_dict.get("recommendation"), rules)
+
+    cga_raw, cga_key, _ = _pick(input_dict, "coverage_gap_analysis", None)
+    cga = adapt_coverage_gap_analysis(cga_raw, rules)
+
+    sp_raw, sp_key, _ = _pick(input_dict, "solution_plan", None)
+    sp = adapt_solution_plan(sp_raw, rules)
+
+    ke_raw, ke_key, ke_alias = _pick(input_dict, "knowledge_evidence", "knowledge_search")
+    ke = adapt_knowledge_evidence(ke_raw)
+
+    rec_raw, rec_key, rec_alias = _pick(input_dict, "product_recommendation", "recommendation")
+    rec = adapt_recommendation(rec_raw, rules)
 
     core = [cs, ra, rk]
     missing_core = []
@@ -204,8 +384,23 @@ def normalize_input(input_dict, rules=None):
         "client_state": cs,
         "requirement_analysis": ra,
         "risk_analysis": rk,
-        "knowledge_search": ks,
+        "coverage_gap_analysis": cga,
+        "solution_plan": sp,
+        # internal keys kept stable for the engine; aliases recorded for honesty
+        "knowledge_search": ke,
         "recommendation": rec,
         "missing_core": missing_core,
         "all_core_missing": (len(missing_core) == 3),
+        "aliases": {
+            "knowledge_evidence": ke_key,
+            "product_recommendation": rec_key,
+        },
+        "supplied_keys": {
+            "knowledge_evidence": _supplied(input_dict, "knowledge_evidence", "knowledge_search"),
+            "product_recommendation": _supplied(input_dict, "product_recommendation", "recommendation"),
+        },
+        "legacy_alias_used": {
+            "knowledge_evidence": ke_alias,
+            "product_recommendation": rec_alias,
+        },
     }
