@@ -1,0 +1,66 @@
+{
+  "_comment": "Case 002: candidate exists but evidence is insufficient. 储蓄/现金流方向缺口 —— 语料库没有对应领域的权威文档，真实检索应返回 insufficient_evidence。此时不得产出有依据的主推荐。",
+  "client_profile": {
+    "client_id": "C-STEP2-002",
+    "profile": {
+      "age": 35,
+      "gender": "female",
+      "marital_status": "married"
+    }
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-005", "requirement_type": "savings", "summary": "长期现金流与教育金储备", "priority": "P2_MEDIUM"}
+    ],
+    "information_sufficiency": {"sufficiency_status": "SUFFICIENT"}
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "risks": [
+      {
+        "risk_id": "R5-001",
+        "risk_category": "R5",
+        "risk_name": "长期储蓄目标未达成",
+        "priority": "P2",
+        "severity": "MEDIUM",
+        "likelihood": "MEDIUM",
+        "residual_risk": "MEDIUM",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 0, "confidence": 0.5}
+      }
+    ]
+  },
+  "coverage_gap_analysis": {
+    "artifact_type": "coverage-gap-analysis",
+    "payload": {
+      "status": "COMPLETE",
+      "gaps": [
+        {
+          "gap_id": "GAP-002",
+          "domain": "savings",
+          "subject": "长期现金流储备",
+          "gap_level": "MODERATE",
+          "related_risk_ids": ["R5-001"],
+          "related_requirement_ids": ["REQ-005"]
+        }
+      ]
+    }
+  },
+  "solution_plan": {
+    "artifact_type": "solution-plan",
+    "payload": {
+      "status": "COMPLETE",
+      "solutions": [
+        {
+          "solution_id": "SOL-002",
+          "solution_type": "SAVINGS",
+          "objective": "建立长期确定性现金流",
+          "coverage_direction": "以长期现金流目标与风险承受能力确定储蓄方向与期限",
+          "priority": "P2",
+          "related_gap_ids": ["GAP-002"],
+          "related_risk_ids": ["R5-001"]
+        }
+      ]
+    }
+  }
+}

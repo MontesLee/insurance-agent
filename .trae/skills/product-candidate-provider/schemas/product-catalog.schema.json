@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Product Catalog (demo V0.1)",
+  "description": "Step 2 / Phase 3. Structured, deterministic, testable product data. A product MUST be a structured object -- never a free-text paragraph an LLM made up.",
+  "type": "object",
+  "required": ["catalog_id", "catalog_version", "is_demo", "products"],
+  "additionalProperties": false,
+  "properties": {
+    "catalog_id": { "type": "string" },
+    "catalog_version": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "is_demo": { "type": "boolean" },
+    "notice": { "type": "string" },
+    "premium_basis": { "type": "string" },
+    "term_whole_life_years": { "type": "integer" },
+    "products": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/product" }
+    }
+  },
+  "definitions": {
+    "product": {
+      "type": "object",
+      "required": [
+        "product_id", "product_name", "product_type", "company", "is_demo",
+        "features", "eligible_age", "eligibility_rules", "coverage_directions",
+        "constraints", "required_evidence_domains", "evidence_refs"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "product_id": { "type": "string", "pattern": "^P[0-9]{3}$" },
+        "product_name": { "type": "string" },
+        "product_type": {
+          "type": "string",
+          "enum": ["medical", "critical_illness", "accident", "life", "savings"]
+        },
+        "company": { "type": "string" },
+        "is_demo": { "const": true },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "eligible_age": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        "eligibility_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule"],
+            "properties": {
+              "rule": { "type": "string" },
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            }
+          }
+        },
+        "coverage_directions": { "type": "array", "items": { "type": "string" } },
+        "constraints": { "type": "array" },
+        "required_evidence_domains": { "type": "array", "items": { "type": "string" } },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } },
+        "premium": {
+          "type": "object",
+          "properties": {
+            "annual": { "type": ["number", "null"] },
+            "basis": { "type": "string" }
+          }
+        },
+        "term": {
+          "type": "object",
+          "properties": {
+            "years": { "type": ["number", "null"] },
+            "basis": { "type": "string" }
+          }
+        },
+        "liquidity_impact": { "type": "string" }
+      }
+    }
+  }
+}

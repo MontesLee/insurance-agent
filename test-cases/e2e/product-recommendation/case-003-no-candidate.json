@@ -1,0 +1,65 @@
+{
+  "_comment": "Case 003: no candidate. 缺口方向（特殊责任/宠物医疗等）在 Product Catalog 中没有任何产品覆盖。必须输出 NO_CANDIDATES 而不是硬凑一个最接近的产品。",
+  "client_profile": {
+    "client_id": "C-STEP2-003",
+    "profile": {
+      "age": 40,
+      "gender": "male"
+    }
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-006", "requirement_type": "general", "summary": "特殊责任风险转移", "priority": "P3_LOW"}
+    ],
+    "information_sufficiency": {"sufficiency_status": "SUFFICIENT"}
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "risks": [
+      {
+        "risk_id": "R9-001",
+        "risk_category": "R9",
+        "risk_name": "特殊责任风险（非常规险种）",
+        "priority": "P3",
+        "severity": "LOW",
+        "likelihood": "LOW",
+        "residual_risk": "LOW",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 0, "confidence": 0.4}
+      }
+    ]
+  },
+  "coverage_gap_analysis": {
+    "artifact_type": "coverage-gap-analysis",
+    "payload": {
+      "status": "COMPLETE",
+      "gaps": [
+        {
+          "gap_id": "GAP-003",
+          "domain": "general",
+          "subject": "特殊责任风险",
+          "gap_level": "LOW",
+          "related_risk_ids": ["R9-001"],
+          "related_requirement_ids": ["REQ-006"]
+        }
+      ]
+    }
+  },
+  "solution_plan": {
+    "artifact_type": "solution-plan",
+    "payload": {
+      "status": "COMPLETE",
+      "solutions": [
+        {
+          "solution_id": "SOL-003",
+          "solution_type": "GENERAL",
+          "objective": "针对特殊风险确定保障方案",
+          "coverage_direction": "根据缺口性质确定对应保障方向与保障期限",
+          "priority": "P3",
+          "related_gap_ids": ["GAP-003"],
+          "related_risk_ids": ["R9-001"]
+        }
+      ]
+    }
+  }
+}

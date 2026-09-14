@@ -1,0 +1,62 @@
+{
+  "suite": "step2-product-recommendation-e2e",
+  "version": "0.1",
+  "_comment": "Step 2 E2E. Evidence / Candidate / Recommendation are REALLY executed (no fixtures for these three). Requirement/Risk/Gap/Solution may come from fixtures per spec section 21.",
+  "cases": [
+    {
+      "id": "case-001-happy-path",
+      "file": "case-001-happy-path.json",
+      "description": "30岁客户，寿险缺口 -> 定期寿险策略。必须真实走通 Solution -> Evidence -> Candidate -> Recommendation，主推荐为 P007，且 P008（同类型但保障方向为储蓄/传承）不得成为主推荐。",
+      "expect": {
+        "provider_status": "COMPLETE",
+        "min_evidence": 1,
+        "require_evidence_trace": true,
+        "recommendation_status": "COMPLETE",
+        "primary_product_id": "P007",
+        "forbidden_primary_product_ids": ["P008"],
+        "expect_rejected": {
+          "P008": ["COVERAGE_DIRECTION_MISMATCH"]
+        },
+        "primary_evidence_refs_nonempty": true
+      }
+    },
+    {
+      "id": "case-002-no-evidence",
+      "file": "case-002-no-evidence.json",
+      "description": "候选存在但缺少可用证据。真实检索会返回语料，但不含该产品所需领域的证据，因此候选被判 EVIDENCE_MISSING，必须输出 INSUFFICIENT_EVIDENCE 等价状态（本项目为 INCOMPLETE_EVIDENCE），且不得产出有依据的主推荐。",
+      "expect": {
+        "provider_status": "COMPLETE",
+        "candidate_count_gt": 0,
+        "all_candidates_evidence_missing": true,
+        "recommendation_status": "INCOMPLETE_EVIDENCE",
+        "primary_product_id": null
+      }
+    },
+    {
+      "id": "case-003-no-candidate",
+      "file": "case-003-no-candidate.json",
+      "description": "Catalog 中不存在覆盖该缺口方向的产品。必须输出 NO_CANDIDATES，并说明缺什么信息、下一步需要什么。",
+      "expect": {
+        "provider_status": "NO_CANDIDATES",
+        "candidate_count": 0,
+        "recommendation_status": "NO_CANDIDATES",
+        "primary_product_id": null,
+        "next_information_needed_nonempty": true
+      }
+    },
+    {
+      "id": "case-004-ineligible-product",
+      "file": "case-004-ineligible-product.json",
+      "description": "客户年龄超出全部医疗险产品投保区间。所有候选必须被判 ELIGIBILITY_INELIGIBLE，不得成为主推荐。",
+      "expect": {
+        "provider_status": "COMPLETE",
+        "candidate_count_gt": 0,
+        "admissible_count": 0,
+        "all_ineligible": true,
+        "recommendation_status": "NO_CANDIDATES",
+        "primary_product_id": null,
+        "not_recommended_contains": "product_ineligible"
+      }
+    }
+  ]
+}

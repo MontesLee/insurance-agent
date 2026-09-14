@@ -1,0 +1,40 @@
+{
+  "version": "0.1",
+  "_comment": "Maps ProductCandidates (Step 2) onto the candidate shape the legacy recommendation engine consumes. Pure projection -- no scoring, no ranking, no new business logic.",
+
+  "product_type_to_requirement_types": {
+    "medical": ["medical"],
+    "critical_illness": ["critical_illness"],
+    "accident": ["accident"],
+    "life": ["life"],
+    "savings": ["savings"]
+  },
+
+  "risk_category_fallback_by_product_type": {
+    "medical": ["R1"],
+    "critical_illness": ["R2"],
+    "accident": ["R3"],
+    "life": ["R4"],
+    "savings": ["R5"]
+  },
+
+  "blocked_reason_by_code": {
+    "PRODUCT_NOT_IN_CATALOG": "product_not_in_catalog",
+    "PRODUCT_TYPE_MISMATCH": "product_type_mismatch",
+    "COVERAGE_DIRECTION_MISMATCH": "coverage_direction_mismatch",
+    "ELIGIBILITY_INELIGIBLE": "product_ineligible",
+    "ELIGIBILITY_UNKNOWN": "eligibility_unverifiable",
+    "EVIDENCE_MISSING": "evidence_missing"
+  },
+
+  "hard_block_codes": [
+    "PRODUCT_NOT_IN_CATALOG",
+    "PRODUCT_TYPE_MISMATCH",
+    "COVERAGE_DIRECTION_MISMATCH",
+    "ELIGIBILITY_INELIGIBLE"
+  ],
+
+  "unknown_block_codes": ["ELIGIBILITY_UNKNOWN"],
+
+  "demo_disclaimer": "demo/mock product data -- not a real purchasable insurance product"
+}

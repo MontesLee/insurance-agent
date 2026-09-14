@@ -109,6 +109,12 @@
             "type": "string"
           }
         },
+        "related_risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "solutions": {
           "type": "array",
           "description": "One strategy per coverage gap. Ordered by priority then gap severity. solutions[0] is the primary.",

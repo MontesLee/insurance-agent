@@ -39,6 +39,14 @@
       ],
       "description": "Canonical KnowledgeEvidence, obtained via the shared Evidence Provider (Phase 4)."
     },
+    "product_candidates": {
+      "type": [
+        "object",
+        "array",
+        "null"
+      ],
+      "description": "Step 2: output of product-candidate-provider (envelope, bare payload, or plain candidate list). When supplied, recommendation consumes REAL catalog products instead of strategy-level placeholders. When absent, the engine falls back to deriving candidates from solution_plan (unchanged legacy behaviour)."
+    },
     "constraints": {
       "type": [
         "object",

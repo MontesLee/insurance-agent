@@ -93,6 +93,28 @@ Requirement Gap Hint  ≠  Coverage Gap  ≠  Solution  ≠  Product Recommendat
 - `product-recommendation` 直接消费 `SolutionPlan + CoverageGapAnalysis + KnowledgeEvidence`（不再需要独立 `candidate_solutions` 生产者）。
 - 该演化在 **Phase 5** 进行，Phase 1 不改 `recommendation` 逻辑，仅在契约层定义未来 `SolutionPlan` 为其 Canonical 候选来源。
 
+### 4.1 Step 2 修正：策略 ≠ 候选（Candidate Provider 的引入）
+
+Phase 5 用 `SolutionPlan → candidate_solutions` 闭合了"无生产者"，但那仍是**策略级占位**：
+策略没有产品、保费、期限、投保资格，也没有证据，`recommendation` 实际在对不可能存在于任何
+产品库的对象排序。
+
+Step 2 引入独立一层闭合它：
+
+```text
+Product Catalog ──► Product Candidate Provider ──► ProductCandidates ──► Recommendation
+```
+
+- `catalog/product-catalog.v0.1.json`：12 个**结构化** demo 产品（`is_demo=true`）
+- `.trae/skills/product-candidate-provider/`：只做**候选生成**，做类型 / 方向 / 资格 / 证据四类
+  确定性判定并打标；**不排序、不选主推**
+- `recommendation`：消费真实 Catalog 候选，硬拒任何未通过产品校验者
+
+> 关键纪律：**Candidate Generation 与 Recommendation 必须分离**。
+> 不允许同一环节"想产品 → 生成产品 → 推荐产品"。
+
+详见 `docs/step2-evidence-recommendation.md`。
+
 ---
 
 ## 5. 基础设施演进路线
@@ -101,6 +123,7 @@ Requirement Gap Hint  ≠  Coverage Gap  ≠  Solution  ≠  Product Recommendat
 |---|---|---|
 | V2.0 | `skills/`(逻辑名) · `contracts/` · `adapters/` · `evidence/` · `workflow/` · `state/` · `tests/` · `rag/` | **已闭环**（Phase 1–7） |
 | V2.1 | `domain/insurance/`（pack / playbook / references / overlays） | **已完成**（Phase 8，详见 docs/domain-pack.md） |
+| V2.2 | `catalog/`（Demo Product Catalog）+ `product-candidate-provider` Skill | **已完成**（Step 2，详见 docs/step2-evidence-recommendation.md） |
 
 > 暂缓理由：同时引入 Domain Pack + Overlay + Playbook + References + RAG 会显著抬高工程复杂度；先跑通 Agent 骨架，再抽 Domain Pack。
 

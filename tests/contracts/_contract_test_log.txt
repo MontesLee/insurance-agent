@@ -5,7 +5,8 @@
 [PASS] solution-plan
 [PASS] knowledge-query
 [PASS] knowledge-evidence
+[PASS] test_knowledge_evidence_traceability
 [PASS] product-recommendation
 [PASS] insurance-report
-CONTRACT TESTS: 9/9 passed
+CONTRACT TESTS: 10/10 passed
 RESULT: ALL GREEN

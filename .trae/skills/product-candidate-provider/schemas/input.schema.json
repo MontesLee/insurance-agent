@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "product-candidate-provider input",
+  "description": "Step 2 / Phase 4. Candidate generation only -- this skill never recommends. solution_plan is required; the rest narrow the result.",
+  "type": "object",
+  "required": ["solution_plan"],
+  "additionalProperties": false,
+  "properties": {
+    "client_profile": {
+      "type": ["object", "null"],
+      "description": "Canonical ClientProfile (envelope or bare payload). Used only for eligibility."
+    },
+    "coverage_gap_analysis": {
+      "type": ["object", "null"],
+      "description": "Canonical CoverageGapAnalysis. Used for gap-domain fallback when solution_type is GENERAL."
+    },
+    "solution_plan": {
+      "type": ["object", "null"],
+      "description": "Canonical SolutionPlan. One strategy per gap."
+    },
+    "knowledge_evidence": {
+      "type": ["object", "null"],
+      "description": "Canonical KnowledgeEvidence. Absent or empty => every candidate gets EVIDENCE_MISSING."
+    },
+    "requested_product_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional explicit product ids. Any id not in the catalog is rejected with PRODUCT_NOT_IN_CATALOG."
+    }
+  }
+}

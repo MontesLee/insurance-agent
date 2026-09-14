@@ -104,8 +104,48 @@
                 "minimum": 0,
                 "maximum": 1
               },
+              "document_id": {
+                "type": "string"
+              },
+              "document_name": {
+                "type": "string"
+              },
+              "chunk_id": {
+                "type": "string"
+              },
+              "section": {
+                "type": "string"
+              },
+              "source_level": {
+                "type": "string"
+              },
+              "retrieval_method": {
+                "type": "string",
+                "enum": [
+                  "sparse_rrf",
+                  "hybrid_rrf",
+                  "unknown"
+                ]
+              },
               "provenance": {
-                "type": "array"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "source_type": {
+                      "type": "string"
+                    },
+                    "source_id": {
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  }
+                }
               },
               "conflict": {
                 "type": "boolean"

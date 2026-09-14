@@ -1,0 +1,97 @@
+{
+  "version": "0.1",
+  "_comment": "product-candidate-provider rules. The engine consumes this file and never hardcodes a mapping, threshold or vocabulary.",
+
+  "catalog_path": "catalog/product-catalog.v0.1.json",
+
+  "solution_type_to_product_types": {
+    "MEDICAL": ["medical"],
+    "CRITICAL_ILLNESS": ["critical_illness"],
+    "ACCIDENT": ["accident"],
+    "TERM_LIFE": ["life"],
+    "SAVINGS": ["savings"],
+    "GENERAL": []
+  },
+
+  "domain_to_product_types": {
+    "medical": ["medical"],
+    "critical_illness": ["critical_illness"],
+    "accident": ["accident"],
+    "life": ["life"],
+    "savings": ["savings"],
+    "general": []
+  },
+
+  "general_fallback_to_gap_domains": true,
+
+  "coverage_direction": {
+    "match_mode": "any_token",
+    "empty_direction_status": "UNKNOWN",
+    "empty_product_directions_status": "UNKNOWN"
+  },
+
+  "eligibility": {
+    "age_paths": [
+      "profile.age",
+      "profile.personal.age",
+      "client_state.profile.age",
+      "personal.age",
+      "age"
+    ],
+    "age_value_keys": ["value", "amount"],
+    "unknown_age_status": "UNKNOWN",
+    "enforce_rules": ["age", "occupation_class"],
+    "occupation_paths": ["profile.occupation_class", "profile.occupation.occupation_class"],
+    "unknown_occupation_skips_check": true
+  },
+
+  "evidence": {
+    "domain_by_document_prefix": {
+      "00": "general",
+      "01": "medical",
+      "02": "critical_illness",
+      "03": "accident",
+      "04": "life",
+      "05": "general",
+      "06": "general"
+    },
+    "domain_of_document_by_name_contains": {
+      "medical": "medical",
+      "critical": "critical_illness",
+      "accident": "accident",
+      "life": "life",
+      "claims": "general",
+      "underwriting": "general",
+      "taxonomy": "general"
+    },
+    "match_sources": ["required_evidence_domains", "evidence_refs"],
+    "missing_evidence_status": "MISSING",
+    "require_evidence_for_admissible": true
+  },
+
+  "status_when_no_products_matched": "NO_CANDIDATES",
+  "status_when_input_invalid": "INSUFFICIENT_INPUT",
+  "status_when_unknown_product_requested": "INVALID_PRODUCT",
+
+  "reject_reason_codes": {
+    "PRODUCT_TYPE_MISMATCH": "产品类型与解决策略要求的类型不一致",
+    "COVERAGE_DIRECTION_MISMATCH": "产品保障方向与解决策略指定的方向不匹配",
+    "ELIGIBILITY_INELIGIBLE": "客户不符合产品投保条件",
+    "ELIGIBILITY_UNKNOWN": "客户投保资格所需信息不足，无法判定",
+    "EVIDENCE_MISSING": "产品存在但缺少对应知识证据，不得作为有依据的推荐",
+    "PRODUCT_NOT_IN_CATALOG": "产品不存在于 Product Catalog"
+  },
+
+  "next_information_needed_by_reason": {
+    "ELIGIBILITY_UNKNOWN": "补充客户年龄与职业类别",
+    "EVIDENCE_MISSING": "补充对应险种的知识库证据或明确该结论无证据支撑",
+    "PRODUCT_TYPE_MISMATCH": "确认保障缺口所属险种，或扩充 Product Catalog",
+    "COVERAGE_DIRECTION_MISMATCH": "明确解决策略的保障方向关键词"
+  },
+
+  "no_candidates_guidance": {
+    "reason_code": "NO_PRODUCT_COVERS_DIRECTION",
+    "detail": "Product Catalog 中没有任何产品覆盖该解决策略要求的险种与保障方向",
+    "needed": "确认保障缺口所属险种与保障方向，或在 Product Catalog 中补充对应产品；在补齐前不得硬凑最接近的产品"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "_comment": "Case 004: ineligible product. 客户85岁，超出 Catalog 中全部医疗险产品的投保年龄上限（P001<=65 / P002<=60 / P003<=60 / P011 60-80）。所有候选必须判 ELIGIBILITY_INELIGIBLE，一个都不能成为主推荐。",
+  "client_profile": {
+    "client_id": "C-STEP2-004",
+    "profile": {
+      "age": 85,
+      "gender": "female"
+    }
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-007", "requirement_type": "medical", "summary": "大额医疗支出保障", "priority": "P1_HIGH"}
+    ],
+    "information_sufficiency": {"sufficiency_status": "SUFFICIENT"}
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "risks": [
+      {
+        "risk_id": "R1-002",
+        "risk_category": "R1",
+        "risk_name": "大额医疗费用支出",
+        "priority": "P1",
+        "severity": "HIGH",
+        "likelihood": "HIGH",
+        "residual_risk": "HIGH",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 500000, "confidence": 0.7}
+      }
+    ]
+  },
+  "coverage_gap_analysis": {
+    "artifact_type": "coverage-gap-analysis",
+    "payload": {
+      "status": "COMPLETE",
+      "gaps": [
+        {
+          "gap_id": "GAP-004",
+          "domain": "medical",
+          "subject": "高额医疗费用",
+          "gap_level": "CRITICAL",
+          "related_risk_ids": ["R1-002"],
+          "related_requirement_ids": ["REQ-007"]
+        }
+      ]
+    }
+  },
+  "solution_plan": {
+    "artifact_type": "solution-plan",
+    "payload": {
+      "status": "COMPLETE",
+      "solutions": [
+        {
+          "solution_id": "SOL-004",
+          "solution_type": "MEDICAL",
+          "objective": "建立大额医疗支出保障",
+          "coverage_direction": "以大额医疗支出敞口确定保额，优先覆盖社保目录外费用与免赔额以上部分",
+          "priority": "P1",
+          "related_gap_ids": ["GAP-004"],
+          "related_risk_ids": ["R1-002"]
+        }
+      ]
+    }
+  }
+}

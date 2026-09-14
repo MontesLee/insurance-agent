@@ -179,6 +179,73 @@ SOLUTION_PLAN_PAYLOAD = {
             },
         },
         "related_gap_ids": {"type": "array", "items": {"type": "string"}},
+        "related_risk_ids": {"type": "array", "items": {"type": "string"}},
+        # Phase 3 added solutions[] / information_gaps by hand to the generated contract
+        # without updating this generator, so a re-run silently reverted them. They are
+        # declared here now: the generated file must be reproducible from this source.
+        "solutions": {
+            "type": "array",
+            "description": "One strategy per coverage gap. Ordered by priority then gap severity. solutions[0] is the primary.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "solution_id", "solution_type", "objective", "coverage_direction", "priority",
+                ],
+                "additionalProperties": False,
+                "properties": {
+                    "solution_id": {"type": "string"},
+                    "solution_type": {
+                        "type": "string",
+                        "description": "Strategy class (e.g. TERM_LIFE). NOT a concrete product.",
+                    },
+                    "objective": {"type": "string", "minLength": 1},
+                    "coverage_direction": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "保障方向 / 额度与期限逻辑。禁止具体产品名 / 保险公司名。",
+                    },
+                    "priority": {"type": "string", "enum": ["P0", "P1", "P2", "P3"]},
+                    "constraints": {
+                        "type": "array",
+                        "items": {"type": "object", "properties": {
+                            "constraint": {"type": "string"},
+                            "value": {"type": "string"},
+                            "source": {"type": "string"},
+                        }},
+                    },
+                    "trade_offs": {
+                        "type": "array",
+                        "items": {"type": "object", "properties": {
+                            "axis": {"type": "string"},
+                            "option_a": {"type": "string"},
+                            "option_b": {"type": "string"},
+                            "chosen": {"type": "string"},
+                            "reason": {"type": "string"},
+                        }},
+                    },
+                    "rejected_directions": {
+                        "type": "array",
+                        "items": {"type": "object", "properties": {
+                            "direction": {"type": "string"},
+                            "reason": {"type": "string"},
+                        }},
+                    },
+                    "related_gap_ids": {"type": "array", "items": {"type": "string"}},
+                    "related_risk_ids": {"type": "array", "items": {"type": "string"}},
+                    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+                    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+                },
+            },
+        },
+        "information_gaps": {
+            "type": "array",
+            "description": "Gaps whose coverage status is UNKNOWN -> strategy cannot be fixed yet.",
+            "items": {"type": "object", "properties": {
+                "gap_id": {"type": "string"},
+                "domain": {"type": "string"},
+                "reason": {"type": "string"},
+            }},
+        },
         "status": {
             "type": "string",
             "enum": ["COMPLETE", "PRELIMINARY", "NEED_MORE_INFORMATION", "INSUFFICIENT_INFORMATION", "FAILED"],
@@ -235,7 +302,29 @@ KNOWLEDGE_EVIDENCE_PAYLOAD = {
                     "source_type": {"type": "string"},
                     "relevance": {"type": ["number", "null"]},
                     "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-                    "provenance": {"type": "array"},
+                    # Step 2: Recommendation -> Evidence -> Document -> Chunk must resolve.
+                    # Without document_id/chunk_id a consumer can only point at an opaque
+                    # evidence_id, which makes provenance uncheckable.
+                    "document_id": {"type": "string"},
+                    "document_name": {"type": "string"},
+                    "chunk_id": {"type": "string"},
+                    "section": {"type": "string"},
+                    "source_level": {"type": "string"},
+                    "retrieval_method": {
+                        "type": "string",
+                        "enum": ["sparse_rrf", "hybrid_rrf", "unknown"],
+                    },
+                    "provenance": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "source_type": {"type": "string"},
+                                "source_id": {"type": "string"},
+                                "confidence": {"type": ["number", "null"]},
+                            },
+                        },
+                    },
                     "conflict": {"type": "boolean"},
                 },
             },
@@ -308,7 +397,7 @@ SCHEMAS = {
     "solution-plan.schema.json": envelope(
         "solution-plan",
         SOLUTION_PLAN_PAYLOAD,
-        "Solution STRATEGY layer (Gap -> Solution). No concrete product / insurer names. Skill not yet implemented.",
+        "Solution STRATEGY layer (Gap -> Solution). No concrete product / insurer names. Implemented in Phase 3 (skill: solution). payload.solutions[] carries one strategy per gap; the top-level objective/coverage_direction/priority/solution_type are DERIVED from solutions[0] (single source of truth).",
     ),
     "knowledge-query.schema.json": envelope(
         "knowledge-query",

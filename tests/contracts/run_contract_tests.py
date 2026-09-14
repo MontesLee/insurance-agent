@@ -22,6 +22,7 @@ TEST_MODULES = [
     "test_solution_plan_contract",
     "test_knowledge_query_contract",
     "test_knowledge_evidence_contract",
+    "test_knowledge_evidence_traceability",
     "test_product_recommendation_contract",
     "test_insurance_report_contract",
 ]

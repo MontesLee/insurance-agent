@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "product-candidate-provider output",
+  "description": "Step 2 / Phase 4. Emits catalog-backed candidates with deterministic match/eligibility/evidence flags. It does NOT rank or recommend.",
+  "type": "object",
+  "required": ["skill", "version", "status", "candidates", "admissible_candidate_ids", "rejected", "unknowns", "next_information_needed", "catalog", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "skill": { "type": "string" },
+    "version": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["COMPLETE", "NO_CANDIDATES", "INSUFFICIENT_INPUT", "INVALID_PRODUCT"]
+    },
+    "candidates": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/candidate" }
+    },
+    "admissible_candidate_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Candidates with no reject reason. Only these may reach a recommendation."
+    },
+    "rejected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason_codes"],
+        "properties": {
+          "product_id": { "type": ["string", "null"] },
+          "candidate_id": { "type": ["string", "null"] },
+          "reason_codes": { "type": "array", "items": { "type": "string" } },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "unknowns": { "type": "array" },
+    "next_information_needed": { "type": "array" },
+    "catalog": {
+      "type": "object",
+      "required": ["is_demo", "product_count"],
+      "properties": {
+        "catalog_id": { "type": "string" },
+        "catalog_version": { "type": "string" },
+        "is_demo": { "type": "boolean" },
+        "product_count": { "type": "integer" }
+      }
+    },
+    "provenance": { "type": "array" }
+  },
+  "definitions": {
+    "candidate": {
+      "type": "object",
+      "required": [
+        "candidate_id", "product_id", "product_type", "solution_id",
+        "eligibility", "evidence", "admissible", "reject_reason_codes"
+      ],
+      "properties": {
+        "candidate_id": { "type": "string" },
+        "product_id": { "type": "string" },
+        "product_name": { "type": "string" },
+        "product_type": { "type": "string" },
+        "company": { "type": "string" },
+        "is_demo": { "type": "boolean" },
+        "solution_id": { "type": "string" },
+        "related_gap_ids": { "type": "array", "items": { "type": "string" } },
+        "related_risk_ids": { "type": "array", "items": { "type": "string" } },
+        "product_type_match": { "type": "string", "enum": ["MATCH", "MISMATCH"] },
+        "coverage_direction_match": { "type": "string", "enum": ["MATCH", "MISMATCH", "UNKNOWN"] },
+        "coverage_direction_hits": { "type": "array", "items": { "type": "string" } },
+        "eligibility": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "type": "string", "enum": ["ELIGIBLE", "INELIGIBLE", "UNKNOWN"] },
+            "checks": { "type": "array" },
+            "reasons": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": ["status", "available"],
+          "properties": {
+            "status": { "type": "string", "enum": ["AVAILABLE", "MISSING"] },
+            "available": { "type": "boolean" },
+            "evidence_ids": { "type": "array", "items": { "type": "string" } },
+            "documents": { "type": "array", "items": { "type": "string" } },
+            "domains_matched": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "features": { "type": "array" },
+        "constraints": { "type": "array" },
+        "premium": { "type": "object" },
+        "term": { "type": "object" },
+        "liquidity_impact": { "type": "string" },
+        "admissible": { "type": "boolean" },
+        "reject_reason_codes": { "type": "array", "items": { "type": "string" } },
+        "provenance": { "type": "array" }
+      }
+    }
+  }
+}

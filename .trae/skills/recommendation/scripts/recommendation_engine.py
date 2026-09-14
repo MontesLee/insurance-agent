@@ -32,6 +32,16 @@ if REPO_ROOT not in sys.path:
 
 FIT_LABELS = ["strong_fit", "good_fit", "partial_fit", "poor_fit", "not_suitable", "insufficient_evidence"]
 
+# Step 2: violation types produced by product validation (never by constraint maths).
+PRODUCT_BLOCK_TYPES = {
+    "product_ineligible",
+    "product_type_mismatch",
+    "coverage_direction_mismatch",
+    "product_not_in_catalog",
+    "evidence_missing",
+    "product_rejected",
+}
+
 
 def _dig(d, *keys, default=None):
     cur = d
@@ -265,6 +275,27 @@ def evaluate_candidate(cand, ctx, ks, rules):
     # as a hard PASS, which fabricated a "within_budget"/"meets_term" assurance for
     # strategy-level candidates that carry no product quote.
     violations, hard_pass, unverifiable = [], [], []
+
+    # --- Step 2: product validation ---
+    # Catalog-backed candidates carry `_product_validation` from the Candidate Provider.
+    # Strategy-level candidates (legacy path) do NOT, so this block never fires for them
+    # and the 11 legacy eval cases are unaffected.
+    # A product that failed eligibility / type / direction validation is a HARD reject --
+    # never a "the model liked it" recommendation. An unverifiable eligibility is its own
+    # third state (never silently a pass).
+    pval = cand.get("_product_validation")
+    if isinstance(pval, dict):
+        pid = pval.get("product_id") or cand.get("candidate_id")
+        for b in pval.get("blockers") or []:
+            sev = b.get("severity")
+            detail = "product %s rejected: %s" % (pid, b.get("code") or b.get("blocked_reason"))
+            if sev == "hard":
+                violations.append({"type": b.get("blocked_reason", "product_rejected"),
+                                   "detail": detail, "severity": "hard"})
+            elif sev == "unverifiable":
+                unverifiable.append({"type": b.get("blocked_reason", "product_unverifiable"),
+                                     "detail": detail, "severity": "unverifiable"})
+
     budget = _candidate_num(cand, "premium", "annual")
     term = _candidate_num(cand, "term", "years")
     liq = cand.get("liquidity_impact")
@@ -474,10 +505,28 @@ def generate_recommendation(input_dict, rules=None):
     not_rec = [e for e in evals if e["recommendation_status"] == "not_recommended"]
     insuff = [e for e in evals if e["recommendation_status"] == "insufficient_evidence"]
 
+    # Step 2: keep the product identity alongside each evaluation so the final
+    # recommendation traces back to a catalog product, never to a free-text invention.
+    product_meta_by_cid = {}
+    for c in candidates:
+        pv = c.get("_product_validation")
+        if isinstance(pv, dict) and c.get("candidate_id"):
+            meta = dict(pv)
+            meta["product_name"] = c.get("solution_name")
+            product_meta_by_cid[c["candidate_id"]] = meta
+
     # Build not_recommended entries with reasons
     not_rec_out = []
     for e in not_rec:
-        reason = "hard constraint violation" if e["constraint_fit"]["violations"] else "poor requirement/risk fit"
+        pviol = [v for v in e["constraint_fit"]["violations"]
+                 if v.get("type") in PRODUCT_BLOCK_TYPES]
+        if pviol:
+            reason = "product validation failed: " + ", ".join(
+                sorted({str(v["type"]) for v in pviol}))
+        elif e["constraint_fit"]["violations"]:
+            reason = "hard constraint violation"
+        else:
+            reason = "poor requirement/risk fit"
         not_rec_out.append({"candidate_id": e["candidate_id"], "reason": reason, "exception": False})
     for e in insuff:
         not_rec_out.append({"candidate_id": e["candidate_id"],
@@ -501,6 +550,20 @@ def generate_recommendation(input_dict, rules=None):
             "reason_codes": reason_codes,
             "provenance": primary["provenance"],
         }
+        # Step 2: the recommendation must name a real catalog product, so the product
+        # identity travels with it (product_id / is_demo / gap + solution lineage).
+        pmeta = product_meta_by_cid.get(primary["candidate_id"])
+        if pmeta:
+            primary_out["product"] = {
+                "product_id": pmeta.get("product_id"),
+                "product_name": pmeta.get("product_name"),
+                "product_type": pmeta.get("product_type"),
+                "is_demo": bool(pmeta.get("is_demo", False)),
+                "solution_id": pmeta.get("solution_id"),
+                "related_gap_ids": list(pmeta.get("related_gap_ids") or []),
+                "eligibility": pmeta.get("eligibility"),
+                "evidence_status": pmeta.get("evidence_status"),
+            }
 
     alt_out = [{
         "candidate_id": e["candidate_id"],

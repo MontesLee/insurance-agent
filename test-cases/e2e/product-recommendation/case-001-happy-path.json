@@ -1,0 +1,74 @@
+{
+  "_comment": "Case 001: happy path. 30岁客户 / 寿险缺口 / 定期寿险策略。Evidence、Candidate、Recommendation 真实执行。",
+  "client_profile": {
+    "client_id": "C-STEP2-001",
+    "profile": {
+      "age": 30,
+      "gender": "male",
+      "marital_status": "married",
+      "dependents": [{"relation": "child", "age": 0}],
+      "financial_profile": {
+        "annual_income": {"value": 500000, "status": "KNOWN", "source": "client_statement", "confidence": 0.9},
+        "mortgage": {"value": 2000000, "status": "KNOWN", "source": "client_statement", "confidence": 0.8}
+      }
+    }
+  },
+  "requirement_analysis": {
+    "analysis_status": "COMPLETE",
+    "requirements": [
+      {"requirement_id": "REQ-002", "requirement_type": "life", "summary": "家庭责任期收入替代保障", "priority": "P0_CRITICAL"}
+    ],
+    "information_sufficiency": {"sufficiency_status": "SUFFICIENT"}
+  },
+  "risk_assessment": {
+    "analysis_status": "FORMAL",
+    "risks": [
+      {
+        "risk_id": "R4-001",
+        "risk_category": "R4",
+        "risk_name": "主要收入者身故导致家庭现金流中断（含200万房贷）",
+        "priority": "P0",
+        "severity": "CRITICAL",
+        "likelihood": "MEDIUM",
+        "residual_risk": "HIGH",
+        "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 3000000, "confidence": 0.8}
+      }
+    ]
+  },
+  "coverage_gap_analysis": {
+    "artifact_type": "coverage-gap-analysis",
+    "payload": {
+      "status": "COMPLETE",
+      "gaps": [
+        {
+          "gap_id": "GAP-001",
+          "domain": "life",
+          "subject": "家庭责任期收入替代",
+          "gap_level": "CRITICAL",
+          "related_risk_ids": ["R4-001"],
+          "related_requirement_ids": ["REQ-002"]
+        }
+      ]
+    }
+  },
+  "solution_plan": {
+    "artifact_type": "solution-plan",
+    "payload": {
+      "status": "COMPLETE",
+      "solutions": [
+        {
+          "solution_id": "SOL-001",
+          "solution_type": "TERM_LIFE",
+          "objective": "建立家庭责任保障",
+          "coverage_direction": "以家庭责任（房贷、子女抚养、赡养）与收入替代缺口确定保障额度，保障期限覆盖主要责任期",
+          "priority": "P0",
+          "related_gap_ids": ["GAP-001"],
+          "related_risk_ids": ["R4-001"]
+        }
+      ]
+    }
+  },
+  "constraints": {
+    "budget_max": 5000
+  }
+}

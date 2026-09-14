@@ -29,6 +29,10 @@ for p in (HERE, REPO_ROOT):
         sys.path.insert(0, p)
 
 from solution_to_candidates import build_v2_input, load_rules as load_translate_rules  # noqa: E402
+from product_candidates_to_candidate_solutions import (  # noqa: E402
+    build_v2_input_from_product_candidates,
+    load_rules as load_projection_rules,
+)
 from recommendation_engine import generate_recommendation, load_rules as load_engine_rules  # noqa: E402
 from adapters.recommendation_adapter import to_canonical  # noqa: E402
 
@@ -63,15 +67,31 @@ def run(v2_input, translate_rules=None, engine_rules=None):
     if errors:
         return {"_validation_errors": errors, "status": "INSUFFICIENT_INPUT"}, errors
 
-    legacy_input = build_v2_input(
-        requirement_analysis=v2_input.get("requirement_analysis"),
-        risk_assessment=v2_input.get("risk_assessment"),
-        coverage_gap_analysis=v2_input.get("coverage_gap_analysis"),
-        solution_plan=v2_input.get("solution_plan"),
-        knowledge_evidence=v2_input.get("knowledge_evidence"),
-        constraints=v2_input.get("constraints"),
-        rules=translate_rules,
-    )
+    product_candidates = v2_input.get("product_candidates")
+
+    if product_candidates:
+        # Step 2: real, catalog-backed candidates. Strategies are no longer dressed up
+        # as products -- the recommendation now ranks actual catalog entries.
+        legacy_input = build_v2_input_from_product_candidates(
+            requirement_analysis=v2_input.get("requirement_analysis"),
+            risk_assessment=v2_input.get("risk_assessment"),
+            coverage_gap_analysis=v2_input.get("coverage_gap_analysis"),
+            solution_plan=v2_input.get("solution_plan"),
+            knowledge_evidence=v2_input.get("knowledge_evidence"),
+            product_candidates=product_candidates,
+            constraints=v2_input.get("constraints"),
+            rules=load_projection_rules(),
+        )
+    else:
+        legacy_input = build_v2_input(
+            requirement_analysis=v2_input.get("requirement_analysis"),
+            risk_assessment=v2_input.get("risk_assessment"),
+            coverage_gap_analysis=v2_input.get("coverage_gap_analysis"),
+            solution_plan=v2_input.get("solution_plan"),
+            knowledge_evidence=v2_input.get("knowledge_evidence"),
+            constraints=v2_input.get("constraints"),
+            rules=translate_rules,
+        )
 
     out = generate_recommendation(legacy_input, engine_rules)
 
@@ -79,11 +99,18 @@ def run(v2_input, translate_rules=None, engine_rules=None):
     canonical = to_canonical(out)
     warnings += _validate(canonical, CANONICAL_SCHEMA, "canonical output")
 
-    canonical["payload"]["candidate_source"] = "solution_plan"
-    canonical["payload"]["derivation"] = {
-        "candidate_solutions_supplied_as_input": False,
-        "candidate_solutions_derived_from": "solution_plan.solutions[]",
-    }
+    if product_candidates:
+        canonical["payload"]["candidate_source"] = "product_candidate_provider"
+        canonical["payload"]["derivation"] = {
+            "candidate_solutions_supplied_as_input": False,
+            "candidate_solutions_derived_from": "product_candidates[] (catalog-backed)",
+        }
+    else:
+        canonical["payload"]["candidate_source"] = "solution_plan"
+        canonical["payload"]["derivation"] = {
+            "candidate_solutions_supplied_as_input": False,
+            "candidate_solutions_derived_from": "solution_plan.solutions[]",
+        }
     return canonical, warnings
 
 
