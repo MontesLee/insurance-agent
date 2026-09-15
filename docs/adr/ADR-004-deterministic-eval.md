@@ -5,9 +5,9 @@ Skill 产出的 artifact 是否「可信」，需要一个判据。
 最省事的做法是让产出方自己声明 `"status": "ok"`，或者让另一个 LLM 打分。
 
 ## Decision
-Eval 是**独立于 Skill 的确定性引擎**（`workflow/eval_engine.py`），执行 6 类机器可判的检查：
+Eval 是**独立于 Skill 的确定性引擎**（`runtime/eval_engine.py`），执行 6 类机器可判的检查：
 `schema / required_fields / required_non_empty / contamination / provenance / cross_artifact / invariant`。
-规则外置在 `workflow/resources/config/eval.rules.json`，可用 `-RulesPath` 做负向注入。
+规则外置在 `runtime/resources/config/eval.rules.json`，可用 `-RulesPath` 做负向注入。
 **无法评估的检查一律记 FAIL，绝不记 MANUAL/UNKNOWN 通过。**
 
 ## Alternatives

@@ -26,9 +26,9 @@ for p in (REPO_ROOT,):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from state import case_state as cs  # noqa: E402
-from workflow import orchestrator as orch  # noqa: E402
-from workflow import checkpoint as cp  # noqa: E402
+from runtime.state import case_state as cs  # noqa: E402
+from runtime import orchestrator as orch  # noqa: E402
+from runtime import checkpoint as cp  # noqa: E402
 
 FIXTURE = os.path.join(REPO_ROOT, "tests", "e2e", "fixtures", "case-full-chain.json")
 KB_EMPTY = os.path.join(REPO_ROOT, "test-cases", "e2e", "full-agent", "kb-empty")

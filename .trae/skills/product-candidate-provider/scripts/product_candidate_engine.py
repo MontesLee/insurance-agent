@@ -332,7 +332,7 @@ def resolve_evidence(product, knowledge_evidence, rules, grounding_rules=None):
     grounding = None
     rollup = None
     try:
-        from evidence import attribute_grounding as ag  # shared Evidence layer
+        from knowledge.evidence import attribute_grounding as ag  # shared Evidence layer
         grounding = ag.ground_product_attributes(product, matched, grounding_rules)
         rollup = grounding.get("rollup")
     except Exception as e:  # noqa: BLE001 - grounding must never break candidate build

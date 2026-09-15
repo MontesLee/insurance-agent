@@ -18,7 +18,7 @@ REPO = os.path.dirname(os.path.dirname(HERE))
 if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
-from workflow import observability as obs  # noqa: E402
+from runtime import observability as obs  # noqa: E402
 
 BENCH_DIR = os.path.join(REPO, "evals", "agent-benchmark")
 

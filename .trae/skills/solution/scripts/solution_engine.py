@@ -3,7 +3,7 @@
 Strategy layer. It answers ONLY:
     "针对已判定的保障缺口，应该采用什么解决策略？"
 
-Design boundaries (see CONTRACT.md / docs/architecture-v2.md §3.1):
+Design boundaries (see CONTRACT.md / docs/architecture/architecture-v2.md §3.1):
 - Solution != Product: this engine emits STRATEGY (objective / coverage_direction /
   trade-offs / rejected directions). It NEVER names a concrete insurance product or
   insurer. Every emitted string comes from resources/config/solution-mapping.rules.json

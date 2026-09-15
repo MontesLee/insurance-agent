@@ -32,12 +32,12 @@ for p in (REPO_ROOT,):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from state import case_state as cs  # noqa: E402
-from workflow import orchestrator as orch  # noqa: E402
-from workflow import tasks as tk  # noqa: E402
-from workflow import artifact_registry as reg  # noqa: E402
-from workflow import checkpoint as cp  # noqa: E402
-from workflow import eval_engine as ev  # noqa: E402
+from runtime.state import case_state as cs  # noqa: E402
+from runtime import orchestrator as orch  # noqa: E402
+from runtime import tasks as tk  # noqa: E402
+from runtime import artifact_registry as reg  # noqa: E402
+from runtime import checkpoint as cp  # noqa: E402
+from runtime import eval_engine as ev  # noqa: E402
 
 MANIFEST = os.path.join(HERE, "manifest.json")
 RUN_ROOT = os.path.join(REPO_ROOT, "tmp", "full-agent")

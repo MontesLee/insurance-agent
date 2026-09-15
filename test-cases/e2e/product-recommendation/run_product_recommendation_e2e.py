@@ -33,8 +33,8 @@ for p in (REPO_ROOT, CAND_SCRIPTS, REC_SCRIPTS):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from evidence import request as ev_request  # noqa: E402
-from evidence import provider as ev_provider  # noqa: E402
+from knowledge.evidence import request as ev_request  # noqa: E402
+from knowledge.evidence import provider as ev_provider  # noqa: E402
 import product_candidate_engine as cand_engine  # noqa: E402
 from product_candidate_engine import load_catalog, load_rules as load_cand_rules  # noqa: E402
 

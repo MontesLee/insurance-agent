@@ -31,8 +31,8 @@ def run():
     if not os.path.isdir(KB_DIR):
         return (NAME, False, "domain corpus missing: %s" % KB_DIR)
 
-    from rag.store import KnowledgeStore
-    from rag.engine import KnowledgeSearchEngine
+    from knowledge.rag.store import KnowledgeStore
+    from knowledge.rag.engine import KnowledgeSearchEngine
     from adapters.knowledge_search_adapter import to_canonical
 
     ks_rules = os.path.join(REPO, ".trae", "skills", "knowledge-search",

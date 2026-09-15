@@ -93,7 +93,7 @@
 
 **执行方式**：`Deterministic`（规则引擎）/ `LLM`（对话式上游，artifact 注入）/
 `RAG`（共享 Evidence Provider）/ `External Data`（demo catalog，可替换）。
-完整图与标记见 **`docs/architecture.md`**。
+完整图与标记见 **`docs/architecture/architecture.md`**。
 
 ---
 
@@ -123,13 +123,13 @@ Requirement Gap Hint  ≠  Coverage Gap  ≠  Solution  ≠  Product Recommendat
 ```
 
 > 缺口层**不携带任何金额字段**；策略层**禁止出现产品名 / 公司名**；候选层**只生成不排序**。
-> 详细职责边界见 `docs/architecture-v2.md`。
+> 详细职责边界见 `docs/architecture/architecture-v2.md`。
 
 ---
 
 ## 4. CaseState
 
-**一个客户 = 一个 CaseState**，是所有 Skill 的共享黑板（`state/case_state.py`）：
+**一个客户 = 一个 CaseState**，是所有 Skill 的共享黑板（`runtime/state/case_state.py`）：
 
 ```text
 artifacts{}          各层 Canonical Artifact
@@ -143,7 +143,7 @@ trace[]             结构化 Execution Trace（Step 4 Phase 2）
 status / waiting_for_user / review
 ```
 
-**三不变量**（`state/transitions.py`，可机检）：
+**三不变量**（`runtime/state/transitions.py`，可机检）：
 
 | 不变量 | 反例即报 |
 |---|---|
@@ -212,8 +212,8 @@ Product Catalog ─► Product Candidate Provider ─► ProductCandidates ─�
 
 ## 8. Orchestrator
 
-`workflow/orchestrator.py` 是唯一运行时循环，**不含任何保险业务判断**；行为由
-`workflow/insurance-analysis.yaml`（声明式单一真源）驱动。
+`runtime/orchestrator.py` 是唯一运行时循环，**不含任何保险业务判断**；行为由
+`runtime/insurance-analysis.yaml`（声明式单一真源）驱动。
 
 ```text
 next_runnable ─► run stage ─► Eval
@@ -232,7 +232,7 @@ next_runnable ─► run stage ─► Eval
 
 ## 9. Eval
 
-**独立于 Skill 的确定性引擎**（`workflow/eval_engine.py`），6 类机器可判检查：
+**独立于 Skill 的确定性引擎**（`runtime/eval_engine.py`），6 类机器可判检查：
 
 | 检查 | 抓什么 |
 |---|---|
@@ -249,7 +249,7 @@ next_runnable ─► run stage ─► Eval
 
 ## 10. Repair
 
-`workflow/repair.py` 把失败检查映射到动作：
+`runtime/repair.py` 把失败检查映射到动作：
 
 | 动作 | 适用 |
 |---|---|
@@ -344,7 +344,7 @@ Recommendation      SKIPPED
 Case                NEEDS_REVIEW
 ```
 
-这比单纯打印 `ERROR` 有价值得多。事件类型与字段见 `docs/execution-trace.md`。
+这比单纯打印 `ERROR` 有价值得多。事件类型与字段见 `docs/architecture/execution-trace.md`。
 
 ---
 
@@ -444,31 +444,21 @@ python tests/workflow/test_step4_phase13_guardrails.py                 # Safety 
 
 ---
 
-## 17. 项目结构
+## 17. Repository Structure
 
-```text
-insurance-agent/
-├── README.md                     ← 本文件
-├── AGENTS.md                     ← 命名规范与工程纪律（改 Skill 前必读）
-├── demo.py                       ← Demo CLI（Phase 10）
-│
-├── contracts/                    ← 9 份 Canonical Artifact 契约
-├── adapters/                     ← legacy → canonical 纯包络适配器
-├── catalog/                      ← Demo Product Catalog（版本化）
-├── evidence/                     ← 共享 Evidence Provider（request/provider/loop/attribute_grounding）
-├── rag/                          ← RAG 基础层（models/store/engine，纯 stdlib + sqlite3）
-├── domain/insurance/             ← Domain Pack（playbook / references / overlays）
-├── state/                        ← CaseState + transitions + store
-├── workflow/                     ← Orchestrator / eval_engine / repair / checkpoint / trace / observability
-│   ├── insurance-analysis.yaml   ← 声明式工作流单一真源
-│   └── resources/config/         ← 外置规则（eval / repair / orchestrator）
-├── .trae/skills/                 ← 8 个 Specialist Skill
-├── evals/agent-benchmark/        ← Benchmark 数据集 + Golden Cases + Baseline
-├── test-cases/e2e/               ← 全链路 / 产品推荐 E2E
-├── tests/                        ← 契约测试 / 工作流单测 / 变异测试
-└── docs/                         ← 架构 / 契约 / 编排 / Trace / 失败分类 / ADR
-    └── adr/                      ← ADR-001 … ADR-007
-```
+| 目录 | 职责 |
+|---|---|
+| `runtime/` | Agent Runtime：orchestrator / eval_engine / repair / checkpoint / trace / observability / state + 声明式工作流 |
+| `.trae/skills/` | 9 个 Specialist Skill（各带 eval 数据集与外置规则表；`client-intake`、`requirement_analysis` 为冻结 Skill） |
+| `domain/insurance/` | Insurance Domain Pack：险种分类 / 证据等级 / RAG 权威语料 |
+| `knowledge/` | RAG 引擎（sqlite）+ Evidence Provider（grounding / 回环检索） |
+| `contracts/` · `adapters/` · `catalog/` | 9 份 Canonical Artifact 契约 · legacy→canonical 适配器 · 版本化产品目录 |
+| `tests/` · `test-cases/` | 契约 / 变异 / 工作流单测 · E2E 场景数据集 |
+| `evals/` | System-level Benchmark + Golden Cases（区别于 Skill-level evals，见 `evals/README.md`） |
+| `docs/` | architecture / adr / dev-notes / archive（目录契约详见 `docs/repository-structure.md`） |
+| `demo.py` | Demo CLI：A 完整推荐 / B 证据不足→NEEDS_REVIEW / C 多需求策略层 |
+
+结构不变量由 `python tests/structure/test_structure_integrity.py` 守护。
 
 ---
 
@@ -476,13 +466,13 @@ insurance-agent/
 
 | 想了解 | 读 |
 |---|---|
-| 架构总览 + 执行方式标记 | `docs/architecture.md` |
+| 架构总览 + 执行方式标记 | `docs/architecture/architecture.md` |
 | 设计决策与取舍 | `docs/adr/` |
-| 契约层与 legacy 映射 | `docs/contract-layer.md` |
-| 编排 / CaseState / 闸门 | `docs/orchestration.md` |
-| Execution Trace 与事件类型 | `docs/execution-trace.md` |
-| 失败分类 F1–F12 + 处理矩阵 | `docs/failure-taxonomy.md` |
-| Evidence Provider | `docs/evidence-provider.md` |
-| 产品候选 / 推荐分离 | `docs/product-recommendation-v2.md` |
-| 目标架构与四层语义 | `docs/architecture-v2.md` |
+| 契约层与 legacy 映射 | `docs/architecture/contract-layer.md` |
+| 编排 / CaseState / 闸门 | `docs/architecture/orchestration.md` |
+| Execution Trace 与事件类型 | `docs/architecture/execution-trace.md` |
+| 失败分类 F1–F12 + 处理矩阵 | `docs/architecture/failure-taxonomy.md` |
+| Evidence Provider | `docs/architecture/evidence-provider.md` |
+| 产品候选 / 推荐分离 | `docs/architecture/product-recommendation-v2.md` |
+| 目标架构与四层语义 | `docs/architecture/architecture-v2.md` |
 | 命名规范与纪律 | `AGENTS.md` |

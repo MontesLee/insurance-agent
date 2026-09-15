@@ -1,7 +1,0 @@
-[PASS] case-01-multi-gap
-[PASS] case-02-life-only
-[PASS] case-03-unknown
-[PASS] case-04-no-actionable-gap
-[PASS] case-05-preliminary
-
-RESULT: ALL GREEN

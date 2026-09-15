@@ -40,9 +40,9 @@ for p in (REPO, CAND_SCRIPTS, REC_SCRIPTS):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from evidence import attribute_grounding as ag  # noqa: E402
+from knowledge.evidence import attribute_grounding as ag  # noqa: E402
 import product_candidate_engine as ce  # noqa: E402
-import workflow.orchestrator as orch  # noqa: E402
+import runtime.orchestrator as orch  # noqa: E402
 
 passed = failed = 0
 lines = []

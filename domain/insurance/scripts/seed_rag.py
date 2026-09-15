@@ -20,7 +20,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(PACK_ROOT))
 sys.path.insert(0, REPO_ROOT)
 
 import yaml  # PyYAML
-from rag.store import KnowledgeStore
+from knowledge.rag.store import KnowledgeStore
 from build_domain_engine import ingest_pack
 
 DEFAULT_REF = os.path.join(PACK_ROOT, "references")

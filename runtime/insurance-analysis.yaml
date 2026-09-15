@@ -1,0 +1,152 @@
+# Insurance Agent V2 — Orchestration Workflow
+# ===========================================
+# This file is the SINGLE SOURCE OF TRUTH for the pipeline's stage order, the artifact each
+# stage produces, the artifacts it consumes, and who executes it.
+#
+# Data chain (one-way):  FACT -> REQUIREMENT -> RISK -> GAP -> SOLUTION -> PRODUCT -> REPORT
+#
+# Executors
+#   provided : the artifact is produced OUTSIDE the orchestrator (dialogue-driven PowerShell
+#              skill, or a runtime that already ran it) and is seeded into CaseState.
+#              The orchestrator records it as COMPLETED with `provided_by` provenance; it
+#              never pretends to have run it.
+#   python   : the artifact is produced by calling the skill's declared entrypoint.
+#
+# Knowledge Search is deliberately NOT a stage. It is a shared `service` (Evidence Provider)
+# that any stage may request; see `services:` and per-stage `services:` below.
+workflow: insurance-analysis
+version: "2.0"
+description: >
+  Contract-first orchestration of the 8 specialist skills. Each stage reads canonical
+  artifacts from CaseState and writes exactly one canonical artifact back. Ordering,
+  preconditions and artifact freeze are enforced by runtime/state/transitions.py.
+
+state_schema: runtime/state/case_state.schema.json
+
+stages:
+  # ---- Provided by the dialogue-driven intake/analysis skills (seeded) --------------
+  - id: client-intake
+    skill: client-intake
+    produces: client-profile
+    consumes: []
+    executor: provided
+    gate: human_review          # facts are captured with the client in the loop
+    contract: contracts/client-profile.schema.json
+
+  - id: requirement-analysis
+    skill: requirement_analysis
+    produces: requirement-analysis
+    consumes: [client-profile]
+    executor: provided
+    gate: auto
+    contract: contracts/requirement-analysis.schema.json
+
+  - id: risk-analysis
+    skill: risk-analysis
+    produces: risk-assessment
+    consumes: [client-profile, requirement-analysis]
+    executor: provided
+    gate: auto
+    contract: contracts/risk-assessment.schema.json
+
+  # ---- Deterministic engines (run in-process) ---------------------------------------
+  - id: coverage-gap-analysis
+    skill: coverage-gap-analysis
+    produces: coverage-gap-analysis
+    consumes: [client-profile, requirement-analysis, risk-assessment]
+    executor: python
+    gate: auto
+    entrypoint: .trae/skills/coverage-gap-analysis/scripts/invoke-coverage-gap-analysis.py
+    call:
+      fn: run
+      result: tuple3            # (artifact, ok, errors)
+    contract: contracts/coverage-gap-analysis.schema.json
+
+  - id: solution
+    skill: solution
+    produces: solution-plan
+    consumes: [coverage-gap-analysis, requirement-analysis, risk-assessment]
+    executor: python
+    gate: auto
+    entrypoint: .trae/skills/solution/scripts/invoke-solution.py
+    call:
+      fn: run
+      result: tuple3
+    contract: contracts/solution-plan.schema.json
+
+  # ---- Step 2 candidate provider (real Product Catalog, deterministic filters) ------
+  - id: product-candidate-provider
+    skill: product-candidate-provider
+    produces: product-candidates
+    consumes: [client-profile, coverage-gap-analysis, solution-plan]
+    optional_consumes: [knowledge-evidence]
+    executor: python
+    gate: auto
+    entrypoint: .trae/skills/product-candidate-provider/scripts/product_candidate_engine.py
+    call:
+      fn: run
+      result: tuple3            # (artifact, ok, errors)
+    # No canonical contract yet: this artifact is Skill-level (Step 2 deliberate debt).
+    # Eval still runs (required_fields / invariant catalog_exists) via eval.rules.json.
+    eval_policy: standard
+    repair_policy: { max_attempts: 3 }
+    # Evidence round-trip requested on behalf of this stage (Skill -> Request -> KS -> Skill).
+    services:
+      - id: knowledge-search
+        source: solution-plan
+        source_kind: solution
+        purpose: SOLUTION_VALIDATION
+        store_as: knowledge-evidence
+
+  - id: product-recommendation
+    skill: product-recommendation
+    legacy_skill: recommendation
+    produces: product-recommendation
+    consumes: [requirement-analysis, risk-assessment, coverage-gap-analysis, solution-plan]
+    optional_consumes: [knowledge-evidence, product-candidates]
+    executor: python
+    gate: human_review          # the engine sets human_review_required on unverifiable constraints
+    entrypoint: .trae/skills/recommendation/scripts/invoke-product-recommendation.py
+    call:
+      fn: run
+      result: tuple2            # (artifact, warnings)
+    contract: contracts/product-recommendation.schema.json
+    eval_policy: standard
+    repair_policy: { max_attempts: 3 }
+
+  - id: report-generation
+    skill: report-generation
+    produces: insurance-report
+    consumes: [client-profile, requirement-analysis, risk-assessment]
+    optional_consumes: [coverage-gap-analysis, solution-plan, knowledge-evidence, product-recommendation]
+    executor: python
+    gate: auto
+    entrypoint: .trae/skills/report-generation/scripts/report_generation_engine.py
+    call:
+      fn: generate_report
+      rules_from: load_rules    # orchestrator calls module.load_rules() and passes it
+      result: artifact
+    # This engine returns the Skill's native result; the adapter is the declared boundary
+    # that wraps it into the Canonical Contract. (Stages 4/5/7 already return envelopes.)
+    post_adapter: adapters.report_generation_adapter.to_canonical
+    contract: contracts/insurance-report.schema.json
+    # Explicit boundary: which key the artifact arrives under and in which shape.
+    # Default is key=artifact_type (hyphens->underscores), shape=artifact (canonical envelope).
+    # This skill reads client_profile / requirement_analysis / risk_analysis as RAW payloads,
+    # so the boundary is declared here rather than assumed.
+    input_map:
+      client-profile: { key: client_profile, shape: payload }
+      requirement-analysis: { key: requirement_analysis, shape: payload }
+      risk-assessment: { key: risk_analysis, shape: payload }
+
+# Shared, non-linear services. These are NOT steps in `stages:` — any stage may request them.
+services:
+  - id: knowledge-search
+    skill: knowledge-search
+    provides: knowledge-evidence
+    kind: evidence-provider
+    entrypoint: evidence.loop.request_evidence
+    note: >
+      Shared Evidence Provider (V2 Phase 4). Query text is template-generated from
+      (domain, purpose); the requesting artifact is only referenced via related_artifact_ids.
+      The loop is read-only and returns source_unchanged. Evidence != Recommendation.

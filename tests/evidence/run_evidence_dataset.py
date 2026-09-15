@@ -21,9 +21,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from evidence import request as request_mod  # noqa: E402
-from evidence import provider as provider_mod  # noqa: E402
-from evidence import loop as loop_mod  # noqa: E402
+from knowledge.evidence import request as request_mod  # noqa: E402
+from knowledge.evidence import provider as provider_mod  # noqa: E402
+from knowledge.evidence import loop as loop_mod  # noqa: E402
 
 CASES_DIR = os.path.join(HERE, "cases")
 LOG_PATH = os.path.join(HERE, "_evidence_dataset_log.txt")

@@ -26,7 +26,7 @@ sys.path.insert(0, REPO_ROOT)
 sys.path.insert(0, HERE)
 
 import yaml  # PyYAML
-from rag.store import KnowledgeStore, PRODUCT_BY_PREFIX  # noqa: E402
+from knowledge.rag.store import KnowledgeStore, PRODUCT_BY_PREFIX  # noqa: E402
 
 # 复用本包引擎装配
 from build_domain_engine import build_domain_engine, ingest_pack  # noqa: E402

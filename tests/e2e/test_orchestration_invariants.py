@@ -23,9 +23,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from state import case_state as cs  # noqa: E402
-from state import transitions  # noqa: E402
-from workflow import orchestrator as orch  # noqa: E402
+from runtime.state import case_state as cs  # noqa: E402
+from runtime.state import transitions  # noqa: E402
+from runtime import orchestrator as orch  # noqa: E402
 
 FIXTURE = os.path.join(HERE, "fixtures", "case-full-chain.json")
 LOG = os.path.join(HERE, "_orchestration_invariants_log.txt")

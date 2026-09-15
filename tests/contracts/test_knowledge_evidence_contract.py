@@ -14,8 +14,8 @@ REPO = os.path.dirname(os.path.dirname(HERE))
 if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
-from evidence.request import build_evidence_request  # noqa: E402
-from evidence.provider import provide_evidence  # noqa: E402
+from knowledge.evidence.request import build_evidence_request  # noqa: E402
+from knowledge.evidence.provider import provide_evidence  # noqa: E402
 from _common import validate  # noqa: E402
 
 # Decision-layer fields that must never appear in an Evidence artifact.

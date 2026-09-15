@@ -5,8 +5,8 @@
 最直接的做法是在某个脚本里顺序写 9 行调用。
 
 ## Decision
-建一个**不含任何保险业务判断**的 Orchestrator（`workflow/orchestrator.py`），
-其行为由**声明式**的 `workflow/insurance-analysis.yaml` 驱动（stage 顺序 / 生产消费 / executor / gate 全部外置）。
+建一个**不含任何保险业务判断**的 Orchestrator（`runtime/orchestrator.py`），
+其行为由**声明式**的 `runtime/insurance-analysis.yaml` 驱动（stage 顺序 / 生产消费 / executor / gate 全部外置）。
 
 ## Alternatives
 - 硬编码顺序调用：新增/调序要改代码，且顺序逻辑散落。

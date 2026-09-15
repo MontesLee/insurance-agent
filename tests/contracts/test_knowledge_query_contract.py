@@ -17,7 +17,7 @@ if SOLUTION_SCRIPTS not in sys.path:
     sys.path.insert(0, SOLUTION_SCRIPTS)
 
 from solution_engine import analyze, load_rules  # noqa: E402
-from evidence.request import from_solution  # noqa: E402
+from knowledge.evidence.request import from_solution  # noqa: E402
 from _common import validate  # noqa: E402
 
 FIXTURE = os.path.join(

@@ -31,8 +31,8 @@ for p in (REPO, CAND_SCRIPTS, REC_SCRIPTS):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from evidence import request as ev_request  # noqa: E402
-from evidence import provider as ev_provider  # noqa: E402
+from knowledge.evidence import request as ev_request  # noqa: E402
+from knowledge.evidence import provider as ev_provider  # noqa: E402
 import product_candidate_engine as cand_engine  # noqa: E402
 
 STEP2 = os.path.join(REPO, "test-cases", "e2e", "product-recommendation")

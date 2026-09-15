@@ -28,10 +28,10 @@ for p in (REPO_ROOT,):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from state import case_state as cs  # noqa: E402
-from state import store  # noqa: E402
-from state import transitions  # noqa: E402
-from workflow import orchestrator as orch  # noqa: E402
+from runtime.state import case_state as cs  # noqa: E402
+from runtime.state import store  # noqa: E402
+from runtime.state import transitions  # noqa: E402
+from runtime import orchestrator as orch  # noqa: E402
 
 FIXTURE = os.path.join(HERE, "fixtures", "case-full-chain.json")
 LOG = os.path.join(HERE, "_e2e_log.txt")

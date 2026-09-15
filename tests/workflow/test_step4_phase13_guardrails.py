@@ -40,8 +40,8 @@ for p in (REPO, REPORT_SCRIPTS):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-import workflow.orchestrator as orch  # noqa: E402
-from workflow import eval_engine as ev  # noqa: E402
+import runtime.orchestrator as orch  # noqa: E402
+from runtime import eval_engine as ev  # noqa: E402
 import report_generation_engine as rge  # noqa: E402
 
 passed = failed = 0

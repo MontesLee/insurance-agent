@@ -12,3 +12,12 @@ tmp/
 Thumbs.db
 Desktop.ini
 .trae/skills/risk-analysis/nul
+
+# 运行时日志/采样产物（脚本可再生，不入库）
+_*_log.txt
+_*_sample.txt
+__pycache__/
+
+# client-intake 运行时客户数据（README 模板除外）
+client-intake-data/clients/*
+!client-intake-data/clients/README.md

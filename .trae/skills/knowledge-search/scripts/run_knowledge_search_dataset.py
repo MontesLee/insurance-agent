@@ -14,9 +14,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.p
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from rag.store import KnowledgeStore
-from rag.engine import KnowledgeSearchEngine
-from rag.models import Chunk
+from knowledge.rag.store import KnowledgeStore
+from knowledge.rag.engine import KnowledgeSearchEngine
+from knowledge.rag.models import Chunk
 
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KB_DIR = os.path.join(SKILL_DIR, "evals", "fixtures", "kb")

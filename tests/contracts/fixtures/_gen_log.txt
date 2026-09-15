@@ -1,7 +1,0 @@
-fixtures generated:
-client_profile.json
-recommendation.json
-report_generation.json
-requirement_analysis.json
-knowledge_search.json
-risk_assessment.json

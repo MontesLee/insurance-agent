@@ -23,8 +23,8 @@ PACK_ROOT = os.path.dirname(HERE)                      # domain/insurance
 REPO_ROOT = os.path.dirname(os.path.dirname(PACK_ROOT))  # parents[3] from script
 sys.path.insert(0, REPO_ROOT)
 
-from rag.store import KnowledgeStore, chunk_markdown       # noqa: E402
-from rag.engine import KnowledgeSearchEngine              # noqa: E402
+from knowledge.rag.store import KnowledgeStore, chunk_markdown       # noqa: E402
+from knowledge.rag.engine import KnowledgeSearchEngine              # noqa: E402
 
 KS_SKILL = os.path.join(REPO_ROOT, ".trae", "skills", "knowledge-search")
 RET_RULES = os.path.join(KS_SKILL, "resources", "config", "retrieval.rules.json")

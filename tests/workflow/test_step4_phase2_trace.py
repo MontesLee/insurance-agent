@@ -28,7 +28,7 @@ for p in (REPO,):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from workflow import orchestrator as orch  # noqa: E402
+from runtime import orchestrator as orch  # noqa: E402
 
 FULL_AGENT_DIR = os.path.join(REPO, "test-cases", "e2e", "full-agent")
 MANIFEST = os.path.join(FULL_AGENT_DIR, "manifest.json")

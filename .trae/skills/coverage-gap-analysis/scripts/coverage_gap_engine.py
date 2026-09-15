@@ -3,7 +3,7 @@
 Independent business-judgment layer. It answers ONLY:
     "针对已识别的风险与已声明的需求，客户当前保障覆盖到什么程度（缺口在哪）？"
 
-Design boundaries (see CONTRACT.md / docs/architecture-v2.md §3.1):
+Design boundaries (see CONTRACT.md / docs/architecture/architecture-v2.md §3.1):
 - Risk != Coverage Gap: this engine does NOT recompute severity / likelihood /
   residual_risk / priority of a risk. It only *references* risk_id.
 - It does NOT recommend products or strategies (that is solution / product-recommendation).

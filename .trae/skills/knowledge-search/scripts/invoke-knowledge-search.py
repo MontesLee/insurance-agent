@@ -13,8 +13,8 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.p
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from rag.store import KnowledgeStore
-from rag.engine import KnowledgeSearchEngine
+from knowledge.rag.store import KnowledgeStore
+from knowledge.rag.engine import KnowledgeSearchEngine
 
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_KB = os.path.join(SKILL_DIR, "evals", "fixtures", "kb")

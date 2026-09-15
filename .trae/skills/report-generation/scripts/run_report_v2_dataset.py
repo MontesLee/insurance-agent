@@ -16,8 +16,8 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL_DIR = os.path.dirname(HERE)
-# scripts -> report-generation -> skills -> .trae -> insurance-agent
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(SKILL_DIR))))
+# skills -> .trae -> insurance-agent
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(SKILL_DIR)))
 for p in (HERE, REPO_ROOT):
     if p not in sys.path:
         sys.path.insert(0, p)

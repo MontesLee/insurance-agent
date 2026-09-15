@@ -1,9 +1,0 @@
-product-recommendation V2 dataset (2.0)
-
-[PASS] v2_term_life_happy_path  (pipeline)
-[PASS] v2_multi_solution_ranking  (ranking)
-[PASS] v2_no_actionable_solution  (scope)
-[PASS] v2_evidence_insufficient  (evidence)
-[PASS] v2_unverifiable_constraints  (honesty)
-
-DATASET RESULT: ALL GREEN

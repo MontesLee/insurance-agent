@@ -68,8 +68,8 @@ def main():
     # 5) knowledge_search (live engine run)
     if REPO not in sys.path:
         sys.path.insert(0, REPO)
-    from rag.store import KnowledgeStore
-    from rag.engine import KnowledgeSearchEngine
+    from knowledge.rag.store import KnowledgeStore
+    from knowledge.rag.engine import KnowledgeSearchEngine
 
     ks_skill = os.path.join(REPO, ".trae", "skills", "knowledge-search")
     kb_dir = os.path.join(ks_skill, "evals", "fixtures", "kb")

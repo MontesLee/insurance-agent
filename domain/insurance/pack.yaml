@@ -165,5 +165,5 @@ overlays:
 # ---------------------------------------------------------------------------
 consumers:
   - knowledge-search        # 可经 --kb <references_dir> 指向本包作为生产语料
-  - evidence-provider      # evidence/ 回环检索时消费本包语料
+  - evidence-provider      # knowledge/evidence/ 回环检索时消费本包语料
   - all-specialist-skills  # 各 Skill 的 references 可引用本包的 taxonomy/evidence_types 作为规范

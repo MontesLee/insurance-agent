@@ -36,8 +36,8 @@ REPO = os.path.dirname(os.path.dirname(HERE))  # evals/agent-benchmark -> repo r
 if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
-from workflow import orchestrator as orch  # noqa: E402
-from workflow import eval_engine as ev  # noqa: E402
+from runtime import orchestrator as orch  # noqa: E402
+from runtime import eval_engine as ev  # noqa: E402
 
 MANIFEST = os.path.join(HERE, "manifest.json")
 RUN_ROOT = os.path.join(REPO, "tmp", "agent-benchmark")
