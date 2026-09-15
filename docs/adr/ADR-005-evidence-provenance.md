@@ -1,25 +1,38 @@
+> 🌐 **Language:** 🇨🇳 [中文版](ADR-005-evidence-provenance.zh-CN.md) · 🇺🇸 English
+
 # ADR-005 · Evidence provenance
 
 ## Context
-Agent 很容易「凭模型记忆」说出保险知识（例如某产品保证续保 20 年），听起来合理但可能完全错误。
-在保险场景，无来源的结论等同于误导。
+Agents easily state insurance knowledge "from model memory" (e.g. "this product guarantees renewal
+for 20 years") — plausible-sounding but possibly wrong. In insurance, an unsourced conclusion is
+equivalent to misleading the client.
 
 ## Decision
-知识必须以 **Evidence** 形式进入系统，且每条证据携带 `evidence_id / document_name / chunk / source`。
-- 共享 Evidence Provider（当前位于 `knowledge/evidence/` + `knowledge/rag/`；本文写作时仍为 `evidence/` + `rag/`），查询由 `(domain, purpose)` 模板生成，回环只读；
-- **V0.2 属性级 grounding**：产品声明的关键属性（`coverage_type / eligibility_age / renewal_period / deductible / coverage_term`）逐条对照证据，给出 `SUPPORTED / UNSUPPORTED / CONFLICT / NOT_CHECKABLE`；
-- **NOT_CHECKABLE 是独立第三态**，绝不折成 SUPPORTED；
-- 产品候选必须来自 Catalog，推荐必须能溯源到证据。
+Knowledge must enter the system as **Evidence**, each piece carrying
+`evidence_id / document_name / chunk / source`.
+- A shared Evidence Provider (currently at `knowledge/evidence/` + `knowledge/rag/`); queries are
+  generated from `(domain, purpose)` templates and the loop is read-only;
+- **V0.2 attribute-level grounding**: key claimed product attributes (`coverage_type /
+  eligibility_age / renewal_period / deductible / coverage_term`) are checked against evidence one
+  by one, yielding `SUPPORTED / UNSUPPORTED / CONFLICT / NOT_CHECKABLE`;
+- **NOT_CHECKABLE is an explicit third state**, never folded into SUPPORTED;
+- Product candidates must come from the Catalog; recommendations must be traceable to evidence.
 
 ## Alternatives
-- 直接用模型知识回答：不可验证，等于放行幻觉。
-- 仅 document 级溯源（Step 2 现状）：只能证明「查过这个领域的文档」，不能证明「这条属性被支持过」。
-- 要求证据覆盖整个产品体系：工作量为 O(属性 × 产品)，本阶段不现实。
+- Answer directly from model knowledge: unverifiable — a license for hallucination.
+- Document-level provenance only (the Step 2 status quo): proves "a document in this domain was
+  consulted", not "this attribute was supported".
+- Require evidence to cover the entire product system: O(attributes × products) effort —
+  unrealistic at this stage.
 
 ## Why
-「有出处」把可说性变成可核查性。属性级 grounding 进一步回答最要命的问题：
-「我们声称这个产品保证续保 20 年，哪条证据说了这句话？」——如果没有任何 chunk 提到，就是 UNSUPPORTED。
+"Having a source" turns speakability into checkability. Attribute-level grounding answers the most
+fatal question: "We claim this product guarantees renewal for 20 years — which evidence says that
+sentence?" If no chunk mentions it, it is UNSUPPORTED.
 
 ## Trade-offs
-- 属性级匹配用「声明值的可搜索变体」（含金额单位归一，如 `10000元` vs `1 万元`），本质仍是**字符串命中**，不是语义蕴含 —— 会漏判（假阴性），故设计为「不确定时判 NOT_CHECKABLE / UNSUPPORTED，不判 SUPPORTED」。
-- V0.2 只覆盖 5 个关键属性，其余属性不参与判定。
+- Attribute matching uses "searchable variants of the claimed value" (with amount-unit
+  normalization, e.g. `10000元` vs `1 万元`); it is still **string hit**, not semantic entailment —
+  it under-detects (false negatives), so the design says "when uncertain, judge NOT_CHECKABLE /
+  UNSUPPORTED, never SUPPORTED".
+- V0.2 covers only 5 key attributes; other attributes do not participate in the judgment.

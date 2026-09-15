@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](README.zh-CN.md) · 🇺🇸 English
+
 # insurance-agent
 
 A deterministic multi-stage insurance-analysis Agent designed to demonstrate reliable Agent Systems engineering.

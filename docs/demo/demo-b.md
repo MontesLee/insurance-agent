@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](demo-b.zh-CN.md) · 🇺🇸 English
+
 # Demo B — Safe Failure Path (`bm-noev-001`)
 
 **Purpose:** Show the agent **failing safely** instead of fabricating evidence when its knowledge

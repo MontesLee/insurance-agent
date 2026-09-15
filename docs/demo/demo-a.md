@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](demo-a.zh-CN.md) · 🇺🇸 English
+
 # Demo A — Successful Path (`bm-complete-006-single-medical`)
 
 **Purpose:** Show the agent completing a full end-to-end insurance-analysis run and producing a

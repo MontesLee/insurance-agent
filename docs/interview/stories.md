@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](stories.zh-CN.md) · 🇺🇸 English
+
 # Interview Stories — Real Engineering Incidents
 
 Five short stories you can tell to show *how you actually think about agent reliability*. Each is

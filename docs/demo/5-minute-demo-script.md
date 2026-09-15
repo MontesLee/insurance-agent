@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](5-minute-demo-script.zh-CN.md) · 🇺🇸 English
+
 # 5-Minute Demo Script
 
 A walkthrough you can run live in an interview. Times are approximate; the point is the narrative,

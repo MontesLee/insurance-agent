@@ -1,52 +1,57 @@
-# 架构总览（Architecture）
+> 🌐 **Language:** 🇨🇳 [中文版](architecture.zh-CN.md) · 🇺🇸 English
 
-> 面向读者：面试官 / 新协作者。本文回答三件事：**系统长什么样**、**每一层由谁执行**、**为什么这样分层**。
-> 配套：`README.md`（入口）、`docs/adr/`（设计决策）、`docs/architecture/orchestration.md`（编排细节）、
-> `docs/architecture/execution-trace.md`（可观测）、`docs/architecture/failure-taxonomy.md`（失败分类）。
+# Architecture Overview
+
+> Audience: interviewers / new contributors. This document answers three questions: **what the
+> system looks like**, **who executes each layer**, and **why it is layered this way**.
+> Companions: `README.md` (entry point), `docs/adr/` (design decisions),
+> `docs/architecture/orchestration.md` (orchestration details),
+> `docs/architecture/execution-trace.md` (observability),
+> `docs/architecture/failure-taxonomy.md` (failure taxonomy).
 
 ---
 
-## 1. 一张图
+## 1. One Diagram
 
 ```text
                               Customer
-                                 │  (对话 / 表单，executor: provided)
+                                 │  (dialogue / form, executor: provided)
                                  ▼
                         ┌──────────────────┐
                         │   Orchestrator   │  runtime/orchestrator.py
-                        │  (唯一运行时循环) │  + runtime/insurance-analysis.yaml（声明式单一真源）
+                        │ (the only loop)  │  + runtime/insurance-analysis.yaml (declarative single source of truth)
                         └────────┬─────────┘
                                  │
                         ┌────────▼─────────┐
-                        │     CaseState    │  runtime/state/case_state.py   ← 跨 Skill 唯一事实源
-                        │ artifacts/tasks/ │  runtime/state/transitions.py  ← 单调性 / 前置条件 / 冻结
-                        │ registry/evals/  │  runtime/artifact_registry.py ← 血缘 + 指纹
+                        │     CaseState    │  runtime/state/case_state.py   ← the single source of truth across Skills
+                        │ artifacts/tasks/ │  runtime/state/transitions.py  ← monotonicity / preconditions / freezing
+                        │ registry/evals/  │  runtime/artifact_registry.py ← lineage + fingerprints
                         └────────┬─────────┘
                                  │
                         ┌────────▼─────────┐
-                        │   Skill Graph    │  8 个 Specialist Skill（每层一个 artifact）
+                        │   Skill Graph    │  8 Specialist Skills (one artifact per layer)
                         └────────┬─────────┘
                                  │
         ┌────────────────────────┼────────────────────────┐
         ▼                        ▼                        ▼
   Business Skills          Evidence / RAG            Product Catalog
-  (gap/solution/report)    (knowledge-search)        (demo, 版本化)
+  (gap/solution/report)    (knowledge-search)        (demo, versioned)
         │                        │                        │
         └────────────────────────┼────────────────────────┘
                                  ▼
                             Artifacts
                                  │
                                  ▼
-                           Eval (确定性 6 类检查)
+                           Eval (deterministic, 6 check families)
                           ↙                        ↘
                        PASS                        FAIL
                         │                            │
-                        │                         Repair (局部化重跑)
+                        │                         Repair (localized rerun)
                         │                            │
                         │                          Rerun
                         └─────────────┬──────────────┘
                                       ▼
-                                 Checkpoint  (落盘 + 校验，拒绝从损坏态续跑)
+                                 Checkpoint  (persist + validate; never resume from a corrupted state)
                                       │
                                       ▼
                                    Report
@@ -55,57 +60,57 @@
                           Benchmark / Trace / Demo
 ```
 
-**执行方式标记**（§27 要求）：
+**Executor markers** (required by §27):
 
-| 标记 | 含义 | 具体落点 |
+| Marker | Meaning | Where it lands |
 |---|---|---|
-| `Deterministic` | 纯规则引擎，同输入必同输出，可单测 | `coverage-gap-analysis` / `solution` / `product-candidate-provider` / `recommendation` / `report-generation` 的引擎；`eval_engine` / `repair` / `checkpoint` / `transitions` |
-| `LLM` | 由对话式 Skill 产出（本仓库不内置模型调用，产物以 artifact 形式注入） | `client-intake` / `requirement_analysis` / `risk-analysis` 三个上游 stage（`executor: provided`） |
-| `RAG` | 共享 Evidence Provider（`knowledge/rag/` 存储 + `knowledge/evidence/loop.py` 受控回环） | `knowledge-search`（`services:` 中的非线性 Provider，不是 stage） |
-| `External Data` | 外部产品数据源，当前为 demo catalog，可替换 | `catalog/product-catalog.v0.1.json`（`is_demo=true`），通过 Product Provider 抽象隔离 |
+| `Deterministic` | Pure rule engines; same input always yields same output; unit-testable | engines of `coverage-gap-analysis` / `solution` / `product-candidate-provider` / `recommendation` / `report-generation`; `eval_engine` / `repair` / `checkpoint` / `transitions` |
+| `LLM` | Produced by conversational Skills (no model call is embedded in this repo; artifacts are injected as files) | the three upstream stages `client-intake` / `requirement_analysis` / `risk-analysis` (`executor: provided`) |
+| `RAG` | Shared Evidence Provider (`knowledge/rag/` storage + `knowledge/evidence/loop.py` controlled loop) | `knowledge-search` (a non-linear Provider in `services:`, not a stage) |
+| `External Data` | External product data source; currently a demo catalog, replaceable | `catalog/product-catalog.v0.1.json` (`is_demo=true`), isolated behind the Product Provider abstraction |
 
 ---
 
-## 2. Skill Graph（8 个层，单向数据链）
+## 2. Skill Graph (8 layers, one-way data chain)
 
 ```text
 FACT ─► REQUIREMENT ─► RISK ─► GAP ─► SOLUTION ─► PRODUCT ─► REPORT
 ```
 
-| # | Skill | 回答 | 产物 Artifact | 执行 | 关键约束 |
+| # | Skill | Answers | Artifact | Executor | Key constraints |
 |---|---|---|---|---|---|
-| 01 | client-intake | 客户有哪些**事实**？ | ClientProfile | LLM（provided） | FactValue = value/status/source/confidence；UNKNOWN 绝不写入 answered_fields |
-| 02 | requirement-analysis | 想解决什么**问题**？ | RequirementAnalysis | LLM（provided） | coverage_gaps 只是 **hint**，不是最终缺口 |
-| 03 | risk-analysis | 暴露什么**风险**？ | RiskAssessment | LLM（provided） | 三态 IDENTIFIED/NOT_IDENTIFIED/UNDETERMINED；UNDETERMINED 不提升为 Risk |
-| 04 | coverage-gap-analysis | 现有保障哪里**不足**？ | CoverageGapAnalysis | Deterministic | **独立判断层**：不复制 severity/likelihood，只引 `risk_id`；**不携带任何金额字段** |
-| 05 | solution | 应采什么**解决策略**？ | SolutionPlan | Deterministic | 禁止具体产品名 / 公司名（策略 ≠ 产品） |
-| — | knowledge-search | 提供什么**证据**？ | KnowledgeEvidence | RAG（共享服务） | 非线性 Provider；回环只读（`source_unchanged`） |
-| 06 | product-candidate-provider | 哪些产品**够格**？ | ProductCandidates | Deterministic | 只做候选生成（类型/方向/资格/证据四类判定），**不排序、不选主推** |
-| 07 | product-recommendation | 用哪些**产品**实现策略？ | ProductRecommendation | Deterministic | 硬拒任何未通过产品校验的候选，绝不把策略伪装成产品 |
-| 08 | report-generation | 汇总 / 归一化 / 渲染 | InsuranceReport | Deterministic | 只汇报，不做自主保险判断；canonical-first |
+| 01 | client-intake | What **facts** does the client have? | ClientProfile | LLM (provided) | FactValue = value/status/source/confidence; UNKNOWN is never written into answered_fields |
+| 02 | requirement-analysis | What **problems** to solve? | RequirementAnalysis | LLM (provided) | coverage_gaps are **hints** only, not the final gap list |
+| 03 | risk-analysis | What **risks** is the client exposed to? | RiskAssessment | LLM (provided) | Three states IDENTIFIED/NOT_IDENTIFIED/UNDETERMINED; UNDETERMINED is never promoted to a Risk |
+| 04 | coverage-gap-analysis | Where is existing coverage **insufficient**? | CoverageGapAnalysis | Deterministic | **Independent judgment layer**: does not copy severity/likelihood, references `risk_id` only; **carries no monetary fields** |
+| 05 | solution | What **strategy** to adopt? | SolutionPlan | Deterministic | No concrete product names / company names (strategy ≠ product) |
+| — | knowledge-search | What **evidence** is available? | KnowledgeEvidence | RAG (shared service) | Non-linear Provider; the loop is read-only (`source_unchanged`) |
+| 06 | product-candidate-provider | Which products **qualify**? | ProductCandidates | Deterministic | Candidate generation only (type/direction/eligibility/evidence checks); **no ranking, no primary pick** |
+| 07 | product-recommendation | Which **products** implement the strategy? | ProductRecommendation | Deterministic | Hard-rejects any candidate that fails product validation; never disguises a strategy as a product |
+| 08 | report-generation | Aggregate / normalize / render | InsuranceReport | Deterministic | Reports only, makes no autonomous insurance judgments; canonical-first |
 
-> **Candidate Generation 与 Recommendation 必须分离** —— 不允许同一环节「想产品 → 生成产品 → 推荐产品」。
+> **Candidate Generation and Recommendation must be separated** — no single stage may "think of a product → generate the product → recommend the product."
 
 ---
 
-## 3. 控制面（Agent Runtime）
+## 3. Control Plane (Agent Runtime)
 
-| 组件 | 文件 | 职责 |
+| Component | File | Responsibility |
 |---|---|---|
-| Orchestrator | `runtime/orchestrator.py` | `next_runnable → run → eval → PASS/FAIL → repair → checkpoint` 主循环；闸门策略 `stop` |
-| Workflow 声明 | `runtime/insurance-analysis.yaml` | stage 顺序 / artifact 生产消费 / executor / gate 的**单一真源** |
+| Orchestrator | `runtime/orchestrator.py` | The main loop `next_runnable → run → eval → PASS/FAIL → repair → checkpoint`; gate policy `stop` |
+| Workflow declaration | `runtime/insurance-analysis.yaml` | **Single source of truth** for stage order / artifact production-consumption / executors / gates |
 | CaseState | `runtime/state/case_state.py` | `artifacts / artifact_registry / tasks / evaluations / checkpoints / services / events / trace` |
-| Transitions | `runtime/state/transitions.py` | 三不变量：**单调性**（NON_MONOTONIC）/ **前置条件**（MISSING_INPUT_ARTIFACT + INPUT_NOT_RELEASED）/ **冻结**（ARTIFACT_MUTATION，sha256） |
-| Artifact Registry | `runtime/artifact_registry.py` | ART-ID / lineage / fingerprint / evidence_refs；只存元数据，不复制内容 |
-| Eval Engine | `runtime/eval_engine.py` | 6 类确定性检查：schema / required_fields / contamination / provenance / cross_artifact / invariant（+ required_non_empty） |
-| Repair | `runtime/repair.py` | 失败检查 → 动作映射（RERUN_FROM_UPSTREAM / DROP_INVALID_PRODUCTS）；只改**输入**，不改已冻结 artifact |
-| Checkpoint | `runtime/checkpoint.py` | save / load / validate（5 项）→ 损坏即 `CHECKPOINT_INVALID`，绝不静默续跑 |
-| Trace | `runtime/trace.py` | 结构化 Execution Trace（13 事件类型 + `duration_ms`），外置 `<case_dir>/trace.jsonl` |
-| Observability | `runtime/observability.py` | per-skill latency / 调用计数 / repair 次数 / knowledge-search 次数，回答「一个 Case 跑完多少次 Skill 调用」 |
+| Transitions | `runtime/state/transitions.py` | Three invariants: **monotonicity** (NON_MONOTONIC) / **preconditions** (MISSING_INPUT_ARTIFACT + INPUT_NOT_RELEASED) / **freezing** (ARTIFACT_MUTATION, sha256) |
+| Artifact Registry | `runtime/artifact_registry.py` | ART-ID / lineage / fingerprint / evidence_refs; stores metadata only, never copies content |
+| Eval Engine | `runtime/eval_engine.py` | 6 deterministic check families: schema / required_fields / contamination / provenance / cross_artifact / invariant (+ required_non_empty) |
+| Repair | `runtime/repair.py` | Failed checks → action mapping (RERUN_FROM_UPSTREAM / DROP_INVALID_PRODUCTS); modifies **inputs** only, never a frozen artifact |
+| Checkpoint | `runtime/checkpoint.py` | save / load / validate (5 checks) → any corruption is `CHECKPOINT_INVALID`; never resumes silently |
+| Trace | `runtime/trace.py` | Structured execution trace (13 event types + `duration_ms`), externalized to `<case_dir>/trace.jsonl` |
+| Observability | `runtime/observability.py` | per-skill latency / call counts / repair counts / knowledge-search counts — answers "how many Skill calls does one case take" |
 
 ---
 
-## 4. 上下游边界（数据面）
+## 4. Upstream/Downstream Boundaries (Data Plane)
 
 ```text
 ClientProfile ─► RequirementAnalysis ─► RiskAssessment ─► CoverageGapAnalysis
@@ -113,34 +118,35 @@ ClientProfile ─► RequirementAnalysis ─► RiskAssessment ─► CoverageGa
       ─► ProductRecommendation ─► InsuranceReport
 ```
 
-- **单向**：任一层不得越界（`risk-analysis` 不推荐产品、不重产 requirement）。
-- **边界显式化**：各 Skill 入口键名 / 形状并不一致，统一写在 YAML 的 `input_map`（`{artifact_type: {key, shape}}`），**不靠约定**。
-- **适配器边界**：`report-generation` 的引擎返回 **Skill 原生结果**（非 Canonical 信封），由 `post_adapter: adapters.report_generation_adapter.to_canonical` 包裹。其余 stage 的 invoke 脚本内部已 `make_envelope`。
+- **One-way**: no layer may overstep (`risk-analysis` recommends no products and re-produces no requirements).
+- **Explicit boundaries**: each Skill's input key names / shapes differ; they are declared centrally in the YAML `input_map` (`{artifact_type: {key, shape}}`) — **not left to convention**.
+- **Adapter boundary**: the `report-generation` engine returns its **native Skill result** (not a canonical envelope); `post_adapter: adapters.report_generation_adapter.to_canonical` wraps it. All other stages call `make_envelope` inside their invoke scripts.
 
 ---
 
-## 5. 为什么这样分层（对应 README §「为什么这么设计」）
+## 5. Why This Layering (maps to README §"Why designed this way")
 
-| 设计 | 一句话理由 |
+| Design | One-line rationale |
 |---|---|
-| Skill 不直接调用下一个 Skill | 直接调用会把「谁需要什么」烧死在代码里；由 Orchestrator 读声明式 YAML 决定，新增/调序不改 Skill |
-| 必须有 Orchestrator | 需要一个**无业务判断**的中枢：只搬运 artifact、校验契约、强制顺序、在闸门停下 |
-| 必须有 Artifact | 层间靠**结构化契约**而非自由文本对话，才可校验、可 diff、可回溯 |
-| Eval 独立于 Skill | Skill 自己说「我通过」没有意义；校验必须由不产出该结果的组件执行 |
-| Evidence 必须有 provenance | 保险结论若无 `document/chunk` 溯源即为幻觉；属性级 grounding 进一步要求「产品声明的某个属性被哪条证据支持」 |
-| Candidate 与 Recommendation 分离 | 生成与选择分离，避免「自己造产品再自己推荐」的自我认证 |
-| UNKNOWN 不能当 FALSE | 信息缺失 ≠ 事实为假；把 UNKNOWN 折进 PASS 是**伪造通过**，故设为独立第三态 |
-| 失败后不是无限 Retry | 预算是上限不是配额（`max_attempts=3`）；耗尽即 `NEEDS_REVIEW`，由人接手 |
+| Skills never call the next Skill directly | Direct calls burn "who needs what" into code; the Orchestrator reads declarative YAML instead, so adding/reordering stages touches no Skill |
+| An Orchestrator is required | You need a hub with **zero business judgment**: it only moves artifacts, validates contracts, enforces order, and stops at gates |
+| Artifacts are required | Layers communicate via **structured contracts** rather than free-text dialogue — only then can results be validated, diffed, and audited |
+| Eval is independent of Skills | A Skill grading itself "passed" means nothing; validation must be executed by a component that did not produce the result |
+| Evidence must carry provenance | An insurance conclusion without `document/chunk` traceability is a hallucination; attribute-level grounding further demands "which evidence supports this claimed product attribute" |
+| Candidate and Recommendation are separated | Generation and selection are split so a product cannot "recommend itself" (self-certification) |
+| UNKNOWN is not FALSE | Missing information ≠ the fact being false; folding UNKNOWN into PASS is a **fabricated pass**, hence it is an explicit third state |
+| Failure is not infinite retry | The budget is an upper bound, not a quota (`max_attempts=3`); exhaustion escalates to `NEEDS_REVIEW` for a human |
 
 ---
 
-## 6. 运行产物落盘
+## 6. Run Artifacts on Disk
 
 ```text
 <root>/<case_id>/
-  case_state.json          # 唯一事实源快照（含 trace[] / evaluations[] / checkpoints[]）
-  artifacts/<type>.json    # 每个 artifact 单文件，可 diff
-  trace.jsonl              # 结构化 trace（跨 run 可聚合）
+  case_state.json          # snapshot of the single source of truth (incl. trace[] / evaluations[] / checkpoints[])
+  artifacts/<type>.json    # one file per artifact, diffable
+  trace.jsonl              # structured trace (aggregatable across runs)
 ```
 
-> 运行产物落在 `tmp/`（回归运行目录）时**不计入基线**；仓库基线只含代码、契约、数据集与文档。
+> Run artifacts under `tmp/` (the regression run directory) are **not part of the baseline**;
+> the repo baseline contains only code, contracts, datasets, and documentation.

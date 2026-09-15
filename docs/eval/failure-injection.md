@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](failure-injection.zh-CN.md) · 🇺🇸 English
+
 # Failure Injection
 
 This document describes the **adversarial failure scenarios** the runtime is explicitly tested

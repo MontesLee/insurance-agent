@@ -1,23 +1,32 @@
+> 🌐 **Language:** 🇨🇳 [中文版](ADR-002-orchestrator-over-pipeline.zh-CN.md) · 🇺🇸 English
+
 # ADR-002 · Orchestrator instead of hard-coded pipeline
 
 ## Context
-有了 8 个 Skill 后，需要一个东西决定「下一步跑谁、能不能跑、跑完对不对、错了怎么办」。
-最直接的做法是在某个脚本里顺序写 9 行调用。
+With 8 Skills in place, something must decide "who runs next, can it run, was the result correct,
+and what to do on failure." The most direct approach: write 9 sequential calls in one script.
 
 ## Decision
-建一个**不含任何保险业务判断**的 Orchestrator（`runtime/orchestrator.py`），
-其行为由**声明式**的 `runtime/insurance-analysis.yaml` 驱动（stage 顺序 / 生产消费 / executor / gate 全部外置）。
+Build an Orchestrator (**`runtime/orchestrator.py`**) that contains **zero insurance business
+judgment**, driven by the **declarative** `runtime/insurance-analysis.yaml` (stage order /
+production-consumption / executors / gates all externalized).
 
 ## Alternatives
-- 硬编码顺序调用：新增/调序要改代码，且顺序逻辑散落。
-- 通用工作流引擎（Airflow / Temporal 级）：本阶段过重，违反「不引入复杂基础设施」。
-- 让 Skill 自己找下一个 Skill：等于把编排逻辑分散到 8 处。
+- Hard-coded sequential calls: adding/reordering stages means editing code; sequencing logic
+  scatters.
+- General-purpose workflow engines (Airflow / Temporal class): too heavy at this stage; violates
+  "no complex infrastructure".
+- Let Skills find the next Skill themselves: scatters orchestration logic across 8 places.
 
 ## Why
-编排是**跨领域**关注点，与保险无关，因此必须与业务 Skill 解耦。
-声明式 YAML 使「链路长什么样」可被**阅读**（而非从代码推断），也让测试可以直接断言「执行顺序 == 声明顺序」（自评 SE-2）。
+Orchestration is a **cross-domain** concern, unrelated to insurance, so it must be decoupled from
+business Skills. The declarative YAML makes "what the chain looks like" **readable** (instead of
+inferred from code), and lets tests directly assert "execution order == declared order"
+(self-eval SE-2).
 
 ## Trade-offs
-- YAML 与代码之间可能出现两处真源（例如 `index` 字段）——用「列表顺序即 index，不手写」消除。
-- 声明式表达力有限，复杂条件分支（如按 case 类型走不同链）需额外机制；当前用 gate + repair 覆盖。
-- 调试需要同时看 YAML 与 Python，入门门槛略高。
+- YAML and code can become two sources of truth (e.g. the `index` field) — eliminated by "list
+  order is the index; never hand-written".
+- Declarative expressiveness is limited; complex conditional branches (different chains per case
+  type) need extra machinery — currently covered by gates + repair.
+- Debugging requires reading YAML and Python together; slightly higher onboarding cost.

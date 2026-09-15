@@ -1,25 +1,33 @@
+> 🌐 **Language:** 🇨🇳 [中文版](ADR-003-artifact-lineage.zh-CN.md) · 🇺🇸 English
+
 # ADR-003 · Artifact lineage
 
 ## Context
-推荐一个产品后，必须能回答「为什么是它」：它覆盖了哪条需求？针对哪个风险？缺口的判断依据是什么？客户事实从哪来？
-如果层间只传自由文本，这条链就断了。
+After recommending a product, the system must answer "why this one": which requirement it covers,
+which risk it targets, what the gap judgment was based on, and where the client facts came from.
+If layers pass free text to each other, that chain is broken.
 
 ## Decision
-每个产出物注册为**带血缘的 Artifact**：`artifact_id` / `produced_by`（哪个 stage）/ `input_artifacts`（来自哪些 ART）/ `fingerprint`（sha256）/ `evidence_refs`。
-注册表**只存元数据，不复制内容**（内容在 `state["artifacts"]`）。冻结机制保证已发布 artifact 不可改。
+Every output is registered as an **Artifact with lineage**: `artifact_id` / `produced_by` (which
+stage) / `input_artifacts` (which ARTs it came from) / `fingerprint` (sha256) / `evidence_refs`.
+The registry **stores metadata only, never copies content** (content lives in
+`state["artifacts"]`). A freezing mechanism makes published artifacts immutable.
 
 ## Alternatives
-- 只存最终报告：中间推理不可回溯。
-- 把血缘写进 artifact 内部：契约污染，且跨 artifact 引用困难。
-- 全量快照每个中间态：存储爆炸且难以看出「谁依赖谁」。
+- Store only the final report: intermediate reasoning cannot be traced back.
+- Write lineage inside the artifact: pollutes the contract and makes cross-artifact references
+  awkward.
+- Full snapshots of every intermediate state: storage explosion, and "who depends on whom" becomes
+  invisible.
 
 ## Why
-血缘把「结论」变成「可审计的推导链」。它同时支撑三件事：
-(1) Eval 的 `cross_artifact` 检查（如缺口必须引用真实存在的 `risk_id`）；
-(2) 报告里的 Provenance（Recommendation → Product → Evidence → Document → Chunk）；
-(3) 篡改检测（fingerprint 变了即 `ARTIFACT_MUTATION`）。
+Lineage turns "conclusions" into "auditable derivation chains". It supports three things at once:
+(1) Eval's `cross_artifact` checks (e.g. a gap must reference a really existing `risk_id`);
+(2) Provenance in the report (Recommendation → Product → Evidence → Document → Chunk);
+(3) Tamper detection (any fingerprint change is `ARTIFACT_MUTATION`).
 
 ## Trade-offs
-- 每次读写都要维护注册表，代码量增加。
-- fingerprint 与内容强绑定，任何无害的格式变动都会触发不一致 —— 需要严格的「只写一次」纪律。
-- 血缘链在跨 Case 复用时需要额外设计（当前一个客户 = 一个 CaseState）。
+- The registry must be maintained on every read/write; more code.
+- The fingerprint is tightly bound to content — any harmless formatting change triggers
+  inconsistency; requires strict "write once" discipline.
+- Lineage reuse across Cases needs extra design (currently one client = one CaseState).

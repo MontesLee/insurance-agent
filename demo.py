@@ -25,9 +25,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = HERE
 sys.path.insert(0, REPO)
 
-from runtime import orchestrator as orch  # noqa: E402
-from runtime import trace as tr  # noqa: E402
-from runtime import observability as obs  # noqa: E402
+from workflow import orchestrator as orch  # noqa: E402
+from workflow import trace as tr  # noqa: E402
+from workflow import observability as obs  # noqa: E402
 
 BENCH_DIR = os.path.join(REPO, "evals", "agent-benchmark")
 BENCH_RUNNER = os.path.join(BENCH_DIR, "run_agent_benchmark.py")

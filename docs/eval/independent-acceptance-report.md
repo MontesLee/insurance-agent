@@ -1,4 +1,6 @@
-﻿# Independent Acceptance Report — insurance-agent
+> 🌐 **Language:** 🇨🇳 [中文版](independent-acceptance-report.zh-CN.md) · 🇺🇸 English
+
+# Independent Acceptance Report — insurance-agent
 
 > **Reviewer role:** Independent Agent-Systems Acceptance Engineer / Red-Team Reviewer
 > **Date:** 2026-09-15

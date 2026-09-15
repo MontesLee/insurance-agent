@@ -1,3 +1,5 @@
+> 🌐 **Language:** 🇨🇳 [中文版](interview-guide.zh-CN.md) · 🇺🇸 English
+
 # Interview Guide — Q&A
 
 Ten questions an Agent Developer / Agent PM interviewer is likely to ask, with a 30-second answer,
