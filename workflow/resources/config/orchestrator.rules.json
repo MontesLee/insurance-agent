@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "description": "Step 3 orchestrator policy: when the case must stop and ask the client instead of pushing UNKNOWN / CONFLICT downstream (spec §14, §15, §30, §31).",
+
+  "insufficient": {
+    "enabled": true,
+    "trigger_stage": "client-intake",
+    "blocking_fields": [
+      { "profile": "existing_protection", "field": "existing_insurance" },
+      { "profile": "family_profile", "field": "age" },
+      { "profile": "financial_profile", "field": "annual_income" }
+    ],
+    "also_block_when_status_unknown": true,
+    "max_unknown_to_tolerate": 0
+  },
+
+  "conflict": {
+    "enabled": true,
+    "policy": "WAIT_FOR_USER",
+    "comment": "A conflict is never resolved by picking one value. The case parks and both candidates are shown to the client."
+  },
+
+  "next_question_templates": {
+    "existing_protection.existing_insurance": "请确认客户目前已持有的商业保险（险种 + 保额）。若确实无法提供，请明确回答「未知」，我们将按 UNKNOWN 处理，不会替你假设。",
+    "family_profile.age": "请提供客户的准确年龄（用于核保与费率判断）。",
+    "financial_profile.annual_income": "请提供客户当前年收入（税前/税后请注明）。"
+  },
+
+  "default_question": "请补充以下信息：{profile}.{field}",
+
+  "conflict_question": "发现冲突信息（{field}）：{candidates}。请确认哪一个为准，不要由系统代为选择。"
+}

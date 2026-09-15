@@ -1,0 +1,58 @@
+{
+  "version": "v0.1",
+  "generated_at": "2026-09-15T02:56:47.854140+00:00",
+  "cases": 33,
+  "task_success_rate": 1.0,
+  "unsupported_claim_rate": 0.0,
+  "product_hallucination_rate": 0.0,
+  "provenance_completeness": 1.0,
+  "invalid_continuation_rate": 0.0,
+  "repair_success_rate": 0.0909,
+  "human_review_rate": 0.2121,
+  "hard_gates": {
+    "product_hallucination_zero": true,
+    "critical_provenance_failure_zero": true,
+    "invalid_continuation_zero": true
+  },
+  "by_category": {
+    "complete": {
+      "n": 7,
+      "passed": 7
+    },
+    "insufficient_information": {
+      "n": 5,
+      "passed": 5
+    },
+    "conflicting_information": {
+      "n": 5,
+      "passed": 5
+    },
+    "low_risk": {
+      "n": 3,
+      "passed": 3
+    },
+    "high_risk": {
+      "n": 3,
+      "passed": 3
+    },
+    "no_candidates": {
+      "n": 3,
+      "passed": 3
+    },
+    "insufficient_evidence": {
+      "n": 3,
+      "passed": 3
+    },
+    "adversarial": {
+      "n": 3,
+      "passed": 3
+    },
+    "repairable": {
+      "n": 1,
+      "passed": 1
+    }
+  },
+  "golden_cases": 9,
+  "golden_task_success_rate": 1.0,
+  "golden_generated_at": "2026-09-15T02:56:55.082577+00:00"
+}

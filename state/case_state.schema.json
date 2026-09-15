@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "case-state.schema.json",
   "title": "CaseState",
-  "description": "Orchestration state for ONE client case across the 8-skill insurance pipeline (V2 Phase 7). CaseState is the single source of truth: every stage reads its inputs from `artifacts` and writes exactly one artifact back. It records stage status, provenance of each artifact, and an append-only event log. It contains NO business judgment.",
+  "description": "Orchestration state for ONE client case across the insurance pipeline (V2 Phase 7 + Step 3). CaseState is the single source of truth: every stage reads its inputs from `artifacts` and writes exactly one artifact back. Step 3 adds the agent-control layer on top of the Phase 7 core: case-level `status`, a Task execution ledger, an Artifact Registry with lineage, Eval results, Checkpoints and a WAITING_FOR_USER hand-off. It contains NO business judgment.",
   "type": "object",
   "required": ["case_id", "workflow", "stage_order", "stages", "artifacts"],
   "additionalProperties": false,
@@ -24,6 +24,26 @@
     "updated_at": {
       "type": "string"
     },
+    "status": {
+      "enum": ["PENDING", "RUNNING", "WAITING_FOR_USER", "PAUSED_NEEDS_REVIEW",
+               "NEEDS_REVIEW", "COMPLETED", "FAILED", "BLOCKED"],
+      "description": "Step 3 case-level status. PENDING before the first advance; WAITING_FOR_USER when upstream facts are missing/conflicting; NEEDS_REVIEW when a stage exhausted its repair budget."
+    },
+    "waiting_for_user": {
+      "type": ["object", "null"],
+      "description": "Set when the case cannot proceed without more client input. The orchestrator must NOT continue downstream while this is set.",
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "enum": ["INSUFFICIENT_INFORMATION", "CONFLICTING_INFORMATION"]
+        },
+        "trigger_stage": { "type": ["string", "null"] },
+        "blocking_fields": { "type": "array", "items": { "type": "string" } },
+        "conflicts": { "type": "array" },
+        "next_questions": { "type": "array", "items": { "type": "string" } },
+        "requested_at": { "type": ["string", "null"] }
+      }
+    },
     "stage_order": {
       "type": "array",
       "description": "Canonical linear stage order. Derived from the workflow definition, never hand-edited.",
@@ -35,7 +55,7 @@
     },
     "stages": {
       "type": "object",
-      "description": "Per-stage bookkeeping keyed by canonical skill id.",
+      "description": "Per-stage bookkeeping keyed by canonical stage id.",
       "additionalProperties": { "$ref": "#/definitions/stage" }
     },
     "artifacts": {
@@ -43,9 +63,46 @@
       "description": "Canonical artifacts keyed by artifact_type. A stage writes only its own declared artifact.",
       "additionalProperties": { "type": "object" }
     },
+    "artifact_registry": {
+      "type": "object",
+      "description": "Step 3 Artifact Registry: metadata + lineage for every artifact. Content itself lives in `artifacts` (or on disk at content_ref), never duplicated here.",
+      "additionalProperties": { "$ref": "#/definitions/artifact_record" }
+    },
+    "tasks": {
+      "type": "array",
+      "description": "Step 3 execution ledger: one record per stage execution attempt series.",
+      "items": { "$ref": "#/definitions/task" }
+    },
+    "evaluations": {
+      "type": "array",
+      "description": "Step 3 Eval results. Every artifact produced is evaluated before the case may advance.",
+      "items": { "$ref": "#/definitions/evaluation" }
+    },
+    "checkpoints": {
+      "type": "array",
+      "description": "Step 3 checkpoint trail. Each entry marks a durable, reloadable point.",
+      "items": { "$ref": "#/definitions/checkpoint" }
+    },
+    "review": {
+      "type": ["object", "null"],
+      "description": "Set when the case stops for human review: what failed, why, and how many repairs were spent.",
+      "additionalProperties": false,
+      "properties": {
+        "stage_id": { "type": ["string", "null"] },
+        "reason": { "type": ["string", "null"] },
+        "failed_checks": { "type": "array" },
+        "repair_attempts": { "type": "integer", "minimum": 0 },
+        "at": { "type": ["string", "null"] }
+      }
+    },
+    "trace": {
+      "type": "array",
+      "description": "Step 4 Phase 2 structured Execution Trace (spec §4/§5): one record per agent action with trace_id/case_id/task_id/skill/event/attempt/input_artifacts/output_artifact/eval_status/duration_ms/timestamp.",
+      "items": { "type": "object" }
+    },
     "services": {
       "type": "object",
-      "description": "Non-linear shared services (e.g. knowledge-search Evidence Provider) keyed by skill id.",
+      "description": "Non-linear shared services (e.g. knowledge-search Evidence Provider) keyed by service id.",
       "additionalProperties": { "$ref": "#/definitions/service_record" }
     },
     "events": {
@@ -80,7 +137,117 @@
           "type": ["string", "null"],
           "description": "sha256 of the produced canonical artifact; used to detect post-hoc mutation."
         },
-        "notes": { "type": "array", "items": { "type": "string" } }
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "task_id": {
+          "type": ["string", "null"],
+          "description": "Step 3: pointer to this stage's Task record in `tasks`."
+        },
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Step 3: initial run + allowed repairs (default 3 = 1 initial + 2 repairs)."
+        },
+        "repairs": {
+          "type": "array",
+          "description": "Step 3: one entry per repair applied to this stage.",
+          "items": { "$ref": "#/definitions/repair_record" }
+        },
+        "failure_reason": { "type": ["string", "null"] },
+        "eval_ids": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["task_id", "stage_id", "skill", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "task_id": { "type": "string" },
+        "stage_id": { "type": "string" },
+        "skill": { "type": "string" },
+        "status": {
+          "enum": ["PENDING", "RUNNING", "PASS", "FAIL", "REPAIRING", "NEEDS_REVIEW", "SKIPPED"]
+        },
+        "input_artifacts": { "type": "array", "items": { "type": "string" } },
+        "output_artifact": { "type": ["string", "null"] },
+        "attempt": { "type": "integer", "minimum": 0 },
+        "max_attempts": { "type": "integer", "minimum": 1 },
+        "repairs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/repair_record" }
+        },
+        "failure_reason": { "type": ["string", "null"] },
+        "eval_ids": { "type": "array", "items": { "type": "string" } },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "repair_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attempt": { "type": "integer", "minimum": 1 },
+        "failed_checks": { "type": "array" },
+        "repair_action": { "type": "string" },
+        "detail": { "type": ["string", "null"] },
+        "at": { "type": "string" }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "required": ["eval_id", "artifact_type", "status", "checks"],
+      "additionalProperties": false,
+      "properties": {
+        "eval_id": { "type": "string" },
+        "artifact_id": { "type": ["string", "null"] },
+        "artifact_type": { "type": "string" },
+        "stage_id": { "type": ["string", "null"] },
+        "status": { "enum": ["PASS", "FAIL"] },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["check_id", "status"],
+            "additionalProperties": false,
+            "properties": {
+              "check_id": { "type": "string" },
+              "status": { "enum": ["PASS", "FAIL"] },
+              "message": { "type": "string" }
+            }
+          }
+        },
+        "repairable": { "type": "boolean" },
+        "created_at": { "type": "string" }
+      }
+    },
+    "artifact_record": {
+      "type": "object",
+      "required": ["artifact_id", "artifact_type", "producer_skill", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": { "type": "string" },
+        "artifact_type": { "type": "string" },
+        "producer_skill": { "type": "string" },
+        "producer_stage": { "type": ["string", "null"] },
+        "input_artifacts": { "type": "array", "items": { "type": "string" } },
+        "status": { "enum": ["VALID", "STALE"] },
+        "created_at": { "type": "string" },
+        "content_ref": { "type": ["string", "null"] },
+        "fingerprint": { "type": ["string", "null"] },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": { "type": "string" },
+        "stage_id": { "type": ["string", "null"] },
+        "case_status": { "type": ["string", "null"] },
+        "completed_tasks": { "type": "array", "items": { "type": "string" } },
+        "artifacts": { "type": "array", "items": { "type": "string" } },
+        "evals": { "type": "array", "items": { "type": "string" } },
+        "at": { "type": "string" },
+        "valid": { "type": "boolean" }
       }
     },
     "service_record": {
@@ -103,7 +270,7 @@
         "at": { "type": "string" },
         "type": {
           "type": "string",
-          "description": "STAGE_START | STAGE_COMPLETED | STAGE_NEEDS_REVIEW | STAGE_FAILED | STAGE_SKIPPED | ARTIFACT_STORED | SERVICE_CALLED | APPROVED | GUARD_REJECTED | CASE_CREATED"
+          "description": "STAGE_START | STAGE_COMPLETED | STAGE_NEEDS_REVIEW | STAGE_FAILED | STAGE_SKIPPED | ARTIFACT_STORED | SERVICE_CALLED | APPROVED | GUARD_REJECTED | CASE_CREATED | EVAL_PASS | EVAL_FAIL | REPAIR_APPLIED | CHECKPOINT_SAVED | WAITING_FOR_USER"
         },
         "stage": { "type": ["string", "null"] },
         "detail": { "type": ["string", "null"] }

@@ -85,7 +85,15 @@
             "available": { "type": "boolean" },
             "evidence_ids": { "type": "array", "items": { "type": "string" } },
             "documents": { "type": "array", "items": { "type": "string" } },
-            "domains_matched": { "type": "array", "items": { "type": "string" } }
+            "domains_matched": { "type": "array", "items": { "type": "string" } },
+            "attribute_rollup": {
+              "type": ["string", "null"],
+              "description": "Step 4 Phase 7: attribute-level evidence verdict over the product's REQUIRED attributes (SUPPORTED / UNSUPPORTED / CONFLICT / NOT_CHECKABLE). NOT_CHECKABLE is an independent third state, never SUPPORTED."
+            },
+            "grounding": {
+              "type": ["object", "null"],
+              "description": "Per-attribute grounding (attribute -> SUPPORTED/UNSUPPORTED/CONFLICT/NOT_CHECKABLE)."
+            }
           }
         },
         "features": { "type": "array" },

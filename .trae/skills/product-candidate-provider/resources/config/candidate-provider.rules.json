@@ -32,8 +32,10 @@
 
   "eligibility": {
     "age_paths": [
+      "family_profile.age",
       "profile.age",
       "profile.personal.age",
+      "client_state.family_profile.age",
       "client_state.profile.age",
       "personal.age",
       "age"
@@ -79,12 +81,14 @@
     "ELIGIBILITY_INELIGIBLE": "客户不符合产品投保条件",
     "ELIGIBILITY_UNKNOWN": "客户投保资格所需信息不足，无法判定",
     "EVIDENCE_MISSING": "产品存在但缺少对应知识证据，不得作为有依据的推荐",
+    "EVIDENCE_UNSUPPORTED": "产品有证据文档，但证据未支持其关键属性（attribute-level grounding 不通过），不得作为有依据的推荐",
     "PRODUCT_NOT_IN_CATALOG": "产品不存在于 Product Catalog"
   },
 
   "next_information_needed_by_reason": {
     "ELIGIBILITY_UNKNOWN": "补充客户年龄与职业类别",
     "EVIDENCE_MISSING": "补充对应险种的知识库证据或明确该结论无证据支撑",
+    "EVIDENCE_UNSUPPORTED": "补充能直接支持该产品关键属性（保障类型/投保年龄/续保/免赔额/保障期限）的证据文档",
     "PRODUCT_TYPE_MISMATCH": "确认保障缺口所属险种，或扩充 Product Catalog",
     "COVERAGE_DIRECTION_MISMATCH": "明确解决策略的保障方向关键词"
   },

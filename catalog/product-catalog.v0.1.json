@@ -2,6 +2,8 @@
   "catalog_id": "demo-product-catalog",
   "catalog_version": "0.1",
   "generated_at": "2026-09-15",
+  "effective_from": "2026-01-01",
+  "effective_to": null,
   "is_demo": true,
   "notice": "DEMO / MOCK DATA. Every product here is fictional and exists only to make the Candidate -> Recommendation chain testable. is_demo is true on every entry. Do NOT present these as real, purchasable insurance products, and do NOT quote the premium figures as real prices.",
   "premium_basis": "demo_reference",
@@ -10,241 +12,670 @@
     {
       "product_id": "P001",
       "product_name": "demo-百万医疗险A（标准版）",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "medical",
       "company": "demo-insurer-A",
       "is_demo": true,
-      "features": ["住院医疗费用", "特定门诊", "质子重离子", "院外特药"],
-      "eligible_age": { "min": 0, "max": 65 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 65 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "住院医疗费用",
+        "特定门诊",
+        "质子重离子",
+        "院外特药"
       ],
-      "coverage_directions": ["医疗", "住院", "大额", "社保目录外", "免赔额"],
-      "constraints": [{ "constraint": "deductible", "value": "10000元" }],
-      "required_evidence_domains": ["medical"],
-      "evidence_refs": ["01_medical_insurance.md"],
-      "premium": { "annual": 400, "basis": "demo_reference" },
-      "term": { "years": 1 },
+      "eligible_age": {
+        "min": 0,
+        "max": 65
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 65
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "医疗",
+        "住院",
+        "大额",
+        "社保目录外",
+        "免赔额"
+      ],
+      "constraints": [
+        {
+          "constraint": "deductible",
+          "value": "10000元"
+        }
+      ],
+      "required_evidence_domains": [
+        "medical"
+      ],
+      "evidence_refs": [
+        "01_medical_insurance.md"
+      ],
+      "premium": {
+        "annual": 400,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 1
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P002",
       "product_name": "demo-百万医疗险B（长期保证续保）",
+      "product_version": "1.1",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "medical",
       "company": "demo-insurer-A",
       "is_demo": true,
-      "features": ["住院医疗费用", "保证续保20年", "重疾豁免"],
-      "eligible_age": { "min": 0, "max": 60 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 60 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "住院医疗费用",
+        "保证续保20年",
+        "重疾豁免"
       ],
-      "coverage_directions": ["医疗", "住院", "续保", "长期"],
-      "constraints": [{ "constraint": "renewal", "value": "保证续保20年" }],
-      "required_evidence_domains": ["medical"],
-      "evidence_refs": ["01_medical_insurance.md"],
-      "premium": { "annual": 700, "basis": "demo_reference" },
-      "term": { "years": 20 },
+      "eligible_age": {
+        "min": 0,
+        "max": 60
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 60
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "医疗",
+        "住院",
+        "续保",
+        "长期"
+      ],
+      "constraints": [
+        {
+          "constraint": "renewal",
+          "value": "保证续保20年"
+        }
+      ],
+      "required_evidence_domains": [
+        "medical"
+      ],
+      "evidence_refs": [
+        "01_medical_insurance.md"
+      ],
+      "premium": {
+        "annual": 700,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 20
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P003",
       "product_name": "demo-中端医疗险（0免赔）",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "medical",
       "company": "demo-insurer-B",
       "is_demo": true,
-      "features": ["住院0免赔", "门诊医疗", "牙科"],
-      "eligible_age": { "min": 0, "max": 60 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 60 },
-        { "rule": "occupation_class", "max": 3 }
+      "features": [
+        "住院0免赔",
+        "门诊医疗",
+        "牙科"
       ],
-      "coverage_directions": ["医疗", "住院", "门诊", "0免赔"],
-      "constraints": [{ "constraint": "deductible", "value": "0元" }],
-      "required_evidence_domains": ["medical"],
-      "evidence_refs": ["01_medical_insurance.md"],
-      "premium": { "annual": 2600, "basis": "demo_reference" },
-      "term": { "years": 1 },
+      "eligible_age": {
+        "min": 0,
+        "max": 60
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 60
+        },
+        {
+          "rule": "occupation_class",
+          "max": 3
+        }
+      ],
+      "coverage_directions": [
+        "医疗",
+        "住院",
+        "门诊",
+        "0免赔"
+      ],
+      "constraints": [
+        {
+          "constraint": "deductible",
+          "value": "0元"
+        }
+      ],
+      "required_evidence_domains": [
+        "medical"
+      ],
+      "evidence_refs": [
+        "01_medical_insurance.md"
+      ],
+      "premium": {
+        "annual": 2600,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 1
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P004",
       "product_name": "demo-重疾险A（定期至70岁）",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "critical_illness",
       "company": "demo-insurer-B",
       "is_demo": true,
-      "features": ["重大疾病给付", "中症/轻症", "身故责任（可选）"],
-      "eligible_age": { "min": 0, "max": 50 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 50 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "重大疾病给付",
+        "中症/轻症",
+        "身故责任（可选）"
       ],
-      "coverage_directions": ["重疾", "收入替代", "康复", "定期"],
-      "constraints": [{ "constraint": "term", "value": "保障至70岁" }],
-      "required_evidence_domains": ["critical_illness"],
-      "evidence_refs": ["02_critical_illness.md"],
-      "premium": { "annual": 3500, "basis": "demo_reference" },
-      "term": { "years": 30 },
+      "eligible_age": {
+        "min": 0,
+        "max": 50
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 50
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "重疾",
+        "收入替代",
+        "康复",
+        "定期"
+      ],
+      "constraints": [
+        {
+          "constraint": "term",
+          "value": "保障至70岁"
+        }
+      ],
+      "required_evidence_domains": [
+        "critical_illness"
+      ],
+      "evidence_refs": [
+        "02_critical_illness.md"
+      ],
+      "premium": {
+        "annual": 3500,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 30
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P005",
       "product_name": "demo-重疾险B（终身）",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "critical_illness",
       "company": "demo-insurer-A",
       "is_demo": true,
-      "features": ["重大疾病给付", "终身保障", "身故责任"],
-      "eligible_age": { "min": 0, "max": 55 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 55 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "重大疾病给付",
+        "终身保障",
+        "身故责任"
       ],
-      "coverage_directions": ["重疾", "终身", "收入替代"],
-      "constraints": [{ "constraint": "term", "value": "终身" }],
-      "required_evidence_domains": ["critical_illness"],
-      "evidence_refs": ["02_critical_illness.md"],
-      "premium": { "annual": 9000, "basis": "demo_reference" },
-      "term": { "years": 999, "basis": "whole_life_demo" },
+      "eligible_age": {
+        "min": 0,
+        "max": 55
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 55
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "重疾",
+        "终身",
+        "收入替代"
+      ],
+      "constraints": [
+        {
+          "constraint": "term",
+          "value": "终身"
+        }
+      ],
+      "required_evidence_domains": [
+        "critical_illness"
+      ],
+      "evidence_refs": [
+        "02_critical_illness.md"
+      ],
+      "premium": {
+        "annual": 9000,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 999,
+        "basis": "whole_life_demo"
+      },
       "liquidity_impact": "medium"
     },
     {
       "product_id": "P006",
       "product_name": "demo-重疾险C（多次赔付）",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "critical_illness",
       "company": "demo-insurer-C",
       "is_demo": true,
-      "features": ["重疾多次赔付", "癌症二次给付", "终身保障"],
-      "eligible_age": { "min": 0, "max": 45 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 45 },
-        { "rule": "occupation_class", "max": 3 }
+      "features": [
+        "重疾多次赔付",
+        "癌症二次给付",
+        "终身保障"
       ],
-      "coverage_directions": ["重疾", "多次赔付", "终身"],
-      "constraints": [{ "constraint": "term", "value": "终身" }],
-      "required_evidence_domains": ["critical_illness"],
-      "evidence_refs": ["02_critical_illness.md"],
-      "premium": { "annual": 12000, "basis": "demo_reference" },
-      "term": { "years": 999, "basis": "whole_life_demo" },
+      "eligible_age": {
+        "min": 0,
+        "max": 45
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 45
+        },
+        {
+          "rule": "occupation_class",
+          "max": 3
+        }
+      ],
+      "coverage_directions": [
+        "重疾",
+        "多次赔付",
+        "终身"
+      ],
+      "constraints": [
+        {
+          "constraint": "term",
+          "value": "终身"
+        }
+      ],
+      "required_evidence_domains": [
+        "critical_illness"
+      ],
+      "evidence_refs": [
+        "02_critical_illness.md"
+      ],
+      "premium": {
+        "annual": 12000,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 999,
+        "basis": "whole_life_demo"
+      },
       "liquidity_impact": "medium"
     },
     {
       "product_id": "P007",
       "product_name": "demo-定期寿险A（定额）",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "life",
       "company": "demo-insurer-C",
       "is_demo": true,
-      "features": ["身故/全残给付", "定额保额", "可指定受益人"],
-      "eligible_age": { "min": 18, "max": 60 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 18, "max": 60 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "身故/全残给付",
+        "定额保额",
+        "可指定受益人"
       ],
-      "coverage_directions": ["家庭责任", "收入替代", "房贷", "责任期", "身故"],
-      "constraints": [{ "constraint": "term", "value": "保障20年" }],
-      "required_evidence_domains": ["life"],
-      "evidence_refs": ["04_life_insurance.md"],
-      "premium": { "annual": 1800, "basis": "demo_reference" },
-      "term": { "years": 20 },
+      "eligible_age": {
+        "min": 18,
+        "max": 60
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 18,
+          "max": 60
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "家庭责任",
+        "收入替代",
+        "房贷",
+        "责任期",
+        "身故"
+      ],
+      "constraints": [
+        {
+          "constraint": "term",
+          "value": "保障20年"
+        }
+      ],
+      "required_evidence_domains": [
+        "life"
+      ],
+      "evidence_refs": [
+        "04_life_insurance.md"
+      ],
+      "premium": {
+        "annual": 1800,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 20
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P008",
       "product_name": "demo-增额终身寿险",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "life",
       "company": "demo-insurer-B",
       "is_demo": true,
-      "features": ["保额逐年递增", "现金价值累积", "减保取现"],
-      "eligible_age": { "min": 0, "max": 70 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 70 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "保额逐年递增",
+        "现金价值累积",
+        "减保取现"
       ],
-      "coverage_directions": ["储蓄", "传承", "终身", "现金流"],
-      "constraints": [{ "constraint": "liquidity", "value": "前期退保损失高" }],
-      "required_evidence_domains": ["life", "savings"],
-      "evidence_refs": ["04_life_insurance.md"],
-      "premium": { "annual": 20000, "basis": "demo_reference" },
-      "term": { "years": 999, "basis": "whole_life_demo" },
+      "eligible_age": {
+        "min": 0,
+        "max": 70
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 70
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "储蓄",
+        "传承",
+        "终身",
+        "现金流"
+      ],
+      "constraints": [
+        {
+          "constraint": "liquidity",
+          "value": "前期退保损失高"
+        }
+      ],
+      "required_evidence_domains": [
+        "life",
+        "savings"
+      ],
+      "evidence_refs": [
+        "04_life_insurance.md"
+      ],
+      "premium": {
+        "annual": 20000,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 999,
+        "basis": "whole_life_demo"
+      },
       "liquidity_impact": "high"
     },
     {
       "product_id": "P009",
       "product_name": "demo-综合意外险A",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "accident",
       "company": "demo-insurer-A",
       "is_demo": true,
-      "features": ["意外身故/伤残", "意外医疗", "意外住院津贴"],
-      "eligible_age": { "min": 0, "max": 65 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 65 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "意外身故/伤残",
+        "意外医疗",
+        "意外住院津贴"
       ],
-      "coverage_directions": ["意外", "伤残", "意外医疗"],
+      "eligible_age": {
+        "min": 0,
+        "max": 65
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 65
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "意外",
+        "伤残",
+        "意外医疗"
+      ],
       "constraints": [],
-      "required_evidence_domains": ["accident"],
-      "evidence_refs": ["03_accident_insurance.md"],
-      "premium": { "annual": 300, "basis": "demo_reference" },
-      "term": { "years": 1 },
+      "required_evidence_domains": [
+        "accident"
+      ],
+      "evidence_refs": [
+        "03_accident_insurance.md"
+      ],
+      "premium": {
+        "annual": 300,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 1
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P010",
       "product_name": "demo-高危职业意外险B",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "accident",
       "company": "demo-insurer-C",
       "is_demo": true,
-      "features": ["意外身故/伤残", "高危职业可投", "意外医疗"],
-      "eligible_age": { "min": 18, "max": 60 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 18, "max": 60 },
-        { "rule": "occupation_class", "max": 6 }
+      "features": [
+        "意外身故/伤残",
+        "高危职业可投",
+        "意外医疗"
       ],
-      "coverage_directions": ["意外", "伤残", "高危职业"],
-      "constraints": [{ "constraint": "occupation", "value": "限1-6类职业" }],
-      "required_evidence_domains": ["accident"],
-      "evidence_refs": ["03_accident_insurance.md"],
-      "premium": { "annual": 1200, "basis": "demo_reference" },
-      "term": { "years": 1 },
+      "eligible_age": {
+        "min": 18,
+        "max": 60
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 18,
+          "max": 60
+        },
+        {
+          "rule": "occupation_class",
+          "max": 6
+        }
+      ],
+      "coverage_directions": [
+        "意外",
+        "伤残",
+        "高危职业"
+      ],
+      "constraints": [
+        {
+          "constraint": "occupation",
+          "value": "限1-6类职业"
+        }
+      ],
+      "required_evidence_domains": [
+        "accident"
+      ],
+      "evidence_refs": [
+        "03_accident_insurance.md"
+      ],
+      "premium": {
+        "annual": 1200,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 1
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P011",
       "product_name": "demo-老年医疗保险C",
+      "product_version": "1.0",
+      "effective_from": "2025-06-01",
+      "effective_to": null,
       "product_type": "medical",
       "company": "demo-insurer-C",
       "is_demo": true,
-      "features": ["住院医疗费用", "慢性病门诊", "投保年龄放宽"],
-      "eligible_age": { "min": 60, "max": 80 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 60, "max": 80 },
-        { "rule": "occupation_class", "max": 5 }
+      "features": [
+        "住院医疗费用",
+        "慢性病门诊",
+        "投保年龄放宽"
       ],
-      "coverage_directions": ["医疗", "住院", "老年"],
-      "constraints": [{ "constraint": "age", "value": "限60-80岁" }],
-      "required_evidence_domains": ["medical"],
-      "evidence_refs": ["01_medical_insurance.md"],
-      "premium": { "annual": 3500, "basis": "demo_reference" },
-      "term": { "years": 1 },
+      "eligible_age": {
+        "min": 60,
+        "max": 80
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 60,
+          "max": 80
+        },
+        {
+          "rule": "occupation_class",
+          "max": 5
+        }
+      ],
+      "coverage_directions": [
+        "医疗",
+        "住院",
+        "老年"
+      ],
+      "constraints": [
+        {
+          "constraint": "age",
+          "value": "限60-80岁"
+        }
+      ],
+      "required_evidence_domains": [
+        "medical"
+      ],
+      "evidence_refs": [
+        "01_medical_insurance.md"
+      ],
+      "premium": {
+        "annual": 3500,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 1
+      },
       "liquidity_impact": "low"
     },
     {
       "product_id": "P012",
       "product_name": "demo-年金险A",
+      "product_version": "1.0",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "product_type": "savings",
       "company": "demo-insurer-B",
       "is_demo": true,
-      "features": ["约定年龄起领", "确定性现金流", "可附加万能账户"],
-      "eligible_age": { "min": 0, "max": 60 },
-      "eligibility_rules": [
-        { "rule": "age", "min": 0, "max": 60 },
-        { "rule": "occupation_class", "max": 4 }
+      "features": [
+        "约定年龄起领",
+        "确定性现金流",
+        "可附加万能账户"
       ],
-      "coverage_directions": ["储蓄", "现金流", "养老", "教育金"],
-      "constraints": [{ "constraint": "liquidity", "value": "长期锁定，早期退保损失高" }],
-      "required_evidence_domains": ["savings"],
-      "evidence_refs": ["00-product-taxonomy.md"],
-      "premium": { "annual": 30000, "basis": "demo_reference" },
-      "term": { "years": 10 },
+      "eligible_age": {
+        "min": 0,
+        "max": 60
+      },
+      "eligibility_rules": [
+        {
+          "rule": "age",
+          "min": 0,
+          "max": 60
+        },
+        {
+          "rule": "occupation_class",
+          "max": 4
+        }
+      ],
+      "coverage_directions": [
+        "储蓄",
+        "现金流",
+        "养老",
+        "教育金"
+      ],
+      "constraints": [
+        {
+          "constraint": "liquidity",
+          "value": "长期锁定，早期退保损失高"
+        }
+      ],
+      "required_evidence_domains": [
+        "savings"
+      ],
+      "evidence_refs": [
+        "00-product-taxonomy.md"
+      ],
+      "premium": {
+        "annual": 30000,
+        "basis": "demo_reference"
+      },
+      "term": {
+        "years": 10
+      },
       "liquidity_impact": "high"
     }
   ]

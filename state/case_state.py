@@ -46,6 +46,12 @@ def new_case_state(case_id: str, workflow: dict) -> dict:
             "attempts": 0,
             "artifact_fingerprint": None,
             "notes": [],
+            # --- Step 3: task / repair linkage (populated by workflow.tasks) ---
+            "task_id": None,
+            "max_attempts": int(st.get("max_attempts", 3)),
+            "repairs": [],
+            "failure_reason": None,
+            "eval_ids": [],
         }
     services = {}
     for sv in workflow.get("services", []) or []:
@@ -64,6 +70,16 @@ def new_case_state(case_id: str, workflow: dict) -> dict:
         "workflow_version": str(workflow.get("version", "")),
         "created_at": now,
         "updated_at": now,
+        # --- Step 3: agent-control layer -------------------------------------
+        "status": "PENDING",
+        "waiting_for_user": None,
+        "artifact_registry": {},
+        "tasks": [],
+        "evaluations": [],
+        "checkpoints": [],
+        "trace": [],
+        "review": None,
+        # --- Phase 7 core ----------------------------------------------------
         "stage_order": order,
         "current_stage": None,
         "stages": stages,
@@ -73,6 +89,57 @@ def new_case_state(case_id: str, workflow: dict) -> dict:
     }
     record_event(state, "CASE_CREATED", detail="case %s" % case_id)
     return state
+
+
+# --------------------------------------------------------------------------- #
+# Step 3: case-level status & user hand-off
+# --------------------------------------------------------------------------- #
+def set_case_status(state: dict, status: str, detail: Optional[str] = None) -> None:
+    state["status"] = status
+    state["updated_at"] = _now()
+    record_event(state, "CASE_STATUS", detail="%s%s" % (status, (": " + detail) if detail else ""))
+
+
+def wait_for_user(state: dict, reason: str, trigger_stage: Optional[str] = None,
+                  blocking_fields: Optional[list] = None, conflicts: Optional[list] = None,
+                  next_questions: Optional[list] = None) -> dict:
+    """Park the case until the client supplies more information.
+
+    This is the Step 3 hard stop: while `waiting_for_user` is set, the orchestrator must not
+    advance downstream. Missing facts stay UNKNOWN; conflicts are never resolved by picking one.
+    """
+    handoff = {
+        "reason": reason,
+        "trigger_stage": trigger_stage,
+        "blocking_fields": list(blocking_fields or []),
+        "conflicts": list(conflicts or []),
+        "next_questions": list(next_questions or []),
+        "requested_at": _now(),
+    }
+    state["waiting_for_user"] = handoff
+    set_case_status(state, "WAITING_FOR_USER",
+                    "%s @ %s" % (reason, trigger_stage or "<none>"))
+    record_event(state, "WAITING_FOR_USER", stage=trigger_stage, detail=reason)
+    return handoff
+
+
+def clear_waiting_for_user(state: dict) -> None:
+    state["waiting_for_user"] = None
+    state["updated_at"] = _now()
+
+
+def needs_review(state: dict, stage_id: Optional[str], reason: str,
+                 failed_checks: Optional[list] = None, repair_attempts: int = 0) -> dict:
+    rec = {
+        "stage_id": stage_id,
+        "reason": reason,
+        "failed_checks": list(failed_checks or []),
+        "repair_attempts": repair_attempts,
+        "at": _now(),
+    }
+    state["review"] = rec
+    set_case_status(state, "NEEDS_REVIEW", "%s @ %s" % (reason, stage_id or "<none>"))
+    return rec
 
 
 def record_event(state: dict, event_type: str, stage: Optional[str] = None,

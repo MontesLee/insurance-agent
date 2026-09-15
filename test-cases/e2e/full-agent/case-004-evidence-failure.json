@@ -1,0 +1,7 @@
+{
+  "id": "case-004-evidence-failure",
+  "description": "Knowledge Search 命中 0 条证据（语料目录为空）。",
+  "mutations": [],
+  "kb": "empty",
+  "notes": "证据为空必须阻断：EVAL FAIL -> 局部 Repair（最多 2 次）-> 仍失败 -> NEEDS_REVIEW。绝不允许把空证据当知识继续下推。"
+}

@@ -29,11 +29,14 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL_DIR = os.path.dirname(HERE)
 # scripts -> product-candidate-provider -> skills -> .trae -> insurance-agent
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(HERE))))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
 DEFAULT_RULES = os.path.join(SKILL_DIR, "resources", "config", "candidate-provider.rules.json")
 
@@ -80,10 +83,25 @@ def _num(v, value_keys=("value", "amount")):
         return None
     if isinstance(v, (int, float)):
         return float(v)
+    if isinstance(v, str):
+        # Canonical FactValue carries the scalar as a string (e.g. age "35"); coerce it.
+        try:
+            return float(v)
+        except ValueError:
+            return None
     if isinstance(v, dict):
         for k in value_keys:
-            if k in v and isinstance(v[k], (int, float)) and not isinstance(v[k], bool):
-                return float(v[k])
+            if k in v:
+                x = v[k]
+                if isinstance(x, bool):
+                    continue
+                if isinstance(x, (int, float)):
+                    return float(x)
+                if isinstance(x, str):
+                    try:
+                        return float(x)
+                    except ValueError:
+                        continue
     return None
 
 
@@ -276,35 +294,62 @@ def _evidence_domain(item, rules):
     return None
 
 
-def resolve_evidence(product, knowledge_evidence, rules):
+def resolve_evidence(product, knowledge_evidence, rules, grounding_rules=None):
     """Attach KnowledgeEvidence to a product. A product with no evidence is MISSING,
-    not silently supported."""
+    not silently supported.
+
+    Step 4 Phase 7: domain availability alone is NOT enough. The evidence that matched the
+    product's domains is additionally grounded ATTRIBUTE BY ATTRIBUTE (see
+    evidence/attribute_grounding.py). A product whose evidence exists but does not actually
+    state a required attribute (rollup=UNSUPPORTED) is no longer treated as available --
+    "there is a medical document" must not read as "the product's terms are backed".
+    NOT_CHECKABLE is a distinct third state and does NOT block on its own.
+    """
     cfg = rules["evidence"]
     p = extract_payload(knowledge_evidence) or {}
     items = p.get("evidence", []) or []
     if not items:
         return {"status": cfg["missing_evidence_status"], "available": False,
-                "evidence_ids": [], "documents": [], "domains_matched": []}
+                "evidence_ids": [], "documents": [], "domains_matched": [],
+                "grounding": None, "attribute_rollup": None}
 
     required = set(product.get("required_evidence_domains") or [])
     declared = set(product.get("evidence_refs") or [])
-    ids, docs, doms = [], [], []
+    ids, docs, doms, matched = [], [], [], []
     for it in items:
         dom = _evidence_domain(it, rules)
         doc = it.get("document_name") or ""
         hit = (dom is not None and dom in required) or (doc and doc in declared)
         if hit:
+            matched.append(it)
             if it.get("evidence_id"):
                 ids.append(it["evidence_id"])
             if doc and doc not in docs:
                 docs.append(doc)
             if dom and dom not in doms:
                 doms.append(dom)
+
+    grounding = None
+    rollup = None
+    try:
+        from evidence import attribute_grounding as ag  # shared Evidence layer
+        grounding = ag.ground_product_attributes(product, matched, grounding_rules)
+        rollup = grounding.get("rollup")
+    except Exception as e:  # noqa: BLE001 - grounding must never break candidate build
+        grounding = {"rollup": "NOT_CHECKABLE", "attributes": {},
+                     "error": "%s: %s" % (type(e).__name__, e)}
+        rollup = "NOT_CHECKABLE"
+
     if ids or docs:
-        return {"status": "AVAILABLE", "available": True, "evidence_ids": ids,
-                "documents": docs, "domains_matched": doms}
+        # only a POSITIVE "unsupported" downgrades; NOT_CHECKABLE stays non-blocking.
+        degraded = rollup == "UNSUPPORTED"
+        return {"status": cfg["missing_evidence_status"] if degraded else "AVAILABLE",
+                "available": not degraded, "evidence_ids": ids,
+                "documents": docs, "domains_matched": doms,
+                "grounding": grounding, "attribute_rollup": rollup}
     return {"status": cfg["missing_evidence_status"], "available": False,
-            "evidence_ids": [], "documents": [], "domains_matched": []}
+            "evidence_ids": [], "documents": [], "domains_matched": [],
+            "grounding": grounding, "attribute_rollup": rollup}
 
 
 # --------------------------------------------------------------------------- #
@@ -371,10 +416,14 @@ def build_candidates(input_dict, rules=None, catalog=None):
             elif estatus == "UNKNOWN":
                 codes.append("ELIGIBILITY_UNKNOWN")
 
-            # 4. evidence availability
+            # 4. evidence availability + attribute-level grounding (Step 4 Phase 7)
             ev = resolve_evidence(product, knowledge_evidence, rules)
             if rules["evidence"].get("require_evidence_for_admissible") and not ev["available"]:
-                codes.append("EVIDENCE_MISSING")
+                # distinguish "no evidence at all" from "evidence exists but does not
+                # actually state the product's required attributes".
+                codes.append("EVIDENCE_UNSUPPORTED"
+                             if ev.get("attribute_rollup") == "UNSUPPORTED"
+                             else "EVIDENCE_MISSING")
 
             seq += 1
             cand = {
@@ -384,6 +433,13 @@ def build_candidates(input_dict, rules=None, catalog=None):
                 "product_type": product.get("product_type"),
                 "company": product.get("company"),
                 "is_demo": bool(product.get("is_demo", False)),
+                # Step 4 Phase 8: pin the exact catalog edition + product edition the
+                # candidate was selected from, so a historical case can still explain
+                # "why was THIS product recommended THEN" after the catalog moves on.
+                "product_version": product.get("product_version"),
+                "catalog_version": catalog.get("catalog_version"),
+                "effective_from": product.get("effective_from"),
+                "effective_to": product.get("effective_to"),
                 "solution_id": sid,
                 "related_gap_ids": gap_ids,
                 "related_risk_ids": risk_ids,

@@ -9,6 +9,10 @@
     "catalog_id": { "type": "string" },
     "catalog_version": { "type": "string" },
     "generated_at": { "type": "string" },
+    "effective_from": { "type": ["string", "null"],
+                        "description": "Step 4 Phase 8: when this catalog edition becomes effective." },
+    "effective_to": { "type": ["string", "null"],
+                      "description": "When this catalog edition stops being effective (null = open-ended)." },
     "is_demo": { "type": "boolean" },
     "notice": { "type": "string" },
     "premium_basis": { "type": "string" },
@@ -30,6 +34,10 @@
       "properties": {
         "product_id": { "type": "string", "pattern": "^P[0-9]{3}$" },
         "product_name": { "type": "string" },
+        "product_version": { "type": ["string", "null"],
+                             "description": "Step 4 Phase 8: version of THIS product row, so a historical case can explain which edition it was recommended from." },
+        "effective_from": { "type": ["string", "null"] },
+        "effective_to": { "type": ["string", "null"] },
         "product_type": {
           "type": "string",
           "enum": ["medical", "critical_illness", "accident", "life", "savings"]

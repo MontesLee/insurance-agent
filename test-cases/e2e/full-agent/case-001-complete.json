@@ -1,0 +1,7 @@
+{
+  "id": "case-001-complete",
+  "description": "完整客户（32 岁 / 已婚 / 1 孩 / 年收入 60 万 / 房贷 210 万 / 已有重疾 50 万）。上游三件 artifact 由既有 fixture 播种，下游全部真实执行。",
+  "mutations": [],
+  "kb": null,
+  "notes": "本案例还要演示 checkpoint/resume：先在人工闸门暂停并落盘，再加载恢复，且已 PASS 的 Task 不得重跑。"
+}

@@ -354,10 +354,17 @@ def evaluate_candidate(cand, ctx, ks, rules):
 
     # --- tentative recommendation_status ---
     has_hard = any(v["severity"] == "hard" for v in violations)
-    if ev_status in ("insufficient", "conflict"):
-        rec_status = "insufficient_evidence"
-    elif has_hard:
+    # Priority: a HARD product-validation block (ineligible / type / direction mismatch /
+    # not-in-catalog) wins over evidence status. An ineligible product can NEVER be
+    # recommended, so its evidence being missing or present is irrelevant. Previously the
+    # evidence check ran first, which let an ineligible-but-evidence-missing candidate
+    # masquerade as `insufficient_evidence` instead of `not_recommended` -- masking the
+    # real blocker and pushing the overall status toward INCOMPLETE_EVIDENCE when the
+    # correct status is NO_CANDIDATES.
+    if has_hard:
         rec_status = "not_recommended"
+    elif ev_status in ("insufficient", "conflict"):
+        rec_status = "insufficient_evidence"
     elif req_overall in ("poor_fit", "not_suitable"):
         rec_status = "not_recommended"
     else:
@@ -558,6 +565,13 @@ def generate_recommendation(input_dict, rules=None):
                 "product_id": pmeta.get("product_id"),
                 "product_name": pmeta.get("product_name"),
                 "product_type": pmeta.get("product_type"),
+                # Step 4 Phase 8: the exact catalog + product edition this recommendation
+                # was reasoned from, so a historical case stays explainable after the
+                # catalog is updated.
+                "product_version": pmeta.get("product_version"),
+                "catalog_version": pmeta.get("catalog_version"),
+                "effective_from": pmeta.get("effective_from"),
+                "effective_to": pmeta.get("effective_to"),
                 "is_demo": bool(pmeta.get("is_demo", False)),
                 "solution_id": pmeta.get("solution_id"),
                 "related_gap_ids": list(pmeta.get("related_gap_ids") or []),
@@ -565,12 +579,25 @@ def generate_recommendation(input_dict, rules=None):
                 "evidence_status": pmeta.get("evidence_status"),
             }
 
-    alt_out = [{
-        "candidate_id": e["candidate_id"],
-        "fit": e["requirement_fit"]["overall"],
-        "tradeoff": ("lower cost but weaker coverage" if e["requirement_fit"]["score"] < (primary["requirement_fit"]["score"] if primary else 1)
-                     else "secondary option"),
-    } for e in alternatives]
+    alt_out = []
+    for e in alternatives:
+        entry = {
+            "candidate_id": e["candidate_id"],
+            "fit": e["requirement_fit"]["overall"],
+            "tradeoff": ("lower cost but weaker coverage" if e["requirement_fit"]["score"] < (primary["requirement_fit"]["score"] if primary else 1)
+                         else "secondary option"),
+        }
+        ameta = product_meta_by_cid.get(e["candidate_id"])
+        if ameta:
+            entry["product"] = {
+                "product_id": ameta.get("product_id"),
+                "product_name": ameta.get("product_name"),
+                "product_type": ameta.get("product_type"),
+                "product_version": ameta.get("product_version"),
+                "catalog_version": ameta.get("catalog_version"),
+                "is_demo": bool(ameta.get("is_demo", False)),
+            }
+        alt_out.append(entry)
 
     # overall uncertainties
     uncertainties = list(ctx["uncertainties"])
@@ -596,7 +623,17 @@ def generate_recommendation(input_dict, rules=None):
     blocking = [u for u in uncertainties if u.get("type") in blocking_types]
     status = "COMPLETE"
     if primary is None:
-        status = "INCOMPLETE_EVIDENCE" if any(e["evidence"]["status"] != "supported" for e in evals) else "NO_CANDIDATES"
+        # No recommendable product. The status depends on WHY, not merely on whether any
+        # candidate lacks evidence:
+        #  - `insuff` holds candidates that PASSED product checks but only fail the
+        #    evidence check (eligible, just no knowledge backing). Such a product IS
+        #    buyable, we merely cannot justify it yet -> INCOMPLETE_EVIDENCE.
+        #  - otherwise (every candidate is ineligible / poor-fit, or there are none)
+        #    there is no product the client can actually buy -> NO_CANDIDATES.
+        # Using the raw `evidence.status` here would be wrong: an ineligible candidate's
+        # evidence may also read "insufficient" (e.g. an empty knowledge base), but that
+        # does not make it a buyable product, so it must not elevate the status.
+        status = "INCOMPLETE_EVIDENCE" if insuff else "NO_CANDIDATES"
     elif blocking:
         status = "INCOMPLETE_EVIDENCE"
 

@@ -1,0 +1,13 @@
+{
+  "id": "case-003-conflicting-information",
+  "description": "客户年收入出现两个互相冲突的取值：50 万 与 80 万。",
+  "mutations": [
+    {
+      "op": "add_conflict",
+      "field": "financial_profile.annual_income",
+      "candidates": ["50万", "80万"]
+    }
+  ],
+  "kb": null,
+  "notes": "冲突必须原样保留并呈交用户，系统不得自行选择其中一个数字。"
+}

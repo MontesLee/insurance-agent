@@ -100,12 +100,25 @@ def project(product_candidates, risk_assessment=None, rules=None):
             "_product_validation": {
                 "product_id": c.get("product_id"),
                 "product_type": ptype,
+                # Step 4 Phase 8: carry the catalog/product edition through the projection,
+                # so the final recommendation can pin which edition it was based on.
+                "product_version": c.get("product_version"),
+                "catalog_version": c.get("catalog_version"),
+                "effective_from": c.get("effective_from"),
+                "effective_to": c.get("effective_to"),
                 "is_demo": bool(c.get("is_demo", False)),
                 "admissible": bool(c.get("admissible", False)),
                 "reject_reason_codes": codes,
                 "blockers": blockers,
                 "eligibility": (c.get("eligibility") or {}).get("status", "UNKNOWN"),
                 "evidence_status": (c.get("evidence") or {}).get("status", "MISSING"),
+                # Step 4 Phase 7: carry the attribute-level verdict so a downstream reader
+                # can see WHY evidence was rejected (which attribute was not backed).
+                "evidence_attribute_rollup": (c.get("evidence") or {}).get("attribute_rollup"),
+                "evidence_unsupported_attributes": sorted(
+                    k for k, v in ((((c.get("evidence") or {}).get("grounding") or {})
+                                    .get("attributes")) or {}).items()
+                    if isinstance(v, dict) and v.get("status") == "UNSUPPORTED"),
                 "related_gap_ids": list(c.get("related_gap_ids") or []),
                 "solution_id": c.get("solution_id"),
             },

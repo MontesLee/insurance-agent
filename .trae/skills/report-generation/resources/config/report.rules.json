@@ -102,6 +102,28 @@
     "forbidden_product_names": [],
     "forbidden_company_names": []
   },
+  "disclosure": {
+    "demo_disclosure": "本报告基于 DEMO 演示产品目录生成：涉及的产品、条款与价格为模拟数据，不构成真实投保建议。",
+    "demo_product_label": "【演示产品】",
+    "demo_product_note": "该方向指向演示（DEMO）产品，非真实在售产品，仅供结构演示。",
+    "non_product_note": "以上策略来自 SolutionPlan（解决策略层），不含具体产品与保险公司。",
+    "nature_legend": "本报告内容分为三类：事实（客户信息与上游结论）、分析（上游判断结果）、建议（下一步行动）。建议类内容不构成投保承诺。",
+    "fact_label": "事实",
+    "analysis_label": "分析",
+    "advice_label": "建议",
+    "nature_map": {
+      "client_profile": "fact",
+      "financial_profile": "fact",
+      "risk_exposure": "analysis",
+      "coverage_gaps": "analysis",
+      "requirement_priorities": "fact",
+      "solution_strategies": "analysis",
+      "recommended_directions": "analysis",
+      "evidence_summary": "fact",
+      "information_gaps": "fact",
+      "next_actions": "advice"
+    }
+  },
   "report_title": "客户保险需求分析报告",
   "report_version": "1.0"
 }

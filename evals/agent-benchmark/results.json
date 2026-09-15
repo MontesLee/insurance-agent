@@ -1,0 +1,1795 @@
+{
+  "metrics": {
+    "version": "v0.1",
+    "generated_at": "2026-09-15T03:10:51.437604+00:00",
+    "cases": 33,
+    "task_success_rate": 1.0,
+    "unsupported_claim_rate": 0.0,
+    "product_hallucination_rate": 0.0,
+    "provenance_completeness": 1.0,
+    "invalid_continuation_rate": 0.0,
+    "repair_success_rate": 0.0909,
+    "human_review_rate": 0.2121,
+    "repairs_attempted": 11,
+    "repairs_succeeded": 1,
+    "repair_success_rate_repairable_only": 1.0,
+    "repairable_repairs_attempted": 1,
+    "repairable_repairs_succeeded": 1,
+    "complete_recommendations": 2,
+    "hard_gates": {
+      "product_hallucination_zero": true,
+      "critical_provenance_failure_zero": true,
+      "invalid_continuation_zero": true
+    },
+    "invalid_continuation_cases": []
+  },
+  "by_category": {
+    "complete": {
+      "n": 7,
+      "passed": 7
+    },
+    "insufficient_information": {
+      "n": 5,
+      "passed": 5
+    },
+    "conflicting_information": {
+      "n": 5,
+      "passed": 5
+    },
+    "low_risk": {
+      "n": 3,
+      "passed": 3
+    },
+    "high_risk": {
+      "n": 3,
+      "passed": 3
+    },
+    "no_candidates": {
+      "n": 3,
+      "passed": 3
+    },
+    "insufficient_evidence": {
+      "n": 3,
+      "passed": 3
+    },
+    "adversarial": {
+      "n": 3,
+      "passed": 3
+    },
+    "repairable": {
+      "n": 1,
+      "passed": 1
+    }
+  },
+  "cases": [
+    {
+      "id": "bm-complete-001",
+      "category": "complete",
+      "desc": "基准客户：35岁/已婚/1孩/年收入80万/房贷200万",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-complete-002",
+      "category": "complete",
+      "desc": "中年高收入：45岁/年收入120万/房贷300万",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-complete-003",
+      "category": "complete",
+      "desc": "年轻单身：28岁/未婚/年收入30万/无房贷",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-complete-004",
+      "category": "complete",
+      "desc": "临近退休：52岁/年收入60万/无房贷",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-complete-005",
+      "category": "complete",
+      "desc": "双层家庭责任：40岁/2孩/年收入90万/房贷150万",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-complete-006-single-medical",
+      "category": "complete",
+      "desc": "单一需求客户（仅医疗保障）：全链路必须真正落到一个具体产品，且该产品是 DEMO 目录内商品并被标记",
+      "case_status": "COMPLETED",
+      "rec_status": "COMPLETE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "recommendation status == COMPLETE",
+          "ok": true,
+          "detail": "COMPLETE"
+        },
+        {
+          "name": "primary_is_none == False",
+          "ok": true,
+          "detail": "False"
+        },
+        {
+          "name": "report marks demo products (is_demo == True)",
+          "ok": true,
+          "detail": "True"
+        },
+        {
+          "name": "demo disclosure text rendered in the report",
+          "ok": true,
+          "detail": "no DEMO marker in rendered report"
+        },
+        {
+          "name": "disclosed product ids are in the catalog",
+          "ok": true,
+          "detail": "['P001', 'P002', 'P003']"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "COMPLETE recommendation keeps resolvable provenance",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 7,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": true
+    },
+    {
+      "id": "bm-complete-007-single-accident",
+      "category": "complete",
+      "desc": "单一需求客户（仅意外保障）：另一条 COMPLETE 路径，验证推荐可溯源且产品在目录内",
+      "case_status": "COMPLETED",
+      "rec_status": "COMPLETE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "all 9 canonical artifacts present",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "recommendation status == COMPLETE",
+          "ok": true,
+          "detail": "COMPLETE"
+        },
+        {
+          "name": "primary_is_none == False",
+          "ok": true,
+          "detail": "False"
+        },
+        {
+          "name": "report marks demo products (is_demo == True)",
+          "ok": true,
+          "detail": "True"
+        },
+        {
+          "name": "demo disclosure text rendered in the report",
+          "ok": true,
+          "detail": "no DEMO marker in rendered report"
+        },
+        {
+          "name": "disclosed product ids are in the catalog",
+          "ok": true,
+          "detail": "['P009', 'P010']"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "COMPLETE recommendation keeps resolvable provenance",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 4,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": true
+    },
+    {
+      "id": "bm-insufficient-001",
+      "category": "insufficient_information",
+      "desc": "已有商业保险未知（blocking 字段）",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == INSUFFICIENT_INFORMATION",
+          "ok": true,
+          "detail": "INSUFFICIENT_INFORMATION"
+        },
+        {
+          "name": "next_questions non-empty",
+          "ok": true,
+          "detail": "['请确认客户目前已持有的商业保险（险种 + 保额）。若确实无法提供，请明确回答「未知」，我们将按 UNKNOWN 处理，不会替你假设。']"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-insufficient-002",
+      "category": "insufficient_information",
+      "desc": "年龄未知（blocking 字段，核保必需）",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == INSUFFICIENT_INFORMATION",
+          "ok": true,
+          "detail": "INSUFFICIENT_INFORMATION"
+        },
+        {
+          "name": "next_questions non-empty",
+          "ok": true,
+          "detail": "['请提供客户的准确年龄（用于核保与费率判断）。']"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-insufficient-003",
+      "category": "insufficient_information",
+      "desc": "年收入未知（blocking 字段，预算判定必需）",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == INSUFFICIENT_INFORMATION",
+          "ok": true,
+          "detail": "INSUFFICIENT_INFORMATION"
+        },
+        {
+          "name": "next_questions non-empty",
+          "ok": true,
+          "detail": "['请提供客户当前年收入（税前/税后请注明）。']"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-insufficient-004",
+      "category": "insufficient_information",
+      "desc": "三个 blocking 字段同时缺失 -> 一次性问全",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == INSUFFICIENT_INFORMATION",
+          "ok": true,
+          "detail": "INSUFFICIENT_INFORMATION"
+        },
+        {
+          "name": "next_questions non-empty",
+          "ok": true,
+          "detail": "['请确认客户目前已持有的商业保险（险种 + 保额）。若确实无法提供，请明确回答「未知」，我们将按 UNKNOWN 处理，不会替你假设。', '请提供客户的准确年龄（用于核保与费率判断）。', '请提供客户当前年收入（税前/税后请注明）。']"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-insufficient-005",
+      "category": "insufficient_information",
+      "desc": "反向对照：非 blocking 字段未知（住房）-> 不得误停",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-conflict-001",
+      "category": "conflicting_information",
+      "desc": "年收入冲突：50万 vs 80万",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == CONFLICTING_INFORMATION",
+          "ok": true,
+          "detail": "CONFLICTING_INFORMATION"
+        },
+        {
+          "name": "conflict candidates preserved",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-conflict-002",
+      "category": "conflicting_information",
+      "desc": "年龄冲突：35 vs 45（直接影响可保性）",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == CONFLICTING_INFORMATION",
+          "ok": true,
+          "detail": "CONFLICTING_INFORMATION"
+        },
+        {
+          "name": "conflict candidates preserved",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-conflict-003",
+      "category": "conflicting_information",
+      "desc": "已有保险冲突：两份医疗险 vs 无商业保险",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == CONFLICTING_INFORMATION",
+          "ok": true,
+          "detail": "CONFLICTING_INFORMATION"
+        },
+        {
+          "name": "conflict candidates preserved",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-conflict-004",
+      "category": "conflicting_information",
+      "desc": "房贷冲突：200万 vs 0",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == CONFLICTING_INFORMATION",
+          "ok": true,
+          "detail": "CONFLICTING_INFORMATION"
+        },
+        {
+          "name": "conflict candidates preserved",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-conflict-005",
+      "category": "conflicting_information",
+      "desc": "非 blocking 字段冲突（住房）-> 冲突策略对任意字段生效",
+      "case_status": "WAITING_FOR_USER",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "requirement-analysis",
+        "risk-assessment"
+      ],
+      "checks": [
+        {
+          "name": "case_status == WAITING_FOR_USER",
+          "ok": true,
+          "detail": "WAITING_FOR_USER"
+        },
+        {
+          "name": "waiting_reason == CONFLICTING_INFORMATION",
+          "ok": true,
+          "detail": "CONFLICTING_INFORMATION"
+        },
+        {
+          "name": "conflict candidates preserved",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-lowrisk-001",
+      "category": "low_risk",
+      "desc": "全部风险降为 LOW 且已足额覆盖 -> 不应过度推荐",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 5,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-lowrisk-002",
+      "category": "low_risk",
+      "desc": "仅剩一条 LOW 风险（长期储蓄类，知识库无对应 domain）-> 正确行为是拒绝空证据下推、转人工，而不是凭模型记忆编造",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 2,
+      "repairs_succeeded": 0,
+      "repairs_failed": 1,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-lowrisk-003",
+      "category": "low_risk",
+      "desc": "风险等级低但保留原保额缺口 -> 仍应识别缺口而非空转",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-highrisk-001",
+      "category": "high_risk",
+      "desc": "医疗缺口放大到 200万且 CRITICAL",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-highrisk-002",
+      "category": "high_risk",
+      "desc": "重疾缺口放大到 150万且 CRITICAL",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-highrisk-003",
+      "category": "high_risk",
+      "desc": "身为唯一收入来源却身故保障全缺（300万责任）",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 12,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-nocand-001",
+      "category": "no_candidates",
+      "desc": "85岁：Catalog 无任何符合投保年龄的产品",
+      "case_status": "COMPLETED",
+      "rec_status": "NO_CANDIDATES",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "recommendation status == NO_CANDIDATES",
+          "ok": true,
+          "detail": "NO_CANDIDATES"
+        },
+        {
+          "name": "primary_is_none == True",
+          "ok": true,
+          "detail": "True"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-nocand-002",
+      "category": "no_candidates",
+      "desc": "100岁：极端超龄",
+      "case_status": "COMPLETED",
+      "rec_status": "NO_CANDIDATES",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "recommendation status == NO_CANDIDATES",
+          "ok": true,
+          "detail": "NO_CANDIDATES"
+        },
+        {
+          "name": "primary_is_none == True",
+          "ok": true,
+          "detail": "True"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-nocand-003",
+      "category": "no_candidates",
+      "desc": "81岁：越过最高投保年龄（80）一格",
+      "case_status": "COMPLETED",
+      "rec_status": "NO_CANDIDATES",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "recommendation status == NO_CANDIDATES",
+          "ok": true,
+          "detail": "NO_CANDIDATES"
+        },
+        {
+          "name": "primary_is_none == True",
+          "ok": true,
+          "detail": "True"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-noev-001",
+      "category": "insufficient_evidence",
+      "desc": "知识库为空 -> 证据不足必须阻断转人工",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 2,
+      "repairs_succeeded": 0,
+      "repairs_failed": 1,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-noev-002",
+      "category": "insufficient_evidence",
+      "desc": "空知识库 + 45岁客户",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 2,
+      "repairs_succeeded": 0,
+      "repairs_failed": 1,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-noev-003",
+      "category": "insufficient_evidence",
+      "desc": "空知识库 + 高风险客户（不得因'风险明显'就绕过证据）",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "artifact product-recommendation absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 2,
+      "repairs_succeeded": 0,
+      "repairs_failed": 1,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-adv-invalid-product",
+      "category": "adversarial",
+      "desc": "注入 Catalog 之外的产品 ID -> catalog_exists 必须 FAIL 并阻断",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-adv-wrong-provenance",
+      "category": "adversarial",
+      "desc": "注入空 chunk_id -> 证据溯源链断裂必须 FAIL 并阻断",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": null,
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "artifact insurance-report absent",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 0,
+      "repairs_attempted": 2,
+      "repairs_succeeded": 0,
+      "repairs_failed": 1,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-adv-broken-artifact",
+      "category": "adversarial",
+      "desc": "注入破损 artifact（报告 payload 缺失）-> 必填校验必须 FAIL 并阻断",
+      "case_status": "NEEDS_REVIEW",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == NEEDS_REVIEW",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "case blocked (NEEDS_REVIEW)",
+          "ok": true,
+          "detail": "NEEDS_REVIEW"
+        },
+        {
+          "name": "trace shows a failed task",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 0,
+      "repairs_succeeded": 0,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    },
+    {
+      "id": "bm-repair-001",
+      "category": "repairable",
+      "desc": "一次性注入悬空 gap 引用（solution-plan 引用不存在的 GAP-999）-> Repair 应重跑该 stage 并自愈成功，最终 COMPLETED",
+      "case_status": "COMPLETED",
+      "rec_status": "INCOMPLETE_EVIDENCE",
+      "artifacts": [
+        "client-profile",
+        "coverage-gap-analysis",
+        "insurance-report",
+        "knowledge-evidence",
+        "product-candidates",
+        "product-recommendation",
+        "requirement-analysis",
+        "risk-assessment",
+        "solution-plan"
+      ],
+      "checks": [
+        {
+          "name": "case_status == COMPLETED",
+          "ok": true,
+          "detail": "COMPLETED"
+        },
+        {
+          "name": "report produced",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "repairs succeeded >= 1",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "no product outside the Catalog",
+          "ok": true,
+          "detail": "[]"
+        }
+      ],
+      "passed": true,
+      "failed_checks": [],
+      "hallucinated_products": [],
+      "n_products_referenced": 10,
+      "repairs_attempted": 1,
+      "repairs_succeeded": 1,
+      "repairs_failed": 0,
+      "unresolved_evidence_refs": [],
+      "demo_disclosed": false
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "description": "Step 3 Repair Loop configuration. Repair is local (failed stage only), budget-bound, and feedback-driven.",
+
+  "max_repairs": 2,
+  "max_attempts": 3,
+
+  "actions": {
+    "RERUN_FROM_UPSTREAM": {
+      "target": "none",
+      "description": "Discard the stale output and re-run the stage: it re-derives its output from the CURRENT upstream artifacts. Used when references went stale (e.g. a gap_id changed upstream)."
+    },
+    "DROP_INVALID_PRODUCTS": {
+      "target": "stage_input",
+      "description": "Remove candidates whose product_id is absent from the Product Catalog from the stage input, then re-run. Never invents a replacement product."
+    },
+    "ESCALATE": {
+      "target": "none",
+      "terminal": true,
+      "description": "No automatic repair exists (schema violation, contamination, provenance gap). Escalate to NEEDS_REVIEW."
+    }
+  },
+
+  "budget_exhausted_status": "NEEDS_REVIEW"
+}

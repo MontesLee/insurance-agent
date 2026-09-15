@@ -1,0 +1,14 @@
+{
+  "id": "case-002-insufficient-information",
+  "description": "客户未提供已有商业保险信息。existing_protection.existing_insurance 标记为 UNKNOWN 并记入 missing_from_upstream。",
+  "mutations": [
+    {
+      "op": "set_unknown",
+      "profile": "existing_protection",
+      "field": "existing_insurance",
+      "reason": "客户未提供已有商业保险信息"
+    }
+  ],
+  "kb": null,
+  "notes": "Agent 不得假设「没有保单」，必须停下来追问。"
+}

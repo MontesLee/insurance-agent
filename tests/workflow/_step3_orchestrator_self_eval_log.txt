@@ -1,0 +1,17 @@
+PASS SE-1 a missing provided upstream blocks the pipeline
+PASS SE-1 no downstream stage ran past the blocked stage
+PASS SE-2 full run completes
+PASS SE-2 execution order follows the declared workflow order
+PASS SE-3 evidence failure escalates to NEEDS_REVIEW at the producer stage
+PASS SE-3 repair budget not exceeded (<=3 attempts)
+PASS SE-3 exactly two local repairs attempted before escalation
+PASS SE-4 a human-review gate pauses the case
+PASS SE-4 a valid checkpoint is available for resume
+PASS SE-4 resume completes after human approval
+PASS SE-4 resume does not re-execute PASSed tasks
+PASS SE-5 the case pauses for human review
+PASS SE-5 without human approval the case cannot advance past the gate
+PASS SE-5 an explicit approve() releases the gate and completes
+
+STEP3 ORCHESTRATOR SELF-EVAL: 14/14 passed
+RESULT: ALL GREEN

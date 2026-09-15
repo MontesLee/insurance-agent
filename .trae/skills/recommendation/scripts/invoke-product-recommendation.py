@@ -69,6 +69,14 @@ def run(v2_input, translate_rules=None, engine_rules=None):
 
     product_candidates = v2_input.get("product_candidates")
 
+    # Do NOT pre-discard inadmissible candidates here. When the provider produced
+    # candidates but none are admissible (ineligible / evidence-missing), the engine
+    # must still SEE that metadata: it distinguishes INCOMPLETE_EVIDENCE (eligible but
+    # no knowledge backing) from NO_CANDIDATES (all ineligible), and it reports each
+    # ineligible candidate under not_recommended with the product_ineligible reason.
+    # The `if product_candidates:` branch below already guarantees we never fall back
+    # to dressing solution strategies up as products -- that fallback (build_v2_input)
+    # only runs when product_candidates is genuinely absent.
     if product_candidates:
         # Step 2: real, catalog-backed candidates. Strategies are no longer dressed up
         # as products -- the recommendation now ranks actual catalog entries.

@@ -1,0 +1,322 @@
+{
+  "version": "1.0",
+  "description": "Step 4 Phase 3 — Agent Benchmark. Synthetic cases that ask 'can the agent handle a real client case CORRECTLY?', not 'does the code run?'. Every case is a mutation over the proven full-chain seed (tests/e2e/fixtures/case-full-chain.json); upstream (client-intake / requirement / risk) is seeded, everything downstream really executes, evaluates, repairs and checkpoints. Expectations describe BEHAVIOUR and CONSTRAINTS (must detect a gap, must not recommend an ineligible product, must keep provenance, must park on missing/conflicting facts) — never a fixed final text.",
+  "seeds_file": "tests/e2e/fixtures/case-full-chain.json",
+  "provided_by": "upstream-dialogue",
+  "empty_kb": "test-cases/e2e/full-agent/kb-empty",
+
+  "categories": {
+    "complete": "完整客户，全链路可跑通",
+    "insufficient_information": "关键事实缺失 -> 必须停下追问",
+    "conflicting_information": "事实冲突 -> 必须保留冲突并等用户确认",
+    "low_risk": "低风险客户 -> 不做过度推荐",
+    "high_risk": "高风险客户 -> 必须识别并覆盖",
+    "no_candidates": "无合格产品 -> NO_CANDIDATES，不得硬推荐",
+    "insufficient_evidence": "证据不足 -> 阻断并转人工，禁止用模型记忆补知识",
+    "adversarial": "故障注入 -> Eval 必须拦下，禁止带病下推",
+    "repairable": "可自愈故障 -> Repair 必须定位并重跑，最终恢复"
+  },
+
+  "cases": [
+    { "id": "bm-complete-001", "category": "complete",
+      "desc": "基准客户：35岁/已婚/1孩/年收入80万/房贷200万",
+      "mutations": [], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true } },
+
+    { "id": "bm-complete-002", "category": "complete",
+      "desc": "中年高收入：45岁/年收入120万/房贷300万",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "45" },
+        { "op": "set_value", "profile": "financial_profile", "field": "annual_income", "value": "120万" },
+        { "op": "set_value", "profile": "financial_profile", "field": "mortgage", "value": "300万" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true } },
+
+    { "id": "bm-complete-003", "category": "complete",
+      "desc": "年轻单身：28岁/未婚/年收入30万/无房贷",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "28" },
+        { "op": "set_value", "profile": "family_profile", "field": "marital_status", "value": "未婚" },
+        { "op": "set_value", "profile": "financial_profile", "field": "annual_income", "value": "30万" },
+        { "op": "set_value", "profile": "financial_profile", "field": "mortgage", "value": "0" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true } },
+
+    { "id": "bm-complete-004", "category": "complete",
+      "desc": "临近退休：52岁/年收入60万/无房贷",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "52" },
+        { "op": "set_value", "profile": "family_profile", "field": "children", "value": "1孩（已成年）" },
+        { "op": "set_value", "profile": "financial_profile", "field": "annual_income", "value": "60万" },
+        { "op": "set_value", "profile": "financial_profile", "field": "mortgage", "value": "0" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true } },
+
+    { "id": "bm-complete-005", "category": "complete",
+      "desc": "双层家庭责任：40岁/2孩/年收入90万/房贷150万",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "40" },
+        { "op": "set_value", "profile": "family_profile", "field": "children", "value": "2孩（3岁、8岁）" },
+        { "op": "set_value", "profile": "financial_profile", "field": "annual_income", "value": "90万" },
+        { "op": "set_value", "profile": "financial_profile", "field": "mortgage", "value": "150万" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true } },
+
+    { "id": "bm-complete-006-single-medical", "category": "complete",
+      "desc": "单一需求客户（仅医疗保障）：全链路必须真正落到一个具体产品，且该产品是 DEMO 目录内商品并被标记",
+      "mutations": [
+        { "op": "keep_requirements", "requirement_ids": ["REQ-MED"] },
+        { "op": "keep_risks", "risk_ids": ["R1-001"] }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true,
+                  "recommendation_status": "COMPLETE", "primary_is_none": false,
+                  "demo_disclosure": true } },
+
+    { "id": "bm-complete-007-single-accident", "category": "complete",
+      "desc": "单一需求客户（仅意外保障）：另一条 COMPLETE 路径，验证推荐可溯源且产品在目录内",
+      "mutations": [
+        { "op": "keep_requirements", "requirement_ids": ["REQ-ACC"] },
+        { "op": "keep_risks", "risk_ids": ["R3-001"] }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "all_artifacts": true, "require_report": true,
+                  "recommendation_status": "COMPLETE", "primary_is_none": false,
+                  "demo_disclosure": true } },
+
+    { "id": "bm-insufficient-001", "category": "insufficient_information",
+      "desc": "已有商业保险未知（blocking 字段）",
+      "mutations": [
+        { "op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance",
+          "reason": "客户未提供已有商业保险信息" }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "INSUFFICIENT_INFORMATION",
+                  "next_questions_nonempty": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-insufficient-002", "category": "insufficient_information",
+      "desc": "年龄未知（blocking 字段，核保必需）",
+      "mutations": [
+        { "op": "set_unknown", "profile": "family_profile", "field": "age", "reason": "未提供年龄" }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "INSUFFICIENT_INFORMATION",
+                  "next_questions_nonempty": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-insufficient-003", "category": "insufficient_information",
+      "desc": "年收入未知（blocking 字段，预算判定必需）",
+      "mutations": [
+        { "op": "set_unknown", "profile": "financial_profile", "field": "annual_income",
+          "reason": "未提供收入" }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "INSUFFICIENT_INFORMATION",
+                  "next_questions_nonempty": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-insufficient-004", "category": "insufficient_information",
+      "desc": "三个 blocking 字段同时缺失 -> 一次性问全",
+      "mutations": [
+        { "op": "set_unknown", "profile": "family_profile", "field": "age", "reason": "未提供年龄" },
+        { "op": "set_unknown", "profile": "financial_profile", "field": "annual_income", "reason": "未提供收入" },
+        { "op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance",
+          "reason": "未提供已有保险" }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "INSUFFICIENT_INFORMATION",
+                  "next_questions_nonempty": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-insufficient-005", "category": "insufficient_information",
+      "desc": "反向对照：非 blocking 字段未知（住房）-> 不得误停",
+      "mutations": [
+        { "op": "set_unknown", "profile": "family_profile", "field": "housing", "reason": "未提供住房" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "require_report": true } },
+
+    { "id": "bm-conflict-001", "category": "conflicting_information",
+      "desc": "年收入冲突：50万 vs 80万",
+      "mutations": [
+        { "op": "add_conflict", "field": "annual_income", "candidates": ["50万", "80万"] }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "CONFLICTING_INFORMATION",
+                  "conflicts_preserved": ["50万", "80万"],
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-conflict-002", "category": "conflicting_information",
+      "desc": "年龄冲突：35 vs 45（直接影响可保性）",
+      "mutations": [
+        { "op": "add_conflict", "field": "age", "candidates": ["35", "45"] }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "CONFLICTING_INFORMATION",
+                  "conflicts_preserved": ["35", "45"],
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-conflict-003", "category": "conflicting_information",
+      "desc": "已有保险冲突：两份医疗险 vs 无商业保险",
+      "mutations": [
+        { "op": "add_conflict", "field": "existing_insurance",
+          "candidates": ["两份医疗险", "无商业保险"] }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "CONFLICTING_INFORMATION",
+                  "conflicts_preserved": ["两份医疗险", "无商业保险"],
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-conflict-004", "category": "conflicting_information",
+      "desc": "房贷冲突：200万 vs 0",
+      "mutations": [
+        { "op": "add_conflict", "field": "mortgage", "candidates": ["200万", "0"] }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "CONFLICTING_INFORMATION",
+                  "conflicts_preserved": ["200万", "0"],
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-conflict-005", "category": "conflicting_information",
+      "desc": "非 blocking 字段冲突（住房）-> 冲突策略对任意字段生效",
+      "mutations": [
+        { "op": "add_conflict", "field": "housing", "candidates": ["自有住房", "租赁"] }
+      ], "kb": null,
+      "expect": { "case_status": "WAITING_FOR_USER", "waiting_reason": "CONFLICTING_INFORMATION",
+                  "conflicts_preserved": ["自有住房", "租赁"],
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-lowrisk-001", "category": "low_risk",
+      "desc": "全部风险降为 LOW 且已足额覆盖 -> 不应过度推荐",
+      "mutations": [
+        { "op": "set_all_risks", "field": "severity", "value": "LOW" },
+        { "op": "set_all_risks", "field": "likelihood", "value": "LOW" },
+        { "op": "set_all_risks", "field": "residual_risk", "value": "LOW" },
+        { "op": "set_all_risks", "field": "coverage_assessment.unprotected_amount", "value": 0 }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "require_report": true } },
+
+    { "id": "bm-lowrisk-002", "category": "low_risk",
+      "desc": "仅剩一条 LOW 风险（长期储蓄类，知识库无对应 domain）-> 正确行为是拒绝空证据下推、转人工，而不是凭模型记忆编造",
+      "mutations": [
+        { "op": "keep_risks", "risk_ids": ["R5-001"] },
+        { "op": "set_all_risks", "field": "severity", "value": "LOW" },
+        { "op": "set_all_risks", "field": "residual_risk", "value": "LOW" },
+        { "op": "set_all_risks", "field": "coverage_assessment.unprotected_amount", "value": 0 }
+      ], "kb": null,
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-lowrisk-003", "category": "low_risk",
+      "desc": "风险等级低但保留原保额缺口 -> 仍应识别缺口而非空转",
+      "mutations": [
+        { "op": "set_all_risks", "field": "severity", "value": "LOW" },
+        { "op": "set_all_risks", "field": "residual_risk", "value": "LOW" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "require_report": true } },
+
+    { "id": "bm-highrisk-001", "category": "high_risk",
+      "desc": "医疗缺口放大到 200万且 CRITICAL",
+      "mutations": [
+        { "op": "set_risk", "risk_id": "R1-001", "field": "severity", "value": "CRITICAL" },
+        { "op": "set_risk", "risk_id": "R1-001", "field": "likelihood", "value": "HIGH" },
+        { "op": "set_risk", "risk_id": "R1-001", "field": "residual_risk", "value": "CRITICAL" },
+        { "op": "set_risk", "risk_id": "R1-001",
+          "field": "coverage_assessment.unprotected_amount", "value": 2000000 }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "require_report": true } },
+
+    { "id": "bm-highrisk-002", "category": "high_risk",
+      "desc": "重疾缺口放大到 150万且 CRITICAL",
+      "mutations": [
+        { "op": "set_risk", "risk_id": "R2-001", "field": "severity", "value": "CRITICAL" },
+        { "op": "set_risk", "risk_id": "R2-001", "field": "likelihood", "value": "HIGH" },
+        { "op": "set_risk", "risk_id": "R2-001",
+          "field": "coverage_assessment.unprotected_amount", "value": 1500000 }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "require_report": true } },
+
+    { "id": "bm-highrisk-003", "category": "high_risk",
+      "desc": "身为唯一收入来源却身故保障全缺（300万责任）",
+      "mutations": [
+        { "op": "set_risk", "risk_id": "R4-001", "field": "severity", "value": "CRITICAL" },
+        { "op": "set_risk", "risk_id": "R4-001", "field": "residual_risk", "value": "CRITICAL" },
+        { "op": "set_risk", "risk_id": "R4-001", "field": "existing_protection", "value": "无" },
+        { "op": "set_risk", "risk_id": "R4-001",
+          "field": "coverage_assessment.protected_amount", "value": 0 },
+        { "op": "set_risk", "risk_id": "R4-001",
+          "field": "coverage_assessment.unprotected_amount", "value": 3000000 }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "require_report": true } },
+
+    { "id": "bm-nocand-001", "category": "no_candidates",
+      "desc": "85岁：Catalog 无任何符合投保年龄的产品",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "85" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "recommendation_status": "NO_CANDIDATES",
+                  "primary_is_none": true, "require_report": true } },
+
+    { "id": "bm-nocand-002", "category": "no_candidates",
+      "desc": "100岁：极端超龄",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "100" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "recommendation_status": "NO_CANDIDATES",
+                  "primary_is_none": true, "require_report": true } },
+
+    { "id": "bm-nocand-003", "category": "no_candidates",
+      "desc": "81岁：越过最高投保年龄（80）一格",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "81" }
+      ], "kb": null,
+      "expect": { "case_status": "COMPLETED", "recommendation_status": "NO_CANDIDATES",
+                  "primary_is_none": true, "require_report": true } },
+
+    { "id": "bm-noev-001", "category": "insufficient_evidence",
+      "desc": "知识库为空 -> 证据不足必须阻断转人工",
+      "mutations": [], "kb": "empty",
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-noev-002", "category": "insufficient_evidence",
+      "desc": "空知识库 + 45岁客户",
+      "mutations": [
+        { "op": "set_value", "profile": "family_profile", "field": "age", "value": "45" }
+      ], "kb": "empty",
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-noev-003", "category": "insufficient_evidence",
+      "desc": "空知识库 + 高风险客户（不得因'风险明显'就绕过证据）",
+      "mutations": [
+        { "op": "set_risk", "risk_id": "R1-001", "field": "severity", "value": "CRITICAL" },
+        { "op": "set_risk", "risk_id": "R1-001", "field": "likelihood", "value": "HIGH" }
+      ], "kb": "empty",
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": ["product-recommendation", "insurance-report"] } },
+
+    { "id": "bm-adv-invalid-product", "category": "adversarial",
+      "desc": "注入 Catalog 之外的产品 ID -> catalog_exists 必须 FAIL 并阻断",
+      "mutations": [], "kb": null,
+      "fault": { "kind": "invalid_product", "artifact_type": "product-candidates",
+                 "path": "candidates[0].product_id", "value": "P999" },
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": ["insurance-report"] } },
+
+    { "id": "bm-adv-wrong-provenance", "category": "adversarial",
+      "desc": "注入空 chunk_id -> 证据溯源链断裂必须 FAIL 并阻断",
+      "mutations": [], "kb": null,
+      "fault": { "kind": "wrong_provenance", "artifact_type": "knowledge-evidence",
+                 "path": "payload.evidence[0].chunk_id", "value": "" },
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": ["insurance-report"] } },
+
+    { "id": "bm-adv-broken-artifact", "category": "adversarial",
+      "desc": "注入破损 artifact（报告 payload 缺失）-> 必填校验必须 FAIL 并阻断",
+      "mutations": [], "kb": null,
+      "fault": { "kind": "broken_artifact", "artifact_type": "insurance-report",
+                 "path": "payload", "op": "delete" },
+      "expect": { "case_status": "NEEDS_REVIEW", "blocked": true,
+                  "forbidden_artifacts": [] } },
+
+    { "id": "bm-repair-001", "category": "repairable",
+      "desc": "一次性注入悬空 gap 引用（solution-plan 引用不存在的 GAP-999）-> Repair 应重跑该 stage 并自愈成功，最终 COMPLETED",
+      "mutations": [], "kb": null,
+      "fault": { "kind": "orphan_ref", "artifact_type": "solution-plan",
+                 "path": "payload.solutions[0].related_gap_ids", "value": ["GAP-999"],
+                 "once": true },
+      "expect": { "case_status": "COMPLETED", "require_report": true,
+                  "min_repairs_succeeded": 1 } }
+  ]
+}

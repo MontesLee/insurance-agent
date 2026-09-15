@@ -1,0 +1,97 @@
+{
+  "version": "1.0",
+  "description": "Step 3 Eval Engine rules. Every check is deterministic and machine-checkable: no LLM judgment, no MANUAL status. A check that cannot be evaluated MUST report FAIL (never silently pass).",
+
+  "catalog_path": "catalog/product-catalog.v0.1.json",
+
+  "skip_artifact_when": {
+    "product-recommendation": [
+      { "path": "payload.status", "in": ["NO_CANDIDATES", "INCOMPLETE_EVIDENCE", "INSUFFICIENT_EVIDENCE", "INSUFFICIENT_INPUT"] }
+    ]
+  },
+
+  "required_fields": {
+    "client-profile": ["payload"],
+    "requirement-analysis": ["payload"],
+    "risk-assessment": ["payload"],
+    "coverage-gap-analysis": ["payload.gaps"],
+    "solution-plan": ["payload.solutions"],
+    "knowledge-evidence": ["payload.evidence"],
+    "product-candidates": ["candidates"],
+    "product-recommendation": ["payload.status"],
+    "insurance-report": ["payload"]
+  },
+
+  "required_non_empty": {
+    "_comment": "Presence is not enough: an Evidence Provider that returned nothing must FAIL, not pass on an empty list.",
+    "knowledge-evidence": ["payload.evidence"]
+  },
+
+  "contamination": {
+    "applies_to": ["requirement-analysis", "risk-assessment", "coverage-gap-analysis", "solution-plan"],
+    "description": "Upstream analysis layers must not leak concrete products. Terms are the demo catalog's own product ids / company names / product names (loaded at runtime) plus the static patterns below.",
+    "use_catalog_terms": true,
+    "forbidden_patterns": ["推荐购买", "建议购买", "这款产品", "该产品由", "投保链接"]
+  },
+
+  "provenance": [
+    {
+      "id": "evidence_document_chunk",
+      "artifact_type": "knowledge-evidence",
+      "path": "payload.evidence[]",
+      "require_all": ["evidence_id", "document_id", "chunk_id"]
+    },
+    {
+      "id": "recommendation_evidence",
+      "artifact_type": "product-recommendation",
+      "requires_path": "payload.evidence_refs",
+      "min_items": 1,
+      "resolve_in": { "artifact_type": "knowledge-evidence", "path": "payload.evidence[].evidence_id" }
+    }
+  ],
+
+  "cross_artifact": [
+    {
+      "id": "solution_gap_refs",
+      "artifact_type": "solution-plan",
+      "source_path": "payload.solutions[].related_gap_ids[]",
+      "target_artifact": "coverage-gap-analysis",
+      "target_path": "payload.gaps[].gap_id"
+    },
+    {
+      "id": "gap_risk_refs",
+      "artifact_type": "coverage-gap-analysis",
+      "source_path": "payload.gaps[].related_risk_ids[]",
+      "target_artifact": "risk-assessment",
+      "target_path": "payload.risks[].risk_id"
+    },
+    {
+      "id": "gap_requirement_refs",
+      "artifact_type": "coverage-gap-analysis",
+      "source_path": "payload.gaps[].related_requirement_ids[]",
+      "target_artifact": "requirement-analysis",
+      "target_path": "payload.requirements[].requirement_id"
+    }
+  ],
+
+  "invariant": [
+    {
+      "id": "catalog_exists",
+      "artifact_type": "product-candidates",
+      "path": "candidates[].product_id",
+      "must_be_in": "catalog.product_ids"
+    },
+    {
+      "id": "candidate_known",
+      "artifact_type": "product-recommendation",
+      "path": "payload.primary_recommendation.candidate_id",
+      "must_be_in": "artifact:product-candidates:admissible_candidate_ids"
+    }
+  ],
+
+  "repairable": {
+    "_comment": "Repair NEVER rewrites a produced artifact — it changes the STAGE INPUT and re-runs, or (for stale refs) discards the stale output and re-derives it from the current upstream.",
+    "cross_artifact_orphan_refs": "RERUN_FROM_UPSTREAM",
+    "catalog_exists": "DROP_INVALID_PRODUCTS"
+  }
+}

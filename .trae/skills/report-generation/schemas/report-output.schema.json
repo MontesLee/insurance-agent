@@ -27,6 +27,28 @@
         "version": { "type": "string" },
         "generated_at": { "type": "string" },
 
+        "disclosure": {
+          "type": "object",
+          "description": "Safety/guardrail disclosure (Step 4 §30). Marks DEMO products and states the fact/analysis/advice nature of each section so a recommendation can never be read as a real, purchasable product.",
+          "required": ["is_demo", "demo_products", "demo_disclosure", "nature_legend"],
+          "properties": {
+            "is_demo": { "type": "boolean" },
+            "demo_products": { "type": "array", "items": { "type": "string" } },
+            "unverified_products": {
+              "type": "array", "items": { "type": "string" },
+              "description": "Product ids named by the recommendation that are NOT in the shipped catalog (fabrication signal)."
+            },
+            "catalog_checked": {
+              "type": "boolean",
+              "description": "True when the catalog was readable and the demo/fabrication flags were verified against it."
+            },
+            "demo_disclosure": { "type": "string" },
+            "demo_product_note": { "type": "string" },
+            "nature_legend": { "type": "string" },
+            "section_nature": { "type": "object" }
+          }
+        },
+
         "client_profile": {
           "type": "object",
           "required": ["fields", "note"],

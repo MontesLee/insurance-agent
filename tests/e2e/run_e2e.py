@@ -39,7 +39,8 @@ RUN_ROOT = os.path.join(REPO_ROOT, "tmp", "e2e")
 
 GATE_STAGE = "product-recommendation"      # declares gate: human_review
 FINAL_STAGE = "report-generation"
-EXPECTED_STAGES = 7
+# Step 3: product-candidate-provider (Step 2 skill) is now registered in the workflow.
+EXPECTED_STAGES = 8
 
 
 def main():
@@ -58,8 +59,8 @@ def main():
     check("workflow has %d linear stages" % EXPECTED_STAGES, len(ids) == EXPECTED_STAGES, repr(ids))
     check("stage order is the canonical data chain",
           ids == ["client-intake", "requirement-analysis", "risk-analysis",
-                  "coverage-gap-analysis", "solution", "product-recommendation",
-                  "report-generation"], repr(ids))
+                  "coverage-gap-analysis", "solution", "product-candidate-provider",
+                  "product-recommendation", "report-generation"], repr(ids))
     check("knowledge-search is NOT a linear stage (shared provider)",
           "knowledge-search" not in ids)
     check("knowledge-search is declared as a service",
@@ -122,6 +123,11 @@ def main():
         if art_type not in state["artifacts"]:
             all_valid = False
             checked.append("%s: MISSING" % art_type)
+            continue
+        if not st.get("contract"):
+            # Step 2 added product-candidate-provider: a Skill-level artifact with no canonical
+            # contract yet (deliberate debt). It is still Eval-checked via eval.rules.json.
+            checked.append("%s ok (no canonical contract; eval-checked)" % art_type)
             continue
         vok, verrs = orch.validate_artifact(state["artifacts"][art_type], st["contract"])
         if not vok:

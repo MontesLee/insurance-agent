@@ -1,0 +1,79 @@
+--- case-001-complete --- report=COMPLETED stopped_at=None
+--- case-002-insufficient-information --- report=WAITING_FOR_USER stopped_at=client-intake
+--- case-003-conflicting-information --- report=WAITING_FOR_USER stopped_at=client-intake
+--- case-004-evidence-failure --- report=NEEDS_REVIEW stopped_at=product-candidate-provider
+--- case-005-product-failure --- report=COMPLETED stopped_at=None
+[PASS] [case-001-complete] checkpoint loads and validates
+[PASS] [case-001-complete] resumed CaseState keeps PASSed tasks
+[PASS] [case-001-complete] case status == COMPLETED
+[PASS] [case-001-complete] CaseState is schema-valid
+[PASS] [case-001-complete] stage.status mirrors task.status
+[PASS] [case-001-complete] every task PASS
+[PASS] [case-001-complete] artifact client-profile produced
+[PASS] [case-001-complete] artifact requirement-analysis produced
+[PASS] [case-001-complete] artifact risk-assessment produced
+[PASS] [case-001-complete] artifact coverage-gap-analysis produced
+[PASS] [case-001-complete] artifact solution-plan produced
+[PASS] [case-001-complete] artifact knowledge-evidence produced
+[PASS] [case-001-complete] artifact product-candidates produced
+[PASS] [case-001-complete] artifact product-recommendation produced
+[PASS] [case-001-complete] artifact insurance-report produced
+[PASS] [case-001-complete] report lineage reaches the client facts
+[PASS] [case-001-complete] recommendation evidence refs resolve to Evidence
+[PASS] [case-001-complete] every Evidence resolves to Document + Chunk
+[PASS] [case-001-complete] every produced artifact was evaluated
+[PASS] [case-001-complete] no evaluation uses MANUAL as a pass
+[PASS] [case-001-complete] resume did not re-execute PASSed tasks
+[PASS] [case-001-complete] checkpoints were recorded
+[PASS] [case-002-insufficient-information] case status == WAITING_FOR_USER
+[PASS] [case-002-insufficient-information] CaseState is schema-valid
+[PASS] [case-002-insufficient-information] stage.status mirrors task.status
+[PASS] [case-002-insufficient-information] artifact product-recommendation NOT produced
+[PASS] [case-002-insufficient-information] artifact insurance-report NOT produced
+[PASS] [case-002-insufficient-information] every produced artifact was evaluated
+[PASS] [case-002-insufficient-information] no evaluation uses MANUAL as a pass
+[PASS] [case-002-insufficient-information] waiting reason == INSUFFICIENT_INFORMATION
+[PASS] [case-002-insufficient-information] next_questions are produced
+[PASS] [case-002-insufficient-information] coverage-gap-analysis did NOT run
+[PASS] [case-002-insufficient-information] solution did NOT run
+[PASS] [case-002-insufficient-information] product-candidate-provider did NOT run
+[PASS] [case-002-insufficient-information] product-recommendation did NOT run
+[PASS] [case-002-insufficient-information] report-generation did NOT run
+[PASS] [case-003-conflicting-information] case status == WAITING_FOR_USER
+[PASS] [case-003-conflicting-information] CaseState is schema-valid
+[PASS] [case-003-conflicting-information] stage.status mirrors task.status
+[PASS] [case-003-conflicting-information] artifact product-recommendation NOT produced
+[PASS] [case-003-conflicting-information] artifact insurance-report NOT produced
+[PASS] [case-003-conflicting-information] every produced artifact was evaluated
+[PASS] [case-003-conflicting-information] no evaluation uses MANUAL as a pass
+[PASS] [case-003-conflicting-information] waiting reason == CONFLICTING_INFORMATION
+[PASS] [case-003-conflicting-information] both conflicting values preserved (no auto-pick)
+[PASS] [case-003-conflicting-information] coverage-gap-analysis did NOT run
+[PASS] [case-003-conflicting-information] solution did NOT run
+[PASS] [case-003-conflicting-information] product-candidate-provider did NOT run
+[PASS] [case-003-conflicting-information] product-recommendation did NOT run
+[PASS] [case-003-conflicting-information] report-generation did NOT run
+[PASS] [case-004-evidence-failure] case status == NEEDS_REVIEW
+[PASS] [case-004-evidence-failure] CaseState is schema-valid
+[PASS] [case-004-evidence-failure] stage.status mirrors task.status
+[PASS] [case-004-evidence-failure] stopped at product-candidate-provider
+[PASS] [case-004-evidence-failure] artifact product-recommendation NOT produced
+[PASS] [case-004-evidence-failure] artifact insurance-report NOT produced
+[PASS] [case-004-evidence-failure] every produced artifact was evaluated
+[PASS] [case-004-evidence-failure] no evaluation uses MANUAL as a pass
+[PASS] [case-004-evidence-failure] evidence eval FAILED (not silently accepted)
+[PASS] [case-004-evidence-failure] repair budget spent == 2
+[PASS] [case-004-evidence-failure] stage executed at most 3 times (1 initial + 2 repairs)
+[PASS] [case-004-evidence-failure] review record preserved for human-in-the-loop
+[PASS] [case-005-product-failure] case status == COMPLETED
+[PASS] [case-005-product-failure] CaseState is schema-valid
+[PASS] [case-005-product-failure] stage.status mirrors task.status
+[PASS] [case-005-product-failure] artifact insurance-report produced
+[PASS] [case-005-product-failure] every produced artifact was evaluated
+[PASS] [case-005-product-failure] no evaluation uses MANUAL as a pass
+[PASS] [case-005-product-failure] recommendation status == NO_CANDIDATES
+[PASS] [case-005-product-failure] admissible candidates == 0
+[PASS] [case-005-product-failure] no primary recommendation forced
+
+FULL-AGENT E2E: 71/71 checks passed
+E2E RESULT: ALL GREEN

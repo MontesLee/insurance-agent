@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "description": "Step 3 Full Agent E2E. Upstream (client-intake / requirement / risk) is seeded from the proven Phase 7 fixture; every downstream step — Gap, Solution, Evidence, Candidate, Recommendation, Report — is really executed, evaluated and checkpointed.",
+  "seeds_file": "tests/e2e/fixtures/case-full-chain.json",
+  "provided_by": "upstream-dialogue",
+  "empty_kb": "test-cases/e2e/full-agent/kb-empty",
+  "cases": [
+    {
+      "id": "case-001-complete",
+      "file": "case-001-complete.json",
+      "description": "完整客户。全链路真实执行并通过 Eval；验证 CaseState / Task / Artifact / Eval / Checkpoint 与血缘 + 证据双向追溯。",
+      "expect": {
+        "case_status": "COMPLETED",
+        "all_tasks_pass": true,
+        "artifacts": ["client-profile", "requirement-analysis", "risk-assessment",
+                      "coverage-gap-analysis", "solution-plan", "knowledge-evidence",
+                      "product-candidates", "product-recommendation", "insurance-report"],
+        "lineage_of_report_contains": ["insurance-report", "product-recommendation", "product-candidates",
+                                       "solution-plan", "coverage-gap-analysis", "risk-assessment",
+                                       "requirement-analysis", "client-profile"],
+        "evidence_trace_ok": true,
+        "checkpoint_resume_reruns_nothing": true
+      }
+    },
+    {
+      "id": "case-002-insufficient-information",
+      "file": "case-002-insufficient-information.json",
+      "description": "客户未提供已有保险。Agent 必须停在 WAITING_FOR_USER 并给出追问，不得继续到产品推荐。",
+      "expect": {
+        "case_status": "WAITING_FOR_USER",
+        "waiting_reason": "INSUFFICIENT_INFORMATION",
+        "downstream_pending": ["coverage-gap-analysis", "solution", "product-candidate-provider",
+                               "product-recommendation", "report-generation"],
+        "next_questions_nonempty": true,
+        "absent_artifacts": ["product-recommendation", "insurance-report"]
+      }
+    },
+    {
+      "id": "case-003-conflicting-information",
+      "file": "case-003-conflicting-information.json",
+      "description": "年收入存在 50 万 / 80 万冲突。必须保留冲突并等待用户确认，不得自行择一。",
+      "expect": {
+        "case_status": "WAITING_FOR_USER",
+        "waiting_reason": "CONFLICTING_INFORMATION",
+        "conflict_candidates_preserved": ["50万", "80万"],
+        "downstream_pending": ["coverage-gap-analysis", "solution", "product-candidate-provider",
+                               "product-recommendation", "report-generation"],
+        "absent_artifacts": ["product-recommendation", "insurance-report"]
+      }
+    },
+    {
+      "id": "case-004-evidence-failure",
+      "file": "case-004-evidence-failure.json",
+      "description": "Knowledge Search 检索不到证据（空语料）。必须 FAIL → 局部 Repair → 仍失败 → NEEDS_REVIEW，禁止用模型记忆补知识。",
+      "expect": {
+        "case_status": "NEEDS_REVIEW",
+        "stopped_at": "product-candidate-provider",
+        "repair_attempts": 2,
+        "review_present": true,
+        "evidence_eval_failed": true,
+        "absent_artifacts": ["product-recommendation", "insurance-report"]
+      }
+    },
+    {
+      "id": "case-005-product-failure",
+      "file": "case-005-product-failure.json",
+      "description": "客户 85 岁，Catalog 无符合资格的产品。必须输出 NO_CANDIDATES，不得硬推荐最接近的产品。",
+      "expect": {
+        "case_status": "COMPLETED",
+        "recommendation_status": "NO_CANDIDATES",
+        "admissible_candidates": 0,
+        "primary_recommendation_none": true,
+        "artifacts": ["insurance-report"]
+      }
+    }
+  ]
+}

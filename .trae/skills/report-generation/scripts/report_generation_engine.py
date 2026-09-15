@@ -42,7 +42,8 @@ from datetime import datetime, timezone
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(HERE)))))
+# scripts -> report-generation -> skills -> .trae -> repo root (4 levels).
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(HERE))))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
@@ -499,20 +500,24 @@ def build_recommended_directions(rec, rules, prov):
         rc_map = {"covers_high_priority_risk": "覆盖高优先级风险", "within_budget": "在预算范围内",
                   "meets_term": "满足期限要求", "has_unmet_requirements": "仍有未满足需求，需补充方案"}
         rationale = "；".join(rc_map.get(c, c) for c in (primary.get("reason_codes") or [])) or "依据上游 Recommendation 结论"
+        pprod = primary.get("product") or {}
+        pnote = rules.get("demo_product_label", "【演示产品】") if pprod.get("is_demo") else ""
         out.append({
             "rank": "primary", "candidate_id": primary.get("candidate_id"),
             "fit": primary.get("fit"), "rationale": rationale,
             "covered_requirements": cov_req, "covered_risks": cov_risk,
-            "notes": "", "source": "recommendation.primary_recommendation",
+            "notes": pnote, "source": "recommendation.primary_recommendation",
         })
         prov.append({"claim": f"首选推荐方向：{primary.get('candidate_id')}", "source": "recommendation", "confidence": "high"})
     # alternatives
     for alt in rec.get("alternatives", []):
+        aprod = alt.get("product") or {}
+        anote = rules.get("demo_product_label", "【演示产品】") if aprod.get("is_demo") else ""
         out.append({
             "rank": "alternative", "candidate_id": alt.get("candidate_id"),
             "fit": alt.get("fit"), "rationale": alt.get("tradeoff") or "备选方案",
             "covered_requirements": [], "covered_risks": [],
-            "notes": "", "source": "recommendation.alternatives",
+            "notes": anote, "source": "recommendation.alternatives",
         })
     if not out:
         # present an explicit note if recommendation exists but produced no direction.
@@ -524,6 +529,65 @@ def build_recommended_directions(rec, rules, prov):
                     "covered_requirements": [], "covered_risks": [],
                     "notes": "", "source": "recommendation"})
     return out
+
+
+def _catalog_index():
+    """product_id -> is_demo, read from the shipped catalog.
+
+    Used for DEFENCE IN DEPTH: the report does not take the upstream's word for
+    whether a named product is a demo/mock entry, nor that it exists at all. A
+    fabricated product id (not in the catalog) is a safety failure whatever the
+    upstream claimed. Returns None when the catalog cannot be read, so a missing
+    catalog degrades to "cannot verify" rather than "verified fine".
+    """
+    path = os.path.join(REPO_ROOT, "catalog", "product-catalog.v0.1.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            cat = json.load(f)
+    except (OSError, ValueError):
+        return None
+    return {p.get("product_id"): bool(p.get("is_demo"))
+            for p in (cat.get("products") or []) if isinstance(p, dict)}
+
+
+def build_disclosure(rec, rules):
+    """Safety disclosure (Step 4 §30): is the report backed by DEMO products, and what
+    is the fact/analysis/advice nature of each section?
+
+    A recommended direction that resolves to a demo/mock catalog product MUST be marked,
+    otherwise a reader could mistake a simulated product for a real, purchasable one.
+    The demo flag is the UNION of what the upstream declared and what the catalog says,
+    and any product id absent from the catalog is reported as unverified (fabricated).
+    """
+    d = rules.get("disclosure") or {}
+    catalog = _catalog_index()
+    demo_products, unverified = [], []
+    if not rec.get("missing"):
+        for entry in [rec.get("primary")] + list(rec.get("alternatives") or []):
+            if not isinstance(entry, dict):
+                continue
+            prod = entry.get("product") or {}
+            pid = prod.get("product_id")
+            if not pid:
+                continue
+            in_catalog = catalog is None or pid in catalog
+            if not in_catalog:
+                if pid not in unverified:
+                    unverified.append(pid)
+                continue
+            is_demo = bool(prod.get("is_demo")) or (catalog is not None and bool(catalog.get(pid)))
+            if is_demo and pid not in demo_products:
+                demo_products.append(pid)
+    return {
+        "is_demo": bool(demo_products),
+        "demo_products": demo_products,
+        "unverified_products": unverified,
+        "catalog_checked": catalog is not None,
+        "demo_disclosure": d.get("demo_disclosure", ""),
+        "demo_product_note": d.get("demo_product_note", ""),
+        "nature_legend": d.get("nature_legend", ""),
+        "section_nature": dict(d.get("nature_map") or {}),
+    }
 
 
 def build_information_gaps(ra, rk, cs, rules, cga=None):
@@ -678,6 +742,15 @@ def render_markdown(report, metadata, validation, rules):
                  "Risk Analysis / Coverage Gap Analysis，解决策略来自 SolutionPlan，推荐方向来自 "
                  "Product Recommendation，证据来自 Knowledge Evidence。报告不包含任何自主保险判断或产品推销语句。")
     lines.append("")
+
+    # Safety disclosure (Step 4 §30): DEMO marking + fact/analysis/advice nature.
+    disc = report.get("disclosure") or {}
+    if disc.get("demo_disclosure"):
+        lines.append(f"> ⚠️ **{disc['demo_disclosure']}**")
+        lines.append("")
+    if disc.get("nature_legend"):
+        lines.append(f"> {disc['nature_legend']}")
+        lines.append("")
 
     # 01
     lines.append("## 01 客户画像")
@@ -956,6 +1029,7 @@ def generate_report(input_dict, rules=None):
         structured = {
             "title": rules["report_title"], "version": rules["report_version"],
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "disclosure": build_disclosure({"missing": True}, rules),
             "client_profile": {"fields": [], "note": rules["missing_section_note"]},
             "financial_profile": {"table": [], "note": rules["missing_section_note"]},
             "risk_exposure": empty_risk, "coverage_gaps": [], "coverage_gap_derivation": "derived",
@@ -992,12 +1066,14 @@ def generate_report(input_dict, rules=None):
     evidence_summary = build_evidence_summary(ks, rules)
     information_gaps = build_information_gaps(ra, rk, cs, rules, cga)
     next_actions = build_next_actions(information_gaps, rules)
+    disclosure = build_disclosure(rec, rules)
 
     conflicts = detect_conflicts(ra, rk, rec, rules, cga)
 
     structured = {
         "title": rules["report_title"], "version": rules["report_version"],
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "disclosure": disclosure,
         "client_profile": client_profile, "financial_profile": financial_profile,
         "risk_exposure": risk_exposure, "coverage_gaps": coverage_gaps,
         "coverage_gap_derivation": gap_derivation,
@@ -1023,6 +1099,12 @@ def generate_report(input_dict, rules=None):
         warnings.append(f"MISSING_UPSTREAM_RESULT: {norm['supplied_keys']['product_recommendation']}")
     if ks.get("conflict"):
         warnings.append(rules.get("evidence_conflict_note", ""))
+    if disclosure["is_demo"]:
+        # Guardrail: a DEMO-backed recommendation must be flagged, never silently presented
+        # as a real product. The list of products is carried so the flag is auditable.
+        warnings.append("DEMO_PRODUCT_DISCLOSURE: %s (%s)" %
+                        (rules.get("disclosure", {}).get("demo_disclosure", ""),
+                         ", ".join(disclosure["demo_products"])))
     source_skills = [s for s, k in [("client-intake", "client_state"), ("requirement-analysis", "requirement_analysis"),
                                     ("risk-analysis", "risk_analysis")] if not norm[k].get("missing")]
     if not cga.get("missing"):
@@ -1039,6 +1121,15 @@ def generate_report(input_dict, rules=None):
                                   "rendered_report": rendered, "metadata": {"conflicts": conflicts},
                                   "provenance": prov}, rules, norm)
     validation["warnings"] = warnings + validation["warnings"]
+    # Safety HARD errors: a report that names a product it cannot verify, or presents a
+    # demo product without its disclosure, must not be delivered as a clean report.
+    if disclosure["unverified_products"]:
+        validation["errors"].append(
+            "FABRICATED_PRODUCT: 以下产品不在 Demo Catalog 中，报告拒绝将其作为推荐呈现：%s"
+            % ", ".join(disclosure["unverified_products"]))
+    if disclosure["is_demo"] and not disclosure["demo_disclosure"]:
+        validation["errors"].append(
+            "DEMO_PRODUCT_UNMARKED: 推荐引用了演示产品，但缺少 DEMO 声明文案（guardrail 失效）")
     # a successful report with conflicts still passes structural validation (conflicts are surfaced, not fatal)
     validation["passed"] = (len(validation["errors"]) == 0)
 

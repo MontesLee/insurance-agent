@@ -1,0 +1,9 @@
+{
+  "id": "case-005-product-failure",
+  "description": "客户 85 岁，Demo Catalog 中所有产品均不符合投保年龄。",
+  "mutations": [
+    { "op": "set_value", "profile": "family_profile", "field": "age", "value": "85" }
+  ],
+  "kb": null,
+  "notes": "无合格候选时必须输出 NO_CANDIDATES，不得退而求其次推荐「最接近」的产品。"
+}

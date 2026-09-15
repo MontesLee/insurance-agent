@@ -74,19 +74,22 @@ stages:
       result: tuple3
     contract: contracts/solution-plan.schema.json
 
-  - id: product-recommendation
-    skill: product-recommendation
-    legacy_skill: recommendation
-    produces: product-recommendation
-    consumes: [requirement-analysis, risk-assessment, coverage-gap-analysis, solution-plan]
+  # ---- Step 2 candidate provider (real Product Catalog, deterministic filters) ------
+  - id: product-candidate-provider
+    skill: product-candidate-provider
+    produces: product-candidates
+    consumes: [client-profile, coverage-gap-analysis, solution-plan]
     optional_consumes: [knowledge-evidence]
     executor: python
-    gate: human_review          # the engine sets human_review_required on unverifiable constraints
-    entrypoint: .trae/skills/recommendation/scripts/invoke-product-recommendation.py
+    gate: auto
+    entrypoint: .trae/skills/product-candidate-provider/scripts/product_candidate_engine.py
     call:
       fn: run
-      result: tuple2            # (artifact, warnings)
-    contract: contracts/product-recommendation.schema.json
+      result: tuple3            # (artifact, ok, errors)
+    # No canonical contract yet: this artifact is Skill-level (Step 2 deliberate debt).
+    # Eval still runs (required_fields / invariant catalog_exists) via eval.rules.json.
+    eval_policy: standard
+    repair_policy: { max_attempts: 3 }
     # Evidence round-trip requested on behalf of this stage (Skill -> Request -> KS -> Skill).
     services:
       - id: knowledge-search
@@ -94,6 +97,22 @@ stages:
         source_kind: solution
         purpose: SOLUTION_VALIDATION
         store_as: knowledge-evidence
+
+  - id: product-recommendation
+    skill: product-recommendation
+    legacy_skill: recommendation
+    produces: product-recommendation
+    consumes: [requirement-analysis, risk-assessment, coverage-gap-analysis, solution-plan]
+    optional_consumes: [knowledge-evidence, product-candidates]
+    executor: python
+    gate: human_review          # the engine sets human_review_required on unverifiable constraints
+    entrypoint: .trae/skills/recommendation/scripts/invoke-product-recommendation.py
+    call:
+      fn: run
+      result: tuple2            # (artifact, warnings)
+    contract: contracts/product-recommendation.schema.json
+    eval_policy: standard
+    repair_policy: { max_attempts: 3 }
 
   - id: report-generation
     skill: report-generation

@@ -1,0 +1,66 @@
+{
+  "version": "0.2",
+  "description": "V0.2 attribute-level evidence grounding (spec §18/§19). Only a bounded set of material product attributes is grounded; anything outside this set is NOT_CHECKABLE and never counts as SUPPORTED. Every search term lives here, never in code.",
+  "statuses": {
+    "supported": "SUPPORTED",
+    "unsupported": "UNSUPPORTED",
+    "conflict": "CONFLICT",
+    "not_checkable": "NOT_CHECKABLE"
+  },
+  "min_evidence_chars": 20,
+  "term_expansion": {
+    "strip_whitespace": true,
+    "amount_variants": true,
+    "amount_units": ["元", "万元"],
+    "ten_thousand": 10000
+  },
+  "attributes": [
+    {
+      "id": "coverage_type",
+      "label": "保障类型",
+      "required": true,
+      "claim": { "from": "product", "path": "product_type" },
+      "evidence_terms": ["{value}"],
+      "synonyms": {
+        "medical": ["医疗", "住院医疗", "医疗险"],
+        "critical_illness": ["重疾", "重大疾病", "重疾险"],
+        "accident": ["意外", "意外险"],
+        "life": ["寿险", "定期寿险", "身故"],
+        "savings": ["储蓄", "养老", "年金", "增额终身寿"]
+      }
+    },
+    {
+      "id": "eligibility_age",
+      "label": "投保年龄",
+      "required": false,
+      "claim": { "from": "product", "path": "eligible_age" },
+      "evidence_terms": ["{range}", "{min}周岁至{max}周岁", "{min}-{max}周岁"],
+      "synonyms": {}
+    },
+    {
+      "id": "renewal_period",
+      "label": "续保条件",
+      "required": false,
+      "claim": { "from": "constraint", "name": "renewal" },
+      "evidence_terms": ["{value}"],
+      "synonyms": {}
+    },
+    {
+      "id": "deductible",
+      "label": "免赔额",
+      "required": false,
+      "claim": { "from": "constraint", "name": "deductible" },
+      "evidence_terms": ["{value}"],
+      "synonyms": {}
+    },
+    {
+      "id": "coverage_term",
+      "label": "保障期限",
+      "required": false,
+      "claim": { "from": "constraint", "name": "term" },
+      "evidence_terms": ["{value}"],
+      "synonyms": {}
+    }
+  ],
+  "required_note": "Only `coverage_type` is REQUIRED, because it is the one attribute the demo knowledge base actually speaks to for every product family. The other attributes are grounded and reported but must NOT block: the demo KB carries no per-product renewal/term/deductible wording, so blocking on them would reject every product and teach nothing. A required attribute that the evidence does not state IS a positive UNSUPPORTED and DOES block."
+}

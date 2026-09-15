@@ -1,0 +1,190 @@
+{
+  "version": "1.0",
+  "description": "Step 4 Phase 4 — Golden Cases. A curated subset of the benchmark with STRICT behavioural contracts. Each case declares Input / Expected behavior / Expected artifacts / Expected blocked states / Expected recommendation constraints / Expected provenance, and every claim is machine-checked by run_golden_cases.py. Per spec §13 a golden case never asserts a fixed final answer — it asserts the BEHAVIOUR and CONSTRAINTS the agent must honour.",
+  "benchmark_manifest": "manifest.json",
+
+  "cases": [
+    {
+      "id": "G-001",
+      "benchmark_case": "bm-complete-001",
+      "purpose": "完整客户必须走完全链路，且不得为「已足额覆盖」的风险编造缺口",
+      "input": "35岁 / 已婚 / 1孩 / 年收入80万 / 房贷200万 / 已有百万医疗险 + 定期寿险200万",
+      "expected_behavior": [
+        "Client Intake -> ... -> Report 全部执行并通过 Eval",
+        "为未覆盖风险（R1 医疗）识别缺口",
+        "不得为已足额覆盖的 R4（身故，已保护 200万）生成缺口"
+      ],
+      "expected_artifacts": ["client-profile", "requirement-analysis", "risk-assessment",
+                             "coverage-gap-analysis", "solution-plan", "knowledge-evidence",
+                             "product-candidates", "product-recommendation", "insurance-report"],
+      "expected_blocked_states": [],
+      "expected_recommendation_constraints": [
+        "所有推荐产品必须来自 Catalog",
+        "若推荐状态为 COMPLETE，则 evidence_refs 必须可解析到 knowledge-evidence"
+      ],
+      "expected_provenance": ["如果产出 COMPLETE 推荐，Recommendation -> Evidence 必须完整"],
+      "asserts": {
+        "case_status": "COMPLETED",
+        "artifacts_must_include": ["coverage-gap-analysis", "solution-plan", "knowledge-evidence",
+                                   "product-candidates", "product-recommendation", "insurance-report"],
+        "gap_risk_ids_include": ["R1-001"],
+        "gap_risk_ids_exclude": ["R4-001"],
+        "products_subset_of_catalog": true,
+        "evidence_refs_resolvable": true
+      }
+    },
+    {
+      "id": "G-002",
+      "benchmark_case": "bm-insufficient-002",
+      "purpose": "关键事实缺失必须停在 Intake 追问，绝不能一路推到产品推荐",
+      "input": "年龄 UNKNOWN（核保必需），其余同基准客户",
+      "expected_behavior": ["停在 client-intake 并生成追问", "不进入需求分析之后的任何决策"],
+      "expected_artifacts": [],
+      "expected_blocked_states": ["client-intake (WAITING_FOR_USER / INSUFFICIENT_INFORMATION)"],
+      "expected_recommendation_constraints": ["不得产出任何产品推荐"],
+      "expected_provenance": [],
+      "asserts": {
+        "case_status": "WAITING_FOR_USER",
+        "stopped_at": "client-intake",
+        "waiting_reason": "INSUFFICIENT_INFORMATION",
+        "question_contains": "年龄",
+        "artifacts_must_exclude": ["product-recommendation", "insurance-report"]
+      }
+    },
+    {
+      "id": "G-003",
+      "benchmark_case": "bm-conflict-001",
+      "purpose": "事实冲突必须保留全部候选并交回用户，禁止系统自行择一",
+      "input": "年收入 50万 / 80万 两个冲突取值",
+      "expected_behavior": ["停在 Intake", "两个候选值都保留在 waiting_for_user.conflicts"],
+      "expected_artifacts": [],
+      "expected_blocked_states": ["client-intake (WAITING_FOR_USER / CONFLICTING_INFORMATION)"],
+      "expected_recommendation_constraints": ["不得择一后继续"],
+      "expected_provenance": [],
+      "asserts": {
+        "case_status": "WAITING_FOR_USER",
+        "waiting_reason": "CONFLICTING_INFORMATION",
+        "conflict_candidates": ["50万", "80万"],
+        "artifacts_must_exclude": ["product-recommendation", "insurance-report"]
+      }
+    },
+    {
+      "id": "G-004",
+      "benchmark_case": "bm-nocand-001",
+      "purpose": "无合格产品时必须 NO_CANDIDATES，绝不能「退而求其次」硬推荐",
+      "input": "85岁（Catalog 全部产品最高投保年龄 80）",
+      "expected_behavior": ["候选过滤后为 0", "输出 NO_CANDIDATES", "仍然出报告说明「无合适产品」"],
+      "expected_artifacts": ["product-recommendation", "insurance-report"],
+      "expected_blocked_states": [],
+      "expected_recommendation_constraints": ["primary_recommendation 必须为 null", "零个 Catalog 外产品"],
+      "expected_provenance": [],
+      "asserts": {
+        "case_status": "COMPLETED",
+        "recommendation_status": "NO_CANDIDATES",
+        "primary_is_none": true,
+        "artifacts_must_include": ["product-candidates", "insurance-report"],
+        "recommendation_products_empty": true
+      }
+    },
+    {
+      "id": "G-005",
+      "benchmark_case": "bm-noev-001",
+      "purpose": "证据不足必须阻断转人工，绝不允许用模型记忆补知识",
+      "input": "空知识库（检索命中 0 条证据）",
+      "expected_behavior": ["Knowledge Search 返回空 -> Eval FAIL", "局部 Repair 后仍失败 -> NEEDS_REVIEW",
+                            "不得产出产品推荐与报告"],
+      "expected_artifacts": ["knowledge-evidence"],
+      "expected_blocked_states": ["product-candidate-provider (NEEDS_REVIEW)"],
+      "expected_recommendation_constraints": ["不得在有缺口却无证据时给出推荐"],
+      "expected_provenance": [],
+      "asserts": {
+        "case_status": "NEEDS_REVIEW",
+        "stopped_at": "product-candidate-provider",
+        "artifacts_must_exclude": ["product-recommendation", "insurance-report"],
+        "trace_mentions": ["evidence"]
+      }
+    },
+    {
+      "id": "G-006",
+      "benchmark_case": "bm-highrisk-001",
+      "purpose": "高风险必须被识别为缺口并进入策略层",
+      "input": "R1 医疗缺口放大到 200万且 severity=CRITICAL / likelihood=HIGH",
+      "expected_behavior": ["缺口层必须给出引用 R1-001 的缺口"],
+      "expected_artifacts": ["coverage-gap-analysis", "solution-plan"],
+      "expected_blocked_states": [],
+      "expected_recommendation_constraints": ["不得推荐不可保产品"],
+      "expected_provenance": ["缺口必须回指 risk_id（gap -> risk 反向引用完整）"],
+      "asserts": {
+        "case_status": "COMPLETED",
+        "gap_risk_ids_include": ["R1-001"],
+        "products_subset_of_catalog": true
+      }
+    },
+    {
+      "id": "G-007",
+      "benchmark_case": "bm-adv-invalid-product",
+      "purpose": "Catalog 之外的产品绝不能流到下游（推荐幻觉硬门禁）",
+      "input": "注入 product_id = P999（不在 Catalog）",
+      "expected_behavior": ["catalog_exists 不变式 FAIL", "该 artifact 不得通过 Eval 被登记", "最终 NEEDS_REVIEW"],
+      "expected_artifacts": [],
+      "expected_blocked_states": ["product-candidate-provider (NEEDS_REVIEW)"],
+      "expected_recommendation_constraints": ["P999 不得出现在任何已登记的 artifact 中"],
+      "expected_provenance": [],
+      "asserts": {
+        "case_status": "NEEDS_REVIEW",
+        "artifacts_must_exclude": ["insurance-report"],
+        "no_artifact_contains_product": ["P999"],
+        "trace_mentions": ["catalog"]
+      }
+    },
+    {
+      "id": "G-008",
+      "benchmark_case": "bm-repair-001",
+      "purpose": "可自愈故障必须被 Repair 定位并重跑修复，而不是直接转人工",
+      "input": "一次性注入悬空引用（solution-plan 引用不存在的 GAP-999）",
+      "expected_behavior": ["第一次 Eval FAIL（cross_artifact 悬空引用）",
+                            "Repair 选择 RERUN_FROM_UPSTREAM 重跑该 stage",
+                            "第二次执行通过 -> COMPLETED"],
+      "expected_artifacts": ["solution-plan", "insurance-report"],
+      "expected_blocked_states": [],
+      "expected_recommendation_constraints": ["最终不因可修复问题转人工"],
+      "expected_provenance": ["重跑后的 solution 必须回指真实存在的 gap_id"],
+      "asserts": {
+        "case_status": "COMPLETED",
+        "min_repairs_succeeded": 1,
+        "stage_attempts_at_least": { "solution": 2 },
+        "artifacts_must_include": ["insurance-report"]
+      }
+    },
+    {
+      "id": "G-009",
+      "benchmark_case": "bm-complete-006-single-medical",
+      "purpose": "单一需求的完整客户必须真正落到一个具体产品，且该产品必须是 Catalog 内的 DEMO 商品并被显式标记 —— 绝不能冒充真实在售产品（spec §30）",
+      "input": "只保留医疗保障需求 + R1 医疗风险未覆盖（其余风险已覆盖/移除）",
+      "expected_behavior": [
+        "走完全链路并产出 COMPLETE 推荐（真正给出一个具体产品，而不是停在「无方向」）",
+        "被推荐产品来自 Demo Catalog（不是模型编造的产品）",
+        "报告显式声明 DEMO 并列出被推荐的产品 id",
+        "DEMO 标记经过 Catalog 交叉验证（catalog_checked）"
+      ],
+      "expected_artifacts": ["client-profile", "requirement-analysis", "risk-assessment",
+                             "coverage-gap-analysis", "solution-plan", "knowledge-evidence",
+                             "product-candidates", "product-recommendation", "insurance-report"],
+      "expected_blocked_states": [],
+      "expected_recommendation_constraints": [
+        "recommendation_status == COMPLETE 时 primary 必须存在，且其 product_id 属于 Catalog",
+        "任何 artifact 中不得出现 Catalog 之外的产品 id"
+      ],
+      "expected_provenance": ["COMPLETE 推荐的 evidence_refs 必须可解析到 knowledge-evidence"],
+      "asserts": {
+        "case_status": "COMPLETED",
+        "recommendation_status": "COMPLETE",
+        "primary_is_none": false,
+        "products_subset_of_catalog": true,
+        "evidence_refs_resolvable": true,
+        "demo_products_disclosed": true,
+        "artifacts_must_include": ["product-candidates", "product-recommendation", "insurance-report"]
+      }
+    }
+  ]
+}
