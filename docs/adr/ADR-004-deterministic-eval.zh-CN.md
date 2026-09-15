@@ -1,27 +1,36 @@
 > 🌐 **Language:** 🇺🇸 [English](ADR-004-deterministic-eval.md) · 🇨🇳 中文
 
-# ADR-004 · Deterministic eval
+<a id="adr-004-deterministic-eval"></a>
+# ADR-004 · 确定性评估
 
-## Context
-Skill 产出的 artifact 是否「可信」，需要一个判据。
-最省事的做法是让产出方自己声明 `"status": "ok"`，或者让另一个 LLM 打分。
+<a id="context"></a>
+## 背景
 
-## Decision
-Eval 是**独立于 Skill 的确定性引擎**（`runtime/eval_engine.py`），执行 6 类机器可判的检查：
+一个 Skill 产出的产物是否“可信”，需要一把标尺。最偷懒的做法：让生产者自行声明 `"status": "ok"`，或让另一个 LLM 来打分。
+
+<a id="decision"></a>
+## 决策
+
+评估是一个**独立于 Skill 的确定性 Eval Engine（评估引擎）**（`runtime/eval_engine.py`），执行 6 类可由机器判定的检查族：
 `schema / required_fields / required_non_empty / contamination / provenance / cross_artifact / invariant`。
-规则外置在 `runtime/resources/config/eval.rules.json`，可用 `-RulesPath` 做负向注入。
-**无法评估的检查一律记 FAIL，绝不记 MANUAL/UNKNOWN 通过。**
+规则外置于 `runtime/resources/config/eval.rules.json`，并可通过 `-RulesPath` 进行负向注入。
+**任何无法被评估的检查都被记录为 FAIL——绝不以 MANUAL/UNKNOWN 通过。**
 
-## Alternatives
-- Skill 自评：等于让被检查方自己批卷，不可信。
-- LLM-as-judge：对高风险场景不稳定、不可复现、且会掩盖确定性问题。
-- 只做 schema 校验：抓不到「结论引用了不存在的 evidence」这类语义错误。
+<a id="alternatives"></a>
+## 备选方案
 
-## Why
-「保险 Agent 是高风险决策场景」，判据必须**可复现、可回归、可反证**。
-确定性 Eval 使「修改后是否真的变好了」变成可对比的问题（Before/After），而不是直觉。
+- Skill 自评：被检查方给自己的答卷打分；不可信。
+- LLM-as-judge：在高风险领域中不稳定且不可复现；掩盖确定性问题。
+- 仅做 schema 校验：会漏掉语义错误，例如“结论引用了不存在的证据”。
 
-## Trade-offs
-- 确定性检查覆盖不了「语气是否推销」「表述是否易懂」等主观维度（当前有意不做）。
-- 规则外置增加一层间接，且规则本身可能写错 —— 用负向探针（篡改规则副本）反向验证。
-- 严格性会导致「宁可 FAIL 也不及格」：某些本该人工判断的场景会被判 FAIL → 进 `NEEDS_REVIEW`，牺牲自动化率换正确性。
+<a id="why"></a>
+## 理由
+
+“保险代理是高风险的决策场景”——这把标尺必须**可复现、可回归、可证伪**。确定性评估把“这次改动是否真的改善了结果”变成一个可比较的问题（Before/After），而非凭直觉。
+
+<a id="trade-offs"></a>
+## 取舍
+
+- 确定性检查无法覆盖主观维度，例如“语气是否过于推销” / “措辞是否易懂”（目前刻意超出范围）。
+- 外置规则增加了一层间接性，且规则本身也可能出错——通过负向探针（被篡改的规则副本）反向验证。
+- 严格性带来“宁可 FAIL 也不要通过”：某些本应由人工判定的场景会被判为 FAIL → `NEEDS_REVIEW`，以自动化率为代价换取正确性。

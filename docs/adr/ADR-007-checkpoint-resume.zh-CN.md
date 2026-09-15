@@ -1,28 +1,36 @@
 > 🌐 **Language:** 🇺🇸 [English](ADR-007-checkpoint-resume.md) · 🇨🇳 中文
 
-# ADR-007 · Checkpoint / Resume
+<a id="adr-007-checkpoint-resume"></a>
+# ADR-007 · 检查点 / 恢复
 
-## Context
-Agent 跑一条长链（9 步 + 可能多次 repair）会中断：等待客户补资料、等待人工审核、进程被杀。
-若每次中断都从零重跑，既浪费又会重复施加副作用（如重复检索）。
+<a id="context"></a>
+## 背景
 
-## Decision
-- **Checkpoint**：每阶段 OK/GATE/NEEDS_REVIEW 后由 `run()` 落盘（`case_state.json` + `checkpoints[]` 条目）。
-- **Validate 后信任**：`load()` 做 5 项校验（文件存在/可解析、`case_id` 匹配、schema 合法、registry fingerprint 一致、task→stage 引用完整）；
-  **任一失败即 `CHECKPOINT_INVALID` + 原因列表，绝不从损坏状态静默续跑**。
-- **Resume** 只重跑未 PASS 的 task，并**报告**被重跑的 PASSed task（正常应为空）。
-- **闸门是真实停点**：gate `stop` → `PAUSED_NEEDS_REVIEW`，`next_runnable` 仍指向被闸 stage，**重试不可绕过**，必须显式 `approve()`。
+一个运行长链路的智能体（9 个步骤 + 可能多次修复）会被打断：等待客户补充数据、等待人工复核、进程被杀死。每次中断都从头重跑，既浪费工作成果，又会重复副作用（例如重复的检索）。
 
-## Alternatives
-- 不落盘，全靠内存：进程一死全丢。
-- 落盘但不校验：损坏状态静默续跑会产出错误结论且难以发现。
-- 闸门做成「建议」：人工审核形同虚设。
+<a id="decision"></a>
+## 决策
 
-## Why
-可恢复性同时要求「能续」和「续得对」。校验是「续得对」的前提；
-前置条件要求**生产者 stage 已 `COMPLETED`**（而非 artifact 存在），否则停在 `NEEDS_REVIEW` 的 stage 挡不住下游。
+- **检查点（Checkpoint）**：在每个阶段以 OK/GATE/NEEDS_REVIEW 结束时，`run()` 进行持久化（`case_state.json` + 一条 `checkpoints[]` 记录）。
+- **先验证再信任（Trust after validate）**：`load()` 执行 5 项检查（文件存在/可解析、`case_id` 匹配、schema 有效、注册表 fingerprint 一致、task→stage 引用完整）；**任何失败即为 `CHECKPOINT_INVALID` + 一份原因列表——绝不静默地从损坏状态恢复**。
+- **恢复（Resume）**只重跑非 PASS 的任务，并**报告**任何被重跑的 PASS 任务（通常为空）。
+- **门禁是真正的停止点**：门禁 `stop` → `PAUSED_NEEDS_REVIEW`；`next_runnable` 仍指向被门禁挡住的阶段，**重试无法绕过它**——必须显式调用 `approve()`。
 
-## Trade-offs
-- 每次 checkpoint 全量落盘，Case 大时 IO 偏高（当前规模可接受）。
-- 严格校验会在环境迁移（如绝对路径变化）时误报 `CHECKPOINT_INVALID`，需人工介入。
-- 冻结 + 校验意味着「手动修一下 state 再跑」不被允许，调试需要走正规 repair 路径。
+<a id="alternatives"></a>
+## 备选方案
+
+- 不做持久化，仅用内存：进程一死，一切尽失。
+- 持久化但不验证：从损坏状态静默恢复会产生难以察觉的错误结论。
+- 把门禁当作“建议”：人工复核变得毫无意义。
+
+<a id="why"></a>
+## 理由
+
+可恢复性要求“能恢复”与“恢复正确”两者兼备。验证是后者的前提；前提要求**生产者阶段处于 `COMPLETED`**（而非仅仅是产物存在）——否则一个停在 `NEEDS_REVIEW` 的阶段无法拦住下游。
+
+<a id="trade-offs"></a>
+## 取舍
+
+- 每个检查点都持久化完整状态；对大型案例而言 IO 较重（当前规模下可接受）。
+- 严格验证会在环境迁移时假阳性（false-positive）报出 `CHECKPOINT_INVALID`（例如绝对路径变化）；需要人工介入。
+- 冻结 + 验证意味着“手动改状态再重跑”不被允许；调试必须走正规的修复路径。
