@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 680" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="680" fill="#ffffff"/>
+
+  <!-- Reliability layer -->
+  <rect x="18" y="18" width="784" height="644" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="34" y="42" font-size="15" font-weight="700" fill="#0f172a">Reliability Layer</text>
+  <text x="34" y="62" font-size="12" fill="#475569">Eval → Repair → Rerun → Review &#160;·&#160; Provenance / Trace / Checkpoint</text>
+
+  <!-- Client Input -->
+  <rect x="325" y="80" width="170" height="42" rx="8" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+  <text x="410" y="106" font-size="14" font-weight="600" text-anchor="middle" fill="#0c4a6e">Client Input</text>
+
+  <!-- CaseState -->
+  <rect x="285" y="148" width="250" height="56" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+  <text x="410" y="172" font-size="14" font-weight="600" text-anchor="middle" fill="#14532d">Structured Client State</text>
+  <text x="410" y="192" font-size="11" text-anchor="middle" fill="#166534">(CaseState — provided upstream in current portfolio)</text>
+
+  <!-- Orchestrator -->
+  <rect x="295" y="232" width="230" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.5"/>
+  <text x="410" y="259" font-size="14" font-weight="600" text-anchor="middle" fill="#713f12">Orchestrator (state-driven)</text>
+
+  <!-- Three branches -->
+  <rect x="40" y="312" width="160" height="44" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="120" y="339" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">Requirement</text>
+
+  <rect x="330" y="312" width="160" height="44" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="410" y="339" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">Risk</text>
+
+  <rect x="620" y="312" width="160" height="44" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="700" y="339" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">Gap</text>
+
+  <!-- Solution -->
+  <rect x="330" y="386" width="160" height="44" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="410" y="413" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">Solution</text>
+
+  <!-- Product Candidate Provider -->
+  <rect x="275" y="460" width="270" height="44" rx="8" fill="#fae8ff" stroke="#a21caf" stroke-width="1.5"/>
+  <text x="410" y="487" font-size="13" font-weight="600" text-anchor="middle" fill="#701a75">Product Candidate Provider</text>
+
+  <!-- RAG + Catalog side -->
+  <rect x="40" y="544" width="160" height="44" rx="8" fill="#ffedd5" stroke="#c2410c" stroke-width="1.5"/>
+  <text x="120" y="571" font-size="13" font-weight="600" text-anchor="middle" fill="#7c2d12">RAG</text>
+
+  <rect x="620" y="544" width="160" height="44" rx="8" fill="#ffedd5" stroke="#c2410c" stroke-width="1.5"/>
+  <text x="700" y="571" font-size="13" font-weight="600" text-anchor="middle" fill="#7c2d12">Catalog</text>
+
+  <!-- Recommendation -->
+  <rect x="300" y="544" width="220" height="44" rx="8" fill="#fae8ff" stroke="#a21caf" stroke-width="1.5"/>
+  <text x="410" y="571" font-size="13" font-weight="600" text-anchor="middle" fill="#701a75">Recommendation</text>
+
+  <!-- Report -->
+  <rect x="330" y="618" width="160" height="40" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+  <text x="410" y="643" font-size="13" font-weight="600" text-anchor="middle" fill="#134e4a">Report</text>
+
+  <!-- Arrows -->
+  <g stroke="#334155" stroke-width="1.6" fill="none" marker-end="url(#arrow)">
+    <line x1="410" y1="122" x2="410" y2="146"/>
+    <line x1="410" y1="204" x2="410" y2="230"/>
+    <line x1="410" y1="276" x2="120" y2="310"/>
+    <line x1="410" y1="276" x2="410" y2="310"/>
+    <line x1="410" y1="276" x2="700" y2="310"/>
+    <line x1="120" y1="356" x2="395" y2="384"/>
+    <line x1="410" y1="356" x2="410" y2="384"/>
+    <line x1="700" y1="356" x2="425" y2="384"/>
+    <line x1="410" y1="430" x2="410" y2="458"/>
+    <line x1="410" y1="504" x2="410" y2="542"/>
+    <line x1="200" y1="566" x2="298" y2="566"/>
+    <line x1="620" y1="566" x2="522" y2="566"/>
+    <line x1="410" y1="588" x2="410" y2="616"/>
+  </g>
+
+  <text x="410" y="700" font-size="11" text-anchor="middle" fill="#64748b">Data chain: FACT → REQUIREMENT → RISK → GAP → SOLUTION → PRODUCT → REPORT (single direction, no backflow)</text>
+</svg>

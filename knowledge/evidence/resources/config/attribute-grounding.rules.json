@@ -62,5 +62,12 @@
       "synonyms": {}
     }
   ],
-  "required_note": "Only `coverage_type` is REQUIRED, because it is the one attribute the demo knowledge base actually speaks to for every product family. The other attributes are grounded and reported but must NOT block: the demo KB carries no per-product renewal/term/deductible wording, so blocking on them would reject every product and teach nothing. A required attribute that the evidence does not state IS a positive UNSUPPORTED and DOES block."
+  "required_note": "Only `coverage_type` is REQUIRED, because it is the one attribute the demo knowledge base actually speaks to for every product family. The other attributes are grounded and reported but must NOT block: the demo KB carries no per-product renewal/term/deductible wording, so blocking on them would reject every product and teach nothing. A required attribute that the evidence does not state IS a positive UNSUPPORTED and DOES block.",
+  "policy_doc": {
+    "version": "0.2",
+    "blocking_attributes": ["coverage_type"],
+    "non_blocking_reported_attributes": ["eligibility_age", "renewal_period", "deductible", "coverage_term"],
+    "design_rationale": "V0.2 uses a 'core-attribute hard-block + auxiliary-attribute non-blocking' strategy. Only `coverage_type` is REQUIRED (blocking) because it is the single attribute the demo knowledge base actually speaks to for every product family. The auxiliary attributes (eligibility_age, renewal_period, deductible, coverage_term) ARE grounded and reported for transparency, but they MUST NOT block a product: the demo KB carries no per-product renewal/term/deductible wording, so blocking on them would reject every product and teach nothing.",
+    "important_caveat": "Non-blocking does NOT mean the evidence has PROVEN the attribute. A non-blocking attribute whose evidence is insufficient remains exposed as UNSUPPORTED / NOT_CHECKABLE (uncertainty) and is surfaced as a non-blocking mismatch — it must never be silently read as SUPPORTED. Only a positive UNSUPPORTED (evidence exists and contradicts the claim) downgrades a product; NOT_CHECKABLE never blocks on its own."
+  }
 }

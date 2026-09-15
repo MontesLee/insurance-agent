@@ -86,6 +86,13 @@
       "artifact_type": "product-recommendation",
       "path": "payload.primary_recommendation.candidate_id",
       "must_be_in": "artifact:product-candidates:admissible_candidate_ids"
+    },
+    {
+      "id": "catalog_has_primary_product",
+      "artifact_type": "product-recommendation",
+      "path": "payload.primary_recommendation.product.product_id",
+      "must_be_in": "catalog.product_ids",
+      "note": "Defence-in-depth: directly verify the embedded primary product_id against the catalog, independent of the candidate_id -> catalog chain. A recommendation must never vouch for a product that is not in the catalog even if candidate_id somehow resolved."
     }
   ],
 
