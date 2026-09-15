@@ -1,6 +1,6 @@
 # Demo A — Successful Path (`bm-complete-006-single-medical`)
 
-**Purpose:** Show the agent completing a real insurance-analysis run end-to-end and producing a
+**Purpose:** Show the agent completing a full end-to-end insurance-analysis run and producing a
 recommendation that is **evidence-grounded, catalog-checked, and explicitly marked as demo**.
 
 ```bash

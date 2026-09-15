@@ -6,6 +6,12 @@
 >
 > 本架构已吸收用户在 Phase 1 评审中的 **3 个边界修正** + **暂缓 domain/insurance** 决策。
 
+> ⚠️ **HISTORICAL / PRE-RESTRUCTURE.** This document describes the V2 evolution period, when
+> `workflow/` · `state/` · `evidence/` · `rag/` were the intended top-level layout. The repository was
+> later restructured into `runtime/` + `knowledge/` (commit `764abd5`); see README §4 and
+> `docs/architecture/portfolio-architecture.svg` for the current layout. The directory names here are
+> historical and do **not** represent current code locations.
+
 ---
 
 ## 1. 设计哲学：Contract-first Agent Architecture

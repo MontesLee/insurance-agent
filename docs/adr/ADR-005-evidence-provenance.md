@@ -6,7 +6,7 @@ Agent 很容易「凭模型记忆」说出保险知识（例如某产品保证�
 
 ## Decision
 知识必须以 **Evidence** 形式进入系统，且每条证据携带 `evidence_id / document_name / chunk / source`。
-- 共享 Evidence Provider（`evidence/` + `rag/`），查询由 `(domain, purpose)` 模板生成，回环只读；
+- 共享 Evidence Provider（当前位于 `knowledge/evidence/` + `knowledge/rag/`；本文写作时仍为 `evidence/` + `rag/`），查询由 `(domain, purpose)` 模板生成，回环只读；
 - **V0.2 属性级 grounding**：产品声明的关键属性（`coverage_type / eligibility_age / renewal_period / deductible / coverage_term`）逐条对照证据，给出 `SUPPORTED / UNSUPPORTED / CONFLICT / NOT_CHECKABLE`；
 - **NOT_CHECKABLE 是独立第三态**，绝不折成 SUPPORTED；
 - 产品候选必须来自 Catalog，推荐必须能溯源到证据。

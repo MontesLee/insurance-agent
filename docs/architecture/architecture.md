@@ -141,7 +141,6 @@ ClientProfile ─► RequirementAnalysis ─► RiskAssessment ─► CoverageGa
   case_state.json          # 唯一事实源快照（含 trace[] / evaluations[] / checkpoints[]）
   artifacts/<type>.json    # 每个 artifact 单文件，可 diff
   trace.jsonl              # 结构化 trace（跨 run 可聚合）
-  trace.md                 # 人读视图（Trace Viewer，Phase 11）
 ```
 
 > 运行产物落在 `tmp/`（回归运行目录）时**不计入基线**；仓库基线只含代码、契约、数据集与文档。

@@ -310,7 +310,8 @@ python demo.py --list     # list available cases
 | [Demo B](docs/demo/demo-b.md) | `bm-noev-001` | empty KB → 2 repairs → `NEEDS_REVIEW` |
 | [5-Minute Script](docs/demo/5-minute-demo-script.md) | — | interview walkthrough |
 
-Both demos stream a step-by-step trace and persist `trace.jsonl` (structured) + `trace.md` (human).
+Both demos persist a structured `trace.jsonl` (machine-readable execution trace); the human-readable
+walkthrough is the annotated narrative in each demo doc.
 
 **P001 is a fictional demo catalog product** (`is_demo = true`), used only for runtime validation. It
 is **not** a real insurance product, premium, or insurer offering.
