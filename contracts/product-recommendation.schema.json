@@ -86,13 +86,26 @@
             },
             "provenance": {
               "type": "array"
+            },
+            "reason": {
+              "type": "string",
+              "description": "自然语言主推原因：因为[需求/风险匹配与证据状态]，所以[主推该产品]。"
             }
           }
         },
         "alternatives": {
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "candidate_id": { "type": "string" },
+              "fit": { "type": "string" },
+              "tradeoff": { "type": "string" },
+              "reason": {
+                "type": "string",
+                "description": "自然语言备选原因：因为[与主推的差异]，所以[作为备选]。"
+              }
+            }
           }
         },
         "not_recommended": {

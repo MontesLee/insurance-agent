@@ -164,6 +164,7 @@ def analyze(
                 "related_risk_ids": list(gap.get("related_risk_ids") or []),
                 "confidence": gap.get("confidence"),
                 "evidence_refs": ev,
+                "reason": f"因为 {gap_id} 缺口等级 {gap_level}、当前覆盖 {cov_status}，所以采用 {sol_type.get(domain, 'GENERAL')} 策略：{_direction_for(gap, rules)}",
             }
         )
 

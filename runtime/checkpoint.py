@@ -47,9 +47,9 @@ def save(state: dict, root: str, stage_id: Optional[str] = None) -> dict:
                                                          len(entry["completed_tasks"]),
                                                          len(entry["artifacts"])))
     tr.emit(state, "CHECKPOINT_SAVED", task_id=None, skill=None,
-            output_artifact=None, detail="%s stage=%s tasks=%d artifacts=%d"
-            % (entry["checkpoint_id"], stage_id, len(entry["completed_tasks"]),
-               len(entry["artifacts"])))
+            output_artifact=None, detail="%s%s tasks=%d artifacts=%d"
+            % (entry["checkpoint_id"], " stage=%s" % stage_id if stage_id else "",
+               len(entry["completed_tasks"]), len(entry["artifacts"])))
     # rewrite so the checkpoint entry itself is durable
     store.save(state, root)
     return entry

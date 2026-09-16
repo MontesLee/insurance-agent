@@ -455,6 +455,11 @@ def build_candidates(input_dict, rules=None, catalog=None):
                 "liquidity_impact": product.get("liquidity_impact"),
                 "admissible": not codes,
                 "reject_reason_codes": codes,
+                "reason": (
+                    "因为与缺口 " + str(gap_ids) + " 匹配、核保状态 " + str(estatus)
+                    + (("、证据状态 " + str(ev["status"])) if ev else "")
+                    + ("，所以纳入候选池" if not codes else ("，但存在拒绝原因 " + "、".join(str(c) for c in codes) + "，所以排除出候选"))
+                ),
                 "provenance": [
                     {"source_type": "PRODUCT_CATALOG", "source_id": pid, "confidence": None},
                     {"source_type": "SOLUTION", "source_id": sid, "confidence": None},

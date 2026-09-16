@@ -175,6 +175,7 @@ def analyze(
                 "gap_level": gap_level,
                 "confidence": conf,
                 "evidence_refs": ev,
+                "reason": f"因为现有覆盖状态为『{status}』、风险 {risk_id} 优先级 {risk.get('priority', 'P3')}，所以判定为保障缺口等级 {gap_level}，建议方向：{direction}",
             }
         )
         gap_prio[gap_id] = risk.get("priority", "P3")

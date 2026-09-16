@@ -156,6 +156,10 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "reason": {
+                "type": "string",
+                "description": "因果说明：因为[现有覆盖状态/风险优先级]，所以[缺口等级与建议方向]。"
               }
             }
           }

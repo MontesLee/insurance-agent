@@ -123,6 +123,7 @@
 
     "reasoning": { "type": "string", "minLength": 1, "description": "Evidence → Reasoning 链。" },
     "conclusion": { "type": "string", "minLength": 1, "description": "不得超出 evidence 支撑范围。" },
+    "reason": { "type": "string", "minLength": 1, "description": "因果一句话：因为[敞口/现有保障]，所以[该风险结论]。" },
     "reasoning_evidence_refs": {
       "type": "array",
       "minItems": 1,

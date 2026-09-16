@@ -427,6 +427,14 @@ def evaluate_candidate(cand, ctx, ks, rules):
         "tradeoffs": tradeoffs,
         "uncertainties": candidate_uncs,
         "recommendation_status": rec_status,
+        "reason": (
+            f"因为需求匹配度 {req_overall}（得分 {round(req_score, 4)}）、"
+            f"风险覆盖 {risk_overall}（覆盖 {', '.join(covered) or '无'}），"
+            + (f"触发硬约束冲突：{'; '.join(v['detail'] for v in violations)}，"
+               if has_hard else "")
+            + f"证据状态 {ev_status}，"
+            f"所以判定推荐状态为 {rec_status}"
+        ),
         "provenance": prov,
         "_composite": None,
     }
@@ -528,16 +536,20 @@ def generate_recommendation(input_dict, rules=None):
         pviol = [v for v in e["constraint_fit"]["violations"]
                  if v.get("type") in PRODUCT_BLOCK_TYPES]
         if pviol:
-            reason = "product validation failed: " + ", ".join(
-                sorted({str(v["type"]) for v in pviol}))
+            reason = ("因为产品校验未通过（" + ", ".join(sorted({str(v["type"]) for v in pviol}))
+                      + "），所以不推荐")
         elif e["constraint_fit"]["violations"]:
-            reason = "hard constraint violation"
+            reason = ("因为触发硬约束（"
+                      + "; ".join(v.get("detail", v.get("type", "")) for v in e["constraint_fit"]["violations"])
+                      + "），所以不推荐")
         else:
-            reason = "poor requirement/risk fit"
+            reason = ("因为需求匹配度 " + e["requirement_fit"]["overall"] + "、风险覆盖 "
+                      + e["risk_fit"]["overall"] + "，匹配度不足，所以不推荐")
         not_rec_out.append({"candidate_id": e["candidate_id"], "reason": reason, "exception": False})
     for e in insuff:
         not_rec_out.append({"candidate_id": e["candidate_id"],
-                            "reason": "insufficient_evidence (no knowledge backing)", "exception": False})
+                            "reason": "因为该候选产品虽通过产品校验、但缺乏知识库证据支撑，所以暂不能推荐（INCOMPLETE_EVIDENCE）",
+                            "exception": False})
 
     # primary recommendation object
     primary_out = None
@@ -551,10 +563,19 @@ def generate_recommendation(input_dict, rules=None):
             reason_codes.append("meets_term")
         if primary["requirement_fit"]["unmet"]:
             reason_codes.append("has_unmet_requirements")
+        _prim_parts = ["需求匹配度 " + primary["requirement_fit"]["overall"]]
+        if primary["risk_fit"]["covered_risks"]:
+            _prim_parts.append("覆盖高优先级风险 " + ", ".join(primary["risk_fit"]["covered_risks"]))
+        if "budget" in primary["constraint_fit"]["hard_constraints"]:
+            _prim_parts.append("在预算内")
+        if primary["requirement_fit"]["unmet"]:
+            _prim_parts.append("未满足需求 " + ", ".join(primary["requirement_fit"]["unmet"]))
+        _prim_parts.append("证据状态 " + primary["evidence"]["status"])
         primary_out = {
             "candidate_id": primary["candidate_id"],
             "fit": primary["requirement_fit"]["overall"],
             "reason_codes": reason_codes,
+            "reason": "因为" + "、".join(_prim_parts) + "，所以作为主推荐",
             "provenance": primary["provenance"],
         }
         # Step 2: the recommendation must name a real catalog product, so the product
@@ -584,6 +605,10 @@ def generate_recommendation(input_dict, rules=None):
         entry = {
             "candidate_id": e["candidate_id"],
             "fit": e["requirement_fit"]["overall"],
+            "reason": (
+                f"因为 {e['candidate_id']} 同样通过产品校验、需求匹配度 {e['requirement_fit']['overall']}，"
+                f"但综合评分低于主推，所以作为备选"
+            ),
             "tradeoff": ("lower cost but weaker coverage" if e["requirement_fit"]["score"] < (primary["requirement_fit"]["score"] if primary else 1)
                          else "secondary option"),
         }

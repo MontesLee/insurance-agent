@@ -82,35 +82,40 @@
           "requirement_type": "medical",
           "summary": "大额医疗支出保障",
           "priority": "P1_HIGH",
-          "boundary": "requirement_only"
+          "boundary": "requirement_only",
+          "reason": "因为客户是家庭主要收入来源、仅有职工社保与一份百万医疗险，大额医疗支出无商业保障，所以产生『大额医疗支出保障』需求（优先级 P1）"
         },
         {
           "requirement_id": "REQ-CI",
           "requirement_type": "critical_illness",
           "summary": "重疾收入补偿",
           "priority": "P1_HIGH",
-          "boundary": "requirement_only"
+          "boundary": "requirement_only",
+          "reason": "因为客户是家庭主要收入来源、年收入 80 万，一旦罹患重疾将长期中断收入且无重疾专项补偿，所以产生『重疾收入补偿』需求（优先级 P1）"
         },
         {
           "requirement_id": "REQ-ACC",
           "requirement_type": "accident",
           "summary": "意外医疗",
           "priority": "P2_MEDIUM",
-          "boundary": "requirement_only"
+          "boundary": "requirement_only",
+          "reason": "因为客户日常通勤与家庭活动存在意外风险、已有意外险保额有限（仅 10 万），所以产生『意外医疗』需求（优先级 P2）"
         },
         {
           "requirement_id": "REQ-LIFE",
           "requirement_type": "life",
           "summary": "家庭责任保障",
           "priority": "P0_CRITICAL",
-          "boundary": "requirement_only"
+          "boundary": "requirement_only",
+          "reason": "因为客户有房贷 200 万与未成年子女（6 岁）抚养责任、是家庭唯一主要收入来源，所以产生『家庭责任保障』需求（优先级 P0）"
         },
         {
           "requirement_id": "REQ-SAV",
           "requirement_type": "savings",
           "summary": "长期储蓄",
           "priority": "P3_LOW",
-          "boundary": "requirement_only"
+          "boundary": "requirement_only",
+          "reason": "因为存在退休/子女教育等长期现金流目标，所以产生『长期储蓄』需求（优先级 P3）"
         }
       ]
     },
@@ -135,6 +140,7 @@
             "confidence": 0.9
           },
           "conclusion": "寿险已充分覆盖家庭责任",
+          "reason": "因为已有定期寿险 200 万、家庭责任敞口已被完全覆盖（unprotected=0），所以判定寿险已充分覆盖家庭责任",
           "reasoning_evidence_refs": [
             "E004"
           ]
@@ -154,6 +160,7 @@
             "confidence": 0.7
           },
           "conclusion": "医疗风险无任何商业保障",
+          "reason": "因为客户仅有职工社保、大额医疗支出无商业保障、敞口达 50 万，所以判定医疗风险无任何商业保障",
           "reasoning_evidence_refs": [
             "E001"
           ]
@@ -173,6 +180,7 @@
             "confidence": 0.6
           },
           "conclusion": "重疾保额不足",
+          "reason": "因为已有部分重疾保障 30 万、但收入中断敞口达 70 万，缺口显著，所以判定重疾保额不足",
           "reasoning_evidence_refs": [
             "E002"
           ]
@@ -192,6 +200,7 @@
             "confidence": 0.6
           },
           "conclusion": "意外保障部分覆盖",
+          "reason": "因为已有意外险 10 万、但意外伤残收入损失敞口仍有 5 万，所以判定意外保障部分覆盖",
           "reasoning_evidence_refs": [
             "E003"
           ]
@@ -211,6 +220,7 @@
             "confidence": 0.5
           },
           "conclusion": "无长期储蓄规划",
+          "reason": "因为无长期储蓄规划、退休现金流敞口 30 万，所以需建立长期储蓄",
           "reasoning_evidence_refs": [
             "E005"
           ]

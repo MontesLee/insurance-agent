@@ -612,6 +612,7 @@ foreach ($did in $scope) {
         priority = $prio
         reasoning = $reasoning
         conclusion = $conclusion
+        reason = ($reasoning + "，所以" + $conclusion)
         reasoning_evidence_refs = @($refs)
         evidence = @($evidence)
         assumptions = @($candAssumptions)

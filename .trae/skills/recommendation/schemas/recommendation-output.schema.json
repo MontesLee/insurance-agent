@@ -38,7 +38,8 @@
           "enum": ["strong_fit", "good_fit", "partial_fit", "poor_fit", "not_suitable", "insufficient_evidence"]
         },
         "reason_codes": { "type": "array", "items": { "type": "string" } },
-        "provenance": { "type": "array" }
+        "provenance": { "type": "array" },
+        "reason": { "type": "string", "description": "自然语言主推原因。" }
       }
     },
     "alternatives": {

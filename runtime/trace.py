@@ -25,6 +25,9 @@ EVENTS = {
     "EVAL_STARTED", "EVAL_COMPLETED", "REPAIR_STARTED", "REPAIR_COMPLETED",
     "CHECKPOINT_SAVED", "CHECKPOINT_LOADED", "TASK_FAILED", "CASE_WAITING",
     "CASE_COMPLETED", "CASE_NEEDS_REVIEW",
+    # Web UI Phase 1 additions (observability only, mapped 1:1 onto runtime/events.py):
+    "ARTIFACT_STORED", "REPAIR_EXHAUSTED",
+    "TOOL_STARTED", "TOOL_COMPLETED", "TOOL_FAILED",
 }
 
 # case_id -> case directory (NOT stored in state, to keep the CaseState schema clean
@@ -35,6 +38,12 @@ _CASE_DIRS: dict = {}
 # emitted, so the Demo CLI can show progress in real time. Never affects execution.
 _SINK = None
 
+# Additional permanent sinks (Web UI Phase 1): same contract as set_sink, but many may
+# be attached at once (e.g. the event bus tap) without disturbing the single-slot sink
+# the Demo CLI installs. Each invocation is individually guarded — a broken observer
+# must never affect the run.
+_SINKS: list = []
+
 
 def set_sink(fn) -> None:
     global _SINK
@@ -44,6 +53,18 @@ def set_sink(fn) -> None:
 def clear_sink() -> None:
     global _SINK
     _SINK = None
+
+
+def add_sink(fn) -> "callable":
+    """Attach an additional sink. Returns a remover; safe to call twice."""
+    _SINKS.append(fn)
+
+    def _remove() -> None:
+        try:
+            _SINKS.remove(fn)
+        except ValueError:
+            pass
+    return _remove
 
 
 def register_case(case_id: str, case_dir: str) -> None:
@@ -85,6 +106,11 @@ def emit(state, event, *, case_id=None, task_id=None, skill=None, attempt=None,
     if _SINK is not None:
         try:
             _SINK(rec)
+        except Exception:
+            pass
+    for _fn in list(_SINKS):
+        try:
+            _fn(rec)
         except Exception:
             pass
     return rec

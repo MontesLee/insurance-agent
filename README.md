@@ -318,6 +318,36 @@ walkthrough is the annotated narrative in each demo doc.
 **P001 is a fictional demo catalog product** (`is_demo = true`), used only for runtime validation. It
 is **not** a real insurance product, premium, or insurer offering.
 
+## 12a. Web UI — runtime observability (event stream + React UI)
+
+**Web UI is an observability/control-plane layer over the existing Agent Runtime.**
+No business logic moved: the server invokes the existing orchestrator exactly like
+`demo.py`, and the React app renders only what the runtime produces (RuntimeEvents,
+Run metadata, artifacts, provenance). See
+[docs/architecture/webui-event-stream.md](docs/architecture/webui-event-stream.md) and
+[docs/architecture/webui.md](docs/architecture/webui.md); demo walkthrough in
+[docs/demo/webui-demo.md](docs/demo/webui-demo.md).
+
+```bash
+python -m runtime.server            # terminal 1: FastAPI + SSE on 127.0.0.1:8000
+cd web && npm install && npm run dev  # terminal 2: React UI on http://localhost:5173
+```
+
+API surface: `GET /api/health` · `GET /api/cases` · `POST /api/runs` (409 when the
+case already has an active run) · `GET /api/runs/{id}` (incl. the workflow's
+`stage_order`) · `GET /api/runs/{id}/events?after_event_id=` (replay) ·
+`GET /api/runs/{id}/stream` (live SSE, resumable via `Last-Event-ID`) ·
+`GET /api/runs/{id}/artifacts[/{type}]` (registry + lineage + canonical artifact).
+
+Backend tests: `pytest tests/runtime -q` (also script-runnable, wired into
+`tmp/run_regression.py`). Frontend tests: `cd web && npm test`
+(`E2E_RUNTIME=1 npm test` adds a real-server E2E).
+
+> Honest scope: the current portfolio still uses **structured Client State** as the
+> upstream input boundary — raw natural-language intake is not yet the primary
+> execution path. The UI runs the repository's benchmark/demo cases; it is not a
+> fully autonomous end-to-end insurance conversational agent.
+
 ## 13. Honest limitations
 
 Stated up front, because they define the portfolio's scope:

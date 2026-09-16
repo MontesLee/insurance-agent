@@ -440,6 +440,11 @@
         "boundary": {
           "type": "string",
           "const": "requirement_only"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "因果说明：因为[客户情况/上游风险]，所以[产生该需求及其优先级]。"
         }
       }
     },

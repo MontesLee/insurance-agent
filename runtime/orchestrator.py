@@ -176,6 +176,11 @@ def _run_stage_services(state: dict, workflow: dict, stage: dict,
         src = state.get("artifacts", {}).get(spec["source"])
         if src is None:
             rec["calls"] += 1
+            tr.emit(state, "TOOL_STARTED", skill=sdef["skill"],
+                    detail="tool=%s purpose=%s stage=%s" % (spec["id"], spec["purpose"], stage["id"]))
+            tr.emit(state, "TOOL_FAILED", skill=sdef["skill"],
+                    detail="tool=%s purpose=%s missing_source=%s"
+                           % (spec["id"], spec["purpose"], spec["source"]))
             cs.record_event(state, "SERVICE_CALLED", stage=stage["id"],
                             detail="%s: missing source %s" % (spec["id"], spec["source"]))
             out.append({"id": spec["id"], "ok": False,
@@ -183,12 +188,22 @@ def _run_stage_services(state: dict, workflow: dict, stage: dict,
             continue
         from knowledge.evidence import loop as ev_loop
 
+        tr.emit(state, "TOOL_STARTED", skill=sdef["skill"],
+                detail="tool=%s purpose=%s stage=%s" % (spec["id"], spec["purpose"], stage["id"]))
         rnd = ev_loop.request_evidence(src, source_kind=spec["source_kind"],
                                        purpose=spec["purpose"], kb_dir=kb_dir)
         rec["calls"] += 1
         rec["last_requester"] = stage["id"]
         rec["last_at"] = cs._now()
         rec["source_unchanged"] = rnd.get("source_unchanged")
+        if rnd.get("ok"):
+            tr.emit(state, "TOOL_COMPLETED", skill=sdef["skill"],
+                    detail="tool=%s purpose=%s source_unchanged=%s"
+                           % (spec["id"], spec["purpose"], rnd.get("source_unchanged")))
+        else:
+            tr.emit(state, "TOOL_FAILED", skill=sdef["skill"],
+                    detail="tool=%s purpose=%s errors=%s"
+                           % (spec["id"], spec["purpose"], rnd.get("errors", [])))
         cs.record_event(state, "SERVICE_CALLED", stage=stage["id"],
                         detail="%s purpose=%s source_unchanged=%s"
                                % (spec["id"], spec["purpose"], rnd.get("source_unchanged")))
@@ -206,11 +221,19 @@ def _run_stage_services(state: dict, workflow: dict, stage: dict,
                     out.append({"id": spec["id"], "ok": False, "reason": "; ".join(reasons)})
                     continue
                 art = state["artifacts"][store_as]
-                reg.register(state, store_as, art,
-                             {"id": spec["id"], "skill": sdef["skill"], "consumes": []})
+                arec = reg.register(state, store_as, art,
+                                    {"id": spec["id"], "skill": sdef["skill"], "consumes": []})
+                tr.emit(state, "ARTIFACT_STORED", skill=sdef["skill"],
+                        output_artifact=arec["artifact_id"],
+                        detail="artifact_type=%s stage=%s" % (store_as, stage["id"]))
+            tr.emit(state, "EVAL_STARTED", skill=sdef["skill"],
+                    detail="artifact=%s" % store_as)
             rec_ = ev.evaluate(state, store_as, art,
                                {"id": spec["id"], "skill": sdef["skill"], "contract": None},
                                rules=EV_RULES, registry=reg)
+            tr.emit(state, "EVAL_COMPLETED", skill=sdef["skill"],
+                    eval_status=rec_["status"],
+                    detail="artifact=%s eval=%s" % (store_as, rec_["eval_id"]))
             if rec_["status"] == "FAIL":
                 # Spec §32: an Evidence Provider that returns nothing must stop the stage —
                 # it must never be allowed to flow downstream as if it were knowledge.
@@ -249,15 +272,23 @@ def seed_case(workflow: dict, case_id: str, seeds: dict,
         ok, reasons = cs.put_artifact(state, art_type, artifact, st["id"])
         if not ok:  # pragma: no cover - first write cannot violate immutability
             raise RuntimeError("seed failed for %s: %s" % (art_type, reasons))
-        reg.register(state, art_type, state["artifacts"][art_type], st)
+        arec = reg.register(state, art_type, state["artifacts"][art_type], st)
+        tr.emit(state, "ARTIFACT_STORED", task_id=rec.get("task_id"), skill=st.get("skill"),
+                output_artifact=arec["artifact_id"],
+                detail="artifact_type=%s stage=%s (seeded)" % (art_type, st["id"]))
         tk.begin_attempt(state, st["id"])
         tk.set_output(state, st["id"], reg.by_type(state, art_type)["artifact_id"])
 
         # Eval gates seeded artifacts too (spec §16): an artifact that entered the case from
         # outside is still an artifact, and a contaminated one must not flow downstream.
         eval_rules, _ = _rules()
+        tr.emit(state, "EVAL_STARTED", task_id=rec.get("task_id"), skill=st.get("skill"),
+                detail="artifact=%s" % art_type)
         rec_eval = ev.evaluate(state, art_type, state["artifacts"][art_type], st,
                                rules=eval_rules, registry=reg)
+        tr.emit(state, "EVAL_COMPLETED", task_id=rec.get("task_id"), skill=st.get("skill"),
+                eval_status=rec_eval["status"],
+                detail="artifact=%s eval=%s" % (art_type, rec_eval["eval_id"]))
         tk.attach_eval(state, st["id"], rec_eval["eval_id"])
         if rec_eval["status"] == "FAIL":
             reason = "EVAL_FAIL(%s): %s" % (
@@ -454,6 +485,9 @@ def _execute_stage(state: dict, workflow: dict, stage: dict, kb_dir=None,
                     return {"outcome": "NEEDS_REVIEW", "stage": sid, "reasons": rs}
                 arec = reg.register(state, stage["produces"], artifact, stage)
                 tk.set_output(state, sid, arec["artifact_id"])
+                tr.emit(state, "ARTIFACT_STORED", task_id=tid, skill=stage.get("skill"),
+                        attempt=attempt, output_artifact=arec["artifact_id"],
+                        detail="artifact_type=%s stage=%s" % (stage["produces"], sid))
                 tr.emit(state, "SKILL_COMPLETED", task_id=tid, skill=stage.get("skill"),
                         attempt=attempt, output_artifact=arec["artifact_id"],
                         eval_status="PASS", duration_ms=tm.ms(), detail="stage=%s" % sid)
@@ -481,6 +515,10 @@ def _execute_stage(state: dict, workflow: dict, stage: dict, kb_dir=None,
                 attempt=attempt, eval_status=("FAIL" if rec_ is not None else "ERROR"),
                 detail=reason)
         if not enable_repair or attempt >= max_attempts:
+            tr.emit(state, "REPAIR_EXHAUSTED", task_id=tid, skill=stage.get("skill"),
+                    attempt=attempt,
+                    detail="stage=%s budget=%s reason=%s"
+                           % (sid, "exhausted" if enable_repair else "disabled", reason[:240]))
             cs.needs_review(state, sid, reason, failed_checks=failed,
                             repair_attempts=max(0, attempt - 1))
             tk.set_status(state, sid, "NEEDS_REVIEW", failure_reason=reason)
@@ -489,6 +527,9 @@ def _execute_stage(state: dict, workflow: dict, stage: dict, kb_dir=None,
 
         action = repair.plan(failed, eval_rules) if rec_ is not None else "RERUN_FROM_UPSTREAM"
         if action is None:
+            tr.emit(state, "REPAIR_EXHAUSTED", task_id=tid, skill=stage.get("skill"),
+                    attempt=attempt,
+                    detail="stage=%s not_repairable reason=%s" % (sid, reason[:240]))
             cs.needs_review(state, sid, reason, failed_checks=failed,
                             repair_attempts=max(0, attempt - 1))
             tk.set_status(state, sid, "NEEDS_REVIEW", failure_reason=reason)
@@ -503,6 +544,9 @@ def _execute_stage(state: dict, workflow: dict, stage: dict, kb_dir=None,
         tr.emit(state, "REPAIR_COMPLETED", task_id=tid, skill=stage.get("skill"),
                 attempt=attempt, detail="action=%s changed=%s" % (action, changed))
         if not changed:
+            tr.emit(state, "REPAIR_EXHAUSTED", task_id=tid, skill=stage.get("skill"),
+                    attempt=attempt,
+                    detail="stage=%s repair_ineffective reason=%s" % (sid, reason[:240]))
             cs.needs_review(state, sid, reason, failed_checks=failed,
                             repair_attempts=max(0, attempt - 1))
             tk.set_status(state, sid, "NEEDS_REVIEW", failure_reason=reason)

@@ -103,7 +103,8 @@
         "liquidity_impact": { "type": "string" },
         "admissible": { "type": "boolean" },
         "reject_reason_codes": { "type": "array", "items": { "type": "string" } },
-        "provenance": { "type": "array" }
+        "provenance": { "type": "array" },
+        "reason": { "type": "string", "description": "因果说明：因为[缺口匹配/核保/证据]，所以[纳入或排除候选]。" }
       }
     }
   }

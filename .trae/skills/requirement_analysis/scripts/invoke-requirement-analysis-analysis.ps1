@@ -262,6 +262,7 @@ function Add-RequirementPackage {
         summary = $CoverageGap
         priority = $Priority
         boundary = "requirement_only"
+        reason = $Reasoning
     })
 
     [void]$Priorities.Add([pscustomobject]@{
