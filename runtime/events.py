@@ -52,6 +52,11 @@ EVENT_TYPES = frozenset({
     # specialist agent executor (Phase 5.1)
     "agent_step_started", "agent_tool_call", "agent_tool_completed",
     "agent_output_validated",
+    # agent-to-agent communication (Phase 6)
+    "agent_message_sent", "agent_message_received",
+    "agent_message_acknowledged", "agent_message_failed",
+    # message-driven scheduling (Phase 6.2)
+    "handoff_validated", "handoff_rejected", "task_activated",
 })
 
 # events after which a run's stream is closed

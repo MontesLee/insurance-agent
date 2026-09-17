@@ -217,8 +217,8 @@ def test_real_agent_execution(c: Checks):
     c.chk("execution: risk-assessment artifact in CaseState",
           "risk-assessment" in (state.get("artifacts") or {}),
           sorted((state.get("artifacts") or {}).keys()))
-    c.chk("execution: agent events present",
-          any(e[0] == "agent_started" for e in events)
+    c.chk("execution: agent events present (step/tool/validated)",
+          any(e[0] == "agent_step_started" for e in events)
           and any(e[0] == "agent_tool_call" for e in events)
           and any(e[0] == "agent_output_validated" for e in events))
     c.chk("execution: FakeLLM was called (not _execute_stage)",

@@ -13,6 +13,7 @@ Deterministic stage tools execute the EXISTING workflow stages through
 from __future__ import annotations
 
 import copy
+import os
 from typing import Any, Callable, Optional
 
 from runtime import orchestrator as orch
@@ -322,27 +323,90 @@ def _make_stage_tool(tool_name: str):
 # knowledge + catalog tools
 # --------------------------------------------------------------------------- #
 def _knowledge_search(args: dict, ctx: ToolContext) -> dict:
+    """Execute RAG and store the result as a canonical knowledge-evidence Artifact.
+
+    Phase 6.2.2: the tool produces the artifact; the Harness runs eval (skip_eval).
+    Empty RAG results fail closed — no fabricated evidence is ever stored.
+    """
     from knowledge.evidence.provider import build_engine
 
+    query = args["query"]
     engine = build_engine()
-    res = engine.search(args["query"])
+    res = engine.search(query)
     hits = getattr(res, "chunks", None) or getattr(res, "results", None) or []
-    out = []
-    for c in hits[:5]:
-        out.append({
-            "chunk_id": getattr(c, "chunk_id", None),
-            "document_id": getattr(c, "document_id", None),
-            "document_name": getattr(c, "document_name", None),
-            "section": getattr(c, "section", None),
+    if not hits:
+        return _fail("no valid evidence found for query %r — cannot fabricate knowledge"
+                     % query[:60])
+
+    evidence = []
+    for i, c in enumerate(hits[:5]):
+        doc_id = getattr(c, "document_id", None) or ""
+        chunk_id = getattr(c, "chunk_id", None) or ""
+        score = getattr(c, "final_score", None) or getattr(c, "score", None)
+        confidence = min(1.0, score) if isinstance(score, (int, float)) else None
+        evidence.append({
+            "evidence_id": "E%03d" % (i + 1),
             "content": (getattr(c, "content", None) or "")[:400],
-            "score": getattr(c, "final_score", None) or getattr(c, "score", None),
+            "source": doc_id or chunk_id or "unknown",
+            "source_type": getattr(c, "source_type", "internal"),
+            "relevance": score,
+            "confidence": confidence,
+            "document_id": doc_id,
+            "document_name": getattr(c, "document_name", None),
+            "chunk_id": chunk_id,
+            "section": getattr(c, "section", None),
+            "source_level": getattr(c, "source_level", None),
         })
-    if not out:
-        return _ok("knowledge search returned no evidence for this query",
-                   data={"evidence": [],
-                         "note": "知识库中没有找到相关证据，请如实告知用户"})
-    return _ok("knowledge search returned %d evidence chunks" % len(out),
-               data={"evidence": out})
+
+    state = ctx.state
+    now = cs.now()
+    artifact = {
+        "artifact_type": "knowledge-evidence",
+        "skill": "knowledge-search",
+        "legacy_skill": "knowledge_search",
+        "schema_version": "1.0",
+        "generated_at": now,
+        "payload": {
+            "status": "success",
+            "query": query,
+            "evidence": evidence,
+            "conflict": False,
+        },
+        "provenance": [
+            {"source_type": "knowledge", "source_id": e["source"], "confidence": e["confidence"]}
+            for e in evidence if e["source"]
+        ],
+    }
+
+    art_type = "knowledge-evidence"
+    stage_id = "product-candidate-provider"  # the workflow stage that normally produces this
+
+    # Respect artifact freeze: if downstream already started, don't overwrite
+    existing = (state.get("artifacts") or {}).get(art_type)
+    if existing is not None and any(t in (state.get("artifacts") or {})
+                                     for t in DOWNSTREAM_TYPES):
+        arec = reg.by_type(state, art_type)
+        if arec:
+            return _ok("knowledge-evidence already stored (%d items)"
+                       % len((existing.get("payload") or {}).get("evidence", [])),
+                       artifact_id=arec["artifact_id"], artifact_type=art_type,
+                       eval_id=None, eval_status=None)
+
+    # Store the artifact (skip_eval — the Harness owns eval)
+    ok, reasons = cs.put_artifact(state, art_type, artifact, stage_id)
+    if not ok and existing is not None:
+        # put_artifact refused overwrite; use the existing artifact
+        pass  # fall through to register
+    arec = reg.register(state, art_type, artifact,
+                        {"id": stage_id, "skill": "knowledge-search",
+                         "consumes": []})
+    tr.emit(state, "ARTIFACT_STORED", skill="knowledge-search",
+            output_artifact=arec["artifact_id"],
+            detail="artifact_type=%s stage=%s (agent)" % (art_type, stage_id))
+    ctx.persist()
+    return _ok("knowledge-evidence stored (%d evidence items)" % len(evidence),
+               artifact_id=arec["artifact_id"], artifact_type=art_type,
+               eval_id=None, eval_status=None)
 
 
 def _check_catalog_product(args: dict, ctx: ToolContext) -> dict:
@@ -363,6 +427,67 @@ def _check_catalog_product(args: dict, ctx: ToolContext) -> dict:
             for p in hits[:5]]
     return _ok("found %d matching products in the demo catalog" % len(hits),
                data={"products": slim})
+
+
+# --------------------------------------------------------------------------- #
+# agent-to-agent communication tool (Phase 6)
+# --------------------------------------------------------------------------- #
+SEND_AGENT_MESSAGE = {
+    "name": "send_agent_message",
+    "description": ("Send a coordination message to another authorized agent. "
+                    "Messages reference artifact_ids (NOT full content). "
+                    "The Harness controls when the target agent executes — "
+                    "sending a message does NOT trigger immediate execution."),
+    "parameters": {
+        "type": "object",
+        "required": ["to_agent", "message_type"],
+        "properties": {
+            "to_agent": {"type": "string",
+                         "description": "Target agent_id (must be in Agent Registry)"},
+            "message_type": {"type": "string",
+                             "enum": ["TASK_HANDOFF", "INFORMATION_REQUEST",
+                                      "INFORMATION_RESPONSE", "REVIEW_REQUEST",
+                                      "REVIEW_RESPONSE"]},
+            "task_id": {"type": "string", "maxLength": 60},
+            "artifact_ids": {"type": "array", "maxItems": 10,
+                             "items": {"type": "string"},
+                             "description": "Artifact IDs to reference (must exist)"},
+            "content": {"type": "object",
+                        "description": "Coordination instruction (NOT full artifact data)"},
+        },
+        "additionalProperties": False,
+    },
+}
+
+
+def _send_agent_message(args: dict, ctx: ToolContext) -> dict:
+    """Controlled A2A: validate + persist via MessageBus. Never executes target."""
+    from runtime.agents.message_bus import MessageBus
+
+    # the MessageBus lives in the project directory (from ToolContext)
+    project_dir = getattr(ctx, "project_dir", None) or ctx.run_id
+    if not os.path.isdir(project_dir):
+        return _fail("MESSAGE_SEND_FAILED: no project directory for message bus")
+
+    bus = MessageBus(project_dir)
+    try:
+        from_agent = getattr(ctx, "agent_id", "unknown_agent")
+        msg = bus.send(
+            from_agent=from_agent,
+            to_agent=args["to_agent"],
+            message_type=args["message_type"],
+            task_id=args.get("task_id", ""),
+            artifact_ids=args.get("artifact_ids"),
+            content=args.get("content"),
+            case_state=ctx.state,
+            project=getattr(ctx, "project", None))
+        return _ok("message sent to %s" % args["to_agent"],
+                   data={"message_id": msg["message_id"],
+                         "status": msg["status"]})
+    except ValueError as e:
+        return _fail("MESSAGE_SEND_FAILED: %s" % str(e)[:160])
+    except Exception as e:  # noqa: BLE001
+        return _fail("MESSAGE_SEND_FAILED: %r" % e)
 
 
 # --------------------------------------------------------------------------- #

@@ -127,6 +127,38 @@ for _agent_id, _def in AGENT_REGISTRY.items():
     for _tt in _def["allowed_task_types"]:
         TASK_AGENT_MAP[_tt] = _agent_id
 
+# --------------------------------------------------------------------------- #
+# Communication Policy (Phase 6.2 §11): who may send messages to whom.
+# Derived from the workflow's data-flow: analysis → knowledge/evidence →
+# product selection → reporting. Reverse/diagonal communication is denied.
+# --------------------------------------------------------------------------- #
+COMMUNICATION_POLICY: dict = {
+    "insurance_analyst": {
+        "knowledge_specialist",   # analyst may request evidence
+        "product_specialist",    # analyst hands off to product selection
+    },
+    "knowledge_specialist": {
+        "insurance_analyst",     # evidence flows back to analysis
+    },
+    "product_specialist": {
+        "report_specialist",     # product results feed the report
+        "insurance_analyst",     # product specialist may request analysis review
+    },
+    "report_specialist": {
+        "insurance_analyst",     # report specialist may flag analysis gaps
+    },
+}
+
+
+def allowed_message_targets(agent_id: str) -> set:
+    """Which agents this agent may send messages to."""
+    return COMMUNICATION_POLICY.get(agent_id, set())
+
+
+def can_communicate(sender: str, target: str) -> bool:
+    """Check communication policy: sender → target allowed?"""
+    return target in COMMUNICATION_POLICY.get(sender, set())
+
 
 def get(agent_id: str):
     return AGENT_REGISTRY.get(agent_id)

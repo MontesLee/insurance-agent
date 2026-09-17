@@ -82,7 +82,9 @@ def test_1_general_knowledge(c: Checks):
     c.chk("T1 no client-intake or pipeline tools",
           not any(t in ("record_client_profile", "coverage_gap_analysis",
                         "recommendation", "report_generation") for t in tools), tools)
-    c.chk("T1 no artifacts, direct answer", not state.get("artifacts"))
+    _t1_arts = [a for a in (state.get("artifacts") or {}) if a != "knowledge-evidence"]
+    c.chk("T1 no ANALYSIS artifacts (knowledge-evidence acceptable)",
+          len(_t1_arts) == 0, sorted((state.get("artifacts") or {}).keys()))
 
 
 @section
@@ -103,7 +105,9 @@ def test_2_general_guidance(c: Checks):
     c.chk("T2 knowledge_search allowed", "knowledge_search" in tools, tools)
     c.chk("T2 NO record_client_profile / intake",
           "record_client_profile" not in tools, tools)
-    c.chk("T2 no artifacts, direct structured answer", not state.get("artifacts"))
+    _t2_arts = [a for a in (state.get("artifacts") or {}) if a != "knowledge-evidence"]
+    c.chk("T2 no ANALYSIS artifacts", len(_t2_arts) == 0,
+          sorted((state.get("artifacts") or {}).keys()))
     c.chk("T2 answer covers key factors + soft CTA",
           "保额" in out.message or "预算" in out.message,
           out.message[:60])
@@ -164,7 +168,9 @@ def test_5_knowledge_vs_pipeline(c: Checks):
     c.chk("T5 NO pipeline tools",
           not any(t in ("record_client_profile", "coverage_gap_analysis",
                         "recommendation") for t in tools), tools)
-    c.chk("T5 no artifacts", not state.get("artifacts"))
+    _t5_arts = [a for a in (state.get("artifacts") or {}) if a != "knowledge-evidence"]
+    c.chk("T5 no ANALYSIS artifacts", len(_t5_arts) == 0,
+          sorted((state.get("artifacts") or {}).keys()))
 
 
 @section

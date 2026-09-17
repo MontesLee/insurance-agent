@@ -287,19 +287,19 @@ class LongRunningHarness:
         if task_graph:
             # Phase 4: create tasks from the validated graph, preserving the
             # graph's task_ids so dependencies resolve correctly
-            id_map: dict = {}  # graph task_id → project task_id (identity here)
             for t in task_graph.get("tasks", []):
                 graph_id = t.get("task_id") or _uid("task")
                 task = p.create_task(t["task_type"],
                                      dependencies=t.get("dependencies") or [])
                 # force the project task_id to match the graph's
                 task["task_id"] = graph_id
-                id_map[graph_id] = graph_id
                 if t.get("description"):
-                    p._set_task(graph_id, description=t["description"][:200])
+                    task["description"] = t["description"][:200]
                 # Multi-Agent: carry assigned_agent from the graph if present
                 if t.get("assigned_agent"):
-                    p._set_task(graph_id, assigned_agent=t["assigned_agent"])
+                    task["assigned_agent"] = t["assigned_agent"]
+            # persist the graph task_ids (create_task saved with auto IDs)
+            p._save()
         else:
             # Phase 3: code-defined linear chain
             for tt in (task_types or TASK_CHAIN):
@@ -442,9 +442,18 @@ class LongRunningHarness:
                     self.agent_executor, SpecialistAgentExecutor)
                     else SpecialistAgentExecutor(self.agent_executor))
                 state["_workflow"] = wf  # executor needs stage defs
+
+                # Phase 6.2.2: dual-write emit — SSE callback AND durable
+                # project.events.jsonl (no second event store, just a bridge)
+                def _agent_emit(event_type, data, _p=project, _cb=self.emit):
+                    _cb(event_type, data)
+                    safe = {k: v for k, v in (data or {}).items()
+                            if isinstance(v, (str, int, float, bool)) or v is None}
+                    _p._event(event_type, **safe)
+
                 result = executor.execute(
                     agent_id=assigned, task=task, project=project,
-                    case_state=state, emit=self.emit)
+                    case_state=state, emit=_agent_emit)
                 state.pop("_workflow", None)
 
                 # Phase 5.2: Harness owns the Eval boundary.
@@ -505,13 +514,115 @@ class LongRunningHarness:
             # ---- checkpoint after each PASS (§11) ---------------------------- #
             self._checkpoint(project, state, task["task_id"])
 
+        # ---- Phase 6.2: message-driven scheduling loop ---------------------- #
+        # After the sequential pass, consume handoffs. If any handoff activates
+        # a still-PENDING task whose dependencies are now met, loop back and
+        # run another sequential pass. Bounded to prevent infinite loops.
+        handoff_stats = {"checked": 0, "acked": 0, "failed": 0, "pending": 0,
+                         "invalid": 0}
+        max_scheduling_rounds = 5  # safety bound for message-driven re-runs
+        for round_num in range(max_scheduling_rounds):
+            stats = self._consume_handoffs(project, state)
+            for k in handoff_stats:
+                handoff_stats[k] += stats.get(k, 0)
+
+            # if any task_activated events fired and there are still PENDING
+            # tasks, loop back for another sequential execution pass
+            activated = stats.get("pending", 0) > 0
+            has_pending_tasks = any(t["status"] == "PENDING" for t in project.tasks)
+            if not (activated and has_pending_tasks):
+                break
+
+            # run another sequential pass for newly-eligible tasks
+            for task in project.tasks:
+                if task["status"] != "PENDING":
+                    continue
+                tt = task["task_type"]
+                from runtime.planner import registry as _pr
+                rd = _pr.get(tt)
+                stage_id = rd["stage_id"] if rd else TASK_DEFS.get(tt, ("", None))[0]
+                missing = [d for d in task["dependencies"]
+                           if self._dep_status(project, d) not in ("PASSED", "COMPLETED")]
+                if missing:
+                    continue  # dependency not met yet — skip
+                # Re-execute this task (simplified path for activated tasks)
+                result2 = self._execute_single_task(
+                    project, state, wf, task, stage_id)
+                executed.extend(result2)
+
         project.status = "completed" if all(
             t["status"] in ("PASSED", "COMPLETED") for t in project.tasks
         ) else ("needs_review" if any(t["status"] == "NEEDS_REVIEW"
                                       for t in project.tasks) else "failed")
         project._save()
         return {"status": project.status, "executed": executed,
+                "handoffs": handoff_stats,
                 "project": project.to_public()}
+
+    def _execute_single_task(self, project, state, wf, task, stage_id):
+        """Execute one task in the message-driven scheduling loop.
+        Returns a list of executed outcome dicts."""
+        from runtime.planner import registry as _pr
+        from runtime.agents import agent_for_task
+        tt = task["task_type"]
+        assigned = task.get("assigned_agent") or agent_for_task(tt) or ""
+
+        # Check stage completion (idempotency)
+        stage_status = (state.get("stages", {}).get(stage_id, {}) or {}).get("status")
+        if stage_status == "COMPLETED":
+            project._set_task(task["task_id"], status="COMPLETED")
+            return [{"task": tt, "outcome": "SKIPPED", "agent": assigned}]
+
+        stage = transitions.stage_by_id(wf, stage_id)
+        if stage is None:
+            project._set_task(task["task_id"], status="FAILED",
+                              reason="unknown stage %s" % stage_id)
+            return [{"task": tt, "outcome": "FAILED", "agent": assigned}]
+
+        project._set_task(task["task_id"], status="RUNNING",
+                          attempt=task["attempt"] + 1)
+        project._event("task_started", task_id=task["task_id"], task_type=tt,
+                       agent_id=assigned or None)
+
+        state["current_stage"] = stage_id
+
+        if assigned and self.agent_executor is not None:
+            from runtime.agents.executor import SpecialistAgentExecutor
+            executor = (self.agent_executor if isinstance(
+                self.agent_executor, SpecialistAgentExecutor)
+                else SpecialistAgentExecutor(self.agent_executor))
+            state["_workflow"] = wf
+            result = executor.execute(
+                agent_id=assigned, task=task, project=project,
+                case_state=state, emit=self.emit)
+            state.pop("_workflow", None)
+            if result.outcome == "ARTIFACT_READY":
+                result = self._run_eval_and_repair(
+                    state, wf, stage_id, task, project, assigned, executor)
+        else:
+            result = orch._execute_stage(state, wf, stage)
+
+        outcome = result.get("outcome")
+        if outcome == "GATE":
+            orch.approve(state, stage_id)
+            outcome = "OK"
+
+        if outcome == "OK":
+            arts = self._stage_artifacts(state, stage_id)
+            project._set_task(task["task_id"], status="PASSED",
+                              output_artifacts=arts)
+            project._event("task_completed", task_id=task["task_id"],
+                           task_type=tt, artifacts=arts,
+                           agent_id=assigned or None)
+            self._checkpoint(project, state, task["task_id"])
+            return [{"task": tt, "outcome": "PASS", "agent": assigned}]
+        else:
+            project._set_task(task["task_id"], status="NEEDS_REVIEW",
+                              reason=str(result.get("reasons", ""))[:200])
+            project._event("task_failed", task_id=task["task_id"],
+                           task_type=tt, agent_id=assigned or None,
+                           reason=str(result.get("reasons", ""))[:200])
+            return [{"task": tt, "outcome": "NEEDS_REVIEW", "agent": assigned}]
 
     def resume(self, project_id: str, workflow: Optional[dict] = None,
                force_rerun: bool = False) -> dict:
@@ -561,6 +672,18 @@ class LongRunningHarness:
         arec = reg.by_type(state, art_type)
         return [arec["artifact_id"]] if arec else []
 
+    def _consume_handoffs(self, project, state: dict) -> dict:
+        """Phase 6.1: process TASK_HANDOFF messages after task execution."""
+        try:
+            from runtime.agents.handoff import consume_handoffs
+            from runtime.agents.message_bus import MessageBus
+            bus = MessageBus(project._dir)
+            return consume_handoffs(bus, project, state,
+                                    emit=lambda t, d: self.emit(t, {
+                                        "project_id": project.project_id, **d}))
+        except Exception as e:  # noqa: BLE001 — handoff failure never breaks the run
+            return {"error": str(e)[:120]}
+
     def _stage_done(self, state: dict, stage_id: str) -> bool:
         st = state.get("stages", {}).get(stage_id, {}) or {}
         return st.get("status") == "COMPLETED"
@@ -580,9 +703,15 @@ class LongRunningHarness:
         from runtime import repair as rep
         from runtime import trace as tr
         from runtime import tasks as tk
+        from runtime.planner import registry as _pr
 
         stage = transitions.stage_by_id(wf, stage_id)
-        art_type = (stage or {}).get("produces") or ""
+        # Phase 6.2.2: use the Planner Registry's produced_artifacts for the
+        # artifact type — the workflow stage may produce a different artifact
+        # (e.g. knowledge_search → knowledge-evidence, NOT product-candidates)
+        _pdef = _pr.get(task.get("task_type", ""))
+        _parts = (_pdef or {}).get("produced_artifacts") or []
+        art_type = _parts[0] if _parts else (stage or {}).get("produces") or ""
         max_repairs = 2
 
         for attempt in range(1 + max_repairs):  # 1 initial + 2 repairs

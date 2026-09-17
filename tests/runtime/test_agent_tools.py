@@ -133,15 +133,24 @@ def test_knowledge_and_catalog_tools(c: Checks):
     ctx = fresh_ctx()
 
     out = reg["knowledge_search"].execute({"query": "百万医疗险 免赔额"}, ctx)
-    c.chk("knowledge: real KB query returns structured evidence",
-          out["status"] == "completed"
-          and isinstance(out["data"].get("evidence"), list), out.get("summary"))
-    if out["data"].get("evidence"):
-        c.chk("knowledge: evidence carries document provenance",
-              all("document_id" in e for e in out["data"]["evidence"]))
+    c.chk("knowledge: real KB query stores knowledge-evidence artifact",
+          out["status"] == "completed" and out.get("artifact_id") is not None,
+          out.get("summary"))
+    c.chk("knowledge: artifact_type = knowledge-evidence",
+          out.get("artifact_type") == "knowledge-evidence", out.get("artifact_type"))
+    _ke = (ctx.state.get("artifacts") or {}).get("knowledge-evidence")
+    c.chk("knowledge: artifact in CaseState", _ke is not None)
+    if _ke:
+        _ev = ((_ke.get("payload") or {}).get("evidence") or [])
+        c.chk("knowledge: evidence items present", len(_ev) >= 1, len(_ev))
+        c.chk("knowledge: provenance preserved",
+              len(_ke.get("provenance") or []) >= 1)
+        c.chk("knowledge: evidence has source ids",
+              all(e.get("source") for e in _ev if e))
+    c.chk("knowledge: no self-eval (deferred to Harness)",
+          out.get("eval_id") is None, out.get("eval_id"))
 
-    # the demo KB is tiny and lenient — prove the honest-empty contract against
-    # an EMPTY KB (the same one the benchmark uses for the no-evidence case)
+    # Phase 6.2.2: empty KB → fail-closed (no fabricated evidence)
     import knowledge.evidence.provider as kep
 
     class _EmptyEngine:
@@ -156,9 +165,8 @@ def test_knowledge_and_catalog_tools(c: Checks):
         out = reg["knowledge_search"].execute({"query": "任意查询"}, ctx)
     finally:
         kep.build_engine = _orig_build
-    c.chk("knowledge: empty KB → honest not-found note (no fabrication)",
-          out["status"] == "completed" and out["data"].get("evidence") == []
-          and "没有找到" in out["data"].get("note", ""), out["data"].get("note"))
+    c.chk("knowledge: empty KB → FAIL closed (no fabrication)",
+          out["status"] == "failed", (out["status"], out.get("summary")))
 
     hit = reg["check_catalog_product"].execute({"query": "P001"}, ctx)
     c.chk("catalog: existing demo product found",

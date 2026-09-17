@@ -84,10 +84,16 @@ class SpecialistAgentExecutor:
 
         # ---- 3. Build agent-scoped tool registry ----------------------------- #
         from runtime.agent.tools import build_registry, ToolContext, validate_arguments
+        from runtime.agent.tools import SEND_AGENT_MESSAGE, Tool, _send_agent_message
         full_registry = build_registry()
         allowed = agent_def.get("allowed_tools", [])
         scoped_tools = {name: full_registry[name] for name in allowed
                         if name in full_registry}
+        # Phase 6: every specialist agent gets the A2A communication tool
+        # (the MessageBus validates recipients; the tool itself is controlled)
+        scoped_tools["send_agent_message"] = Tool(
+            SEND_AGENT_MESSAGE["name"], SEND_AGENT_MESSAGE["description"],
+            SEND_AGENT_MESSAGE["parameters"], _send_agent_message)
         if not scoped_tools:
             return AgentExecutionResult("AGENT_FAILED",
                                         error_code="NO_ALLOWED_TOOLS")
@@ -102,8 +108,8 @@ class SpecialistAgentExecutor:
                                         error_code="LLM_PROVIDER_UNAVAILABLE")
 
         # ---- 5. Run the agent loop ------------------------------------------- #
-        emit("agent_started", {"task_id": task_id, "agent_id": agent_id,
-                               "task_type": task_type})
+        # NOTE: agent_started is emitted by the HARNESS (single source of truth
+        # for task lifecycle); the executor only emits step/tool-level events.
         system_prompt = agent_def["system_prompt"]
         context = self._build_context(case_state, task, scoped_tools,
                                       expected_artifacts)
@@ -115,8 +121,13 @@ class SpecialistAgentExecutor:
 
         # Phase 5.2: skip_eval=True → Tool stores artifact WITHOUT running eval.
         # The Harness owns the eval boundary (eval runs after agent completes).
+        # Phase 6: inject agent_id + project_dir for A2A communication tool.
         ctx = ToolContext(case_state, case_state.get("_workflow", {}),
                           task_id, persist=lambda: None, skip_eval=True)
+        ctx.agent_id = agent_id
+        ctx.project = project
+        ctx.project_dir = (getattr(project, "_dir", None)
+                           if project is not None else None)
         t0 = time.perf_counter()
 
         for step in range(1, MAX_AGENT_STEPS + 1):
