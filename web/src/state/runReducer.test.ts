@@ -158,3 +158,74 @@ describe("replay equals live (refresh safety)", () => {
     expect(one).toEqual(batched);
   });
 });
+
+describe("agent streaming deltas (transient, DeepSeek-style live output)", () => {
+  it("accumulates same-kind deltas in the stream buffer, never in events[]", () => {
+    const s = apply([
+      ev({ event_type: "run_started" }),
+      ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "用户要给孩子" } }),
+      ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "买保险…" } }),
+    ]);
+    expect(s.stream).toEqual({ kind: "reasoning", text: "用户要给孩子买保险…" });
+    expect(s.events.map((e) => e.event_type)).toEqual(["run_started"]);
+  });
+
+  it("kind switch restarts the buffer; next phase clears it", () => {
+    const s = apply([
+      ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "思考…" } }),
+      ev({ event_type: "agent_stream_delta", data: { kind: "content", text: "结论A" } }),
+      ev({ event_type: "agent_stream_delta", data: { kind: "content", text: "结论B" } }),
+    ]);
+    expect(s.stream).toEqual({ kind: "content", text: "结论A结论B" });
+    const s2 = apply([
+      ...s.events,
+      ev({ event_type: "run_started" }),
+      ev({ event_type: "agent_stream_delta", data: { kind: "content", text: "x" } }),
+      ev({ event_type: "agent_decision", data: { action: "call_tool", tool: "record_client_profile" } }),
+    ]);
+    expect(s2.stream).toBeNull();
+  });
+
+  it("deltas never move pipeline/eval state", () => {
+    const s = apply([
+      ev({ event_type: "agent_stream_delta", data: { kind: "content", text: "长文本" } }),
+    ]);
+    expect(Object.values(s.stages).every((st) => st.status === "pending")).toBe(true);
+    expect(s.evals).toHaveLength(0);
+  });
+});
+
+describe("tool_started marks the pipeline step RUNNING (live step indicator)", () => {
+  it("dialogue tools immediately light up their stage + track currentTool", () => {
+    const s = apply([
+      ev({ event_type: "run_started" }),
+      ev({ event_type: "tool_started", skill: "record_client_profile" }),
+    ]);
+    expect(s.currentTool).toBe("record_client_profile");
+    expect(s.stages["client-intake"]!.status).toBe("running");
+    // subsequent events (artifact/eval) no longer clear the current step
+    const s2 = apply([
+      ...s.events,
+      ev({ event_type: "artifact_created", stage: "client-intake", artifact_id: "ART-001" }),
+    ]);
+    expect(s2.currentTool).toBe("record_client_profile");
+    expect(s2.stages["client-intake"]!.status).toBe("running");
+  });
+
+  it("currentTool clears on tool completion; never overrides a passed stage", () => {
+    const s = apply([
+      ev({ event_type: "stage_started", stage: "client-intake" }),
+      ev({ event_type: "stage_completed", stage: "client-intake", status: "PASS" }),
+      ev({ event_type: "tool_started", skill: "record_client_profile" }),
+      ev({ event_type: "tool_completed", skill: "record_client_profile" }),
+    ]);
+    expect(s.currentTool).toBeNull();
+    expect(s.stages["client-intake"]!.status).toBe("passed");
+  });
+
+  it("unknown/QA tools do not touch unrelated pipeline stages beyond their map", () => {
+    const s = apply([ev({ event_type: "tool_started", skill: "knowledge_search" })]);
+    expect(s.currentTool).toBe("knowledge_search");
+    expect(s.stages["risk-analysis"]!.status).toBe("pending");
+  });
+});

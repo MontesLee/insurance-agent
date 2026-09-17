@@ -48,8 +48,14 @@ from runtime import orchestrator as orch  # noqa: E402
 from runtime import trace as tr  # noqa: E402
 from runtime import events as events_mod  # noqa: E402
 from runtime import artifact_registry as reg  # noqa: E402
+from runtime import checkpoint as cp  # noqa: E402
+from runtime.state import case_state as cs  # noqa: E402
 from runtime.state import store as state_store  # noqa: E402
+from runtime import tasks as tk  # noqa: E402
 from runtime.event_bus import CLOSED, EventBus, default_bus  # noqa: E402
+from runtime.agent import (ChatManager, ProviderNotConfigured,  # noqa: E402
+                           run_agent_turn, provider_from_env)
+from runtime.agent.tools import ToolContext  # noqa: E402
 
 BENCH_DIR = os.path.join(REPO_ROOT, "evals", "agent-benchmark")
 BENCH_RUNNER = os.path.join(BENCH_DIR, "run_agent_benchmark.py")
@@ -82,12 +88,17 @@ BENCH = _load_bench()
 # Run registry — metadata about ONE execution of a case (never a second CaseState)
 # --------------------------------------------------------------------------- #
 class RunManager:
-    def __init__(self, bus: Optional[EventBus] = None, run_root: Optional[str] = None):
+    def __init__(self, bus: Optional[EventBus] = None, run_root: Optional[str] = None,
+                 agent_provider=None):
         self.bus = bus or default_bus
         self.run_root = run_root or DEFAULT_RUN_ROOT
+        self.agent_provider = agent_provider      # injectable (tests use FakeLLM)
+        self.agent_fast_provider = None           # optional fast tier injection
+        self.chats = ChatManager()
         self._runs: dict = {}          # run_id -> Run metadata dict
         self._lock = threading.Lock()
         self._active: dict = {}        # case_id -> run_id of THE active run (trace routing)
+        self._active_chat: dict = {}   # chat_id -> run_id (one agent turn at a time)
         self._wf = None
         self._base = None
         self._cases: dict = {}
@@ -343,6 +354,175 @@ class RunManager:
                     run.pop("_adapter", None)    # M-2: drop the run-scoped adapter
             self.bus.finish(run_id)   # defensive: every subscriber wakes and closes
 
+    # ---------------- Mode B: real LLM agent runs (Phase 2.6) ----------------- #
+    def agent_provider_or_fail(self):
+        """Configured provider or raise ProviderNotConfigured — NEVER a silent
+        fallback to the deterministic demo (spec §41). Same config layer as the
+        smoke test: process env over <repo root>/.env."""
+        if self.agent_provider is not None:
+            return self.agent_provider
+        from runtime.agent.config import load_llm_config
+        return load_llm_config().to_provider()
+
+    def agent_provider_status(self) -> dict:
+        if self.agent_provider is not None:
+            return {"configured": True, "provider": self.agent_provider.name,
+                    "model": self.agent_provider.model, "source": "injected"}
+        from runtime.agent.config import load_llm_config
+        cfg = load_llm_config()
+        out = cfg.describe()
+        out["source"] = "env-or-dotenv" if out["configured"] else None
+        return out
+
+    def create_agent_run(self, chat_id: str, text: str, provider=None) -> tuple:
+        """Start one agent turn as a Run. Returns (run, None) or (None, reason)
+        with reason in {"busy:<run_id>"} — same one-at-a-time semantics as the
+        deterministic path, per CHAT (the conversation is the unit of work)."""
+        self._ensure_loaded()
+        fast = self.agent_fast_provider
+        if provider is None:
+            provider = self.agent_provider_or_fail()
+            if fast is None:
+                from runtime.agent.config import load_llm_config
+                cfg = load_llm_config()
+                fast = cfg.to_provider(fast=True) if cfg.fast_model else None
+        with self._lock:
+            busy = self._active_chat.get(chat_id)
+            if busy is not None:
+                return None, "busy:%s" % busy
+            run_id = "run_%s" % uuid.uuid4().hex[:8]
+            run = {
+                "run_id": run_id,
+                "case_id": "agentcase-%s" % run_id[4:],
+                "chat_id": chat_id,
+                "mode": "agent",
+                "status": "queued",
+                "started_at": None,
+                "completed_at": None,
+                "current_stage": None,
+                "event_count": 0,
+                "result_status": None,
+                "reasons": [],
+                "stage_order": [{"id": st["id"], "skill": st.get("skill"),
+                                 "produces": st.get("produces")}
+                                for st in self._wf.get("stages", [])],
+                # run-scoped adapter (M-2 discipline): tool-driven tr.emit records
+                # (stage/eval/artifact/checkpoint) flow to THIS run's event stream
+                "_adapter": events_mod.TraceEventAdapter(),
+            }
+            self._runs[run_id] = run
+            self._active_chat[chat_id] = run_id
+        self.chats.get_or_create(chat_id)
+        self.chats.add_user_message(chat_id, text)
+        self.chats.link_run(chat_id, run_id)
+        threading.Thread(target=self._agent_worker,
+                         args=(run_id, chat_id, text, provider, fast), daemon=True,
+                         name="agent-%s" % run_id).start()
+        return self.get_run(run_id), None
+
+    def _agent_worker(self, run_id: str, chat_id: str, text: str, provider,
+                      fast_provider=None) -> None:
+        from runtime.agent.state import AgentState
+
+        run = self._runs.get(run_id) or {}
+        case_id = run.get("case_id") or "agentcase"
+        run_dir = os.path.join(self.run_root, run_id)
+        os.makedirs(run_dir, exist_ok=True)
+        self._set(run_id, status="running", started_at=events_mod.now_iso())
+        self._active[case_id] = run_id   # route tool trace records to this run
+        remove_tap = tr.add_sink(self._make_tap(run_id, case_id))
+        try:
+            self._emit(run_id, "run_started", case_id=case_id, status="running",
+                       message="Agent run started",
+                       data={"mode": "agent", "chat_id": chat_id,
+                             "provider": provider.name, "model": provider.model})
+
+            # fresh canonical CaseState for this agent run (no demo seeding!)
+            state = cs.new_case_state(case_id, self._wf)
+            tk.init_tasks(state, self._wf)
+            tr.register_case(case_id, os.path.join(run_dir, case_id))
+
+            def persist():
+                cp.save(state, run_dir, None)
+
+            ctx = ToolContext(state, self._wf, run_id, persist=persist)
+            agent_state = AgentState(run_id, case_id, chat_id)
+
+            # cross-turn memory: replay the prior conversation turns so the
+            # agent knows what the user ALREADY said (the chat owns history;
+            # CaseState remains the canonical fact store). run_agent_turn
+            # appends the current (last) user message itself.
+            history = (self.chats.view(chat_id) or {}).get("messages", [])
+            last_user = max((i for i, m in enumerate(history)
+                             if m.get("role") == "user"), default=0)
+            prev_user_id = None
+            for m in history[max(0, last_user - 16):last_user]:  # bound ~8 turns
+                if m.get("role") == "user":
+                    prev_user_id = agent_state.add_user(m["content"])
+                elif m.get("role") == "assistant" and prev_user_id:
+                    agent_state.add_assistant(m["content"],
+                                              m.get("kind", "finish"), prev_user_id)
+
+            def emit(event_type: str, data: dict) -> None:
+                if event_type == "agent_stream_delta":
+                    # live-only streaming text: fans out to open SSE streams,
+                    # never enters history/replay/durable records
+                    self.bus.publish_transient(run_id, {
+                        "event_id": None, "run_id": run_id,
+                        "timestamp": events_mod.now_iso(),
+                        "event_type": "agent_stream_delta",
+                        "stage": None, "skill": None, "status": None,
+                        "case_id": case_id, "artifact_id": None, "eval_id": None,
+                        "repair_attempt": None,
+                        "message": None, "data": data})
+                    return
+                self._emit(run_id, event_type, case_id=case_id,
+                           stage=data.get("stage"), skill=data.get("tool"),
+                           status=data.get("status"), message=data.get("summary"),
+                           data={k: v for k, v in data.items()
+                                 if k not in ("stage", "tool", "status", "summary")})
+
+            outcome = run_agent_turn(provider, agent_state, text, ctx, emit,
+                                     fast_provider=fast_provider)
+            persist()
+
+            status_map = {"waiting_user": "waiting", "completed": "completed",
+                          "needs_review": "needs_review", "failed": "failed"}
+            run_status = status_map.get(outcome.status, "needs_review")
+            self._emit(run_id, "run_completed", case_id=case_id, status=run_status,
+                       message=outcome.message[:600],
+                       data={"result_status": outcome.status.upper(),
+                             "agent": {"turns": agent_state.turn,
+                                       "tool_calls": len(agent_state.tool_history),
+                                       "usage": agent_state.usage}})
+            self._set(run_id, status=run_status, completed_at=events_mod.now_iso(),
+                      result_status=outcome.status.upper(),
+                      reasons=[outcome.reason][:1] if outcome.reason else [])
+            self.chats.add_assistant_message(
+                chat_id, outcome.message,
+                "ask" if outcome.action == "ask_user" else "finish", run_id)
+        except Exception as e:  # noqa: BLE001 — agent wrapper must always terminate
+            from runtime.agent.config import redact_secrets
+            safe = redact_secrets(repr(e))
+            print("[server] agent run %s crashed: %s" % (run_id, safe), file=sys.stderr)
+            traceback.print_exc()
+            self._emit(run_id, "run_failed", case_id=case_id, status="failed",
+                       message="agent run crashed: %s" % safe[:300],
+                       data={"error_type": type(e).__name__})
+            self._set(run_id, status="failed", completed_at=events_mod.now_iso(),
+                      result_status="CRASHED", reasons=[repr(e)[:300]])
+            self.chats.add_assistant_message(chat_id, "Agent 运行异常，已停止。"
+                                             "不会输出未经校验的结果。", "error", run_id)
+        finally:
+            remove_tap()
+            self._active.pop(case_id, None)
+            self._active_chat.pop(chat_id, None)
+            with self._lock:
+                r = self._runs.get(run_id)
+                if r is not None:
+                    r.pop("_adapter", None)
+            self.bus.finish(run_id)
+
 
 # --------------------------------------------------------------------------- #
 # FastAPI application
@@ -351,9 +531,55 @@ class RunRequest(BaseModel):
     case_id: str
 
 
+class ChatMessageRequest(BaseModel):
+    text: str
+
+
+def _sse_generator(mgr: RunManager, run_id: str, cursor: Optional[str]):
+    """The one SSE generator (GET stream + POST chat-message stream share it)."""
+    cur = cursor   # local copy: the closed-over value is the resume point
+    sub = mgr.bus.subscribe(run_id)
+    try:
+        for e in mgr.bus.events_for(run_id, after_event_id=cur):
+            yield _sse_chunk(e)
+            cur = e["event_id"]
+        if mgr.bus.is_run_done(run_id):
+            return
+        while True:
+            try:
+                item = sub.get(timeout=0.5)
+            except queue_mod.Empty:
+                if mgr.bus.is_run_done(run_id):
+                    for e in mgr.bus.events_for(run_id, after_event_id=cur):
+                        yield _sse_chunk(e)
+                    return
+                yield ": keep-alive\n\n"
+                continue
+            if item is CLOSED:
+                # top up from history (covers events dropped while lagging)
+                for e in mgr.bus.events_for(run_id, after_event_id=cur):
+                    yield _sse_chunk(e)
+                return
+            yield _sse_chunk(item)
+            cur = item["event_id"]
+    finally:
+        mgr.bus.unsubscribe(sub)
+
+
+def _sse_response(mgr: RunManager, run_id: str, cursor: Optional[str]):
+    return StreamingResponse(_sse_generator(mgr, run_id, cursor),
+                              media_type="text/event-stream",
+                              headers={"Cache-Control": "no-cache, no-transform",
+                                       "X-Accel-Buffering": "no"})
+
+
 def _sse_chunk(event: dict) -> str:
-    return "event: runtime\nid: %s\ndata: %s\n\n" % (
-        event.get("event_id"), json.dumps(event, ensure_ascii=False))
+    # transient deltas carry no event_id → no `id:` line, so the browser's
+    # Last-Event-ID resume cursor stays anchored to the last DURABLE event
+    if event.get("event_id"):
+        return "event: runtime\nid: %s\ndata: %s\n\n" % (
+            event["event_id"], json.dumps(event, ensure_ascii=False))
+    return "event: runtime\ndata: %s\n\n" % json.dumps(event, ensure_ascii=False)
 
 
 def create_app(manager: Optional[RunManager] = None) -> FastAPI:
@@ -423,41 +649,60 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
         _require_run(mgr, run_id)
         # resume cursor priority: explicit query param, then the SSE Last-Event-ID header
         cursor = after_event_id or (request.headers.get("last-event-id") if request else None)
+        return _sse_response(mgr, run_id, cursor)
 
-        def gen():
-            cur = cursor   # local copy: the closed-over value is the resume point
-            sub = mgr.bus.subscribe(run_id)
-            try:
-                for e in mgr.bus.events_for(run_id, after_event_id=cur):
-                    yield _sse_chunk(e)
-                    cur = e["event_id"]
-                if mgr.bus.is_run_done(run_id):
-                    return
-                while True:
-                    try:
-                        item = sub.get(timeout=0.5)
-                    except queue_mod.Empty:
-                        if mgr.bus.is_run_done(run_id):
-                            for e in mgr.bus.events_for(run_id, after_event_id=cur):
-                                yield _sse_chunk(e)
-                            return
-                        yield ": keep-alive\n\n"
-                        continue
-                    if item is CLOSED:
-                        # top up from history (covers events dropped while lagging)
-                        for e in mgr.bus.events_for(run_id, after_event_id=cur):
-                            yield _sse_chunk(e)
-                        return
-                    yield _sse_chunk(item)
-                    cur = item["event_id"]
-            finally:
-                mgr.bus.unsubscribe(sub)
+    # ------------------------------------------------------------------ #
+    # Mode B: agent chats (Phase 2.6) — the frontend never sees the LLM
+    # ------------------------------------------------------------------ #
+    @app.get("/api/agent/config")
+    def agent_config():
+        return mgr.agent_provider_status()
 
-        return StreamingResponse(gen(), media_type="text/event-stream",
-                                 headers={"Cache-Control": "no-cache, no-transform",
-                                          "X-Accel-Buffering": "no"})
+    @app.post("/api/chats", status_code=201)
+    def create_chat():
+        chat = mgr.chats.get_or_create(None)
+        return {"chat_id": chat["chat_id"]}
+
+    @app.get("/api/chats/{chat_id}")
+    def get_chat(chat_id: str):
+        chat = mgr.chats.view(chat_id)
+        if chat is None:
+            raise HTTPException(status_code=404, detail="unknown chat_id")
+        return chat
+
+    @app.post("/api/chats/{chat_id}/messages")
+    def send_chat_message(chat_id: str, req: ChatMessageRequest):
+        return _start_agent_turn(mgr, chat_id, req)
+
+    @app.post("/api/chats/{chat_id}/messages/stream")
+    def send_chat_message_stream(chat_id: str, req: ChatMessageRequest,
+                                 request: Request = None):
+        result = _start_agent_turn(mgr, chat_id, req)
+        cursor = request.headers.get("last-event-id") if request else None
+        return _sse_response(mgr, result["run_id"], cursor)
 
     return app
+
+
+def _start_agent_turn(mgr: RunManager, chat_id: str, req: ChatMessageRequest) -> dict:
+    """Create the agent run for one user message (shared by both message routes)."""
+    if not req.text or not req.text.strip():
+        raise HTTPException(status_code=422, detail="text must not be empty")
+    try:
+        run, reason = mgr.create_agent_run(chat_id, req.text.strip())
+    except ProviderNotConfigured as e:
+        # fail CLOSED — never silently fall back to the deterministic demo
+        raise HTTPException(status_code=503, detail={
+            "error": "llm_provider_not_configured",
+            "message": ("LLM provider is not configured. Please configure the "
+                        "provider (LLM_PROVIDER / LLM_MODEL / LLM_API_KEY) or "
+                        "switch to Demo Mode."),
+        }) from e
+    if run is None:
+        return JSONResponse(status_code=409, content={
+            "error": "chat_busy", "run_id": reason.split(":", 1)[1],
+            "chat_id": chat_id})
+    return {"chat_id": chat_id, "run_id": run["run_id"], "status": run["status"]}
 
 
 def _require_run(mgr: RunManager, run_id: str) -> None:

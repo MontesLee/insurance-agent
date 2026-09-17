@@ -29,6 +29,13 @@ from runtime.server import RunManager, create_app  # noqa: E402
 
 RUN_ROOT = os.path.join(REPO, "tmp", "webui-tests")
 
+# Hermetic tests: NEVER read the developer's real <repo>/.env (a configured key
+# would make "unconfigured → 503" tests attempt REAL provider calls). Explicit
+# dotenv_path tests in test_agent_config bypass this by design.
+os.environ.setdefault("INSURANCE_AGENT_NO_DOTENV", "1")
+import runtime.agent.config as _agent_config  # noqa: E402
+_agent_config.DEFAULT_ENV_PATH = os.path.join(REPO, "tmp", "does-not-exist.env")
+
 
 class Checks:
     """Check accumulator shared by script mode and pytest mode.

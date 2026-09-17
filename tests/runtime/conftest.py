@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import pytest  # noqa: E402
 
+import _common  # noqa: E402,F401  (import side-effect isolates the repo .env)
 from _common import Checks  # noqa: E402
 
 

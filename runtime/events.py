@@ -27,6 +27,10 @@ from typing import Any, Optional
 EVENT_TYPES = frozenset({
     # run lifecycle
     "run_started", "run_completed", "run_failed",
+    # agent loop (Phase 2.6): actions/summaries only — never hidden reasoning
+    "agent_step_started", "agent_decision", "agent_step_error",
+    # live-only streaming text deltas (transient: never persisted to history)
+    "agent_stream_delta",
     # stage lifecycle
     "stage_started", "stage_completed", "stage_failed",
     # eval lifecycle
@@ -39,6 +43,15 @@ EVENT_TYPES = frozenset({
     "checkpoint_created", "checkpoint_resumed",
     # tool / shared-service lifecycle (knowledge-search Evidence Provider)
     "tool_started", "tool_completed", "tool_failed",
+    # planner lifecycle (Phase 4)
+    "planner_started", "planner_completed", "planner_failed",
+    "graph_validation_started", "graph_validation_passed", "graph_validation_failed",
+    # multi-agent lifecycle (Phase 5)
+    "agent_assigned", "agent_started", "agent_completed", "agent_failed",
+    "agent_validation_failed",
+    # specialist agent executor (Phase 5.1)
+    "agent_step_started", "agent_tool_call", "agent_tool_completed",
+    "agent_output_validated",
 })
 
 # events after which a run's stream is closed

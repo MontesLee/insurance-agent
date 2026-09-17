@@ -63,6 +63,23 @@ export const api = {
   health: () => request<{ status: string }>("/api/health"),
   cases: () => request<{ cases: CaseInfo[] }>("/api/cases"),
 
+  // ---- Agent Mode (Phase 2.6) — the frontend never sees the LLM provider ---- #
+  agentConfig: () =>
+    request<{ configured: boolean; provider: string | null; model: string | null }>(
+      "/api/agent/config"),
+  createChat: () => request<{ chat_id: string }>("/api/chats", { method: "POST" }),
+  getChat: (chatId: string) =>
+    request<{
+      chat_id: string;
+      messages: { role: string; content: string; kind?: string; run_id?: string }[];
+      runs: string[];
+    }>(`/api/chats/${chatId}`),
+  postChatMessage: (chatId: string, text: string) =>
+    request<{ chat_id: string; run_id: string; status: string }>(
+      `/api/chats/${chatId}/messages`,
+      { method: "POST", body: JSON.stringify({ text }) },
+    ),
+
   createRun: (caseId: string) =>
     request<{ run_id: string; case_id: string; status: string }>("/api/runs", {
       method: "POST",

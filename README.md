@@ -318,14 +318,17 @@ walkthrough is the annotated narrative in each demo doc.
 **P001 is a fictional demo catalog product** (`is_demo = true`), used only for runtime validation. It
 is **not** a real insurance product, premium, or insurer offering.
 
-## 12a. Web UI — runtime observability (event stream + React UI)
+## 12a. Web UI — chat-first agent system (event stream + React UI)
 
 **Web UI is an observability/control-plane layer over the existing Agent Runtime.**
-No business logic moved: the server invokes the existing orchestrator exactly like
-`demo.py`, and the React app renders only what the runtime produces (RuntimeEvents,
-Run metadata, artifacts, provenance). See
-[docs/architecture/webui-event-stream.md](docs/architecture/webui-event-stream.md) and
-[docs/architecture/webui.md](docs/architecture/webui.md); demo walkthrough in
+The default view is a chatbot (User Mode): chat history, conversation, live Agent
+Activity, artifact/report cards. `⚙ Developer Mode` keeps the Phase 2 Cases/Runtime
+console for engineers — both views consume the SAME `/api/runs` + SSE RuntimeEvent
+stream; neither owns agent execution state. See
+[docs/architecture/chat-ui.md](docs/architecture/chat-ui.md) (chat UI),
+[docs/architecture/webui-event-stream.md](docs/architecture/webui-event-stream.md)
+(event stream), [docs/architecture/webui.md](docs/architecture/webui.md);
+demos: [docs/demo/chat-demo.md](docs/demo/chat-demo.md),
 [docs/demo/webui-demo.md](docs/demo/webui-demo.md).
 
 ```bash
@@ -341,12 +344,18 @@ case already has an active run) · `GET /api/runs/{id}` (incl. the workflow's
 
 Backend tests: `pytest tests/runtime -q` (also script-runnable, wired into
 `tmp/run_regression.py`). Frontend tests: `cd web && npm test`
-(`E2E_RUNTIME=1 npm test` adds a real-server E2E).
+(`E2E_RUNTIME=1 npm test` adds real-server E2Es incl. the chat flow).
 
-> Honest scope: the current portfolio still uses **structured Client State** as the
-> upstream input boundary — raw natural-language intake is not yet the primary
-> execution path. The UI runs the repository's benchmark/demo cases; it is not a
-> fully autonomous end-to-end insurance conversational agent.
+> Honest scope: the chat has TWO modes. **Agent Mode** (default, Phase 2.6) sends the
+> conversation through a real LLM agent loop (`runtime/agent/` — understand → decide →
+> tool-call → existing skills/eval/repair → report; insufficient info ⇒ the agent asks
+> instead of producing a report). LLM config comes from process env **or a git-ignored
+> `.env` at the repo root** (template: `.env.example`; GLM = OpenAI-compatible
+> `LLM_PROVIDER=glm` + `LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4` +
+> `LLM_MODEL` + `LLM_API_KEY`; verify with `python -m runtime.agent.smoke_test`).
+> Agent Mode **fails closed** when unconfigured. **演示 Demo Mode**
+> maps prompts to benchmark cases over structured Client State — raw natural-language
+> intake remains outside the deterministic path's regression surface.
 
 ## 13. Honest limitations
 

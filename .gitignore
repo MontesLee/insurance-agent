@@ -21,3 +21,7 @@ __pycache__/
 # client-intake 运行时客户数据（README 模板除外）
 client-intake-data/clients/*
 !client-intake-data/clients/README.md
+
+# LLM 密钥配置（.env.example 为模板，可入库；.env 永不入库）
+.env
+.env.local

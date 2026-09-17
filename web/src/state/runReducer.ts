@@ -30,6 +30,11 @@ export interface EvalUiEntry {
   repairAttempt: number | null;
 }
 
+export interface StreamUiState {
+  text: string;
+  kind: "reasoning" | "content";
+}
+
 export interface RunUiState {
   runId: string;
   status: RunStatus | "unknown";
@@ -40,6 +45,10 @@ export interface RunUiState {
   currentStage: string | null;
   terminalEvent: RuntimeEvent | null;
   connected: boolean;
+  /** live-only LLM output (transient deltas; rebuilt never — not in history) */
+  stream: StreamUiState | null;
+  /** the tool the agent is currently executing (null between tools) */
+  currentTool: string | null;
 }
 
 export function initRunState(runId: string, stageOrder: StageInfo[]): RunUiState {
@@ -68,8 +77,24 @@ export function initRunState(runId: string, stageOrder: StageInfo[]): RunUiState
     currentStage: null,
     terminalEvent: null,
     connected: false,
+    stream: null,
+    currentTool: null,
   };
 }
+
+/** agent tool name -> workflow stage it executes (for live highlighting) */
+const TOOL_TO_STAGE: Record<string, string> = {
+  record_client_profile: "client-intake",
+  record_requirement_analysis: "requirement-analysis",
+  record_risk_assessment: "risk-analysis",
+  coverage_gap_analysis: "coverage-gap-analysis",
+  solution: "solution",
+  product_candidate_provider: "product-candidate-provider",
+  recommendation: "product-recommendation",
+  report_generation: "report-generation",
+  knowledge_search: "product-candidate-provider",
+  check_catalog_product: "product-candidate-provider",
+};
 
 function stage(state: RunUiState, id: string | null): StageUiState | null {
   if (!id) return null;
@@ -102,6 +127,7 @@ const TRANSITIONS: Record<EventType, (s: RunUiState, e: RuntimeEvent) => void> =
   run_completed: (s, e) => {
     s.status = statusFromTerminal(e);
     s.currentStage = null;
+    s.currentTool = null;
     s.terminalEvent = e;
     // a run parked for human review keeps the blocked stage visibly flagged
     if (s.status === "needs_review") {
@@ -112,9 +138,22 @@ const TRANSITIONS: Record<EventType, (s: RunUiState, e: RuntimeEvent) => void> =
   run_failed: (s, e) => {
     s.status = "failed";
     s.currentStage = null;
+    s.currentTool = null;
     s.terminalEvent = e;
   },
+  // agent-loop events: timeline-only for pipeline/eval state (§22 — they enrich
+  // the stream, they never move stage state; the LLM cannot fake progress)
+  agent_step_started: (s) => { s.stream = null; },
+  agent_decision: (s) => { s.stream = null; },
+  agent_step_error: () => {},
+  // live streaming text: append to the transient buffer; NEVER into events[]
+  agent_stream_delta: (s, e) => {
+    const kind = e.data["kind"] === "reasoning" ? "reasoning" : "content";
+    const prev = s.stream && s.stream.kind === kind ? s.stream.text : "";
+    s.stream = { kind, text: (prev + String(e.data["text"] ?? "")).slice(-4000) };
+  },
   stage_started: (s, e) => {
+    s.stream = null;
     const st = stage(s, e.stage);
     if (!st) return;
     st.status = "running";
@@ -177,9 +216,15 @@ const TRANSITIONS: Record<EventType, (s: RunUiState, e: RuntimeEvent) => void> =
   },
   checkpoint_created: () => {},
   checkpoint_resumed: () => {},
-  tool_started: () => {},
-  tool_completed: () => {},
-  tool_failed: () => {},
+  tool_started: (s, e) => {
+    s.currentTool = e.skill;
+    // map the agent tool to its workflow stage so the pipeline line goes
+    // RUNNING immediately (dialogue tools emit stage_started late or never)
+    const st = stage(s, TOOL_TO_STAGE[e.skill ?? ""] ?? null);
+    if (st && st.status === "pending") st.status = "running";
+  },
+  tool_completed: (s) => { s.currentTool = null; },
+  tool_failed: (s) => { s.currentTool = null; },
 };
 
 function closeEval(s: RunUiState, e: RuntimeEvent, outcome: "pass" | "fail") {
@@ -235,7 +280,8 @@ export function runReducer(state: RunUiState | null, action: RunAction): RunUiSt
           Object.entries(state.stages).map(([k, v]) => [k, { ...v }]),
         ),
         evals: state.evals.map((v) => ({ ...v })),
-        events: [...state.events, e],
+        // transient deltas live in `stream`, never in the durable timeline
+        events: e.event_type === "agent_stream_delta" ? state.events : [...state.events, e],
       };
       const t = TRANSITIONS[e.event_type];
       if (t) t(next, e);

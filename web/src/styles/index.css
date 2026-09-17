@@ -34,3 +34,13 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* live agent step shimmer + streaming dots (Phase 2.6 streaming UI) */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes dotblink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}

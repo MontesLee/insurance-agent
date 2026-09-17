@@ -87,6 +87,23 @@ class EventBus:
         except Exception as e:  # noqa: BLE001 — the bus must never break the runtime
             print("[event_bus] publish failed (ignored): %r" % e, file=sys.stderr)
 
+    def publish_transient(self, run_id: str, event: dict) -> None:
+        """Fan out to LIVE subscribers WITHOUT appending to history.
+
+        Used for high-frequency, replay-irrelevant payloads (e.g. streaming
+        text deltas): they appear in open SSE streams, never in
+        GET /events replay, resume cursors or durable observability records."""
+        try:
+            with self._lock:
+                subs = [s for s in self._subs.get(run_id, ()) if not s.closed]
+            for sub in subs:
+                try:
+                    sub.queue.put_nowait(event)
+                except Exception:  # noqa: BLE001 — drop for THIS subscriber only
+                    sub.dropped += 1
+        except Exception as e:  # noqa: BLE001 — the bus must never break the runtime
+            print("[event_bus] publish_transient failed (ignored): %r" % e, file=sys.stderr)
+
     def finish(self, run_id: str) -> None:
         """Mark the run finished even when no terminal event was published (defensive)."""
         try:
