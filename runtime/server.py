@@ -40,6 +40,7 @@ if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
 from fastapi import FastAPI, HTTPException, Request  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import JSONResponse, StreamingResponse  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
@@ -535,6 +536,34 @@ class ChatMessageRequest(BaseModel):
     text: str
 
 
+class ApprovalDecisionRequest(BaseModel):
+    """Phase 9 §17: minimal human decision body (no user system in V0.1)."""
+    actor: str = "human"
+    reason: str = ""
+
+
+def _harness_root(manager: "RunManager") -> str:
+    """Root that holds LongRunningHarness projects (Phase 9 approval API)."""
+    return os.environ.get(
+        "INSURANCE_AGENT_HARNESS_ROOT",
+        os.path.join(manager.run_root, "harness-projects"))
+
+
+def _find_approval(approval_id: str, root: str):
+    """(project_id, approval dict | None) — scan project approval stores."""
+    from runtime.approval.store import ApprovalStore
+    if not os.path.isdir(root):
+        return None, None
+    for pid in sorted(os.listdir(root)):
+        pdir = os.path.join(root, pid)
+        if not os.path.isdir(pdir):
+            continue
+        appr = ApprovalStore(pdir).get(approval_id)
+        if appr is not None:
+            return pid, appr
+    return None, None
+
+
 def _sse_generator(mgr: RunManager, run_id: str, cursor: Optional[str]):
     """The one SSE generator (GET stream + POST chat-message stream share it)."""
     cur = cursor   # local copy: the closed-over value is the resume point
@@ -681,7 +710,61 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
         cursor = request.headers.get("last-event-id") if request else None
         return _sse_response(mgr, result["run_id"], cursor)
 
+    # ---- Phase 9 §17: minimal human-approval API (state only; execution
+    #      resumes via the Harness — LongRunningHarness.resume_approval). ---
+    @app.get("/api/projects/{project_id}/approvals")
+    def list_project_approvals(project_id: str):
+        from runtime.approval.store import ApprovalStore
+        pdir = os.path.join(_harness_root(mgr), project_id)
+        if not os.path.isdir(pdir):
+            return JSONResponse({"error": "project not found"}, status_code=404)
+        return {"project_id": project_id,
+                "approvals": ApprovalStore(pdir).all()}
+
+    @app.get("/api/approvals/{approval_id}")
+    def get_approval(approval_id: str):
+        pid, appr = _find_approval(approval_id, _harness_root(mgr))
+        if appr is None:
+            return JSONResponse({"error": "approval not found"}, status_code=404)
+        return {"project_id": pid, "approval": appr}
+
+    @app.post("/api/approvals/{approval_id}/approve")
+    def approve_approval(approval_id: str, req: ApprovalDecisionRequest):
+        return _resolve_approval(mgr, approval_id, "approve", req)
+
+    @app.post("/api/approvals/{approval_id}/reject")
+    def reject_approval(approval_id: str, req: ApprovalDecisionRequest):
+        return _resolve_approval(mgr, approval_id, "reject", req)
+
     return app
+
+
+def _resolve_approval(mgr: "RunManager", approval_id: str, op: str,
+                      req: "ApprovalDecisionRequest") -> dict:
+    """Idempotent approve/reject on the approval STATE. Actors other than
+    human/harness are refused (agents, planners, tools cannot resolve)."""
+    from runtime.approval import ApprovalManager
+    from runtime.harness import load_project
+    pid, appr = _find_approval(approval_id, _harness_root(mgr))
+    if appr is None:
+        return JSONResponse({"error": "approval not found"}, status_code=404)
+    pdir = os.path.join(_harness_root(mgr), pid)
+    project = load_project(_harness_root(mgr), pid)
+    emit = None
+    if project is not None:
+        def emit(event_type, data, _p=project):
+            safe = {k: v for k, v in (data or {}).items()
+                    if isinstance(v, (str, int, float, bool)) or v is None}
+            _p._event(event_type, **safe)
+    manager = ApprovalManager(pdir, emit=emit)
+    if op == "approve":
+        out = manager.approve(approval_id, actor=req.actor)
+    else:
+        out = manager.reject(approval_id, actor=req.actor, reason=req.reason)
+    if not out.get("ok"):
+        return JSONResponse({"error": out.get("error"), "approval": out.get("approval")},
+                            status_code=409)
+    return {"project_id": pid, "result": out}
 
 
 def _start_agent_turn(mgr: RunManager, chat_id: str, req: ChatMessageRequest) -> dict:

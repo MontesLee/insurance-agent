@@ -76,6 +76,10 @@ HARNESS_TASK_EVENTS = {
     # Phase 8 dynamic replanning (Harness-owned; see docs/architecture/dynamic-replanning.md)
     "replan_triggered", "replan_started", "replan_completed", "replan_failed",
     "graph_revision_created",
+    # Phase 9 human-in-the-loop approval gateway (see docs/architecture/human-in-the-loop.md)
+    "approval_requested", "approval_waiting", "approval_approved",
+    "approval_rejected", "approval_expired", "approval_resumed",
+    "approval_failed",
 }
 
 _TASK_STATUSES = {"PENDING", "RUNNING", "PASSED", "FAILED", "BLOCKED",
@@ -321,7 +325,8 @@ class LongRunningHarness:
                  agent_executor=None,
                  max_concurrency: int = 1,
                  max_replans: int = 2,
-                 planner_provider=None):
+                 planner_provider=None,
+                 approval_policy=None):
         self.root = harness_root
         self.emit = emit or (lambda event_type, data: None)
         # Phase 5.1: inject a SpecialistAgentExecutor or an LLMProvider for
@@ -331,6 +336,9 @@ class LongRunningHarness:
         # FakePlannerProvider in tests; a real LLMProvider in production).
         # Falls back to a raw-LLM agent_executor when not set.
         self.planner_provider = planner_provider
+        # Phase 9: deterministic human-approval gateway. None = not installed
+        # → every policy outcome is AUTO (Phase 8 behaviour unchanged).
+        self.approval_policy = approval_policy
         # Phase 7: DAG-aware bounded parallel scheduler. 1 = sequential (Phase 6 compat).
         if not isinstance(max_concurrency, int) or max_concurrency < 1:
             raise ValueError("max_concurrency must be a positive int, got %r" % max_concurrency)
@@ -437,6 +445,23 @@ class LongRunningHarness:
         # Phase 8 R11: replans left in_progress by an interrupted process are
         # failed on resume — never assumed successful (both execution paths)
         self._recover_interrupted_replans(project)
+        # Phase 9 §12: propagate human REJECTED/EXPIRED decisions made in
+        # other processes (e.g. the API) into the replan ledger, then honour
+        # any blocking approval: a waiting project executes NOTHING until a
+        # human approves AND the Harness resumes (fail closed).
+        self._sync_resolved_approvals(project)
+        waiting = self._waiting_approvals(project)
+        if waiting:
+            project.status = "waiting_approval"
+            project._save()
+            return {"status": "waiting_approval",
+                    "waiting_approvals": [a["approval_id"] for a in waiting],
+                    "executed": executed,
+                    "handoffs": {"checked": 0, "acked": 0, "failed": 0,
+                                 "pending": 0, "invalid": 0},
+                    "replans": {"triggered": 0, "accepted": 0, "failed": 0,
+                                "no_change": 0},
+                    "project": project.to_public()}
 
         # Phase 7: DAG-aware bounded parallel path (max_concurrency > 1).
         # max_concurrency == 1 keeps the Phase 6 sequential path unchanged.
@@ -475,16 +500,44 @@ class LongRunningHarness:
                 has_pending_tasks = any(t["status"] == "PENDING" for t in project.tasks)
                 if not (activated and has_pending_tasks):
                     break
-            project.status = "completed" if all(
-                t["status"] in ("PASSED", "COMPLETED") for t in project.tasks
-            ) else ("needs_review" if any(t["status"] == "NEEDS_REVIEW"
-                                          for t in project.tasks) else "failed")
+            project.status = self._final_status(project)
             project._save()
             return {"status": project.status, "executed": executed,
                     "handoffs": handoff_stats, "replans": replan_stats,
                     "project": project.to_public()}
 
         for task in project.tasks:
+            # ---- crash recovery parity with the parallel path (Phase 9
+            #      hardening): a task left RUNNING by an interrupted process
+            #      resumes from PENDING — never assumed terminal ----------
+            if task["status"] == "RUNNING":
+                project._set_task(task["task_id"], status="PENDING",
+                                  reason="recovered: RUNNING at interruption -> PENDING")
+                task["status"] = "PENDING"
+                project._event("task_recovered", task_id=task["task_id"],
+                               task_type=task["task_type"],
+                               from_status="RUNNING", to_status="PENDING")
+                self.emit("task_recovered", {
+                    "project_id": project.project_id,
+                    "task_id": task["task_id"], "task_type": task["task_type"],
+                    "from_status": "RUNNING", "to_status": "PENDING"})
+            # ---- idempotency: a terminal-ok task that actually produced its
+            #      work is never re-executed (unless force_rerun). The stage-
+            #      completed check below alone was insufficient for agent-mode
+            #      tasks (their CaseState stage stays RUNNING), which let a
+            #      re-run duplicate PASSED work. Tasks terminal-ok WITHOUT
+            #      evidence (no completed stage, no output artifacts — e.g.
+            #      forged state) still re-execute.
+            if task["status"] in ("PASSED", "COMPLETED") and not force_rerun:
+                _sid_early = self._stage_id_for(task["task_type"])
+                if self._stage_done(state, _sid_early) or task.get("output_artifacts"):
+                    project._event("task_skipped", task_id=task["task_id"],
+                                   task_type=task["task_type"],
+                                   reason="already terminal")
+                    self.emit("task_skipped", {"project_id": project.project_id,
+                                               "task_id": task["task_id"]})
+                    executed.append({"task": task["task_type"], "outcome": "SKIPPED"})
+                    continue
             tt = task["task_type"]
             # use the Planner Registry for the trusted mapping (falls back to
             # the legacy TASK_DEFS for Phase 3 compatibility)
@@ -702,10 +755,7 @@ class LongRunningHarness:
             self._run_pending_pass(project, state, wf, executed)
             self._consume_handoffs(project, state)
 
-        project.status = "completed" if all(
-            t["status"] in ("PASSED", "COMPLETED") for t in project.tasks
-        ) else ("needs_review" if any(t["status"] == "NEEDS_REVIEW"
-                                      for t in project.tasks) else "failed")
+        project.status = self._final_status(project)
         project._save()
         return {"status": project.status, "executed": executed,
                 "handoffs": handoff_stats, "replans": replan_stats,
@@ -1289,7 +1339,7 @@ class LongRunningHarness:
         acceptance — later revisions append to project.graph_revisions."""
         snap_tasks = [{
             "task_id": t["task_id"], "task_type": t["task_type"],
-            "status": t["status"],
+            "status": t.get("status", "PLANNED"),
             "dependencies": list(t.get("dependencies") or []),
             "description": (t.get("description") or "")[:200],
         } for t in (tasks if tasks is not None else project.tasks)]
@@ -1355,6 +1405,10 @@ class LongRunningHarness:
         if self.max_replans <= 0:
             return None
         if len(project.replans) >= self.max_replans:
+            return None
+        # Phase 9 §14: a human REJECTED replan stops replanning for this
+        # project (fail closed — no alternative graph is auto-generated).
+        if any(r.get("status") == "rejected" for r in project.replans):
             return None
         if any(t["status"] == "RUNNING" for t in project.tasks):
             return None
@@ -1426,7 +1480,9 @@ class LongRunningHarness:
     def _recover_interrupted_replans(self, project: Project) -> None:
         """R11/§22: a replan left in_progress by an interrupted process is
         marked failed on resume — an unfinished Planner operation is never
-        assumed successful, and no half-applied graph can exist."""
+        assumed successful, and no half-applied graph can exist. A replan
+        paused in waiting_approval is NOT a failure: it is legitimately
+        waiting for a human (Phase 9)."""
         changed = False
         for rec in project.replans:
             if rec.get("status") == "in_progress":
@@ -1532,8 +1588,19 @@ class LongRunningHarness:
             return _finish("no_change", "REPLAN_NO_CHANGE: planner reproduced "
                                        "the current graph structure")
 
-        # apply as a NEW immutable revision, preserving terminal-ok work
         revision = project.current_graph_revision + 1
+        diff = self._graph_diff(project.tasks, new_tasks)
+
+        # ---- Phase 9: deterministic approval gateway (§8) ----------------- #
+        # An unapproved graph NEVER becomes active: the validated candidate
+        # is persisted as PENDING_APPROVAL and the project pauses.
+        outcome, pol_reason = self._approval_outcome(project, diff)
+        if outcome == "HUMAN_APPROVAL":
+            return self._pause_for_replan_approval(
+                project, state, rec, new_tasks, revision, diff,
+                pol_reason, executed)
+
+        # AUTO: the deterministic policy IS the approval (§9) — activate
         diff = self._apply_graph_revision(project, new_tasks, revision)
         rec.update({"status": "accepted", "revision": revision,
                     "diff": diff})
@@ -1562,6 +1629,193 @@ class LongRunningHarness:
         executed.append({"task": "REPLAN", "outcome": "ACCEPTED",
                          "revision": revision})
         return rec
+
+    # ------------------------------------------------------------------ #
+    # Phase 9: Human-in-the-Loop Approval Gateway
+    #
+    # The Harness is the ONLY layer that pauses for and resumes from an
+    # approval. The ApprovalManager owns approval STATE; the policy is
+    # deterministic; an unapproved graph revision can never become active.
+    # ------------------------------------------------------------------ #
+    def _approval_manager(self, project: Project):
+        from runtime.approval import ApprovalManager
+        mgr = ApprovalManager(project._dir, emit=self._approval_emit(project))
+        mgr._harness = self  # audit hook: manager never uses it (state only)
+        return mgr
+
+    def _approval_emit(self, project: Project):
+        def _emit(event_type, data):
+            self.emit(event_type, {"project_id": project.project_id, **data})
+            safe = {k: v for k, v in (data or {}).items()
+                    if isinstance(v, (str, int, float, bool)) or v is None
+                    or (isinstance(v, list) and all(
+                        isinstance(x, str) for x in v))}
+            project._event(event_type, **safe)
+        return _emit
+
+    def _approval_outcome(self, project: Project, diff: dict) -> tuple:
+        """Deterministic policy outcome for a validated replan candidate.
+        No policy installed → AUTO (Phase 8 behaviour unchanged)."""
+        if self.approval_policy is None:
+            return "AUTO", "no approval policy installed"
+        return self.approval_policy.evaluate_replan(diff, project)
+
+    def _pause_for_replan_approval(self, project: Project, state: dict,
+                                   rec: dict, new_tasks: list, revision: int,
+                                   diff: dict, reason: str,
+                                   executed: list) -> dict:
+        """Persist the validated candidate as PENDING_APPROVAL, create the
+        ApprovalRequest, and pause the project. Nothing executes until a
+        human approves AND the Harness resumes (§8/§12)."""
+        from runtime.approval import create_request, APPROVAL_REPLAN
+        mgr = self._approval_manager(project)
+        snapshot = self._snapshot_revision(
+            project, revision=revision,
+            parent_revision=rec["revision_from"],
+            trigger=rec["trigger"], planner_run_id=rec["replan_id"],
+            status="pending_approval", diff=diff,
+            tasks=[dict(t, description=(t.get("description") or ""),
+                        status="PLANNED") for t in new_tasks])
+        project.graph_revisions.append(snapshot)
+        appr = mgr.create_request(create_request(
+            project_id=project.project_id,
+            request_type=APPROVAL_REPLAN,
+            reason="High-impact replan: %s" % reason,
+            graph_revision=revision,
+            context={"diff": diff, "trigger": rec["trigger"],
+                     "candidate_fingerprint": self._graph_fingerprint(new_tasks),
+                     "replan_id": rec["replan_id"]}))
+        mgr.wait(appr["approval_id"])
+        appr = mgr.get(appr["approval_id"])   # WAITING_HUMAN state for the checkpoint
+        rec.update({"status": "waiting_approval", "revision": revision,
+                    "diff": diff, "approval_id": appr["approval_id"]})
+        project.status = "waiting_approval"
+        project._save()
+        self._checkpoint(project, state, task_id=None, approval=appr)
+        executed.append({"task": "REPLAN", "outcome": "WAITING_APPROVAL",
+                         "revision": revision,
+                         "approval_id": appr["approval_id"]})
+        return rec
+
+    def _waiting_approvals(self, project: Project) -> list:
+        """Approvals that block execution: a human decision is pending, or a
+        decision was made but the Harness has not resumed yet (explicit
+        resume is the only path onward — §13)."""
+        from runtime.approval.store import ApprovalStore
+        return [a for a in ApprovalStore(project._dir).all()
+                if a["status"] in ("WAITING_HUMAN", "APPROVED")]
+
+    def _final_status(self, project: Project) -> str:
+        """Terminal project status, honouring a blocking approval first."""
+        if self._waiting_approvals(project):
+            return "waiting_approval"
+        if all(t["status"] in ("PASSED", "COMPLETED") for t in project.tasks):
+            return "completed"
+        if any(t["status"] == "NEEDS_REVIEW" for t in project.tasks):
+            return "needs_review"
+        return "failed"
+
+    def _sync_resolved_approvals(self, project: Project) -> None:
+        """Propagate human REJECTED/EXPIRED decisions into the replan ledger
+        and graph lineage (the decision may have been made in another
+        process, e.g. via the API). A rejected replan stops replanning for
+        the project — fail closed; no alternative graph is generated (§14)."""
+        from runtime.approval.store import ApprovalStore
+        changed = False
+        for a in ApprovalStore(project._dir).all():
+            if a["status"] not in ("REJECTED", "EXPIRED"):
+                continue
+            for r in project.replans:
+                if r.get("approval_id") == a["approval_id"] \
+                        and r.get("status") == "waiting_approval":
+                    r["status"] = "rejected"
+                    r["error"] = ("approval %s: %s"
+                                  % (a["status"], a.get("reject_reason", "")))[:300]
+                    r["completed_at"] = _now()
+                    changed = True
+            for rev in project.graph_revisions:
+                if rev.get("revision") == a.get("graph_revision") \
+                        and rev.get("status") == "pending_approval":
+                    rev["status"] = "rejected"
+                    changed = True
+        if changed:
+            project._save()
+
+    def resume_approval(self, project, approval_id: str,
+                        workflow: Optional[dict] = None) -> dict:
+        """Phase 9 §13: the ONLY resume path. Validates the human approval,
+        activates the approved graph revision (PENDING_APPROVAL → ACTIVE),
+        checkpoints, and executes the remaining tasks. Idempotent: a second
+        resume neither re-activates nor re-executes."""
+        from runtime.approval import APPROVAL_REPLAN
+        if isinstance(project, str):
+            project = load_project(self.root, project)
+        if project is None:
+            return {"status": "FAILED", "reason": "project not found"}
+        appr = self._approval_manager(project).get(approval_id)
+        if appr is None:
+            return {"status": "FAILED", "reason": "approval not found: %s"
+                    % approval_id}
+        if appr["status"] == "RESUMED":
+            # idempotent: no re-activation; still drain any remaining work
+            # (run() itself is idempotent — terminal tasks never re-execute)
+            result = self.run(project, workflow=workflow)
+            result["already_resumed"] = True
+            result["approval_id"] = approval_id
+            return result
+        if appr["status"] != "APPROVED":
+            return {"status": "FAILED",
+                    "reason": "approval %s is %s — resume requires an "
+                              "APPROVED request (Harness-owned resume only)"
+                              % (approval_id, appr["status"])}
+
+        revision = appr.get("graph_revision")
+        rev_rec = next((r for r in project.graph_revisions
+                        if r.get("revision") == revision), None)
+        if appr.get("request_type") != APPROVAL_REPLAN:
+            return {"status": "FAILED",
+                    "reason": "resume unsupported for request_type %s in V0.1"
+                              % appr.get("request_type")}
+
+        if rev_rec is not None and rev_rec.get("status") == "active" \
+                and project.current_graph_revision == revision:
+            # crash between activation-save and mark_resumed — activation is
+            # already durable; finish the resume idempotently
+            pass
+        elif rev_rec is not None and rev_rec.get("status") == "pending_approval":
+            candidate = [{"task_id": t["task_id"], "task_type": t["task_type"],
+                          "dependencies": list(t.get("dependencies") or []),
+                          "description": t.get("description") or ""}
+                         for t in rev_rec["tasks"]]
+            self._apply_graph_revision(project, candidate, revision)
+            rev_rec["status"] = "active"
+            rev_rec["approved_by"] = "policy:human"
+            project.current_graph_revision = revision
+            project.state_version += 1
+        else:
+            return {"status": "FAILED",
+                    "reason": "graph revision %s is not awaiting activation "
+                              "(status=%s)" % (revision,
+                                               (rev_rec or {}).get("status"))}
+
+        for r in project.replans:
+            if r.get("approval_id") == approval_id \
+                    and r.get("status") == "waiting_approval":
+                r.update({"status": "accepted", "revision": revision})
+        project._save()
+        self._approval_emit(project)("graph_revision_created", {
+            "graph_revision": revision,
+            "parent_revision": rev_rec.get("parent_revision"),
+            "trigger": rev_rec.get("trigger"),
+            "planner_run_id": rev_rec.get("planner_run_id"),
+            "approved_by": "policy:human",
+            "task_count": len(project.tasks)})
+        mgr = self._approval_manager(project)
+        mgr.mark_resumed(approval_id)
+        state = self._load_case_state(project)
+        if state is not None:
+            self._checkpoint(project, state, task_id=None)
+        return self.run(project, workflow=workflow)
 
     def _apply_graph_revision(self, project: Project, new_tasks: list,
                               revision: int) -> dict:
@@ -1638,7 +1892,8 @@ class LongRunningHarness:
     # ------------------------------------------------------------------ #
     # helpers
     # ------------------------------------------------------------------ #
-    def _checkpoint(self, project: Project, state: dict, task_id: str) -> dict:
+    def _checkpoint(self, project: Project, state: dict, task_id: str = None,
+                    approval: Optional[dict] = None) -> dict:
         entry = cp.save(state, self._case_root(project), None)
         rec = {
             "checkpoint_id": entry["checkpoint_id"],
@@ -1647,6 +1902,8 @@ class LongRunningHarness:
             "state_version": project.state_version,
             "created_at": _now(),
             "graph_revision": project.current_graph_revision,
+            "approval_id": (approval or {}).get("approval_id"),
+            "approval_status": (approval or {}).get("status"),
             "artifact_refs": entry.get("artifacts", []),
             "completed_task_ids": [t["task_id"] for t in project.tasks
                                    if t["status"] in ("PASSED", "COMPLETED")],

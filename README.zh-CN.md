@@ -44,6 +44,7 @@ DAG** 调度。FastAPI + React 聊天 UI 负责观察与驱动。
 - 长运行 Harness：project、任务生命周期、依赖屏障、每个终态 checkpoint
 - **有界并行 DAG 调度**（`max_concurrency`，默认 1 = 保持原串行路径）
 - **Harness 控制的动态重规划**（有界预算、确定性触发、不可变图修订、校验器把关）
+- **人工审批网关**（确定性策略、fail-closed 状态机、崩溃安全的暂停/恢复）
 - 4 个专家 Agent：确定性 task→agent 分配、受控工具集、权限校验
 - 基于 MessageBus 的 Agent 间通信：持久化、策略受限、PASS 后才 ACK 的 handoff
 - 确定性 Eval（schema / 必填字段 / 污染 / 溯源 / 跨 artifact / 不变量）+ 最多 2 次 Repair
@@ -125,6 +126,7 @@ python evals/agent-benchmark/run_golden_cases.py       # golden 回归
 | Harness、任务状态、恢复、失败模型 | [harness.zh-CN.md](docs/architecture/harness.zh-CN.md) |
 | 有界并行 DAG 调度器 | [parallel-scheduler.zh-CN.md](docs/architecture/parallel-scheduler.zh-CN.md) |
 | 动态重规划（Phase 8 V0.1） | [dynamic-replanning.zh-CN.md](docs/architecture/dynamic-replanning.zh-CN.md) |
+| 人工审批（Phase 9 V0.1） | [human-in-the-loop.zh-CN.md](docs/architecture/human-in-the-loop.zh-CN.md) |
 | 专家 Agent、执行器、工具 | [agents.zh-CN.md](docs/architecture/agents.zh-CN.md) |
 | A2A 通信与 handoff | [a2a.zh-CN.md](docs/architecture/a2a.zh-CN.md) |
 | Eval 与 Repair 边界 | [eval.zh-CN.md](docs/architecture/eval.zh-CN.md) |
@@ -170,6 +172,7 @@ docs/               架构、ADR、开发指南、演示脚本
 | 6 | A2A 通信：MessageBus、handoff 生命周期、通信策略 |
 | 7 | 有界并行 DAG 调度器（隔离 worker、scheduler 独占提交、恢复）+ housekeeping 冻结 |
 | 8 | 动态重规划 V0.1（确定性触发、安全屏障、不可变图修订、有界预算） |
+| 9 | 人工审批网关 V0.1（确定性策略、fail-closed 审批、Harness 独占恢复） |
 
 每层冻结后才进入下一层；`max_concurrency=1` 至今逐字节保持 Phase 6
 串行路径。

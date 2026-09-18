@@ -57,6 +57,10 @@ EVENT_TYPES = frozenset({
     "agent_message_acknowledged", "agent_message_failed",
     # message-driven scheduling (Phase 6.2)
     "handoff_validated", "handoff_rejected", "task_activated",
+    # human-in-the-loop approval gateway (Phase 9)
+    "approval_requested", "approval_waiting", "approval_approved",
+    "approval_rejected", "approval_expired", "approval_resumed",
+    "approval_failed",
 })
 
 # events after which a run's stream is closed

@@ -11,8 +11,8 @@
 | 图修订 / 基于运行反馈的 planner 重试 | 部分 —— Phase 8 已把运行结果（状态、触发原因）回流进受校验的重规划；通用反馈回路仍是未来工作 | `ReplanContext` 是接缝 |
 | 持久外部队列（Redis/Kafka/…） | 未实现 | checkpoint/队列边界本就是文件形态；代码中没有任何队列客户端 |
 | 分布式 worker | 未实现 | worker 隔离 + scheduler 独占提交是本地前身；没有网络层 |
-| `NEEDS_REVIEW` 任务的人工审批 UI | 部分：状态与门已存在；审批目前是程序化的（`orchestrator.approve`） | 任务状态与事件已建模 review；没有审批界面 |
-| 飞书 / 外部通知 | 未实现 | —— |
+| ~~人工审批~~ **审批网关已于 Phase 9 V0.1 实现**（[human-in-the-loop](architecture/human-in-the-loop.zh-CN.md)）—— 确定性策略、fail-closed 审批、Harness 独占恢复、最小 API | 已实现 | 未来：审批 UI 按钮、飞书适配器、TTL、拒绝→替代规划 |
+| 飞书 / 外部通知 | 未实现（Phase 9 审批网关的未来适配器） | 审批事件 + API 是接缝 |
 | 生产级长运行执行（服务、看护进程） | 未实现 | harness 是库；`python -m runtime.server` 是唯一常驻进程 |
 | 更丰富的知识源（外部语料、授权内容） | 未实现 | Evidence Provider 是唯一接缝；语料目前是本地演示库 |
 | 保险之外的更多领域 | 未实现 | skills/contracts/catalog 就是可替换的领域包 |
