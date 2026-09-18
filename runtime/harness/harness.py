@@ -29,6 +29,7 @@ from runtime import orchestrator as orch
 from runtime import tasks as tk
 from runtime import checkpoint as cp
 from runtime import trace as tr
+from runtime import artifact_registry as reg_mod
 from runtime.state import case_state as cs
 from runtime.state import store as state_store
 from runtime.state import transitions
@@ -70,6 +71,8 @@ HARNESS_TASK_EVENTS = {
     "project_created", "task_created", "task_started", "task_completed",
     "task_failed", "task_skipped", "checkpoint_created", "checkpoint_loaded",
     "run_resumed",
+    # Phase 7 parallel scheduler: batch selection + crash-recovery reset
+    "task_scheduled", "task_recovered",
 }
 
 _TASK_STATUSES = {"PENDING", "RUNNING", "PASSED", "FAILED", "BLOCKED",
@@ -239,6 +242,50 @@ def load_project(harness_root: str, project_id: str) -> Optional[Project]:
 
 
 # --------------------------------------------------------------------------- #
+# Phase 7 §8: worker execution contract
+# --------------------------------------------------------------------------- #
+class TaskExecutionResult:
+    """What ONE worker returns to the scheduler. The worker EXECUTES only —
+    it never decides PASS/FAIL and never mutates scheduler or project state.
+    """
+
+    def __init__(self, task_id: str, agent_id: str = "", status: str = "",
+                 artifacts: Optional[list] = None,
+                 execution_metadata: Optional[dict] = None, error: str = "",
+                 worker_state: Optional[dict] = None,
+                 events: Optional[list] = None):
+        self.task_id = task_id
+        self.agent_id = agent_id
+        self.status = status            # ARTIFACT_READY | OK | AGENT_FAILED | NEEDS_REVIEW
+        self.artifacts = artifacts or []   # produced artifact types (candidates)
+        self.execution_metadata = execution_metadata or {}
+        self.error = error
+        self.worker_state = worker_state   # isolated CaseState copy (merged by the scheduler)
+        self.events = events or []         # worker events, replayed at commit
+
+    def get(self, key, default=None):
+        return {"outcome": self.status, "reasons": ([self.error] if self.error else []),
+                "error_code": self.error}.get(key, default)
+
+
+class _WorkerProjectProxy:
+    """Read-only project stand-in handed to workers (§7).
+
+    Workers must not touch shared project state. The proxy only exposes the
+    project dir (so the MessageBus persists agent messages in the right
+    place) and CAPTURES _event() calls for the scheduler to replay in
+    deterministic commit order.
+    """
+
+    def __init__(self, project_dir: str, sink: list):
+        self._dir = project_dir
+        self._sink = sink
+
+    def _event(self, event_type: str, **data) -> None:
+        self._sink.append((event_type, dict(data)))
+
+
+# --------------------------------------------------------------------------- #
 # the harness executor
 # --------------------------------------------------------------------------- #
 class LongRunningHarness:
@@ -251,12 +298,22 @@ class LongRunningHarness:
 
     def __init__(self, harness_root: str,
                  emit: Optional[Callable[[str, dict], None]] = None,
-                 agent_executor=None):
+                 agent_executor=None,
+                 max_concurrency: int = 1):
         self.root = harness_root
         self.emit = emit or (lambda event_type, data: None)
         # Phase 5.1: inject a SpecialistAgentExecutor or an LLMProvider for
         # agent-mode execution; None = deterministic reference mode only
         self.agent_executor = agent_executor
+        # Phase 7: DAG-aware bounded parallel scheduler. 1 = sequential (Phase 6 compat).
+        if not isinstance(max_concurrency, int) or max_concurrency < 1:
+            raise ValueError("max_concurrency must be a positive int, got %r" % max_concurrency)
+        self.max_concurrency = max_concurrency
+        # Phase 7 §13: no task may ever have two concurrently-running workers.
+        # The scheduler thread is the only writer of this set.
+        self._running_task_ids: set = set()
+        # Phase 7: project dir workers use for the MessageBus (set per run)
+        self._worker_project_dir: str = ""
 
     # ------------------------------------------------------------------ #
     # project lifecycle
@@ -336,6 +393,37 @@ class LongRunningHarness:
         project.status = "running"
         project._save()
         executed = []
+
+        # Phase 7: DAG-aware bounded parallel path (max_concurrency > 1).
+        # max_concurrency == 1 keeps the Phase 6 sequential path unchanged.
+        if self.max_concurrency > 1:
+            executed = []
+            # §16 crash recovery: interrupted RUNNING -> PENDING, terminal
+            # tasks are skipped and never re-executed (§14 idempotency)
+            self._parallel_recovery_pass(project, executed)
+            handoff_stats = {"checked": 0, "acked": 0, "failed": 0, "pending": 0,
+                             "invalid": 0}
+            max_scheduling_rounds = 5  # same bound as the sequential path
+            for _round in range(max_scheduling_rounds):
+                executed.extend(self._run_parallel(project, state, wf,
+                                                   force_rerun=force_rerun))
+                stats = self._consume_handoffs(project, state)
+                for k in handoff_stats:
+                    handoff_stats[k] += stats.get(k, 0)
+                # handoff-activated PENDING tasks go through another parallel
+                # pass (the scheduler — never the bus — still decides)
+                activated = stats.get("pending", 0) > 0
+                has_pending_tasks = any(t["status"] == "PENDING" for t in project.tasks)
+                if not (activated and has_pending_tasks):
+                    break
+            project.status = "completed" if all(
+                t["status"] in ("PASSED", "COMPLETED") for t in project.tasks
+            ) else ("needs_review" if any(t["status"] == "NEEDS_REVIEW"
+                                          for t in project.tasks) else "failed")
+            project._save()
+            return {"status": project.status, "executed": executed,
+                    "handoffs": handoff_stats,
+                    "project": project.to_public()}
 
         for task in project.tasks:
             tt = task["task_type"]
@@ -623,6 +711,459 @@ class LongRunningHarness:
                            task_type=tt, agent_id=assigned or None,
                            reason=str(result.get("reasons", ""))[:200])
             return [{"task": tt, "outcome": "NEEDS_REVIEW", "agent": assigned}]
+
+    # ------------------------------------------------------------------ #
+    # Phase 7: DAG-aware bounded parallel scheduler
+    # ------------------------------------------------------------------ #
+    def _stage_id_for(self, task_type: str) -> str:
+        """task_type → workflow stage id (Planner Registry, legacy fallback)."""
+        from runtime.planner import registry as _pr
+        pdef = _pr.get(task_type)
+        if pdef:
+            return pdef["stage_id"]
+        return TASK_DEFS.get(task_type, ("", None))[0]
+
+    def _produced_types_for(self, task_type: str) -> list:
+        """task_type → artifact types the Planner Registry declares it produces."""
+        from runtime.planner import registry as _pr
+        pdef = _pr.get(task_type)
+        if pdef:
+            return list(pdef.get("produced_artifacts") or [])
+        art = TASK_DEFS.get(task_type, ("", None))[1]
+        return [art] if art else []
+
+    def _resolve_agent_executor(self):
+        """The executor workers and repairs share: a SpecialistAgentExecutor
+        (or custom execute()-shaped test executor) as-is, an LLM provider
+        wrapped in SpecialistAgentExecutor."""
+        from runtime.agents.executor import SpecialistAgentExecutor
+        ae = self.agent_executor
+        if hasattr(ae, "execute") and not hasattr(ae, "generate"):
+            return ae  # SpecialistAgentExecutor or a custom test executor
+        return SpecialistAgentExecutor(ae)
+
+    def _compute_runnable(self, project: Project) -> list:
+        """Phase 7 §4: PENDING tasks whose dependencies are all PASSED/COMPLETED,
+        excluding anything already running. Stable graph order (§19)."""
+        order = {t["task_id"]: i for i, t in enumerate(project.tasks)}
+        runnable = []
+        for task in project.tasks:
+            if task["status"] != "PENDING":
+                continue
+            if task["task_id"] in self._running_task_ids:
+                continue
+            deps_ok = all(self._dep_status(project, d) in ("PASSED", "COMPLETED")
+                          for d in task.get("dependencies", []))
+            if deps_ok:
+                runnable.append(task["task_id"])
+        return sorted(runnable, key=order.__getitem__)
+
+    def _parallel_recovery_pass(self, project: Project, executed: list) -> None:
+        """§16 crash recovery. Recorded policy: a task left RUNNING by an
+        interrupted process is recovered to PENDING (never assumed PASS) and
+        re-executed; already-terminal tasks are skipped, not re-executed (§14)."""
+        self._running_task_ids = set()
+        for task in project.tasks:
+            if task["status"] == "RUNNING":
+                project._set_task(task["task_id"], status="PENDING",
+                                  reason="recovered: RUNNING at interruption -> PENDING")
+                project._event("task_recovered", task_id=task["task_id"],
+                               task_type=task["task_type"],
+                               from_status="RUNNING", to_status="PENDING")
+                self.emit("task_recovered", {
+                    "project_id": project.project_id,
+                    "task_id": task["task_id"], "task_type": task["task_type"],
+                    "from_status": "RUNNING", "to_status": "PENDING"})
+            elif task["status"] in ("PASSED", "COMPLETED"):
+                executed.append({"task": task["task_type"], "outcome": "SKIPPED",
+                                 "agent": task.get("assigned_agent") or ""})
+
+    def _terminalize_ready(self, project: Project, state: dict,
+                           executed: list, force_rerun: bool) -> None:
+        """Idempotency (§14): PENDING tasks whose workflow stage is already
+        COMPLETED on disk (e.g. checkpoint recovery) become COMPLETED/SKIPPED
+        without invoking an agent. Unknown task types fail fast.
+
+        force_rerun deliberately covers ONLY the stage-done skip: already
+        PASSED/COMPLETED tasks are never re-executed in parallel mode —
+        idempotency (§14) outranks force_rerun here (known, documented
+        asymmetry vs the sequential path)."""
+        for task in project.tasks:
+            if task["status"] != "PENDING":
+                continue
+            tid, tt = task["task_id"], task["task_type"]
+            stage_id = self._stage_id_for(tt)
+            if not stage_id:
+                project._set_task(tid, status="FAILED",
+                                  reason="unknown task_type %s" % tt)
+                project._event("task_failed", task_id=tid, task_type=tt,
+                               reason="unknown task_type %s" % tt)
+                self._checkpoint(project, state, tid)
+                executed.append({"task": tt, "outcome": "FAILED"})
+                continue
+            if force_rerun:
+                continue
+            stage_status = (state.get("stages", {}).get(stage_id, {}) or {}).get("status")
+            done = stage_status == "COMPLETED" or (
+                stage_id in _UNIQUE_STAGES and self._stage_done(state, stage_id))
+            if done:
+                project._set_task(tid, status="COMPLETED",
+                                  output_artifacts=self._stage_artifacts(state, stage_id))
+                project._event("task_skipped", task_id=tid, task_type=tt,
+                               reason="already_passed")
+                self.emit("task_skipped", {"project_id": project.project_id,
+                                           "task_id": tid, "task_type": tt})
+                self._checkpoint(project, state, tid)
+                executed.append({"task": tt, "outcome": "SKIPPED"})
+
+    def _block_downstream(self, project: Project, state: dict,
+                          executed: list) -> int:
+        """§12 failure propagation: a PENDING task whose dependency is
+        FAILED/NEEDS_REVIEW/BLOCKED becomes terminally BLOCKED."""
+        blocked = 0
+        for task in project.tasks:
+            if task["status"] != "PENDING":
+                continue
+            bad = [d for d in task.get("dependencies", [])
+                   if self._dep_status(project, d) in ("FAILED", "NEEDS_REVIEW", "BLOCKED")]
+            if not bad:
+                continue
+            tid, tt = task["task_id"], task["task_type"]
+            project._set_task(tid, status="BLOCKED", reason="unmet dependencies")
+            project._event("task_failed", task_id=tid, task_type=tt,
+                           reason="BLOCKED by %s" % bad)
+            self.emit("task_failed", {"project_id": project.project_id,
+                                      "task_id": tid, "task_type": tt,
+                                      "reason": "BLOCKED"})
+            self._checkpoint(project, state, tid)
+            executed.append({"task": tt, "outcome": "BLOCKED"})
+            blocked += 1
+        return blocked
+
+    def _run_parallel(self, project: Project, state: dict, wf: dict,
+                      force_rerun: bool = False) -> list:
+        """Phase 7 §22: DAG-aware bounded parallel execution loop.
+
+        Round-based scheduler (worker pool = ThreadPoolExecutor):
+          1. terminalize stage-done tasks (idempotency) and BLOCKED tasks
+          2. compute the runnable set (graph order), fill up to
+             max_concurrency slots, mark RUNNING (never two workers per task)
+          3. agent tasks execute on isolated CaseState copies in workers;
+             reference tasks execute in the scheduler thread on the main
+             state (the same code path as Phase 6 — safe because the
+             scheduler thread is the only main-state writer)
+          4. barrier: wait for the round, then COMMIT IN GRAPH ORDER —
+             merge artifacts, replay worker events, run Harness-owned
+             Eval + Repair, set the terminal status, checkpoint
+
+        Determinism (§19): thread completion order never decides commits —
+        artifact ids, eval ids and events follow graph order.
+        """
+        import copy as _copy
+        from concurrent.futures import ThreadPoolExecutor
+        from runtime.agents import agent_for_task, validate_assignment
+
+        executed = []
+        max_rounds = 200  # safety bound
+        # workers read this (MessageBus location); only the scheduler writes it
+        self._worker_project_dir = project._dir
+        pool = ThreadPoolExecutor(max_workers=self.max_concurrency)
+        try:
+            for _round in range(max_rounds):
+                self._terminalize_ready(project, state, executed, force_rerun)
+                runnable = self._compute_runnable(project)
+                if not runnable:
+                    if self._block_downstream(project, state, executed):
+                        continue  # a fresh BLOCKED state may cascade further
+                    break
+                batch = runnable[:self.max_concurrency]
+
+                # ---- schedule + start the round -------------------------------- #
+                workers = {}     # tid -> future (agent mode)
+                ref_tasks = []   # (tid, stage_id) reference mode
+                for slot, tid in enumerate(batch):
+                    task = project.get_task(tid)
+                    tt = task["task_type"]
+                    stage_id = self._stage_id_for(tt)
+                    assigned = task.get("assigned_agent") or agent_for_task(tt) or ""
+                    if assigned:
+                        project._set_task(tid, assigned_agent=assigned)
+                        ok_assign, assign_err = validate_assignment(tt, assigned)
+                        if not ok_assign:
+                            project._set_task(tid, status="BLOCKED",
+                                              reason=assign_err)
+                            project._event("agent_validation_failed",
+                                           task_id=tid, task_type=tt,
+                                           agent_id=assigned, reason=assign_err[:160])
+                            self.emit("agent_validation_failed",
+                                      {"project_id": project.project_id,
+                                       "task_id": tid, "task_type": tt,
+                                       "agent_id": assigned, "reason": assign_err[:160]})
+                            self._checkpoint(project, state, tid)
+                            executed.append({"task": tt, "outcome": "AGENT_INVALID"})
+                            continue
+                        project._event("agent_assigned", task_id=tid, task_type=tt,
+                                       agent_id=assigned)
+                        self.emit("agent_assigned", {"project_id": project.project_id,
+                                                     "task_id": tid, "task_type": tt,
+                                                     "agent_id": assigned})
+                    attempt = task["attempt"] + 1
+                    project._set_task(tid, status="RUNNING", attempt=attempt)
+                    self._running_task_ids.add(tid)  # §13 no duplicate execution
+                    worker_id = "w%d" % slot
+                    project._event("task_scheduled", task_id=tid, task_type=tt,
+                                   worker_id=worker_id)
+                    project._event("task_started", task_id=tid, task_type=tt,
+                                   attempt=attempt, agent_id=assigned or None,
+                                   worker_id=worker_id)
+                    self.emit("task_started", {"project_id": project.project_id,
+                                               "task_id": tid, "task_type": tt,
+                                               "agent_id": assigned or None,
+                                               "worker_id": worker_id})
+                    if assigned:
+                        project._event("agent_started", task_id=tid, task_type=tt,
+                                       agent_id=assigned, attempt=attempt)
+                        self.emit("agent_started", {"project_id": project.project_id,
+                                                    "task_id": tid, "task_type": tt,
+                                                    "agent_id": assigned})
+                    if assigned and self.agent_executor is not None:
+                        # snapshot BEFORE submit: workers never observe the
+                        # main state while the scheduler mutates it (§7)
+                        snapshot = _copy.deepcopy(state)
+                        workers[tid] = pool.submit(self._execute_worker, wf, task,
+                                                   assigned, worker_id, snapshot)
+                    else:
+                        ref_tasks.append((tid, stage_id))
+
+                # ---- reference tasks run in the scheduler thread (main state),
+                #      concurrently with the in-flight agent workers --------- #
+                ref_results = {}
+                for tid, stage_id in ref_tasks:
+                    ref_results[tid] = self._execute_reference(state, wf, stage_id)
+
+                # ---- round barrier, then graph-order commit (§19) ------------- #
+                agent_results = {tid: fut.result() for tid, fut in workers.items()}
+                for tid in batch:
+                    if tid in ref_results:
+                        executed.extend(
+                            self._commit_reference(project, state,
+                                                   ref_results[tid], tid))
+                    elif tid in agent_results:
+                        executed.extend(
+                            self._commit_agent(project, state, wf,
+                                               agent_results[tid]))
+                    self._running_task_ids.discard(tid)
+        finally:
+            pool.shutdown(wait=True)
+        return executed
+
+    def _execute_worker(self, wf: dict, task: dict, assigned: str,
+                        worker_id: str, snapshot: dict) -> "TaskExecutionResult":
+        """Run ONE agent task on an isolated CaseState copy (§7/§8).
+
+        The worker only executes; it never decides PASS, never touches the
+        project / main state / checkpoints, and its emitted events are
+        captured for the scheduler to replay in commit order.
+        """
+        t0 = time.time()
+        captured: list = []
+        worker_state = snapshot
+        worker_state["_workflow"] = wf
+        proxy = _WorkerProjectProxy(self._worker_project_dir, captured)
+
+        def _worker_emit(event_type, data):
+            captured.append((event_type, dict(data or {})))
+
+        try:
+            executor = self._resolve_agent_executor()
+            result = executor.execute(agent_id=assigned, task=task,
+                                      project=proxy, case_state=worker_state,
+                                      emit=_worker_emit)
+            produced = [t for t in self._produced_types_for(task["task_type"])
+                        if t in (worker_state.get("artifacts") or {})]
+            return TaskExecutionResult(
+                task_id=task["task_id"], agent_id=assigned,
+                status=result.outcome, artifacts=produced,
+                execution_metadata={
+                    "worker_id": worker_id,
+                    "duration_ms": round((time.time() - t0) * 1000, 1)},
+                error=getattr(result, "error_code", "") or "",
+                worker_state=worker_state, events=captured)
+        except Exception as e:  # noqa: BLE001 — a worker crash fails ONE task
+            return TaskExecutionResult(
+                task_id=task["task_id"], agent_id=assigned,
+                status="AGENT_FAILED",
+                execution_metadata={
+                    "worker_id": worker_id,
+                    "duration_ms": round((time.time() - t0) * 1000, 1)},
+                error="WORKER_EXCEPTION: %r" % e,
+                worker_state=worker_state, events=captured)
+        finally:
+            worker_state.pop("_workflow", None)
+
+    def _execute_reference(self, state: dict, wf: dict, stage_id: str) -> dict:
+        """Reference (deterministic-runtime) task, executed by the scheduler
+        thread on the MAIN state — the exact Phase 6 execution path."""
+        stage = transitions.stage_by_id(wf, stage_id)
+        if stage is None:
+            return {"outcome": "NEEDS_REVIEW",
+                    "reasons": ["unknown stage %s" % stage_id]}
+        state["current_stage"] = stage_id
+        return orch._execute_stage(state, wf, stage)  # noqa: SLF001 — Phase 6 path
+
+    def _commit_reference(self, project: Project, state: dict,
+                          result: dict, tid: str) -> list:
+        """Commit a reference-mode task result (scheduler thread only)."""
+        task = project.get_task(tid)
+        tt = task["task_type"]
+        assigned = task.get("assigned_agent") or ""
+        outcome = result.get("outcome")
+        if outcome == "GATE":
+            orch.approve(state, self._stage_id_for(tt))
+            outcome = "OK"
+        if outcome == "OK":
+            arts = self._stage_artifacts(state, self._stage_id_for(tt))
+            project._set_task(tid, status="PASSED", output_artifacts=arts)
+            project._event("task_completed", task_id=tid, task_type=tt,
+                           artifacts=arts, agent_id=assigned or None)
+            self.emit("task_completed", {"project_id": project.project_id,
+                                         "task_id": tid, "task_type": tt,
+                                         "artifacts": arts})
+            self._checkpoint(project, state, tid)
+            return [{"task": tt, "outcome": "PASS", "agent": assigned}]
+        reason = str(result.get("reasons", ""))[:200] or "execution failed"
+        project._set_task(tid, status="NEEDS_REVIEW", reason=reason)
+        project._event("task_failed", task_id=tid, task_type=tt,
+                       agent_id=assigned or None, reason=reason)
+        self.emit("task_failed", {"project_id": project.project_id,
+                                  "task_id": tid, "task_type": tt,
+                                  "reason": reason})
+        self._checkpoint(project, state, tid)  # terminal → checkpoint (§15)
+        return [{"task": tt, "outcome": "NEEDS_REVIEW", "agent": assigned}]
+
+    def _commit_agent(self, project: Project, state: dict, wf: dict,
+                      wres: "TaskExecutionResult") -> list:
+        """Commit one agent-mode worker result in the scheduler thread:
+        replay events → merge artifacts → Harness-owned Eval + Repair →
+        terminal status → checkpoint. Only this thread writes shared state."""
+        tid = wres.task_id
+        task = project.get_task(tid)
+        tt = task["task_type"]
+        assigned = wres.agent_id
+        stage_id = self._stage_id_for(tt)
+
+        # 1. replay worker-captured events (dual-write, graph order)
+        for etype, edata in wres.events:
+            self.emit(etype, {"project_id": project.project_id, **edata})
+            safe = {k: v for k, v in edata.items()
+                    if isinstance(v, (str, int, float, bool)) or v is None}
+            project._event(etype, **safe)
+
+        # 2. merge the worker's artifacts into the main state
+        merged = self._merge_worker_artifacts(state, wf, wres.worker_state)
+
+        # 3. Harness-owned Eval + Repair — the ONLY PASS authority (§9).
+        #    A worker result alone can NEVER yield PASS: only the eval branch
+        #    can, so a misbehaving executor cannot self-pass.
+        if wres.status == "ARTIFACT_READY" and merged:
+            result = self._run_eval_and_repair(
+                state, wf, stage_id, task, project, assigned,
+                self._resolve_agent_executor())
+            outcome = result.get("outcome")
+            if outcome == "GATE":
+                orch.approve(state, stage_id)
+                outcome = "OK"
+        else:
+            result, outcome = wres, None
+
+        if outcome == "OK":
+            arts = self._produced_artifact_ids(state, tt)
+            project._set_task(tid, status="PASSED", output_artifacts=arts)
+            project._event("task_completed", task_id=tid, task_type=tt,
+                           artifacts=arts, agent_id=assigned or None)
+            self.emit("task_completed", {"project_id": project.project_id,
+                                         "task_id": tid, "task_type": tt,
+                                         "artifacts": arts})
+            project._event("agent_completed", task_id=tid, task_type=tt,
+                           agent_id=assigned, artifacts=arts)
+            self.emit("agent_completed", {"project_id": project.project_id,
+                                          "task_id": tid, "task_type": tt,
+                                          "agent_id": assigned,
+                                          "artifacts": arts})
+            self._checkpoint(project, state, tid)
+            return [{"task": tt, "outcome": "PASS", "agent": assigned}]
+
+        reason = wres.error or "; ".join(str(r) for r in result.get("reasons") or [])
+        reason = (reason or "agent execution failed")[:200]
+        project._set_task(tid, status="NEEDS_REVIEW", reason=reason)
+        project._event("task_failed", task_id=tid, task_type=tt,
+                       agent_id=assigned or None, reason=reason)
+        project._event("agent_failed", task_id=tid, task_type=tt,
+                       agent_id=assigned, reason=reason[:160])
+        self.emit("agent_failed", {"project_id": project.project_id,
+                                   "task_id": tid, "task_type": tt,
+                                   "agent_id": assigned, "reason": reason[:160]})
+        self._checkpoint(project, state, tid)  # terminal → checkpoint (§15)
+        return [{"task": tt, "outcome": "NEEDS_REVIEW", "agent": assigned}]
+
+    def _merge_worker_artifacts(self, state: dict, wf: dict,
+                                worker_state: dict) -> bool:
+        """Scheduler-thread merge of a worker's produced artifacts into the
+        main state (§7). Content is RE-REGISTERED through the canonical
+        put_artifact + artifact_registry path so ids stay sequential and
+        unique regardless of worker count. Returns False on a collision."""
+        main_arts = state.setdefault("artifacts", {})
+        for art_type, art in (worker_state.get("artifacts") or {}).items():
+            if art_type in main_arts:
+                # same type re-produced (e.g. repair recovery): only the exact
+                # same content may merge; anything else is a P0 collision
+                if transitions.fingerprint(main_arts[art_type]) != \
+                        transitions.fingerprint(art):
+                    cs.record_event(state, "MERGE_REJECTED", detail=(
+                        "ARTIFACT_COLLISION: %s produced twice with different "
+                        "content" % art_type))
+                    return False
+                continue
+            wrec = (worker_state.get("artifact_registry") or {}).get(art_type) or {}
+            producer = wrec.get("producer_stage")
+            if not producer:
+                for st in transitions.stage_defs(wf):
+                    if st.get("produces") == art_type:
+                        producer = st["id"]
+                        break
+            if not producer:  # service-provided artifacts (knowledge-evidence)
+                producer = self._stage_id_for("knowledge_search")
+            ok, reasons = cs.put_artifact(state, art_type, art, producer)
+            if not ok:
+                cs.record_event(state, "MERGE_REJECTED", detail="; ".join(reasons))
+                return False
+            stage_def = transitions.stage_by_id(wf, producer) or {
+                "id": producer, "skill": wrec.get("producer_skill"),
+                "consumes": []}
+            arec = reg_mod.register(state, art_type, art, stage_def)
+            tr.emit(state, "ARTIFACT_STORED", output_artifact=arec["artifact_id"],
+                    detail="artifact_type=%s stage=%s (parallel merge)"
+                           % (art_type, producer))
+            # mirror stage/task completion when the worker completed the stage
+            wstage = (worker_state.get("stages") or {}).get(producer, {})
+            if wstage.get("status") == "COMPLETED" and \
+                    state["stages"][producer].get("status") != "COMPLETED":
+                tk.set_output(state, producer, arec["artifact_id"])
+                tk.set_status(state, producer, "COMPLETED")
+                state["stages"][producer]["completed_at"] = \
+                    wstage.get("completed_at") or cs.now()
+                cs.record_event(state, "STAGE_COMPLETED", stage=producer,
+                                detail="parallel merge")
+        return True
+
+    def _produced_artifact_ids(self, state: dict, task_type: str) -> list:
+        """Artifact ids a task_type produced (Planner Registry types)."""
+        out = []
+        for art_type in self._produced_types_for(task_type):
+            arec = reg_mod.by_type(state, art_type)
+            if arec:
+                out.append(arec["artifact_id"])
+        return out
 
     def resume(self, project_id: str, workflow: Optional[dict] = None,
                force_rerun: bool = False) -> dict:
