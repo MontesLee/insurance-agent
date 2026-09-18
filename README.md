@@ -47,6 +47,7 @@ Most LLM demos optimize the prompt loop. This repository optimizes the
 - **Bounded parallel DAG scheduling** (`max_concurrency`, default 1 = unchanged sequential mode)
 - **Harness-controlled dynamic replanning** (bounded budget, deterministic triggers, immutable graph revisions, validator-gated)
 - **Human-in-the-loop approval gateway** (deterministic policy, fail-closed state machine, crash-safe pause/resume)
+- **Human-on-the-loop control plane** (deterministic monitor + signals, risk levels, audited idempotent supervisor commands, safe-barrier pause/resume)
 - 4 specialist Agents with a deterministic task→agent map, scoped tools, and permission validation
 - Agent-to-Agent communication via a persistent, policy-enforced MessageBus with ACK-after-PASS handoffs
 - Deterministic Eval (schema / required fields / contamination / provenance / cross-artifact / invariants) + repair ≤ 2
@@ -136,6 +137,7 @@ Test strategy and current known infra issues:
 | Bounded parallel DAG scheduler | [docs/architecture/parallel-scheduler.md](docs/architecture/parallel-scheduler.md) |
 | Dynamic replanning (Phase 8 V0.1) | [docs/architecture/dynamic-replanning.md](docs/architecture/dynamic-replanning.md) |
 | Human-in-the-loop approval (Phase 9 V0.1) | [docs/architecture/human-in-the-loop.md](docs/architecture/human-in-the-loop.md) |
+| Human-on-the-loop control plane (Phase 10 V0.1) | [docs/architecture/human-on-the-loop.md](docs/architecture/human-on-the-loop.md) |
 | Specialist agents, executor, tools | [docs/architecture/agents.md](docs/architecture/agents.md) |
 | A2A communication & handoffs | [docs/architecture/a2a.md](docs/architecture/a2a.md) |
 | Eval & repair boundary | [docs/architecture/eval.md](docs/architecture/eval.md) |
@@ -182,6 +184,7 @@ docs/               architecture, ADRs, development guides, demo scripts
 | 7 | Bounded parallel DAG scheduler (isolated workers, scheduler-owned commit, recovery) + housekeeping freeze |
 | 8 | Dynamic replanning V0.1 (deterministic triggers, safe barriers, immutable graph revisions, bounded budget) |
 | 9 | Human-in-the-loop approval gateway V0.1 (deterministic policy, fail-closed approvals, Harness-owned resume) |
+| 10 | Human-on-the-loop control plane V0.1 (deterministic monitor, intervention policy, audited supervisor commands) |
 
 Each layer froze before the next began; `max_concurrency=1` still runs the
 Phase 6 sequential path byte-for-byte.

@@ -80,6 +80,14 @@ HARNESS_TASK_EVENTS = {
     "approval_requested", "approval_waiting", "approval_approved",
     "approval_rejected", "approval_expired", "approval_resumed",
     "approval_failed",
+    # Phase 10 human-on-the-loop control plane (docs/architecture/human-on-the-loop.md)
+    "monitor_started", "monitor_signal_detected", "risk_level_changed",
+    "intervention_created", "intervention_notified", "intervention_required",
+    "control_command_received", "control_command_validated",
+    "control_command_rejected", "control_command_applied",
+    "runtime_pausing", "runtime_paused", "runtime_resuming", "runtime_resumed",
+    "task_retry_requested", "task_cancel_requested",
+    "human_information_received",
 }
 
 _TASK_STATUSES = {"PENDING", "RUNNING", "PASSED", "FAILED", "BLOCKED",
@@ -92,6 +100,11 @@ def _now() -> str:
 
 def _uid(prefix: str) -> str:
     return "%s_%s" % (prefix, uuid.uuid4().hex[:8])
+
+
+def _paused_result(project, executed):
+    return {"status": "paused", "executed": executed,
+            "project": project.to_public()}
 
 
 # --------------------------------------------------------------------------- #
@@ -326,7 +339,10 @@ class LongRunningHarness:
                  max_concurrency: int = 1,
                  max_replans: int = 2,
                  planner_provider=None,
-                 approval_policy=None):
+                 approval_policy=None,
+                 monitor_enabled: bool = True,
+                 monitor_config: Optional[dict] = None,
+                 intervention_policy=None):
         self.root = harness_root
         self.emit = emit or (lambda event_type, data: None)
         # Phase 5.1: inject a SpecialistAgentExecutor or an LLMProvider for
@@ -339,6 +355,12 @@ class LongRunningHarness:
         # Phase 9: deterministic human-approval gateway. None = not installed
         # → every policy outcome is AUTO (Phase 8 behaviour unchanged).
         self.approval_policy = approval_policy
+        # Phase 10: human-on-the-loop control plane. The monitor observes at
+        # safe barriers; the intervention policy is deterministic; commands
+        # are applied only by the Harness.
+        self.monitor_enabled = bool(monitor_enabled)
+        self.monitor_config = monitor_config
+        self.intervention_policy = intervention_policy
         # Phase 7: DAG-aware bounded parallel scheduler. 1 = sequential (Phase 6 compat).
         if not isinstance(max_concurrency, int) or max_concurrency < 1:
             raise ValueError("max_concurrency must be a positive int, got %r" % max_concurrency)
@@ -450,6 +472,29 @@ class LongRunningHarness:
         # any blocking approval: a waiting project executes NOTHING until a
         # human approves AND the Harness resumes (fail closed).
         self._sync_resolved_approvals(project)
+        # ---- Phase 10: control-plane recovery + supervisor gates --------- #
+        # A crashed pending command is re-applied idempotently; a PAUSED or
+        # CANCELLED runtime refuses to execute until an explicit RESUME.
+        if self.monitor_enabled:
+            plane = self._control_plane(project)
+            plane.recover_pending_commands()
+            sup = plane.supervisor()
+            if sup.get("status") == "PAUSED":
+                project.status = "paused"
+                project._save()
+                return _paused_result(project, executed)
+            if sup.get("status") == "CANCELLED":
+                project.status = "cancelled"
+                project._save()
+                return {"status": "cancelled", "executed": executed,
+                        "project": project.to_public()}
+            if sup.get("status") == "PAUSING":
+                # crash between PAUSE request and the barrier: complete it
+                self._complete_pause(project, state,
+                                     reason="recovered pending pause")
+                return _paused_result(project, executed)
+            if sup.get("status") in ("RUNNING", "RESUMING"):
+                plane.set_status("RUNNING")
         waiting = self._waiting_approvals(project)
         if waiting:
             project.status = "waiting_approval"
@@ -476,11 +521,19 @@ class LongRunningHarness:
                             "no_change": 0}
             max_scheduling_rounds = 5  # same bound as the sequential path
             for _round in range(max_scheduling_rounds):
+                if self._pause_pending(project):
+                    self._complete_pause(project, state,
+                                         reason="supervisor pause")
+                    return _paused_result(project, executed)
                 executed.extend(self._run_parallel(project, state, wf,
                                                    force_rerun=force_rerun))
                 stats = self._consume_handoffs(project, state)
                 for k in handoff_stats:
                     handoff_stats[k] += stats.get(k, 0)
+
+                # ---- Phase 10: observe + intervention at the safe barrier -- #
+                if self._monitor_and_intervene(project, state, executed) == "paused":
+                    return _paused_result(project, executed)
 
                 # ---- Phase 8: replan evaluation at the SAFE BARRIER ----- #
                 # _run_parallel has returned: all workers joined, all
@@ -500,13 +553,24 @@ class LongRunningHarness:
                 has_pending_tasks = any(t["status"] == "PENDING" for t in project.tasks)
                 if not (activated and has_pending_tasks):
                     break
+            # ---- Phase 10: one final observation of the settled state ---- #
+            if self._monitor_and_intervene(project, state, executed) == "paused":
+                return _paused_result(project, executed)
             project.status = self._final_status(project)
             project._save()
             return {"status": project.status, "executed": executed,
                     "handoffs": handoff_stats, "replans": replan_stats,
                     "project": project.to_public()}
 
+        _seq_paused = False
         for task in project.tasks:
+            # ---- Phase 10: supervisor pause honored at this safe barrier --
+            #      (the previous task's commit + eval/repair are complete)
+            if self._pause_pending(project):
+                self._complete_pause(project, state,
+                                     reason="supervisor pause")
+                _seq_paused = True
+                break
             # ---- crash recovery parity with the parallel path (Phase 9
             #      hardening): a task left RUNNING by an interrupted process
             #      resumes from PENDING — never assumed terminal ----------
@@ -714,6 +778,9 @@ class LongRunningHarness:
             # ---- checkpoint after each PASS (§11) ---------------------------- #
             self._checkpoint(project, state, task["task_id"])
 
+        if _seq_paused:
+            return _paused_result(project, executed)
+
         # ---- Phase 6.2: message-driven scheduling loop ---------------------- #
         # After the sequential pass, consume handoffs. If any handoff activates
         # a still-PENDING task whose dependencies are now met, loop back and
@@ -743,6 +810,9 @@ class LongRunningHarness:
         # preserves terminal-ok work), then execute the new PENDING tasks.
         replan_stats = {"triggered": 0, "accepted": 0, "failed": 0, "no_change": 0}
         for _replan_round in range(self.max_replans):
+            # ---- Phase 10: observe + intervention at the safe barrier ------ #
+            if self._monitor_and_intervene(project, state, executed) == "paused":
+                return _paused_result(project, executed)
             trigger = self._evaluate_replan_trigger(project, state)
             if trigger is None:
                 break
@@ -755,6 +825,9 @@ class LongRunningHarness:
             self._run_pending_pass(project, state, wf, executed)
             self._consume_handoffs(project, state)
 
+        # ---- Phase 10: one final observation of the settled state -------- #
+        if self._monitor_and_intervene(project, state, executed) == "paused":
+            return _paused_result(project, executed)
         project.status = self._final_status(project)
         project._save()
         return {"status": project.status, "executed": executed,
@@ -1018,6 +1091,8 @@ class LongRunningHarness:
         pool = ThreadPoolExecutor(max_workers=self.max_concurrency)
         try:
             for _round in range(max_rounds):
+                if self._pause_pending(project):
+                    break   # safe barrier: the previous round fully committed
                 self._terminalize_ready(project, state, executed, force_rerun)
                 runnable = self._compute_runnable(project)
                 if not runnable:
@@ -1706,7 +1781,14 @@ class LongRunningHarness:
                 if a["status"] in ("WAITING_HUMAN", "APPROVED")]
 
     def _final_status(self, project: Project) -> str:
-        """Terminal project status, honouring a blocking approval first."""
+        """Terminal project status, honouring supervisor + approval state."""
+        if self.monitor_enabled:
+            from runtime.control.store import ControlStore
+            sup = ControlStore(project._dir).load_supervisor(project.project_id)
+            if sup.get("status") in ("PAUSED", "PAUSING"):
+                return "paused"
+            if sup.get("status") == "CANCELLED":
+                return "cancelled"
         if self._waiting_approvals(project):
             return "waiting_approval"
         if all(t["status"] in ("PASSED", "COMPLETED") for t in project.tasks):
@@ -1817,6 +1899,249 @@ class LongRunningHarness:
             self._checkpoint(project, state, task_id=None)
         return self.run(project, workflow=workflow)
 
+    # ------------------------------------------------------------------ #
+    # Phase 10: Human-on-the-loop Control Plane
+    #
+    # The human is a SUPERVISOR above the workflow DAG. The monitor observes
+    # at safe barriers; the intervention policy is deterministic; every
+    # human command is audited (control_commands.jsonl) and applied ONLY by
+    # the Harness — never by direct state mutation. Phase 9 approval
+    # gateway remains a separate, unchanged boundary.
+    # ------------------------------------------------------------------ #
+    def _control_plane(self, project: Project):
+        from runtime.control import ControlPlane, RuntimeMonitor, InterventionPolicy
+        return ControlPlane(self, project,
+                            monitor=RuntimeMonitor(self.monitor_config),
+                            policy=self.intervention_policy
+                            or InterventionPolicy())
+
+    def _pause_pending(self, project: Project) -> bool:
+        if not self.monitor_enabled:
+            return False
+        from runtime.control.store import ControlStore
+        sup = ControlStore(project._dir).load_supervisor(project.project_id)
+        return sup.get("status") in ("PAUSING", "PAUSED")
+
+    def _emit_runtime(self, project: Project, event_type: str, **data) -> None:
+        self.emit(event_type, {"project_id": project.project_id, **data})
+        project._event(event_type, **data)
+
+    def _complete_pause(self, project: Project, state,
+                        command_id: str = "", reason: str = "") -> None:
+        plane = self._control_plane(project)
+        plane.set_status("PAUSED")
+        project.status = "paused"
+        project._save()
+        self._emit_runtime(project, "runtime_paused", command_id=command_id,
+                           reason=(reason or "")[:160])
+        if state is not None:
+            self._checkpoint(project, state, task_id=None)
+
+    def _monitor_and_intervene(self, project: Project, state, executed) -> Optional[str]:
+        """Phase 10 section 40: observe at the safe barrier (after commit +
+        eval/repair). Deterministic signals, deterministic policy, and a
+        PAUSE completes only here — at the barrier. Returns "paused"."""
+        if not self.monitor_enabled:
+            return None
+        plane = self._control_plane(project)
+        observation = plane.observe(executed)
+        if plane.supervisor().get("status") == "PAUSING":
+            self._complete_pause(project, state,
+                                 reason=observation.get("decision_reason", ""))
+            return "paused"
+        return None
+
+    def _apply_control_command(self, project: Project, cmd: dict) -> dict:
+        """The ONLY executor of human control commands (section 5/32):
+        validate, mutate state, checkpoint, event. Fail-closed."""
+        command = cmd.get("command")
+        payload = cmd.get("payload") or {}
+        plane = self._control_plane(project)
+        sup = plane.supervisor()
+        cid = cmd.get("command_id", "")
+
+        def _ok(result=None):
+            return {"ok": True, "result": result}
+
+        def _err(msg):
+            return {"ok": False, "error": msg}
+
+        # §24 permission boundary: only a human (or the harness itself)
+        # may issue control commands — agents/planners/tools are refused
+        if command not in ("APPROVE", "REJECT") \
+                and cmd.get("actor") not in ("human", "harness"):
+            return _err("ACTOR_NOT_AUTHORIZED: %r may not issue control "
+                        "commands (human only)" % cmd.get("actor"))
+
+        if command == "PAUSE":
+            if sup.get("status") == "CANCELLED":
+                return _err("cannot pause a cancelled project")
+            self._emit_runtime(project, "runtime_pausing", command_id=cid)
+            if any(t.get("status") == "RUNNING" for t in project.tasks):
+                # section 16/17: honored at the next safe barrier — running
+                # workers are never killed mid-commit
+                plane.set_status("PAUSING")
+                return _ok({"status": "PAUSING",
+                            "note": "applies at the next safe barrier"})
+            self._complete_pause(project, self._load_case_state(project),
+                                 command_id=cid)
+            return _ok({"status": "PAUSED"})
+
+        if command == "RESUME":
+            if sup.get("status") not in ("PAUSED", "RESUMING"):
+                return _err("resume requires a PAUSED runtime (status=%s)"
+                            % sup.get("status"))
+            self._emit_runtime(project, "runtime_resuming", command_id=cid)
+            # resuming ACKNOWLEDGES the alerts that drove the pause: their
+            # exact fingerprints are durably recorded so a persistent (but
+            # human-reviewed) signal cannot re-pause immediately — a changed
+            # runtime state produces a new fingerprint and fires again
+            store = plane.store
+            open_fps = [a.get("fingerprint") for a in store.open_alerts()]
+            sup.setdefault("acknowledged_fingerprints", [])
+            sup["acknowledged_fingerprints"].extend(
+                fp for fp in open_fps if fp)
+            sup["acknowledged_fingerprints"] =                 list(dict.fromkeys(sup["acknowledged_fingerprints"]))[-200:]
+            sup["status"] = "RUNNING"
+            sup["pending_interventions"] = []
+            store.save_supervisor(sup)
+            for alert in store.open_alerts():
+                store.resolve_alert(alert["alert_id"], _now())
+            plane.set_status("RUNNING")
+            self._emit_runtime(project, "runtime_resumed", command_id=cid)
+            return _ok({"status": "RUNNING",
+                        "acknowledged_alerts": len(open_fps)})
+
+        if command == "RETRY_TASK":
+            tid = str(payload.get("task_id") or "")
+            task = project.get_task(tid)
+            if task is None:
+                return _err("unknown task %r" % tid)
+            if task.get("status") == "RUNNING":
+                return _err("task %s is RUNNING" % tid)
+            if task.get("status") in ("PASSED", "COMPLETED"):
+                return _err("task %s is terminal-ok (use force_rerun semantics)"
+                            % tid)
+            if task.get("status") == "PENDING":
+                return _err("task %s is already PENDING — the scheduler will "
+                            "run it" % tid)
+            missing = [d for d in task.get("dependencies") or []
+                       if project.get_task(d) is None]
+            if missing:
+                return _err("retry would violate the graph: unknown deps %s"
+                            % missing)
+            unmet = [d for d in task.get("dependencies") or []
+                     if self._dep_status(project, d) not in ("PASSED", "COMPLETED")]
+            if unmet:
+                return _err("retry cannot succeed: dependencies not met: %s"
+                            % unmet)
+            self._emit_runtime(project, "task_retry_requested", task_id=tid,
+                               command_id=cid)
+            project._set_task(tid, status="PENDING", attempt=0, reason=None)
+            state = self._load_case_state(project)
+            if state is not None:
+                self._checkpoint(project, state, task_id=tid)
+            return _ok({"task_id": tid, "status": "PENDING"})
+
+        if command == "CANCEL":
+            self._emit_runtime(project, "task_cancel_requested", command_id=cid)
+            plane.set_status("CANCELLED")
+            project.status = "cancelled"
+            project._save()
+            state = self._load_case_state(project)
+            if state is not None:
+                self._checkpoint(project, state, task_id=None)
+            return _ok({"status": "CANCELLED",
+                        "note": "fail-closed; all history preserved"})
+
+        if command == "REPLAN":
+            # section 21/38: human REPLAN routes through the EXISTING Phase 8
+            # path — same validator, revisions, diff, budget, no-change guard
+            if len(project.replans) >= self.max_replans:
+                return _err("replan budget exhausted (%d/%d)"
+                            % (len(project.replans), self.max_replans))
+            state = self._load_case_state(project)
+            if state is None:
+                return _err("no valid case state")
+            if any(t.get("status") == "RUNNING" for t in project.tasks):
+                return _err("replan refused at unsafe barrier (tasks RUNNING)")
+            trigger = {"trigger": "HUMAN_REQUEST",
+                       "reason": str(payload.get("reason")
+                                     or "supervisor requested replan")[:200],
+                       "task_ids": []}
+            rec = self._run_replan(project, state, orch.load_workflow(),
+                                   trigger, [])
+            return _ok({"replan": {k: rec.get(k) for k in
+                                   ("status", "revision", "trigger",
+                                    "approval_id")}})
+
+        if command == "PROVIDE_INFORMATION":
+            key = str(payload.get("key") or "").strip()
+            if not key:
+                return _err("information requires a non-empty key")
+            state = self._load_case_state(project)
+            if state is None:
+                return _err("no valid case state")
+            entry = self._apply_human_information(
+                project, state, key, payload.get("value"),
+                str(cmd.get("actor") or "human"))
+            self._checkpoint(project, state, task_id=None)
+            return _ok({"entry": entry})
+
+        if command in ("APPROVE", "REJECT"):
+            aid = str(payload.get("approval_id") or "")
+            mgr = self._approval_manager(project)
+            if mgr.get(aid) is None:
+                return _err("unknown approval %r" % aid)
+            out = (mgr.approve(aid, actor=cmd.get("actor", "human"))
+                   if command == "APPROVE"
+                   else mgr.reject(aid, actor=cmd.get("actor", "human"),
+                                   reason=str(payload.get("reason") or "")))
+            if not out.get("ok"):
+                return _err(out.get("error", "approval refused"))
+            return _ok({"approval_id": aid,
+                        "status": out["approval"]["status"]})
+
+        return _err("unsupported command %r" % command)
+
+    def _apply_human_information(self, project: Project, state: dict,
+                                 key: str, value, actor: str) -> dict:
+        """Section 22/23: human input becomes a `human-input` ARTIFACT with
+        full provenance — never a direct CaseState overwrite. Conflicts are
+        recorded (previous/new value, source, actor, time) as FACT_CONFLICT
+        and left to the existing requirement/risk/replan machinery."""
+        art_type = "human-input"
+        existing = (state.get("artifacts") or {}).get(art_type)
+        entries = list(((existing or {}).get("payload") or {}).get("entries") or [])
+        # the LATEST entry for the key is the current fact — earlier entries
+        # are the append-only history
+        prev_val = next((e.get("value") for e in reversed(entries)
+                         if e.get("key") == key), None)
+        entry = {"key": key, "value": value, "previous_value": prev_val,
+                 "source_type": "human", "actor": actor, "at": _now(),
+                 "conflict": prev_val is not None and prev_val != value}
+        entries.append(entry)
+        artifact = {"artifact_type": art_type, "schema_version": "1.0",
+                    "generated_at": cs.now(),
+                    "payload": {"entries": entries},
+                    "provenance": [{"source_type": "human",
+                                    "source_id": actor, "confidence": 1.0}]}
+        state.setdefault("artifacts", {})[art_type] = artifact
+        arec = reg_mod.register(state, art_type, artifact,
+                                {"id": "human-input", "skill": "human",
+                                 "consumes": []})
+        tr.emit(state, "ARTIFACT_STORED", output_artifact=arec["artifact_id"],
+                detail="artifact_type=%s key=%s actor=%s conflict=%s"
+                       % (art_type, key, actor, entry["conflict"]))
+        if entry["conflict"]:
+            cs.record_event(state, "FACT_CONFLICT", stage=None,
+                            detail="key=%s previous=%r new=%r actor=%s"
+                                   % (key, prev_val, value, actor))
+        self._emit_runtime(project, "human_information_received",
+                           key=key, actor=actor,
+                           conflict=entry["conflict"])
+        return entry
+
     def _apply_graph_revision(self, project: Project, new_tasks: list,
                               revision: int) -> dict:
         """Graph merge / continuation semantics (§14/§15):
@@ -1892,6 +2217,27 @@ class LongRunningHarness:
     # ------------------------------------------------------------------ #
     # helpers
     # ------------------------------------------------------------------ #
+    def _supervisor_checkpoint_fields(self, project: Project) -> dict:
+        if not self.monitor_enabled:
+            return {}
+        try:
+            from runtime.control.store import ControlStore
+            store = ControlStore(project._dir)
+            sup = store.load_supervisor(project.project_id)
+            cmds = store.commands()
+            return {
+                "supervisor_status": sup.get("status"),
+                "risk_level": sup.get("risk_level"),
+                "active_alerts": list(sup.get("active_alerts") or []),
+                "pending_interventions": list(
+                    sup.get("pending_interventions") or []),
+                "last_control_command_id":
+                    cmds[-1]["command_id"] if cmds else None,
+            }
+        except Exception:  # noqa: BLE001 — checkpoints must never fail on
+            # control-plane file issues; the snapshot is best-effort
+            return {}
+
     def _checkpoint(self, project: Project, state: dict, task_id: str = None,
                     approval: Optional[dict] = None) -> dict:
         entry = cp.save(state, self._case_root(project), None)
@@ -1905,6 +2251,9 @@ class LongRunningHarness:
             "approval_id": (approval or {}).get("approval_id"),
             "approval_status": (approval or {}).get("status"),
             "artifact_refs": entry.get("artifacts", []),
+            # Phase 10 supervisor snapshot (section 27) — same checkpoint
+            # system, no second one
+            **self._supervisor_checkpoint_fields(project),
             "completed_task_ids": [t["task_id"] for t in project.tasks
                                    if t["status"] in ("PASSED", "COMPLETED")],
             "pending_task_ids": [t["task_id"] for t in project.tasks

@@ -542,6 +542,17 @@ class ApprovalDecisionRequest(BaseModel):
     reason: str = ""
 
 
+class ControlCommandRequest(BaseModel):
+    """Phase 10 §31: supervisor command body. The API only parses/validates
+    and creates the command — the Harness applies it (never direct state
+    mutation)."""
+    actor: str = "human"
+    task_id: str = ""
+    reason: str = ""
+    key: str = ""
+    value: str = ""
+
+
 def _harness_root(manager: "RunManager") -> str:
     """Root that holds LongRunningHarness projects (Phase 9 approval API)."""
     return os.environ.get(
@@ -736,7 +747,91 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
     def reject_approval(approval_id: str, req: ApprovalDecisionRequest):
         return _resolve_approval(mgr, approval_id, "reject", req)
 
+    # ---- Phase 10 §31: supervisor / control-plane endpoints -------------- #
+    @app.get("/api/projects/{project_id}/supervisor")
+    def get_supervisor(project_id: str):
+        from runtime.control.store import ControlStore
+        pdir = os.path.join(_harness_root(mgr), project_id)
+        if not os.path.isdir(pdir):
+            return JSONResponse({"error": "project not found"}, status_code=404)
+        return {"project_id": project_id,
+                "supervisor": ControlStore(pdir).load_supervisor(project_id)}
+
+    @app.get("/api/projects/{project_id}/alerts")
+    def get_alerts(project_id: str):
+        from runtime.control.store import ControlStore
+        pdir = os.path.join(_harness_root(mgr), project_id)
+        if not os.path.isdir(pdir):
+            return JSONResponse({"error": "project not found"}, status_code=404)
+        return {"project_id": project_id, "alerts": ControlStore(pdir).alerts()}
+
+    @app.get("/api/projects/{project_id}/notifications")
+    def get_notifications(project_id: str):
+        from runtime.control.store import ControlStore
+        pdir = os.path.join(_harness_root(mgr), project_id)
+        if not os.path.isdir(pdir):
+            return JSONResponse({"error": "project not found"}, status_code=404)
+        return {"project_id": project_id,
+                "notifications": ControlStore(pdir).notifications()}
+
+    @app.get("/api/projects/{project_id}/control-commands")
+    def get_control_commands(project_id: str):
+        from runtime.control.store import ControlStore
+        pdir = os.path.join(_harness_root(mgr), project_id)
+        if not os.path.isdir(pdir):
+            return JSONResponse({"error": "project not found"}, status_code=404)
+        return {"project_id": project_id,
+                "commands": ControlStore(pdir).commands()}
+
+    @app.post("/api/projects/{project_id}/control/pause")
+    def control_pause(project_id: str, req: ControlCommandRequest):
+        return _control_command(mgr, project_id, "PAUSE", req)
+
+    @app.post("/api/projects/{project_id}/control/resume")
+    def control_resume(project_id: str, req: ControlCommandRequest):
+        return _control_command(mgr, project_id, "RESUME", req)
+
+    @app.post("/api/projects/{project_id}/control/retry")
+    def control_retry(project_id: str, req: ControlCommandRequest):
+        return _control_command(mgr, project_id, "RETRY_TASK", req)
+
+    @app.post("/api/projects/{project_id}/control/replan")
+    def control_replan(project_id: str, req: ControlCommandRequest):
+        return _control_command(mgr, project_id, "REPLAN", req)
+
+    @app.post("/api/projects/{project_id}/control/cancel")
+    def control_cancel(project_id: str, req: ControlCommandRequest):
+        return _control_command(mgr, project_id, "CANCEL", req)
+
+    @app.post("/api/projects/{project_id}/control/information")
+    def control_information(project_id: str, req: ControlCommandRequest):
+        return _control_command(mgr, project_id, "PROVIDE_INFORMATION", req)
+
     return app
+
+
+def _control_command(mgr: "RunManager", project_id: str, command: str,
+                     req: "ControlCommandRequest") -> dict:
+    """Phase 10 §32: HTTP -> ControlPlane -> Harness. The API never mutates
+    runtime state directly; the Harness validates and applies the audited
+    command (state-only in this process — agent execution continues in the
+    harness runtime)."""
+    from runtime.harness import LongRunningHarness, load_project
+    root = _harness_root(mgr)
+    project = load_project(root, project_id)
+    if project is None:
+        return JSONResponse({"error": "project not found"}, status_code=404)
+    payload = {}
+    for key in ("task_id", "reason", "key", "value"):
+        if getattr(req, key, ""):
+            payload[key] = getattr(req, key)
+    harness = LongRunningHarness(root)
+    plane = harness._control_plane(project)
+    out = plane.command(command, actor=req.actor or "human", payload=payload)
+    if not out.get("ok"):
+        return JSONResponse({"error": out.get("error"),
+                             "command": out.get("command")}, status_code=409)
+    return {"project_id": project_id, "result": out}
 
 
 def _resolve_approval(mgr: "RunManager", approval_id: str, op: str,

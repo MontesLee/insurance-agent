@@ -246,7 +246,20 @@ def test_event_integrity(c: Checks):
               # Phase 7/8 additions (also declared in HARNESS_TASK_EVENTS)
               "task_scheduled", "task_recovered",
               "replan_triggered", "replan_started", "replan_completed",
-              "replan_failed", "graph_revision_created"}
+              "replan_failed", "graph_revision_created",
+              # Phase 9 approval gateway
+              "approval_requested", "approval_waiting", "approval_approved",
+              "approval_rejected", "approval_expired", "approval_resumed",
+              "approval_failed",
+              # Phase 10 control plane
+              "monitor_started", "monitor_signal_detected",
+              "risk_level_changed", "intervention_created",
+              "intervention_notified", "intervention_required",
+              "control_command_received", "control_command_validated",
+              "control_command_rejected", "control_command_applied",
+              "runtime_pausing", "runtime_paused", "runtime_resuming",
+              "runtime_resumed", "task_retry_requested",
+              "task_cancel_requested", "human_information_received"}
     c.chk("events: harness+agent vocabulary used",
           types <= _vocab, types - _vocab)
     shutil.rmtree(root, ignore_errors=True)

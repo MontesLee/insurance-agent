@@ -48,7 +48,8 @@
 深入阅读：[planner](planner.zh-CN.md) · [harness](harness.zh-CN.md) ·
 [并行调度器](parallel-scheduler.zh-CN.md) ·
 [动态重规划](dynamic-replanning.zh-CN.md) ·
-[人工审批](human-in-the-loop.zh-CN.md) · [agents](agents.zh-CN.md) ·
+[人工审批](human-in-the-loop.zh-CN.md) ·
+[Human-on-the-loop](human-on-the-loop.zh-CN.md) · [agents](agents.zh-CN.md) ·
 [a2a](a2a.zh-CN.md) · [eval](eval.zh-CN.md) ·
 [artifact 与溯源](artifacts-and-provenance.zh-CN.md) ·
 [保险领域](insurance-domain.zh-CN.md)
@@ -124,6 +125,7 @@ Harness 判定。见 [eval.md](eval.zh-CN.md)。
 | 7 | 有界并行 DAG 调度器 + housekeeping 冻结 | `harness.py`（`_run_parallel`）、`tests/runtime/test_parallel_*` |
 | 8 | Harness 控制、有边界的动态重规划 | `harness.py`（重规划部分）、`runtime/planner/`（`replan`）、`tests/runtime/test_dynamic_replanning.py` |
 | 9 | 人工审批网关 | `runtime/approval/`、`harness.py`（审批部分）、`tests/runtime/test_approval.py` |
+| 10 | Human-on-the-loop 控制面 | `runtime/control/`、`harness.py`（控制面部分）、`tests/runtime/test_human_on_loop.py` |
 
 各层按顺序冻结；每个阶段的回归至今仍在运行（`max_concurrency=1`
 执行的仍是原样未动的 Phase 6 串行路径）。

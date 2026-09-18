@@ -15,6 +15,7 @@ plausibly grow. Each item notes the existing seam it would build on.
 | ~~Human-in-the-loop approval~~ **approval gateway implemented in Phase 9 V0.1** ([human-in-the-loop.md](architecture/human-in-the-loop.md)) — deterministic policy, fail-closed approvals, Harness-owned resume, minimal API | implemented | future: approval UI buttons, Feishu adapter, TTLs, reject→alternative-planning |
 | Feishu / external notifications | not implemented (future adapter for the Phase 9 approval gateway) | approval events + API are the seam |
 | Long-running production execution (services, watchers) | not implemented | harness is a library; `python -m runtime.server` is the only long-lived process |
+| ~~Supervisor control plane~~ **implemented in Phase 10 V0.1** — deterministic monitor/signals/risk, intervention policy, audited supervisor commands, pause/resume/retry/cancel/replan/human-input ([human-on-the-loop.md](architecture/human-on-the-loop.md)) | implemented | future: Feishu adapter, LLM anomaly detection, TTL alerts, RBAC |
 | Richer knowledge sources (external corpora, licensed content) | not implemented | Evidence Provider is the single seam; corpus is a local demo KB |
 | Additional domains beyond insurance | not implemented | skills/contracts/catalog are the domain pack to swap |
 

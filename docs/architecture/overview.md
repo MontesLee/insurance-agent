@@ -52,7 +52,8 @@ These are separated **deliberately**:
 Deep dives: [planner.md](planner.md) · [harness.md](harness.md) ·
 [parallel-scheduler.md](parallel-scheduler.md) ·
 [dynamic-replanning.md](dynamic-replanning.md) ·
-[human-in-the-loop.md](human-in-the-loop.md) · [agents.md](agents.md) ·
+[human-in-the-loop.md](human-in-the-loop.md) ·
+[human-on-the-loop.md](human-on-the-loop.md) · [agents.md](agents.md) ·
 [a2a.md](a2a.md) · [eval.md](eval.md) ·
 [artifacts-and-provenance.md](artifacts-and-provenance.md) ·
 [insurance-domain.md](insurance-domain.md)
@@ -131,6 +132,7 @@ candidate and stops; PASS is decided only by the Harness. See
 | 7 | bounded parallel DAG scheduler + housekeeping freeze | `harness.py` (`_run_parallel`), `tests/runtime/test_parallel_*` |
 | 8 | Harness-controlled bounded dynamic replanning | `harness.py` (replanning section), `runtime/planner/` (`replan`), `tests/runtime/test_dynamic_replanning.py` |
 | 9 | Human-in-the-loop approval gateway | `runtime/approval/`, `harness.py` (approval section), `tests/runtime/test_approval.py` |
+| 10 | Human-on-the-loop control plane | `runtime/control/`, `harness.py` (control section), `tests/runtime/test_human_on_loop.py` |
 
 Layers froze in order; each phase's regression still runs today
 (`max_concurrency=1` executes the Phase 6 sequential path unchanged).
