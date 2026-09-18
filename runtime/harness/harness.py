@@ -73,6 +73,9 @@ HARNESS_TASK_EVENTS = {
     "run_resumed",
     # Phase 7 parallel scheduler: batch selection + crash-recovery reset
     "task_scheduled", "task_recovered",
+    # Phase 8 dynamic replanning (Harness-owned; see docs/architecture/dynamic-replanning.md)
+    "replan_triggered", "replan_started", "replan_completed", "replan_failed",
+    "graph_revision_created",
 }
 
 _TASK_STATUSES = {"PENDING", "RUNNING", "PASSED", "FAILED", "BLOCKED",
@@ -100,7 +103,12 @@ class Project:
         self.state_version = 0
         self.created_at = _now()
         self.updated_at = _now()
-        self.tasks: list = []       # [task dicts]
+        self.tasks: list = []       # [task dicts] — the ACTIVE graph's tasks
+        # ---- Phase 8: graph revision / lineage (§5/§6) ---------------------- #
+        self.current_graph_revision = 1
+        self.graph_revisions: list = []   # immutable snapshots, newest last
+        self.replans: list = []           # replan attempt records (§20/§22)
+        self.source_request = ""          # original request (replan context)
         self._root = harness_root
         self._dir = os.path.join(harness_root, project_id)
         self._lock = threading.Lock()
@@ -117,6 +125,10 @@ class Project:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "tasks": self.tasks,
+            "current_graph_revision": self.current_graph_revision,
+            "graph_revisions": self.graph_revisions,
+            "replans": self.replans,
+            "source_request": self.source_request,
         }
         with open(os.path.join(self._dir, "project.json"), "w", encoding="utf-8") as f:
             json.dump(doc, f, ensure_ascii=False, indent=2)
@@ -194,6 +206,9 @@ class Project:
             "created_at": self.created_at, "updated_at": self.updated_at,
             "task_ids": [t["task_id"] for t in self.tasks],
             "tasks": self.tasks,
+            "current_graph_revision": self.current_graph_revision,
+            "graph_revisions": self.graph_revisions,
+            "replans": self.replans,
         }
 
 
@@ -238,6 +253,11 @@ def load_project(harness_root: str, project_id: str) -> Optional[Project]:
     p.created_at = doc["created_at"]
     p.updated_at = doc["updated_at"]
     p.tasks = doc["tasks"]
+    # Phase 8 fields — defaults keep pre-Phase-8 projects loadable (§36)
+    p.current_graph_revision = doc.get("current_graph_revision", 1)
+    p.graph_revisions = doc.get("graph_revisions", [])
+    p.replans = doc.get("replans", [])
+    p.source_request = doc.get("source_request", "")
     return p
 
 
@@ -299,16 +319,26 @@ class LongRunningHarness:
     def __init__(self, harness_root: str,
                  emit: Optional[Callable[[str, dict], None]] = None,
                  agent_executor=None,
-                 max_concurrency: int = 1):
+                 max_concurrency: int = 1,
+                 max_replans: int = 2,
+                 planner_provider=None):
         self.root = harness_root
         self.emit = emit or (lambda event_type, data: None)
         # Phase 5.1: inject a SpecialistAgentExecutor or an LLMProvider for
         # agent-mode execution; None = deterministic reference mode only
         self.agent_executor = agent_executor
+        # Phase 8: provider for Harness-initiated replan invocations (a
+        # FakePlannerProvider in tests; a real LLMProvider in production).
+        # Falls back to a raw-LLM agent_executor when not set.
+        self.planner_provider = planner_provider
         # Phase 7: DAG-aware bounded parallel scheduler. 1 = sequential (Phase 6 compat).
         if not isinstance(max_concurrency, int) or max_concurrency < 1:
             raise ValueError("max_concurrency must be a positive int, got %r" % max_concurrency)
         self.max_concurrency = max_concurrency
+        # Phase 8: bounded replan budget per project (§20). 0 disables replanning.
+        if not isinstance(max_replans, int) or max_replans < 0:
+            raise ValueError("max_replans must be a non-negative int, got %r" % max_replans)
+        self.max_replans = max_replans
         # Phase 7 §13: no task may ever have two concurrently-running workers.
         # The scheduler thread is the only writer of this set.
         self._running_task_ids: set = set()
@@ -356,12 +386,23 @@ class LongRunningHarness:
                 if t.get("assigned_agent"):
                     task["assigned_agent"] = t["assigned_agent"]
             # persist the graph task_ids (create_task saved with auto IDs)
+            p.source_request = str(task_graph.get("source_request") or "")[:500]
             p._save()
         else:
             # Phase 3: code-defined linear chain
             for tt in (task_types or TASK_CHAIN):
                 p.create_task(tt,
                               dependencies=[p.tasks[-1]["task_id"]] if p.tasks else [])
+
+        # Phase 8 §5/§6: revision 1 snapshot — the first entry of an
+        # immutable graph lineage (later revisions append, never overwrite)
+        p.current_graph_revision = 1
+        p.graph_revisions = [self._snapshot_revision(
+            p, revision=1, parent_revision=0, trigger="INITIAL",
+            planner_run_id="", status="active")]
+        p._event("graph_revision_created", graph_revision=1,
+                 parent_revision=0, trigger="INITIAL", task_count=len(p.tasks))
+        p._save()
 
         self.emit("project_created", {"project_id": project_id, "name": name})
         return p
@@ -393,6 +434,9 @@ class LongRunningHarness:
         project.status = "running"
         project._save()
         executed = []
+        # Phase 8 R11: replans left in_progress by an interrupted process are
+        # failed on resume — never assumed successful (both execution paths)
+        self._recover_interrupted_replans(project)
 
         # Phase 7: DAG-aware bounded parallel path (max_concurrency > 1).
         # max_concurrency == 1 keeps the Phase 6 sequential path unchanged.
@@ -403,6 +447,8 @@ class LongRunningHarness:
             self._parallel_recovery_pass(project, executed)
             handoff_stats = {"checked": 0, "acked": 0, "failed": 0, "pending": 0,
                              "invalid": 0}
+            replan_stats = {"triggered": 0, "accepted": 0, "failed": 0,
+                            "no_change": 0}
             max_scheduling_rounds = 5  # same bound as the sequential path
             for _round in range(max_scheduling_rounds):
                 executed.extend(self._run_parallel(project, state, wf,
@@ -410,6 +456,19 @@ class LongRunningHarness:
                 stats = self._consume_handoffs(project, state)
                 for k in handoff_stats:
                     handoff_stats[k] += stats.get(k, 0)
+
+                # ---- Phase 8: replan evaluation at the SAFE BARRIER ----- #
+                # _run_parallel has returned: all workers joined, all
+                # results committed, eval/repair done (§7/§24). Never mid-round.
+                trigger = self._evaluate_replan_trigger(project, state)
+                if trigger is not None:
+                    rec = self._run_replan(project, state, wf, trigger, executed)
+                    replan_stats["triggered"] += 1
+                    replan_stats[rec["status"] if rec["status"] in replan_stats
+                                 else "failed"] += 1
+                    if rec["status"] == "accepted":
+                        continue  # a fresh parallel pass executes v2's tasks
+
                 # handoff-activated PENDING tasks go through another parallel
                 # pass (the scheduler — never the bus — still decides)
                 activated = stats.get("pending", 0) > 0
@@ -422,7 +481,7 @@ class LongRunningHarness:
                                           for t in project.tasks) else "failed")
             project._save()
             return {"status": project.status, "executed": executed,
-                    "handoffs": handoff_stats,
+                    "handoffs": handoff_stats, "replans": replan_stats,
                     "project": project.to_public()}
 
         for task in project.tasks:
@@ -622,21 +681,26 @@ class LongRunningHarness:
                 break
 
             # run another sequential pass for newly-eligible tasks
-            for task in project.tasks:
-                if task["status"] != "PENDING":
-                    continue
-                tt = task["task_type"]
-                from runtime.planner import registry as _pr
-                rd = _pr.get(tt)
-                stage_id = rd["stage_id"] if rd else TASK_DEFS.get(tt, ("", None))[0]
-                missing = [d for d in task["dependencies"]
-                           if self._dep_status(project, d) not in ("PASSED", "COMPLETED")]
-                if missing:
-                    continue  # dependency not met yet — skip
-                # Re-execute this task (simplified path for activated tasks)
-                result2 = self._execute_single_task(
-                    project, state, wf, task, stage_id)
-                executed.extend(result2)
+            self._run_pending_pass(project, state, wf, executed)
+
+        # ---- Phase 8: bounded dynamic replanning at the safe barrier -------- #
+        # The sequential pass and handoff loop are done — nothing is RUNNING.
+        # Deterministic trigger evaluation → controlled Planner invocation →
+        # same Graph Validator → apply as an immutable new revision (which
+        # preserves terminal-ok work), then execute the new PENDING tasks.
+        replan_stats = {"triggered": 0, "accepted": 0, "failed": 0, "no_change": 0}
+        for _replan_round in range(self.max_replans):
+            trigger = self._evaluate_replan_trigger(project, state)
+            if trigger is None:
+                break
+            rec = self._run_replan(project, state, wf, trigger, executed)
+            replan_stats["triggered"] += 1
+            replan_stats[rec["status"] if rec["status"] in replan_stats
+                         else "failed"] += 1
+            if rec["status"] != "accepted":
+                break  # failed / no_change — fail closed, no fallback graph
+            self._run_pending_pass(project, state, wf, executed)
+            self._consume_handoffs(project, state)
 
         project.status = "completed" if all(
             t["status"] in ("PASSED", "COMPLETED") for t in project.tasks
@@ -644,11 +708,12 @@ class LongRunningHarness:
                                       for t in project.tasks) else "failed")
         project._save()
         return {"status": project.status, "executed": executed,
-                "handoffs": handoff_stats,
+                "handoffs": handoff_stats, "replans": replan_stats,
                 "project": project.to_public()}
 
     def _execute_single_task(self, project, state, wf, task, stage_id):
-        """Execute one task in the message-driven scheduling loop.
+        """Execute one task in the message-driven scheduling loop (and, in
+        Phase 8, after a replan applies a new revision at a safe barrier).
         Returns a list of executed outcome dicts."""
         from runtime.planner import registry as _pr
         from runtime.agents import agent_for_task
@@ -667,10 +732,27 @@ class LongRunningHarness:
                               reason="unknown stage %s" % stage_id)
             return [{"task": tt, "outcome": "FAILED", "agent": assigned}]
 
+        # agent lifecycle events — parity with the main sequential loop, so
+        # activated/replanned agent tasks are as observable as first-pass ones
+        if assigned:
+            project._set_task(task["task_id"], assigned_agent=assigned)
+            project._event("agent_assigned", task_id=task["task_id"],
+                           task_type=tt, agent_id=assigned)
+            self.emit("agent_assigned", {"project_id": project.project_id,
+                                         "task_id": task["task_id"],
+                                         "task_type": tt, "agent_id": assigned})
+
         project._set_task(task["task_id"], status="RUNNING",
                           attempt=task["attempt"] + 1)
         project._event("task_started", task_id=task["task_id"], task_type=tt,
                        agent_id=assigned or None)
+        if assigned:
+            project._event("agent_started", task_id=task["task_id"],
+                           task_type=tt, agent_id=assigned,
+                           attempt=task["attempt"] + 1)
+            self.emit("agent_started", {"project_id": project.project_id,
+                                        "task_id": task["task_id"],
+                                        "task_type": tt, "agent_id": assigned})
 
         state["current_stage"] = stage_id
 
@@ -702,6 +784,13 @@ class LongRunningHarness:
             project._event("task_completed", task_id=task["task_id"],
                            task_type=tt, artifacts=arts,
                            agent_id=assigned or None)
+            if assigned:
+                project._event("agent_completed", task_id=task["task_id"],
+                               task_type=tt, agent_id=assigned, artifacts=arts)
+                self.emit("agent_completed",
+                          {"project_id": project.project_id,
+                           "task_id": task["task_id"], "task_type": tt,
+                           "agent_id": assigned, "artifacts": arts})
             self._checkpoint(project, state, task["task_id"])
             return [{"task": tt, "outcome": "PASS", "agent": assigned}]
         else:
@@ -710,6 +799,15 @@ class LongRunningHarness:
             project._event("task_failed", task_id=task["task_id"],
                            task_type=tt, agent_id=assigned or None,
                            reason=str(result.get("reasons", ""))[:200])
+            if assigned:
+                project._event("agent_failed", task_id=task["task_id"],
+                               task_type=tt, agent_id=assigned,
+                               reason=str(result.get("reasons", ""))[:160])
+                self.emit("agent_failed",
+                          {"project_id": project.project_id,
+                           "task_id": task["task_id"], "task_type": tt,
+                           "agent_id": assigned,
+                           "reason": str(result.get("reasons", ""))[:160]})
             return [{"task": tt, "outcome": "NEEDS_REVIEW", "agent": assigned}]
 
     # ------------------------------------------------------------------ #
@@ -1165,6 +1263,365 @@ class LongRunningHarness:
                 out.append(arec["artifact_id"])
         return out
 
+    # ------------------------------------------------------------------ #
+    # Phase 8: Harness-controlled bounded dynamic replanning
+    #
+    # The central rule (§39): Agents execute the graph and never own it;
+    # the Harness owns execution; the Planner owns planning. A replan is a
+    # controlled Harness → Planner operation evaluated ONLY at safe
+    # barriers (no running workers), bounded by max_replans, validated by
+    # the SAME Graph Validator, and applied as an IMMUTABLE new graph
+    # revision that preserves terminal-ok work.
+    # ------------------------------------------------------------------ #
+    REPLAN_TRIGGER_CATEGORIES = (
+        "TASK_BLOCKED",               # structural dead-end: downstream can never run
+        "TASK_NEEDS_REPLAN",          # repair-exhausted failure that blocks completion
+        "MISSING_REQUIRED_INFORMATION",  # representable; not auto-produced in V0.1
+        "EXTERNAL_RESULT_CHANGED",       # representable; not auto-produced in V0.1
+    )
+
+    def _snapshot_revision(self, project: Project, revision: int,
+                           parent_revision: int, trigger: str,
+                           planner_run_id: str, status: str,
+                           diff: Optional[dict] = None,
+                           tasks: Optional[list] = None) -> dict:
+        """Immutable graph-revision snapshot (§5/§6). Never mutated after
+        acceptance — later revisions append to project.graph_revisions."""
+        snap_tasks = [{
+            "task_id": t["task_id"], "task_type": t["task_type"],
+            "status": t["status"],
+            "dependencies": list(t.get("dependencies") or []),
+            "description": (t.get("description") or "")[:200],
+        } for t in (tasks if tasks is not None else project.tasks)]
+        return {
+            "revision": revision,
+            "parent_revision": parent_revision,
+            "trigger": trigger,
+            "planner_run_id": planner_run_id,
+            "status": status,
+            "created_at": _now(),
+            "tasks": snap_tasks,
+            "diff": diff,
+        }
+
+    def _graph_fingerprint(self, tasks: list) -> str:
+        """Canonical structural hash of a task set (§21): identity is
+        (task_id, task_type, sorted dependencies) — computed, never LLM-decided."""
+        import hashlib as _hashlib
+        canon = json.dumps(
+            sorted([[t["task_id"], t["task_type"],
+                     sorted(t.get("dependencies") or [])] for t in tasks],
+                   key=lambda x: x[0]),
+            ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return _hashlib.sha256(canon.encode("utf-8")).hexdigest()
+
+    def _graph_diff(self, old_tasks: list, new_tasks: list) -> dict:
+        """Deterministic v1 → v2 diff (§17). Machine-computed, never
+        LLM-generated."""
+        old_by_id = {t["task_id"]: t for t in old_tasks}
+        new_by_id = {t["task_id"]: t for t in new_tasks}
+        dep_changes = []
+        for tid, t in new_by_id.items():
+            if tid in old_by_id:
+                old_deps = sorted(old_by_id[tid].get("dependencies") or [])
+                new_deps = sorted(t.get("dependencies") or [])
+                if old_deps != new_deps:
+                    dep_changes.append({"task_id": tid, "from": old_deps,
+                                        "to": new_deps})
+        return {
+            "added": [t["task_id"] for t in new_tasks if t["task_id"] not in old_by_id],
+            "removed": [t["task_id"] for t in old_tasks if t["task_id"] not in new_by_id],
+            "preserved": [t["task_id"] for t in new_tasks
+                          if t["task_id"] in old_by_id
+                          and old_by_id[t["task_id"]].get("status")
+                          in ("PASSED", "COMPLETED")],
+            "rerun": [t["task_id"] for t in new_tasks
+                      if t["task_id"] in old_by_id
+                      and old_by_id[t["task_id"]].get("status")
+                      not in ("PASSED", "COMPLETED")],
+            "dependency_changes": dep_changes,
+        }
+
+    def _evaluate_replan_trigger(self, project: Project, state: dict) -> Optional[dict]:
+        """Deterministic replan policy (§8/§9/§10). The LLM never decides
+        should_replan. Eligible conditions (V0.1):
+          - budget remains (replan attempts < max_replans)
+          - no task is RUNNING (safe barrier; R1)
+          - TASK_BLOCKED: at least one structurally dead-end BLOCKED task
+          - TASK_NEEDS_REPLAN: a repair-exhausted NEEDS_REVIEW task that has
+            downstream dependents (a failed leaf alone stays NEEDS_REVIEW —
+            NEEDS_REVIEW never automatically means replan)
+        Ordinary eval failures are NOT triggers: they follow Repair first."""
+        if self.max_replans <= 0:
+            return None
+        if len(project.replans) >= self.max_replans:
+            return None
+        if any(t["status"] == "RUNNING" for t in project.tasks):
+            return None
+        blocked = [t for t in project.tasks if t["status"] == "BLOCKED"]
+        if blocked:
+            ids = [t["task_id"] for t in blocked]
+            return {"trigger": "TASK_BLOCKED",
+                    "reason": "dead-end tasks: %s" % ", ".join(ids),
+                    "task_ids": ids}
+        needed = {d for t in project.tasks for d in t.get("dependencies") or []}
+        review = [t for t in project.tasks
+                  if t["status"] == "NEEDS_REVIEW" and t["task_id"] in needed]
+        if review:
+            ids = [t["task_id"] for t in review]
+            return {"trigger": "TASK_NEEDS_REPLAN",
+                    "reason": "repair exhausted with downstream dependents: %s"
+                              % ", ".join(ids),
+                    "task_ids": ids}
+        return None
+
+    def _build_replan_context(self, project: Project, state: dict,
+                              trigger: dict) -> dict:
+        """Structured ReplanContext (§11): ids, statuses and summaries —
+        never a raw project-history dump."""
+        evals = state.get("evaluations") or []
+        arts = state.get("artifacts") or {}
+        return {
+            "project_id": project.project_id,
+            "current_graph_revision": project.current_graph_revision,
+            "original_request": project.source_request[:500],
+            "trigger": trigger["trigger"],
+            "trigger_reason": trigger["reason"][:200],
+            "current_graph": [{
+                "task_id": t["task_id"], "task_type": t["task_type"],
+                "status": t["status"],
+                "dependencies": list(t.get("dependencies") or []),
+            } for t in project.tasks],
+            "completed_tasks": [t["task_id"] for t in project.tasks
+                                if t["status"] in ("PASSED", "COMPLETED")],
+            "failed_tasks": [{"task_id": t["task_id"],
+                              "reason": (t.get("reason") or "")[:120]}
+                             for t in project.tasks
+                             if t["status"] in ("NEEDS_REVIEW", "FAILED")],
+            "blocked_tasks": [t["task_id"] for t in project.tasks
+                              if t["status"] == "BLOCKED"],
+            "case_state_summary": {
+                "case_id": state.get("case_id"),
+                "case_status": state.get("status"),
+                "available_artifacts": sorted(arts.keys()),
+                "evals_passed": sum(1 for e in evals if e.get("status") == "PASS"),
+                "evals_failed": sum(1 for e in evals if e.get("status") == "FAIL"),
+            },
+            "replan_history": [{"revision_from": r.get("revision_from"),
+                                "trigger": r.get("trigger"),
+                                "status": r.get("status")}
+                               for r in project.replans],
+        }
+
+    def _planner_provider(self):
+        """Provider for replan invocations: explicit planner_provider, else a
+        raw LLMProvider agent_executor, else None (replan fails closed)."""
+        if self.planner_provider is not None:
+            return self.planner_provider
+        ae = self.agent_executor
+        if ae is not None and hasattr(ae, "generate") and not hasattr(ae, "execute"):
+            return ae
+        return None
+
+    def _recover_interrupted_replans(self, project: Project) -> None:
+        """R11/§22: a replan left in_progress by an interrupted process is
+        marked failed on resume — an unfinished Planner operation is never
+        assumed successful, and no half-applied graph can exist."""
+        changed = False
+        for rec in project.replans:
+            if rec.get("status") == "in_progress":
+                rec["status"] = "failed"
+                rec["error"] = ("INTERRUPTED: replan incomplete at process "
+                                "stop (never assumed successful)")
+                rec["completed_at"] = _now()
+                project._event("replan_failed",
+                               replan_id=rec.get("replan_id"),
+                               graph_revision=rec.get("revision_from"),
+                               trigger=rec.get("trigger"),
+                               reason=rec["error"][:160])
+                changed = True
+        if changed:
+            project._save()
+
+    def _run_replan(self, project: Project, state: dict, wf: dict,
+                    trigger: dict, executed: list) -> dict:
+        """One controlled replan attempt at a safe barrier. Returns the
+        persisted replan record (status: accepted | failed | no_change)."""
+        from runtime.planner import planner as planner_mod
+
+        def _emit(event_type, data):
+            self.emit(event_type, {"project_id": project.project_id, **data})
+            safe = {k: v for k, v in (data or {}).items()
+                    if isinstance(v, (str, int, float, bool)) or v is None
+                    or (isinstance(v, list) and all(
+                        isinstance(x, str) for x in v))}
+            project._event(event_type, **safe)
+
+        # R1: refuse unless the barrier is safe (no running workers)
+        if any(t["status"] == "RUNNING" for t in project.tasks):
+            rec = {"replan_id": _uid("replan"),
+                   "revision_from": project.current_graph_revision,
+                   "trigger": trigger["trigger"], "reason": trigger["reason"][:200],
+                   "status": "failed", "planner_attempts": 0,
+                   "created_at": _now(), "completed_at": _now(),
+                   "error": "UNSAFE_BARRIER: running tasks exist"}
+            project.replans.append(rec)
+            project._save()
+            _emit("replan_failed", {"replan_id": rec["replan_id"],
+                                    "trigger": rec["trigger"],
+                                    "reason": rec["error"][:160]})
+            return rec
+
+        rec = {"replan_id": _uid("replan"),
+               "revision_from": project.current_graph_revision,
+               "trigger": trigger["trigger"], "reason": trigger["reason"][:200],
+               "status": "in_progress", "planner_attempts": 0,
+               "created_at": _now(), "completed_at": None, "error": ""}
+        # persist BEFORE the planner runs: a crash here leaves an in_progress
+        # record that recovery marks failed (§22 idempotency)
+        project.replans.append(rec)
+        project._save()
+        _emit("replan_triggered", {"replan_id": rec["replan_id"],
+                                   "trigger": rec["trigger"],
+                                   "reason": rec["reason"][:160],
+                                   "graph_revision": rec["revision_from"]})
+        _emit("replan_started", {"replan_id": rec["replan_id"],
+                                 "graph_revision": rec["revision_from"],
+                                 "trigger": rec["trigger"]})
+
+        def _finish(status, error="", result=None):
+            rec["status"] = status
+            rec["error"] = error[:300]
+            rec["completed_at"] = _now()
+            project._save()
+            return rec
+
+        provider = self._planner_provider()
+        if provider is None:
+            _emit("replan_failed", {"replan_id": rec["replan_id"],
+                                    "reason": "NO_PLANNER_PROVIDER"})
+            return _finish("failed", "NO_PLANNER_PROVIDER")
+
+        ctx = self._build_replan_context(project, state, trigger)
+        try:
+            result = planner_mod.replan(provider, ctx, emit=_emit)
+        except Exception as e:  # noqa: BLE001 — a provider crash fails the
+            # replan closed; it never breaks the run or the active graph
+            _emit("replan_failed", {"replan_id": rec["replan_id"],
+                                    "reason": "PROVIDER_ERROR"})
+            return _finish("failed", "PROVIDER_ERROR: %r" % e)
+        rec["planner_attempts"] = result.attempts
+        if not result.ok:
+            # §19: fail closed — bounded retries exhausted, no fallback graph,
+            # the original graph (and its state) stays active and intact
+            _emit("replan_failed", {"replan_id": rec["replan_id"],
+                                    "reason": "PLANNER_FAILED",
+                                    "attempts": result.attempts})
+            return _finish("failed", "PLANNER_FAILED: %s"
+                           % "; ".join(result.errors[:3]))
+
+        new_graph = result.graph
+        new_tasks = [{"task_id": t["task_id"], "task_type": t["task_type"],
+                      "dependencies": list(t.get("dependencies") or [])}
+                     for t in new_graph["tasks"]]
+        # R10/§21: identical structure → REPLAN_NO_CHANGE, loop stops
+        if self._graph_fingerprint(new_tasks) == \
+                self._graph_fingerprint(project.tasks):
+            _emit("replan_failed", {"replan_id": rec["replan_id"],
+                                    "reason": "REPLAN_NO_CHANGE"})
+            return _finish("no_change", "REPLAN_NO_CHANGE: planner reproduced "
+                                       "the current graph structure")
+
+        # apply as a NEW immutable revision, preserving terminal-ok work
+        revision = project.current_graph_revision + 1
+        diff = self._apply_graph_revision(project, new_tasks, revision)
+        rec.update({"status": "accepted", "revision": revision,
+                    "diff": diff})
+        project.graph_revisions.append(self._snapshot_revision(
+            project, revision=revision,
+            parent_revision=rec["revision_from"],
+            trigger=rec["trigger"], planner_run_id=rec["replan_id"],
+            status="active", diff=diff))
+        project.current_graph_revision = revision
+        project.state_version += 1
+        project._save()
+        _emit("graph_revision_created", {
+            "graph_revision": revision,
+            "parent_revision": rec["revision_from"],
+            "trigger": rec["trigger"],
+            "planner_run_id": rec["replan_id"],
+            "task_count": len(project.tasks),
+            "added": len(diff["added"]), "removed": len(diff["removed"]),
+            "preserved": len(diff["preserved"])})
+        _emit("replan_completed", {
+            "replan_id": rec["replan_id"], "graph_revision": revision,
+            "parent_revision": rec["revision_from"],
+            "trigger": rec["trigger"], "planner_attempts": result.attempts,
+            "added": diff["added"], "removed": diff["removed"],
+            "preserved": diff["preserved"]})
+        executed.append({"task": "REPLAN", "outcome": "ACCEPTED",
+                         "revision": revision})
+        return rec
+
+    def _apply_graph_revision(self, project: Project, new_tasks: list,
+                              revision: int) -> dict:
+        """Graph merge / continuation semantics (§14/§15):
+          - same task_id + terminal-ok (PASSED/COMPLETED) → preserved verbatim,
+            never re-executed (R6)
+          - same task_id + non-terminal → reset to PENDING under v2 (audited
+            in diff.rerun)
+          - new task_id → PENDING task created for this revision
+          - v1 task absent from v2 → leaves the active list; it remains in the
+            immutable revision snapshots and in diff.removed (R5)
+        Artifacts live in CaseState, not in the graph — they survive the swap
+        unchanged and remain consumable by v2 tasks (§16)."""
+        old_by_id = {t["task_id"]: t for t in project.tasks}
+        applied = []
+        for t in new_tasks:
+            tid = t["task_id"]
+            prev = old_by_id.get(tid)
+            if prev is not None and prev.get("status") in ("PASSED", "COMPLETED"):
+                kept = dict(prev)
+                kept["dependencies"] = list(t.get("dependencies") or [])
+                applied.append(kept)
+                continue
+            applied.append({
+                "task_id": tid,
+                "project_id": project.project_id,
+                "parent_task_id": None,
+                "task_type": t["task_type"],
+                "status": "PENDING",
+                "dependencies": list(t.get("dependencies") or []),
+                "input_artifacts": [],
+                "output_artifacts": [],
+                "attempt": 0,
+                "max_attempts": 3,
+                "created_at": _now(),
+                "updated_at": _now(),
+                "description": (t.get("description") or "")[:200],
+                "graph_revision_introduced": revision,
+            })
+        diff = self._graph_diff(project.tasks, new_tasks)
+        project.tasks = applied          # the active graph is exactly v2's set
+        project.updated_at = _now()
+        return diff
+
+    def _run_pending_pass(self, project: Project, state: dict, wf: dict,
+                          executed: list) -> None:
+        """Execute every PENDING task whose dependencies are met (used by the
+        message-driven re-run loop and, in Phase 8, after a replan applies a
+        new revision at a safe barrier)."""
+        for task in project.tasks:
+            if task["status"] != "PENDING":
+                continue
+            missing = [d for d in task["dependencies"]
+                       if self._dep_status(project, d) not in ("PASSED", "COMPLETED")]
+            if missing:
+                continue  # dependency not met yet — skip
+            stage_id = self._stage_id_for(task["task_type"])
+            executed.extend(self._execute_single_task(
+                project, state, wf, task, stage_id))
+
     def resume(self, project_id: str, workflow: Optional[dict] = None,
                force_rerun: bool = False) -> dict:
         """Load from disk (a NEW process can call this) and continue."""
@@ -1189,6 +1646,7 @@ class LongRunningHarness:
             "task_id": task_id,
             "state_version": project.state_version,
             "created_at": _now(),
+            "graph_revision": project.current_graph_revision,
             "artifact_refs": entry.get("artifacts", []),
             "completed_task_ids": [t["task_id"] for t in project.tasks
                                    if t["status"] in ("PASSED", "COMPLETED")],

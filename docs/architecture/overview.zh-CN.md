@@ -46,7 +46,8 @@
 - Artifact 是持久事实；Message 只做协调，永不替代 Artifact。
 
 深入阅读：[planner](planner.zh-CN.md) · [harness](harness.zh-CN.md) ·
-[并行调度器](parallel-scheduler.zh-CN.md) · [agents](agents.zh-CN.md) ·
+[并行调度器](parallel-scheduler.zh-CN.md) ·
+[动态重规划](dynamic-replanning.zh-CN.md) · [agents](agents.zh-CN.md) ·
 [a2a](a2a.zh-CN.md) · [eval](eval.zh-CN.md) ·
 [artifact 与溯源](artifacts-and-provenance.zh-CN.md) ·
 [保险领域](insurance-domain.zh-CN.md)
@@ -120,6 +121,7 @@ Harness 判定。见 [eval.md](eval.zh-CN.md)。
 | 5 | 多 Agent：专家执行器、确定性分配 | `agents/executor.py`、`registry.py` |
 | 6 | A2A：MessageBus、handoff、通信策略 | `message_bus.py`、`handoff.py` |
 | 7 | 有界并行 DAG 调度器 + housekeeping 冻结 | `harness.py`（`_run_parallel`）、`tests/runtime/test_parallel_*` |
+| 8 | Harness 控制、有边界的动态重规划 | `harness.py`（重规划部分）、`runtime/planner/`（`replan`）、`tests/runtime/test_dynamic_replanning.py` |
 
 各层按顺序冻结；每个阶段的回归至今仍在运行（`max_concurrency=1`
 执行的仍是原样未动的 Phase 6 串行路径）。
@@ -155,7 +157,9 @@ docs/          本文档体系 + ADR + 开发笔记
   换取按图序确定性提交的代价。
 - 持久化是磁盘 JSON；恢复是跨进程的磁盘断点续跑（测试中为模拟崩溃恢复），
   不是分布式崩溃恢复。
-- 无动态重规划：执行期间任务图不可变。
+- 动态重规划是有界且 Harness 控制的（V0.1）：确定性触发、不可变图修订、
+  校验器把关；Agent 与消息仍然碰不到图。见
+  [dynamic-replanning](dynamic-replanning.zh-CN.md)。
 - 演示产品目录（`is_demo`、虚构保险公司）与小型本地知识库 —— 没有真实
   保险数据，也未连接外部保险数据库。
 - 已知测试基础设施问题：`step3-mutation` 套件报 INFRA_ERROR（干净树可

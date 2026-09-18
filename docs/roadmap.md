@@ -8,8 +8,8 @@ plausibly grow. Each item notes the existing seam it would build on.
 
 | Direction | Status | Natural seam |
 | --- | --- | --- |
-| **Dynamic replanning** — revise the Task Graph at runtime based on eval results / new facts | not implemented (Phase 8 candidate) | the graph is already immutable end-to-end; a replanner would be a new, separately-validated stage between Planner and Harness, still unable to mutate an executing graph |
-| Graph revision / planner retry on runtime feedback | not implemented | `PlannerResult` + validator already fail-closed; runtime outcomes are not fed back |
+| ~~Dynamic replanning~~ **IMPLEMENTED in Phase 8 V0.1** — bounded, Harness-controlled, immutable revisions ([dynamic-replanning.md](architecture/dynamic-replanning.md)) | implemented | future: `MISSING_REQUIRED_INFORMATION` triggers, mid-round replanning, human approval gate |
+| Graph revision / planner retry on runtime feedback | partially — Phase 8 feeds runtime outcomes (statuses, trigger) back into a validated replan; generic feedback loops remain future work | `ReplanContext` is the seam |
 | Durable external queue (Redis/Kafka/…) | not implemented | checkpoint/queue boundaries are already file-shaped; no queue client anywhere |
 | Distributed workers | not implemented | worker isolation + scheduler-owned commit are the local precursor; no network layer |
 | Human-in-the-loop approval UI for `NEEDS_REVIEW` tasks | partially: `NEEDS_REVIEW` + gates exist; review happens programmatically (`orchestrator.approve`) | task states and events already model review; no approval screen |

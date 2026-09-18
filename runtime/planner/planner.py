@@ -44,8 +44,25 @@ def plan(provider: LLMProvider, request: str,
     """Generate + validate a Task Graph for the given request."""
     emit = emit or (lambda t, d: None)
     emit("planner_started", {"request": request[:200]})
-
     prompt = prompts.build_planner_prompt(request, context)
+    return _plan_with_prompt(provider, prompt, request, emit)
+
+
+def replan(provider: LLMProvider, replan_context: dict,
+           emit: Optional[Callable[[str, dict], None]] = None) -> PlannerResult:
+    """Phase 8: a REPLAN request — the same strict pipeline as plan(), with a
+    replan-specific prompt. The Harness owns invocation (never an Agent);
+    output passes the SAME Graph Validator with the SAME bounded retry."""
+    emit = emit or (lambda t, d: None)
+    emit("planner_started", {"request": "REPLAN r%s" % replan_context.get(
+        "current_graph_revision", "?")})
+    prompt = prompts.build_replan_prompt(replan_context)
+    return _plan_with_prompt(provider, prompt, "REPLAN", emit)
+
+
+def _plan_with_prompt(provider: LLMProvider, prompt: str, request: str,
+                      emit: Callable[[str, dict], None]) -> PlannerResult:
+    """Shared generate → parse → schema → validate → normalize loop."""
     errors: list = []
     graph: Optional[dict] = None
 

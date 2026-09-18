@@ -7,8 +7,8 @@
 
 | 方向 | 状态 | 自然接缝 |
 | --- | --- | --- |
-| **动态重规划** —— 运行时依据 eval 结果/新事实修订 Task Graph | 未实现（Phase 8 候选） | 图目前已经端到端不可变；replanner 应是 Planner 与 Harness 之间一个独立校验的新阶段，仍不得改动执行中的图 |
-| 图修订 / 基于运行反馈的 planner 重试 | 未实现 | `PlannerResult` + 校验器已 fail-closed；运行结果尚未回流 |
+| ~~动态重规划~~ **已于 Phase 8 V0.1 实现** —— 有界、Harness 控制、不可变修订（[dynamic-replanning](architecture/dynamic-replanning.zh-CN.md)） | 已实现 | 未来：`MISSING_REQUIRED_INFORMATION` 触发、轮次中重规划、人工审批门 |
+| 图修订 / 基于运行反馈的 planner 重试 | 部分 —— Phase 8 已把运行结果（状态、触发原因）回流进受校验的重规划；通用反馈回路仍是未来工作 | `ReplanContext` 是接缝 |
 | 持久外部队列（Redis/Kafka/…） | 未实现 | checkpoint/队列边界本就是文件形态；代码中没有任何队列客户端 |
 | 分布式 worker | 未实现 | worker 隔离 + scheduler 独占提交是本地前身；没有网络层 |
 | `NEEDS_REVIEW` 任务的人工审批 UI | 部分：状态与门已存在；审批目前是程序化的（`orchestrator.approve`） | 任务状态与事件已建模 review；没有审批界面 |

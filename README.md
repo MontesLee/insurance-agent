@@ -45,6 +45,7 @@ Most LLM demos optimize the prompt loop. This repository optimizes the
 - LLM Planner → strict JSON Task Graph → 10-check Graph Validator (cycle detection, artifact & eval contracts)
 - Long-running Harness: projects, task lifecycle, dependency barriers, per-terminal checkpoints
 - **Bounded parallel DAG scheduling** (`max_concurrency`, default 1 = unchanged sequential mode)
+- **Harness-controlled dynamic replanning** (bounded budget, deterministic triggers, immutable graph revisions, validator-gated)
 - 4 specialist Agents with a deterministic task→agent map, scoped tools, and permission validation
 - Agent-to-Agent communication via a persistent, policy-enforced MessageBus with ACK-after-PASS handoffs
 - Deterministic Eval (schema / required fields / contamination / provenance / cross-artifact / invariants) + repair ≤ 2
@@ -132,6 +133,7 @@ Test strategy and current known infra issues:
 | Planner & graph validation | [docs/architecture/planner.md](docs/architecture/planner.md) |
 | Harness, task states, recovery, failure model | [docs/architecture/harness.md](docs/architecture/harness.md) |
 | Bounded parallel DAG scheduler | [docs/architecture/parallel-scheduler.md](docs/architecture/parallel-scheduler.md) |
+| Dynamic replanning (Phase 8 V0.1) | [docs/architecture/dynamic-replanning.md](docs/architecture/dynamic-replanning.md) |
 | Specialist agents, executor, tools | [docs/architecture/agents.md](docs/architecture/agents.md) |
 | A2A communication & handoffs | [docs/architecture/a2a.md](docs/architecture/a2a.md) |
 | Eval & repair boundary | [docs/architecture/eval.md](docs/architecture/eval.md) |
@@ -176,6 +178,7 @@ docs/               architecture, ADRs, development guides, demo scripts
 | 5 | Multi-agent: specialist executors, deterministic assignment, permission validation |
 | 6 | A2A communication: MessageBus, handoff lifecycle, communication policy |
 | 7 | Bounded parallel DAG scheduler (isolated workers, scheduler-owned commit, recovery) + housekeeping freeze |
+| 8 | Dynamic replanning V0.1 (deterministic triggers, safe barriers, immutable graph revisions, bounded budget) |
 
 Each layer froze before the next began; `max_concurrency=1` still runs the
 Phase 6 sequential path byte-for-byte.

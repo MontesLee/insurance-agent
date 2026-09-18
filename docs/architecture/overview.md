@@ -50,7 +50,8 @@ These are separated **deliberately**:
   artifacts.
 
 Deep dives: [planner.md](planner.md) · [harness.md](harness.md) ·
-[parallel-scheduler.md](parallel-scheduler.md) · [agents.md](agents.md) ·
+[parallel-scheduler.md](parallel-scheduler.md) ·
+[dynamic-replanning.md](dynamic-replanning.md) · [agents.md](agents.md) ·
 [a2a.md](a2a.md) · [eval.md](eval.md) ·
 [artifacts-and-provenance.md](artifacts-and-provenance.md) ·
 [insurance-domain.md](insurance-domain.md)
@@ -127,6 +128,7 @@ candidate and stops; PASS is decided only by the Harness. See
 | 5 | multi-agent: specialist executors, deterministic assignment | `runtime/agents/executor.py`, `registry.py` |
 | 6 | A2A: MessageBus, handoffs, communication policy | `message_bus.py`, `handoff.py` |
 | 7 | bounded parallel DAG scheduler + housekeeping freeze | `harness.py` (`_run_parallel`), `tests/runtime/test_parallel_*` |
+| 8 | Harness-controlled bounded dynamic replanning | `harness.py` (replanning section), `runtime/planner/` (`replan`), `tests/runtime/test_dynamic_replanning.py` |
 
 Layers froze in order; each phase's regression still runs today
 (`max_concurrency=1` executes the Phase 6 sequential path unchanged).
@@ -164,7 +166,9 @@ docs/          this documentation system + ADRs + dev notes
   graph-order commits.
 - Persistence is JSON-on-disk; recovery is process-independent resume from
   disk (simulated crash recovery in tests), not distributed crash recovery.
-- No dynamic replanning: the task graph is immutable during execution.
+- Dynamic replanning is bounded and Harness-controlled (V0.1): deterministic
+  triggers, immutable graph revisions, validator-gated; agents and messages
+  still cannot touch the graph. See [dynamic-replanning.md](dynamic-replanning.md).
 - Demo product catalog (`is_demo`, fictional insurers) and a small local
   knowledge corpus — no live insurer data or external insurance databases.
 - Known pre-existing test-infra issues: `step3-mutation` suite reports

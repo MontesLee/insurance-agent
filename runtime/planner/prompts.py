@@ -47,5 +47,53 @@ def build_planner_prompt(request: str, context: Optional[dict] = None) -> str:
     return prompt
 
 
+REPLAN_SYSTEM_PROMPT = """You are a task planner performing a CONTROLLED REPLAN for an
+insurance analysis system whose task graph already PARTIALLY EXECUTED.
+
+## Available task types (you may ONLY use these):
+{task_catalog}
+
+## Output format (STRICT JSON, no markdown, no explanation):
+{{
+  "tasks": [
+    {{"task_id": "task_001", "task_type": "<from the list above>", "description": "<short>", "dependencies": []}}
+  ]
+}}
+
+## Replan rules:
+1. This is a REPLAN, not a fresh plan. The previous graph partially executed.
+2. Do NOT blindly recreate completed work. Preserve valid completed work:
+   REUSE the exact task_id of every completed task you keep — a reused
+   task_id of a completed task is recognized and NOT re-executed.
+3. Create ONLY the tasks necessary to complete the remaining objective.
+4. Only use task_types from the list above. Do NOT invent new ones.
+5. Respect artifact dependencies: a task's required inputs must be produced
+   upstream or already exist in the available artifacts.
+6. Dependencies must reference task_ids in THIS graph.
+7. You may remove tasks that can never succeed, and add tasks that unblock
+   the objective, but keep the graph minimal.
+8. Return ONLY the JSON object, nothing else.
+"""
+
+
+def build_replan_prompt(replan_context: dict) -> str:
+    """Phase 8 §12: structured ReplanContext → replan prompt. The Harness
+    builds the context (ids, statuses, artifact summaries, trigger) — never
+    a raw history dump."""
+    catalog_lines = []
+    for tt, d in TASK_REGISTRY.items():
+        inputs = ", ".join(d["required_inputs"]) or "(none)"
+        outputs = ", ".join(d["produced_artifacts"])
+        catalog_lines.append(
+            "- %s: %s | inputs: %s | outputs: %s"
+            % (tt, d["description"], inputs, outputs))
+    catalog = "\n".join(catalog_lines)
+
+    prompt = REPLAN_SYSTEM_PROMPT.format(task_catalog=catalog)
+    prompt += "\n## Replan context\n%s\n" % json.dumps(
+        replan_context, ensure_ascii=False, default=str)
+    return prompt
+
+
 from typing import Optional  # noqa: E402
 import json  # noqa: E402
