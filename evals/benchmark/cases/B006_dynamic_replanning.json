@@ -1,0 +1,126 @@
+{
+  "case_id": "B006",
+  "name": "dynamic_replanning",
+  "category": "replanning",
+  "description": "Blocked path triggers a controlled replan: v1->v2 accepted, diff recorded, terminal-ok work preserved, failed task removed without faking success.",
+  "input": {
+    "graph": [
+      {
+        "task_id": "task_0",
+        "task_type": "client_profile"
+      },
+      {
+        "task_id": "task_1",
+        "task_type": "requirement_analysis",
+        "dependencies": [
+          "task_0"
+        ]
+      },
+      {
+        "task_id": "task_2",
+        "task_type": "risk_analysis",
+        "dependencies": [
+          "task_0",
+          "task_1"
+        ]
+      },
+      {
+        "task_id": "task_3",
+        "task_type": "coverage_gap",
+        "dependencies": [
+          "task_0",
+          "task_1",
+          "task_2"
+        ]
+      },
+      {
+        "task_id": "task_4",
+        "task_type": "solution",
+        "dependencies": [
+          "task_1",
+          "task_2",
+          "task_3"
+        ]
+      },
+      {
+        "task_id": "task_5",
+        "task_type": "product_candidates",
+        "dependencies": [
+          "task_0",
+          "task_3",
+          "task_4"
+        ]
+      },
+      {
+        "task_id": "task_6",
+        "task_type": "report_generation",
+        "dependencies": [
+          "task_0",
+          "task_1",
+          "task_2",
+          "task_5"
+        ]
+      }
+    ],
+    "planner_graphs": [
+      [
+        {
+          "task_id": "task_0",
+          "task_type": "client_profile"
+        },
+        {
+          "task_id": "task_1",
+          "task_type": "requirement_analysis",
+          "dependencies": [
+            "task_0"
+          ]
+        },
+        {
+          "task_id": "task_2",
+          "task_type": "risk_analysis",
+          "dependencies": [
+            "task_0",
+            "task_1"
+          ]
+        },
+        {
+          "task_id": "task_3",
+          "task_type": "coverage_gap",
+          "dependencies": [
+            "task_0",
+            "task_1",
+            "task_2"
+          ]
+        },
+        {
+          "task_id": "task_6",
+          "task_type": "report_generation",
+          "dependencies": [
+            "task_0",
+            "task_1",
+            "task_2"
+          ]
+        }
+      ]
+    ],
+    "scripts": {
+      "task_0": "profile",
+      "task_1": "req",
+      "task_2": "risk",
+      "task_3": "coverage_gap",
+      "task_4": "plain:保障缺口分析所需的输入不完整，无法产出方案。",
+      "task_5": "product",
+      "task_6": "report"
+    }
+  },
+  "expected": {
+    "terminal_status": "completed",
+    "required_events": [
+      "replan_triggered",
+      "graph_revision_created"
+    ],
+    "graph_revision": 2,
+    "previous_revision_immutable": true,
+    "max_replans": 1
+  }
+}

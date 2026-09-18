@@ -2,7 +2,12 @@
 
 > 🌐 Language: 🇺🇸 English · 🇨🇳 [中文版](README.zh-CN.md)
 
-**An Agent Runtime / Harness engineering project, demonstrated on an insurance-analysis workload.**
+**A long-running multi-agent runtime that plans, executes, evaluates, repairs, replans and supervises agent workflows.**
+
+It combines a validated Planner, specialist agents, A2A communication, bounded
+parallel execution, dynamic replanning, fail-closed evaluation,
+checkpoint/resume, HITL approval and HOTL supervision. Insurance is the
+first domain adapter, not the runtime itself.
 
 The interesting part of this repository is not the insurance chatbot — it is the
 execution system underneath: a state-driven, eval-gated, observable, resumable,
@@ -56,6 +61,7 @@ Most LLM demos optimize the prompt loop. This repository optimizes the
 - Demo product catalog (explicitly `is_demo`) backing candidate filtering and recommendation
 - Web UI (chat + developer console) with a live SSE event stream and artifact inspector
 - Resume/recovery across processes; 52-suite regression runner; 33-case agent benchmark + golden cases
+- **Deterministic runtime benchmark** (11 cases, 18 failure-injection scenarios, false-pass count 0) and **one-command demos**
 
 ## How does it work?
 
@@ -97,17 +103,25 @@ the server and an OpenAI-compatible SDK for agent mode). The React UI needs
 Node/npm.
 
 ```bash
-# 1. configure (optional — demo/deterministic mode works without an LLM key)
-cp .env.example .env                     # LLM_PROVIDER / LLM_MODEL / LLM_API_KEY / LLM_BASE_URL
-python -m runtime.agent.smoke_test       # verify the provider
+# 1. deterministic Quick Start — no LLM key, no network, no console-encoding
+#    requirements. Runs the REAL runtime (Planner → Harness → 4 agents →
+#    Eval → report) and prints a status-only transcript + run summary.
+python -m demos.demo_basic
 
-# 2. start the web app
+# 2. more deterministic demos (also offline, also real runtime)
+python -m demos.demo_four_agent         # golden 4-agent parallel run
+python -m demos.demo_replan             # failure → controlled replanning
+python -m demos.demo_hitl               # human approval gate
+python -m demos.demo_hotl               # supervisor pause/resume
+python -m evals.benchmark.runner        # 11 deterministic benchmark cases
+
+# 3. web app (optional)
 python -m runtime.server                 # FastAPI + SSE on http://127.0.0.1:8000
 cd web && npm install && npm run dev     # React UI on http://localhost:5173 (2nd terminal)
 
-# 3. run the deterministic pipeline without any server
-python demo.py demo-a                    # complete chain → grounded recommendation
-python demo.py demo-b                    # empty knowledge base → NEEDS_REVIEW (fail-closed)
+# 4. optional real-LLM smoke — requires a configured provider AND network;
+#    fails closed on outage, never silently falls back (see .env.example)
+python -m runtime.agent.smoke_test
 ```
 
 Without `.env` the chat runs in **demo/deterministic mode**; with a key it
@@ -127,6 +141,26 @@ python evals/agent-benchmark/run_golden_cases.py       # golden-case regression
 Test strategy and current known infra issues:
 [docs/development/testing.md](docs/development/testing.md).
 
+## How do I run the demos & the benchmark?
+
+The fastest full experience (6 acts, ~1 minute): `python -m demos.demo_portfolio`
+
+```bash
+python -m demos.demo_basic         # happy path (4 agents → report)
+python -m demos.demo_parallel      # bounded-parallel DAG
+python -m demos.demo_replan        # failure → controlled replanning
+python -m demos.demo_hitl          # human approval gate (approve & resume)
+python -m demos.demo_hotl          # supervisor pause/resume
+python -m demos.demo_four_agent    # the golden four-agent run
+
+python -m evals.benchmark.runner   # 11 deterministic cases + hard gates
+```
+
+All demo output is real runtime state (events/artifacts/checkpoints) —
+never chain-of-thought. Full results:
+[docs/benchmark-report.md](docs/benchmark-report.md); 5-minute interview
+walkthrough: [docs/portfolio-demo.md](docs/portfolio-demo.md).
+
 ## Where is the architecture?
 
 | Topic | Document |
@@ -145,6 +179,11 @@ Test strategy and current known infra issues:
 | Insurance domain, catalog, knowledge | [docs/architecture/insurance-domain.md](docs/architecture/insurance-domain.md) |
 | Key decisions | [docs/adr/](docs/adr/) (7 ADRs, EN + zh-CN) |
 | Future work (not implemented) | [docs/roadmap.md](docs/roadmap.md) |
+| Benchmark & failure injection | [docs/benchmark-report.md](docs/benchmark-report.md) |
+| Generalization (domain vs runtime) | [docs/generalization.md](docs/generalization.md) |
+| Interview demo script | [docs/demo-script.md](docs/demo-script.md) · [portfolio-demo.md](docs/portfolio-demo.md) |
+| Portfolio positioning (2-min read) | [docs/portfolio.md](docs/portfolio.md) |
+| Architecture diagrams | [docs/architecture.md](docs/architecture.md) · [runtime trace](docs/runtime-trace.md) |
 
 ## What this is NOT
 

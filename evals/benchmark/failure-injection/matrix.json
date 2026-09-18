@@ -1,0 +1,110 @@
+{
+  "F01_planner_invalid_json": {
+    "injection": "Planner returns invalid JSON",
+    "expected_state": "replan rec failed after bounded retries",
+    "expected_event": "graph_validation_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F02_planner_invalid_graph": {
+    "injection": "Planner returns a graph with an unknown task_type",
+    "expected_state": "graph validator rejects; no revision created",
+    "expected_event": "graph_validation_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F03_agent_tool_failure": {
+    "injection": "Agent replies plain text instead of calling the tool",
+    "expected_state": "AGENT_FAILED, no artifact, downstream blocked",
+    "expected_event": "agent_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F04_knowledge_empty": {
+    "injection": "knowledge_search finds no usable evidence",
+    "expected_state": "fail closed: no knowledge-evidence artifact",
+    "expected_event": "agent_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F05_product_candidate_invalid": {
+    "injection": "product candidates reference a product_id not in the catalog",
+    "expected_state": "eval FAIL (catalog invariant), bounded repair",
+    "expected_event": "task_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F06_repair_exhausted": {
+    "injection": "artifact keeps failing eval (BAD product_id x5)",
+    "expected_state": "exactly 2 repairs then NEEDS_REVIEW",
+    "expected_event": "task_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F07_task_blocked": {
+    "injection": "upstream failure blocks downstream tasks",
+    "expected_state": "downstream BLOCKED; replan may trigger",
+    "expected_event": "task_failed (BLOCKED)",
+    "expected_terminal": "completed|needs_review"
+  },
+  "F08_replan_no_change": {
+    "injection": "Planner reproduces the identical graph structure",
+    "expected_state": "REPLAN_NO_CHANGE, no revision, loop stops",
+    "expected_event": "replan_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F09_replan_exhausted": {
+    "injection": "replan budget consumed by failing attempts",
+    "expected_state": "no further replanning; monitor raises HIGH",
+    "expected_event": "replan_failed",
+    "expected_terminal": "needs_review"
+  },
+  "F10_approval_rejected": {
+    "injection": "Human REJECTS a pending high-impact replan approval",
+    "expected_state": "revision rejected, v1 stays active, replanning stops",
+    "expected_event": "approval_rejected",
+    "expected_terminal": "needs_review"
+  },
+  "F11_hotl_pause": {
+    "injection": "Intervention policy PAUSE at HIGH risk",
+    "expected_state": "PAUSED at a safe barrier; no mid-commit kill",
+    "expected_event": "runtime_paused",
+    "expected_terminal": "paused"
+  },
+  "F12_crash_during_pause": {
+    "injection": "PAUSE command persisted, process crashes before apply",
+    "expected_state": "idempotent recovery completes the pause once",
+    "expected_event": "runtime_paused",
+    "expected_terminal": "paused"
+  },
+  "F13_crash_during_resume": {
+    "injection": "RESUME command persisted, process crashes before apply",
+    "expected_state": "idempotent recovery resumes and continues",
+    "expected_event": "runtime_resumed",
+    "expected_terminal": "completed"
+  },
+  "F14_duplicate_command": {
+    "injection": "Identical PAUSE command submitted twice",
+    "expected_state": "second is a no-op returning the original record",
+    "expected_event": "control_command_applied",
+    "expected_terminal": "paused"
+  },
+  "F15_unauthorized_actor": {
+    "injection": "Agent actor attempts a control command",
+    "expected_state": "refused by the actor allowlist; nothing mutates",
+    "expected_event": "control_command_rejected",
+    "expected_terminal": "unchanged"
+  },
+  "F16_invalid_a2a_target": {
+    "injection": "Message to a target that is not the task's assigned agent",
+    "expected_state": "handoff rejected (AGENT_MISMATCH)",
+    "expected_event": "handoff_rejected",
+    "expected_terminal": "unchanged"
+  },
+  "F17_invalid_artifact_reference": {
+    "injection": "Message references a non-existent artifact_id",
+    "expected_state": "send refused (ARTIFACT_NOT_FOUND)",
+    "expected_event": "none (send raises)",
+    "expected_terminal": "unchanged"
+  },
+  "F18_fake_eval_pass_attempt": {
+    "injection": "Worker returns OK directly without an artifact",
+    "expected_state": "no self-PASS: task goes NEEDS_REVIEW, no eval record",
+    "expected_event": "task_failed",
+    "expected_terminal": "needs_review"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "case_id": "B003",
+  "name": "knowledge_failure",
+  "category": "knowledge_failure",
+  "description": "knowledge_search returns no usable evidence: NO knowledge-evidence artifact is produced (fail closed) and the dependent report path blocks instead of consuming fabricated knowledge.",
+  "input": {
+    "graph": [
+      {
+        "task_id": "task_0",
+        "task_type": "client_profile"
+      },
+      {
+        "task_id": "task_1",
+        "task_type": "requirement_analysis",
+        "dependencies": [
+          "task_0"
+        ]
+      },
+      {
+        "task_id": "task_2",
+        "task_type": "risk_analysis",
+        "dependencies": [
+          "task_0",
+          "task_1"
+        ]
+      },
+      {
+        "task_id": "task_3",
+        "task_type": "coverage_gap",
+        "dependencies": [
+          "task_0",
+          "task_1",
+          "task_2"
+        ]
+      },
+      {
+        "task_id": "task_4",
+        "task_type": "solution",
+        "dependencies": [
+          "task_1",
+          "task_2",
+          "task_3"
+        ]
+      },
+      {
+        "task_id": "task_5",
+        "task_type": "knowledge_search",
+        "dependencies": [
+          "task_4"
+        ]
+      },
+      {
+        "task_id": "task_6",
+        "task_type": "report_generation",
+        "dependencies": [
+          "task_0",
+          "task_1",
+          "task_2",
+          "task_5"
+        ]
+      }
+    ],
+    "scripts": {
+      "task_0": "profile",
+      "task_1": "req",
+      "task_2": "risk",
+      "task_3": "coverage_gap",
+      "task_4": "solution",
+      "task_5": "know:fail",
+      "task_6": "report"
+    }
+  },
+  "expected": {
+    "terminal_status": "needs_review",
+    "forbidden_artifacts": [
+      "knowledge-evidence",
+      "insurance-report"
+    ],
+    "required_events": [
+      "agent_failed"
+    ],
+    "forbidden_events": [
+      "approval_waiting",
+      "runtime_paused"
+    ],
+    "max_repairs": 0
+  }
+}

@@ -2,7 +2,11 @@
 
 > 🌐 语言：🇨🇳 中文 · 🇺🇸 [English](README.md)
 
-**一个 Agent Runtime / Harness 工程项目，以保险分析作为示范负载。**
+**一个长运行多 Agent 运行时：规划、执行、评估、修复、重规划并监督 Agent 工作流。**
+
+它组合了经过校验的 Planner、专家 Agent、A2A 通信、有界并行执行、动态
+重规划、fail-closed 评估、checkpoint/恢复、HITL 审批与 HOTL 监督。
+保险是第一个领域适配器，而不是运行时本身。
 
 这个仓库有意思的部分不是保险对话机器人，而是其下方的执行系统：一个
 状态驱动、Eval 把关、可观测、可恢复、有界并行的 Agent 运行时，核心是
@@ -54,6 +58,7 @@ DAG** 调度。FastAPI + React 聊天 UI 负责观察与驱动。
 - 演示产品目录（显式 `is_demo`）支撑候选筛选与推荐
 - Web UI（聊天 + 开发者控制台）：SSE 实时事件流 + artifact 检查器
 - 跨进程恢复；52 套回归 runner；33 例 agent benchmark + golden cases
+- **确定性运行时 benchmark**（11 用例、18 个故障注入场景、false-pass 计数 0）与**一条命令的 demo**
 
 ## 怎么运作？
 
@@ -94,17 +99,25 @@ Harness = 何时/可靠性 · Eval = 质量 · Artifact = 持久事实 · Messag
 OpenAI 兼容 SDK）。React UI 需要 Node/npm。
 
 ```bash
-# 1. 配置（可选 —— 无 LLM key 时为 demo/确定性模式）
-cp .env.example .env                     # LLM_PROVIDER / LLM_MODEL / LLM_API_KEY / LLM_BASE_URL
-python -m runtime.agent.smoke_test       # 验证 provider
+# 1. 确定性 Quick Start —— 无需 LLM key、无需网络、不受控制台编码影响。
+#    运行的是真实 Runtime（Planner → Harness → 4 Agent → Eval → 报告），
+#    输出纯状态转录 + 运行摘要。
+python -m demos.demo_basic
 
-# 2. 启动 Web 应用
+# 2. 更多确定性 demo（同样离线、同样是真实 Runtime）
+python -m demos.demo_four_agent         # 四 Agent 并行金样本
+python -m demos.demo_replan             # 失败 → 受控重规划
+python -m demos.demo_hitl               # 人工审批门
+python -m demos.demo_hotl               # 监督者暂停/恢复
+python -m evals.benchmark.runner        # 11 个确定性 benchmark 用例
+
+# 3. Web 应用（可选）
 python -m runtime.server                 # FastAPI + SSE, http://127.0.0.1:8000
 cd web && npm install && npm run dev     # React UI, http://localhost:5173（第二个终端）
 
-# 3. 不起 server 跑确定性流水线
-python demo.py demo-a                    # 完整链路 → 有据推荐
-python demo.py demo-b                    # 空知识库 → NEEDS_REVIEW（fail-closed）
+# 4. 可选的真实 LLM smoke —— 需要已配置的 provider 且网络可达；
+#    断网时 fail-closed，绝不静默回退（见 .env.example）
+python -m runtime.agent.smoke_test
 ```
 
 ## 怎么测？
@@ -117,6 +130,25 @@ python evals/agent-benchmark/run_golden_cases.py       # golden 回归
 ```
 
 测试策略与已知基础设施问题：[docs/development/testing.zh-CN.md](docs/development/testing.zh-CN.md)。
+
+## 怎么跑 demo 和 benchmark？
+
+最快的完整体验（6 幕，约 1 分钟）：`python -m demos.demo_portfolio`
+
+```bash
+python -m demos.demo_basic         # 正常路径（4 Agent → 报告）
+python -m demos.demo_parallel      # 有界并行 DAG
+python -m demos.demo_replan        # 失败 → 受控重规划
+python -m demos.demo_hitl          # 人工审批门（批准并恢复）
+python -m demos.demo_hotl          # 监督者暂停/恢复
+python -m demos.demo_four_agent    # 四 Agent 金样本
+
+python -m evals.benchmark.runner   # 11 个确定性用例 + 硬门
+```
+
+所有 demo 输出都是真实运行时状态（事件/artifact/checkpoint）—— 绝无
+思维链。完整结果：[docs/benchmark-report.zh-CN.md](docs/benchmark-report.zh-CN.md)；
+5 分钟面试走查：[docs/portfolio-demo.zh-CN.md](docs/portfolio-demo.zh-CN.md)。
 
 ## 架构文档在哪？
 
@@ -136,6 +168,11 @@ python evals/agent-benchmark/run_golden_cases.py       # golden 回归
 | 保险领域、目录、知识 | [insurance-domain.zh-CN.md](docs/architecture/insurance-domain.zh-CN.md) |
 | 关键决策 | [docs/adr/](docs/adr/)（7 篇 ADR，中英双语） |
 | 未来方向（未实现） | [docs/roadmap.zh-CN.md](docs/roadmap.zh-CN.md) |
+| Benchmark 与故障注入 | [docs/benchmark-report.zh-CN.md](docs/benchmark-report.zh-CN.md) |
+| 泛化（领域 vs 运行时） | [docs/generalization.zh-CN.md](docs/generalization.zh-CN.md) |
+| 面试 demo 脚本 | [docs/demo-script.md](docs/demo-script.md) · [portfolio-demo.zh-CN.md](docs/portfolio-demo.zh-CN.md) |
+| Portfolio 定位（2 分钟读完） | [docs/portfolio.md](docs/portfolio.md) |
+| 架构图 | [docs/architecture.md](docs/architecture.md) · [运行时 Trace](docs/runtime-trace.md) |
 
 ## 这不是什么
 

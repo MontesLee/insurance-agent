@@ -1,0 +1,697 @@
+{
+  "results": [
+    {
+      "case_id": "B001",
+      "name": "basic_advisory",
+      "category": "happy_path",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "required_agents": [
+          true,
+          "missing []"
+        ],
+        "required_artifacts": [
+          true,
+          "missing []"
+        ],
+        "event:task_completed": [
+          true,
+          ""
+        ],
+        "event:checkpoint_created": [
+          true,
+          ""
+        ],
+        "forbidden_event:replan_triggered": [
+          true,
+          "was emitted"
+        ],
+        "forbidden_event:approval_waiting": [
+          true,
+          "was emitted"
+        ],
+        "max_repairs": [
+          true,
+          "repairs=0"
+        ],
+        "graph_revision": [
+          true,
+          "revision=1"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "required_agents": "missing []",
+        "required_artifacts": "missing []",
+        "forbidden_event:replan_triggered": "was emitted",
+        "forbidden_event:approval_waiting": "was emitted",
+        "max_repairs": "repairs=0",
+        "graph_revision": "revision=1",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    },
+    {
+      "case_id": "B002",
+      "name": "missing_information",
+      "category": "missing_information",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'needs_review' want 'needs_review'"
+        ],
+        "forbidden_artifact:client-profile": [
+          true,
+          "was produced"
+        ],
+        "forbidden_artifact:requirement-analysis": [
+          true,
+          "was produced"
+        ],
+        "forbidden_artifact:insurance-report": [
+          true,
+          "was produced"
+        ],
+        "event:agent_failed": [
+          true,
+          ""
+        ],
+        "forbidden_event:task_completed": [
+          true,
+          "was emitted"
+        ],
+        "max_repairs": [
+          true,
+          "repairs=0"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'needs_review' want 'needs_review'",
+        "forbidden_artifact:client-profile": "was produced",
+        "forbidden_artifact:requirement-analysis": "was produced",
+        "forbidden_artifact:insurance-report": "was produced",
+        "forbidden_event:task_completed": "was emitted",
+        "max_repairs": "repairs=0",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "needs_review"
+    },
+    {
+      "case_id": "B003",
+      "name": "knowledge_failure",
+      "category": "knowledge_failure",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'needs_review' want 'needs_review'"
+        ],
+        "forbidden_artifact:knowledge-evidence": [
+          true,
+          "was produced"
+        ],
+        "forbidden_artifact:insurance-report": [
+          true,
+          "was produced"
+        ],
+        "event:agent_failed": [
+          true,
+          ""
+        ],
+        "forbidden_event:approval_waiting": [
+          true,
+          "was emitted"
+        ],
+        "forbidden_event:runtime_paused": [
+          true,
+          "was emitted"
+        ],
+        "max_repairs": [
+          true,
+          "repairs=0"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'needs_review' want 'needs_review'",
+        "forbidden_artifact:knowledge-evidence": "was produced",
+        "forbidden_artifact:insurance-report": "was produced",
+        "forbidden_event:approval_waiting": "was emitted",
+        "forbidden_event:runtime_paused": "was emitted",
+        "max_repairs": "repairs=0",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "needs_review"
+    },
+    {
+      "case_id": "B004",
+      "name": "product_failure_degrades_via_replan",
+      "category": "product_failure",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "required_artifacts": [
+          true,
+          "missing []"
+        ],
+        "forbidden_artifact:product-candidates": [
+          true,
+          "was produced"
+        ],
+        "forbidden_artifact:product-recommendation": [
+          true,
+          "was produced"
+        ],
+        "event:replan_triggered": [
+          true,
+          ""
+        ],
+        "event:replan_completed": [
+          true,
+          ""
+        ],
+        "graph_revision": [
+          true,
+          "revision=2"
+        ],
+        "previous_revision_immutable": [
+          true,
+          ""
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "required_artifacts": "missing []",
+        "forbidden_artifact:product-candidates": "was produced",
+        "forbidden_artifact:product-recommendation": "was produced",
+        "graph_revision": "revision=2",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    },
+    {
+      "case_id": "B005",
+      "name": "repair_exhaustion",
+      "category": "repair_exhaustion",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'needs_review' want 'needs_review'"
+        ],
+        "event:task_failed": [
+          true,
+          ""
+        ],
+        "forbidden_event:replan_triggered": [
+          true,
+          "was emitted"
+        ],
+        "max_repairs": [
+          true,
+          "repairs=0"
+        ],
+        "exact_failed_evals": [
+          true,
+          "failed_evals=3"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'needs_review' want 'needs_review'",
+        "forbidden_event:replan_triggered": "was emitted",
+        "max_repairs": "repairs=0",
+        "exact_failed_evals": "failed_evals=3",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "needs_review"
+    },
+    {
+      "case_id": "B006",
+      "name": "dynamic_replanning",
+      "category": "replanning",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "event:replan_triggered": [
+          true,
+          ""
+        ],
+        "event:graph_revision_created": [
+          true,
+          ""
+        ],
+        "max_replans": [
+          true,
+          "replans=1"
+        ],
+        "graph_revision": [
+          true,
+          "revision=2"
+        ],
+        "previous_revision_immutable": [
+          true,
+          ""
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "max_replans": "replans=1",
+        "graph_revision": "revision=2",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    },
+    {
+      "case_id": "B007",
+      "name": "parallel_equivalence",
+      "category": "parallel",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "required_artifacts": [
+          true,
+          "missing []"
+        ],
+        "event:task_scheduled": [
+          true,
+          ""
+        ],
+        "forbidden_event:replan_triggered": [
+          true,
+          "was emitted"
+        ],
+        "graph_revision": [
+          true,
+          "revision=1"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "required_artifacts": "missing []",
+        "forbidden_event:replan_triggered": "was emitted",
+        "graph_revision": "revision=1",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    },
+    {
+      "case_id": "B008",
+      "name": "human_approval",
+      "category": "hitl",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "event:approval_requested": [
+          true,
+          ""
+        ],
+        "event:approval_waiting": [
+          true,
+          ""
+        ],
+        "event:approval_approved": [
+          true,
+          ""
+        ],
+        "event:approval_resumed": [
+          true,
+          ""
+        ],
+        "max_replans": [
+          true,
+          "replans=1"
+        ],
+        "graph_revision": [
+          true,
+          "revision=2"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "max_replans": "replans=1",
+        "graph_revision": "revision=2",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    },
+    {
+      "case_id": "B009",
+      "name": "hotl_notify",
+      "category": "hotl",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "event:monitor_signal_detected": [
+          true,
+          ""
+        ],
+        "event:intervention_notified": [
+          true,
+          ""
+        ],
+        "forbidden_event:approval_waiting": [
+          true,
+          "was emitted"
+        ],
+        "forbidden_event:runtime_paused": [
+          true,
+          "was emitted"
+        ],
+        "graph_revision": [
+          true,
+          "revision=2"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "forbidden_event:approval_waiting": "was emitted",
+        "forbidden_event:runtime_paused": "was emitted",
+        "graph_revision": "revision=2",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    },
+    {
+      "case_id": "B010",
+      "name": "hotl_pause_resume",
+      "category": "hotl",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'needs_review' want 'needs_review'"
+        ],
+        "event:intervention_required": [
+          true,
+          ""
+        ],
+        "event:runtime_paused": [
+          true,
+          ""
+        ],
+        "event:runtime_resuming": [
+          true,
+          ""
+        ],
+        "event:runtime_resumed": [
+          true,
+          ""
+        ],
+        "max_replans": [
+          true,
+          "replans=1"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'needs_review' want 'needs_review'",
+        "max_replans": "replans=1",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "needs_review"
+    },
+    {
+      "case_id": "B011",
+      "name": "four_agent_golden",
+      "category": "golden",
+      "passed": true,
+      "checks": {
+        "terminal_status": [
+          true,
+          "got 'completed' want 'completed'"
+        ],
+        "required_agents": [
+          true,
+          "missing []"
+        ],
+        "required_artifacts": [
+          true,
+          "missing []"
+        ],
+        "event:agent_started": [
+          true,
+          ""
+        ],
+        "event:task_completed": [
+          true,
+          ""
+        ],
+        "event:checkpoint_created": [
+          true,
+          ""
+        ],
+        "event:monitor_started": [
+          true,
+          ""
+        ],
+        "forbidden_event:replan_triggered": [
+          true,
+          "was emitted"
+        ],
+        "forbidden_event:approval_waiting": [
+          true,
+          "was emitted"
+        ],
+        "forbidden_event:runtime_paused": [
+          true,
+          "was emitted"
+        ],
+        "graph_revision": [
+          true,
+          "revision=1"
+        ],
+        "no_duplicate_execution": [
+          true,
+          "completed-then-restarted: []"
+        ],
+        "artifact_lineage_valid": [
+          true,
+          ""
+        ],
+        "provenance_valid": [
+          true,
+          ""
+        ],
+        "no_unauthorized_command_applied": [
+          true,
+          ""
+        ]
+      },
+      "failures": [],
+      "details": {
+        "terminal_status": "got 'completed' want 'completed'",
+        "required_agents": "missing []",
+        "required_artifacts": "missing []",
+        "forbidden_event:replan_triggered": "was emitted",
+        "forbidden_event:approval_waiting": "was emitted",
+        "forbidden_event:runtime_paused": "was emitted",
+        "graph_revision": "revision=1",
+        "no_duplicate_execution": "completed-then-restarted: []"
+      },
+      "terminal_status": "completed"
+    }
+  ],
+  "metrics": {
+    "cases_total": 11,
+    "cases_passed": 11,
+    "benchmark_pass_rate": 1.0,
+    "false_pass_count": 0,
+    "duplicate_execution_count": 0,
+    "invalid_transition_count": 0,
+    "unauthorized_command_count": 0,
+    "artifact_lineage_errors": 0,
+    "provenance_errors": 0,
+    "max_replan_depth": 0,
+    "checkpoint_recovery_success_rate": 1.0,
+    "parallel_consistency_rate": 1.0,
+    "a2a_delivery_success_rate": 1.0
+  }
+}

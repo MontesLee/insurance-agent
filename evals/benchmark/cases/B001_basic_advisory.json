@@ -1,0 +1,102 @@
+{
+  "case_id": "B001",
+  "name": "basic_advisory",
+  "category": "happy_path",
+  "description": "Full advisory happy path through four specialist agents; artifacts, lineage, evals and checkpoints verified.",
+  "input": {
+    "graph": [
+      {
+        "task_id": "task_0",
+        "task_type": "client_profile"
+      },
+      {
+        "task_id": "task_1",
+        "task_type": "requirement_analysis",
+        "dependencies": [
+          "task_0"
+        ]
+      },
+      {
+        "task_id": "task_2",
+        "task_type": "risk_analysis",
+        "dependencies": [
+          "task_0",
+          "task_1"
+        ]
+      },
+      {
+        "task_id": "task_3",
+        "task_type": "coverage_gap",
+        "dependencies": [
+          "task_0",
+          "task_1",
+          "task_2"
+        ]
+      },
+      {
+        "task_id": "task_4",
+        "task_type": "solution",
+        "dependencies": [
+          "task_1",
+          "task_2",
+          "task_3"
+        ]
+      },
+      {
+        "task_id": "task_5",
+        "task_type": "product_candidates",
+        "dependencies": [
+          "task_0",
+          "task_3",
+          "task_4"
+        ]
+      },
+      {
+        "task_id": "task_6",
+        "task_type": "report_generation",
+        "dependencies": [
+          "task_0",
+          "task_1",
+          "task_2",
+          "task_5"
+        ]
+      }
+    ],
+    "scripts": {
+      "task_0": "profile",
+      "task_1": "req",
+      "task_2": "risk",
+      "task_3": "coverage_gap",
+      "task_4": "solution",
+      "task_5": "product",
+      "task_6": "report"
+    }
+  },
+  "expected": {
+    "terminal_status": "completed",
+    "required_agents": [
+      "insurance_analyst",
+      "product_specialist",
+      "report_specialist"
+    ],
+    "required_artifacts": [
+      "client-profile",
+      "requirement-analysis",
+      "risk-assessment",
+      "coverage-gap-analysis",
+      "solution-plan",
+      "product-candidates",
+      "insurance-report"
+    ],
+    "required_events": [
+      "task_completed",
+      "checkpoint_created"
+    ],
+    "forbidden_events": [
+      "replan_triggered",
+      "approval_waiting"
+    ],
+    "max_repairs": 0,
+    "graph_revision": 1
+  }
+}

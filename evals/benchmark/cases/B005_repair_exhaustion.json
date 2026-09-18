@@ -1,0 +1,47 @@
+{
+  "case_id": "B005",
+  "name": "repair_exhaustion",
+  "category": "repair_exhaustion",
+  "description": "A persistently failing eval (invalid product_id) exhausts the bounded repair budget: exactly 2 repairs then NEEDS_REVIEW — no infinite loop, no fabricated PASS.",
+  "input": {
+    "executor": "script_agent",
+    "graph": [
+      {
+        "task_id": "task_0",
+        "task_type": "client_profile"
+      },
+      {
+        "task_id": "task_5",
+        "task_type": "product_candidates",
+        "dependencies": [
+          "task_0"
+        ]
+      }
+    ],
+    "artifact_scripts": {
+      "product_candidates": [
+        "bad_product",
+        "bad_product",
+        "bad_product",
+        "bad_product",
+        "bad_product"
+      ],
+      "client_profile": [
+        "profile"
+      ]
+    },
+    "max_concurrency": 2,
+    "max_replans": 0
+  },
+  "expected": {
+    "terminal_status": "needs_review",
+    "required_events": [
+      "task_failed"
+    ],
+    "forbidden_events": [
+      "replan_triggered"
+    ],
+    "exact_failed_evals": 3,
+    "max_repairs": 2
+  }
+}

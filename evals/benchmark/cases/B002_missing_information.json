@@ -1,0 +1,49 @@
+{
+  "case_id": "B002",
+  "name": "missing_information",
+  "category": "missing_information",
+  "description": "Client facts are insufficient: the intake agent refuses to fabricate a profile — the case fails closed and downstream never runs on invented facts.",
+  "input": {
+    "graph": [
+      {
+        "task_id": "task_0",
+        "task_type": "client_profile"
+      },
+      {
+        "task_id": "task_1",
+        "task_type": "requirement_analysis",
+        "dependencies": [
+          "task_0"
+        ]
+      },
+      {
+        "task_id": "task_2",
+        "task_type": "report_generation",
+        "dependencies": [
+          "task_0",
+          "task_1"
+        ]
+      }
+    ],
+    "scripts": {
+      "task_0": "plain:客户提供的信息不足，我无法在不编造事实的情况下建立客户档案。",
+      "task_1": "req",
+      "task_2": "report"
+    }
+  },
+  "expected": {
+    "terminal_status": "needs_review",
+    "forbidden_artifacts": [
+      "client-profile",
+      "requirement-analysis",
+      "insurance-report"
+    ],
+    "required_events": [
+      "agent_failed"
+    ],
+    "forbidden_events": [
+      "task_completed"
+    ],
+    "max_repairs": 0
+  }
+}

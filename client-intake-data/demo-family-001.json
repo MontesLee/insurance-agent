@@ -1,0 +1,28 @@
+{
+  "case_id": "demo-family-001",
+  "description": "Portfolio demo case: 30-year-old married father, newborn child, 500k CNY annual income, upcoming 2M CNY mortgage, dual family responsibility including partial parental support. Realistic but entirely fictional — no real person's data.",
+  "intake": {
+    "family_profile": {
+      "age": {"value": 30},
+      "marital_status": {"value": "已婚"},
+      "children": {"value": "1个（0岁）"},
+      "housing": {"value": "自有住房，计划两年内置换并承担约200万元房贷"}
+    },
+    "financial_profile": {
+      "annual_income": {"value": "50万元"},
+      "annual_expense": {"value": "25万元"},
+      "mortgage": {"value": "计划约200万元（未来两年）"},
+      "insurance_budget": {"value": "每年约2万元"}
+    },
+    "existing_protection": {
+      "social_security": {"value": "夫妻双方均有社保"},
+      "existing_insurance": {"value": "无商业保险"}
+    },
+    "responsibility_profile": {
+      "dependents": {"value": "配偶（有收入）+ 0岁孩子 + 双方父母（需一定赡养）"}
+    },
+    "notes_for_unknown": ["health_status"]
+  },
+  "request": "分析一个30岁已婚、有0岁孩子、年收入50万元、未来可能有200万元房贷的家庭的保险风险，并给出保障方案。",
+  "notice": "产品数据仅用于 Agent Runtime 演示，不构成保险产品推荐或实际投保依据。"
+}
