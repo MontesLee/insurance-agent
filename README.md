@@ -1,234 +1,203 @@
-# insurance-agent
+# Long-running Multi-Agent Runtime
 
-> 🌐 Language: 🇺🇸 English · 🇨🇳 [中文版](README.zh-CN.md)
+> Language: English | [中文版](README.zh-CN.md)
 
-**A long-running multi-agent runtime that plans, executes, evaluates, repairs, replans and supervises agent workflows.**
-
-It combines a validated Planner, specialist agents, A2A communication, bounded
-parallel execution, dynamic replanning, fail-closed evaluation,
-checkpoint/resume, HITL approval and HOTL supervision. Insurance is the
-first domain adapter, not the runtime itself.
-
-The interesting part of this repository is not the insurance chatbot — it is the
-execution system underneath: a state-driven, eval-gated, observable, resumable,
-bounded-parallel Agent runtime built around a strict separation between
-*planning*, *execution*, *quality* and *durable truth*.
+**A state-driven runtime that plans, executes, evaluates, repairs, replans
+and supervises long-running agent workflows.**
+Insurance is the first domain adapter — a software-engineering workflow
+runs on the same runtime to prove the runtime is generic.
 
 ```text
-Insurance Agent            → the demonstration workload
-Agent Runtime / Harness    → the engineering contribution
+Traditional LLM app:    Prompt -> LLM -> Answer
+
+This runtime:           Request -> Planner -> Task Graph -> Long-running Harness
+                        -> Specialist Agents -> Artifacts -> Eval -> Repair
+                        -> Replanning -> Human Control -> Recoverable Result
 ```
+
+```text
+Insurance Agent          -> the demonstration workload
+Agent Runtime / Harness -> the engineering contribution
+```
+
+**My contribution** — the architecture and semantics: planner/validation
+design, task lifecycle, scheduler semantics, agent/skill/tool boundaries,
+eval strategy, repair/replan semantics, HITL/HOTL control design,
+checkpoint/recovery, benchmark & red-team design, domain-adapter
+generalization, productization. (AI coding tools were used as dev tooling;
+the system design and its proofs are the point.)
 
 ---
 
-## What is this?
+## Why I built it
 
-A single-process Agent runtime that turns a user request into a **validated
-Task Graph**, executes it on a **long-running Harness** with **specialist
-Agents**, gates every result behind a **deterministic Eval** with bounded
-**Repair**, and persists everything as **Artifacts with provenance and
-lineage** — sequentially by default, or as a **bounded parallel DAG** when
-`max_concurrency > 1`. A FastAPI + React chat UI observes and drives it.
+A single LLM call cannot deliver **work**: multi-step tasks that run long,
+need several specialists, fail partially, require evidence, and need a
+human who can intervene without becoming a bottleneck. This project builds
+the missing execution layer — the agent *runtime*, not another prompt.
 
-## Why is it interesting?
+## 5-minute demo
 
-Most LLM demos optimize the prompt loop. This repository optimizes the
-**execution engineering around the LLM**:
+```bash
+python -m demos.demo_portfolio
+```
 
-| Problem | This repository's answer |
-| --- | --- |
-| LLM output cannot be trusted | Untrusted Planner output → strict Graph Validator (fail-closed) |
-| Agent self-grading | Agents never decide PASS — the Harness owns Eval + Repair |
-| Long runs die mid-way | Disk-based checkpoints; resume in a NEW process; `RUNNING → PENDING` recovery |
-| Parallel agents corrupt state | Workers execute on isolated CaseState copies; only the scheduler commits |
-| Nobody knows why a result exists | Artifact registry with lineage, fingerprints, provenance |
-| A2A turns into an actor soup | MessageBus is coordination only — it can never schedule, create tasks, or bypass deps |
+Six acts, all real execution: problem -> planner -> 4-agent parallel run ->
+runtime trace from the durable event log -> failure/replan/HITL/HOTL
+recovery -> deliverable with provenance -> second-domain swap.
+[Narrated script (5 & 10 min)](docs/portfolio/demo-script.md).
 
-## What can it do?
-
-- Intent-routed chat (`GENERAL_KNOWLEDGE / GENERAL_GUIDANCE / CLIENT_ADVISORY / PRODUCT_LOOKUP / TASK_EXECUTION`)
-- LLM Planner → strict JSON Task Graph → 10-check Graph Validator (cycle detection, artifact & eval contracts)
-- Long-running Harness: projects, task lifecycle, dependency barriers, per-terminal checkpoints
-- **Bounded parallel DAG scheduling** (`max_concurrency`, default 1 = unchanged sequential mode)
-- **Harness-controlled dynamic replanning** (bounded budget, deterministic triggers, immutable graph revisions, validator-gated)
-- **Human-in-the-loop approval gateway** (deterministic policy, fail-closed state machine, crash-safe pause/resume)
-- **Human-on-the-loop control plane** (deterministic monitor + signals, risk levels, audited idempotent supervisor commands, safe-barrier pause/resume)
-- 4 specialist Agents with a deterministic task→agent map, scoped tools, and permission validation
-- Agent-to-Agent communication via a persistent, policy-enforced MessageBus with ACK-after-PASS handoffs
-- Deterministic Eval (schema / required fields / contamination / provenance / cross-artifact / invariants) + repair ≤ 2
-- Artifact registry: sequential IDs, lineage to client facts, fingerprint freeze verification
-- Local RAG knowledge search with fail-closed evidence provenance
-- Demo product catalog (explicitly `is_demo`) backing candidate filtering and recommendation
-- Web UI (chat + developer console) with a live SSE event stream and artifact inspector
-- Resume/recovery across processes; 52-suite regression runner; 33-case agent benchmark + golden cases
-- **Deterministic runtime benchmark** (11 cases, 18 failure-injection scenarios, false-pass count 0) and **one-command demos**
-
-## How does it work?
+## Architecture
 
 ```mermaid
 flowchart TD
-    U[User] --> IR[Intent Routing<br/>agent_decide]
-    IR -->|general / lookup| QA[Chat answer<br/>no client intake]
-    IR -->|advisory| PL[Planner LLM]
-    PL --> GV[Graph Validator<br/>10 checks, fail-closed]
-    GV -->|invalid| NR1[NEEDS_REVIEW]
-    GV -->|valid| HA[Long-running Harness<br/>immutable Task Graph]
-    HA --> SC{Scheduler<br/>max_concurrency}
-    SC -->|sequential| A1[Task]
-    SC -->|parallel rounds| W1[Worker A] & W2[Worker B]
-    W1 & W2 --> CM[Scheduler-owned commit<br/>merge + replay, graph order]
-    A1 --> CM
-    CM --> EV[Eval — Harness-owned]
+    U[User] --> PL[Planner: WHAT]
+    PL --> GV{Graph Validator: fail-closed}
+    GV --> HA[Harness: WHEN - Runtime Authority]
+    HA --> SC[Bounded DAG Scheduler: isolated workers, deterministic commits]
+    SC --> A1[insurance_analyst] & A2[knowledge_specialist] & A3[product_specialist] & A4[report_specialist]
+    A1 & A2 & A3 & A4 --> BUS[MessageBus: A2A coordination]
+    A1 & A2 & A3 & A4 --> ART[Artifacts: truth + lineage + provenance]
+    ART --> EV{Eval: Harness-owned}
     EV -->|PASS| CP[Checkpoint]
-    EV -->|FAIL| RP[Repair ≤ 2 → retry]
+    EV -->|FAIL| RP[Repair max 2]
     RP --> EV
-    RP -->|exhausted| NR2[NEEDS_REVIEW<br/>downstream BLOCKED]
-    CP --> NX[Next runnable tasks]
+    CP --> NXT[Replan / next tasks]
+    MON[Monitor: observe only] -.signals.-> H
+    H[Human: above the DAG] -->|HITL approve / HOTL pause-resume| HA
 ```
 
-The one-line version of the architecture:
+Authority boundaries: **Harness** = runtime authority (sole state writer);
+**Planner** = plan authority (untrusted -> validated); **Agents** =
+execute/request (never PASS); **Eval** = quality gate (never inside a
+tool); **Artifacts** = source of truth; **Monitor** = observe only;
+**Human** = approve/intervene via the control plane, never direct edits.
 
-```text
-Planner = WHAT · Agent = WHO/HOW · Skill = domain capability · Tool = capability interface
-Harness = WHEN/reliability · Eval = quality · Artifact = durable truth · Message = coordination
-```
+## Multi-agent collaboration
 
-Full details: [docs/architecture/overview.md](docs/architecture/overview.md).
+4 specialists with deterministic assignment and scoped tools (the analyst
+physically cannot name products); coordination only through a validated,
+persistent A2A MessageBus (ACK after PASS); parallel branches on the
+bounded DAG scheduler with worker isolation — the scheduler is the only
+state writer, so results stay deterministic under concurrency.
 
-## How do I run it?
+## Evaluation & reliability
 
-**Environment:** Python 3.11+, repository root as the working directory, no
-install step for the core loop (PyYAML, jsonschema; plus fastapi/uvicorn for
-the server and an OpenAI-compatible SDK for agent mode). The React UI needs
-Node/npm.
+Every artifact passes a deterministic, harness-owned eval (schema, required
+fields, product-leakage contamination, provenance, cross-artifact refs,
+catalog invariants) with bounded repair (max 2), then fail-closed
+NEEDS_REVIEW. Failures never fake success: empty knowledge stores no
+fabricated evidence; LLM outages fail closed; an adversarial false-pass
+suite proves bad inputs are rejected (count 0).
+
+## Human control
+
+- **HITL** — human as decision gate: high-impact graph changes pause in
+  WAITING_HUMAN; approve/reject; rejection fails closed.
+- **HOTL** — human as supervisor above the DAG: a deterministic monitor
+  raises risk signals; policy decides NOTIFY/PAUSE; pause lands at a safe
+  barrier (never mid-commit); audited idempotent commands.
+
+## Insurance case study (first domain adapter)
+
+A realistic (fictional) family case — 30-year-old married father,
+newborn, 500k income, planned 2M mortgage — runs the full pipeline:
+facts -> requirements -> risk -> gap -> solution -> knowledge ->
+candidates -> report, with provenance from report back to client facts.
+`python -m demos.demo_insurance` · [runtime trace](docs/runtime-trace.md)
+
+## Generalization: software engineering (second domain)
+
+Same planner/harness/scheduler/eval/artifact stack; a ~40-line
+declarative domain adapter (task catalog, agents, workflow, eval rules);
+zero runtime fork. 5/5 tasks, 5/5 evals, lineage verified, COMPLETED.
+`python -m demos.demo_generalization` · [audit](docs/generalization.md)
+
+## Benchmark
 
 ```bash
-# 1. deterministic Quick Start — no LLM key, no network, no console-encoding
-#    requirements. Runs the REAL runtime (Planner → Harness → 4 agents →
-#    Eval → report) and prints a status-only transcript + run summary.
+python -m evals.benchmark.runner     # 11/11 cases, hard gates all 0
+```
+
+11 deterministic scenario cases (happy path, missing info, knowledge/
+product failures, repair exhaustion, replanning, parallel equivalence,
+HITL, HOTL notify/pause, 4-agent golden) + an 18-row fault-injection
+matrix + adversarial false-pass testing + tamper testing (breaking the
+runtime breaks the benchmark). [Report](docs/benchmark-report.md)
+
+## Design decisions
+
+13 trade-off records (why not one big agent; why eval is not in the tool;
+why the scheduler is local; why HITL and HOTL differ; why no Redis...):
+[design-decisions.md](docs/portfolio/design-decisions.md) ·
+7 ADRs in [docs/adr/](docs/adr/)
+
+## Limitations (honest)
+
+Validated **portfolio prototype** — single-process, thread-based;
+JSON-file persistence (no Redis/Postgres/K8s by design); demo product
+catalog (not real insurer data, clearly labelled); real-LLM smoke depends
+on external API and fails closed on outage; not production insurance
+advice.
+
+## Quick Start
+
+```bash
+# 1. deterministic Quick Start — no LLM key, no network, encoding-safe
 python -m demos.demo_basic
 
-# 2. more deterministic demos (also offline, also real runtime)
+# 2. more demos (offline, real runtime)
 python -m demos.demo_four_agent         # golden 4-agent parallel run
-python -m demos.demo_replan             # failure → controlled replanning
+python -m demos.demo_replan             # failure -> controlled replanning
 python -m demos.demo_hitl               # human approval gate
 python -m demos.demo_hotl               # supervisor pause/resume
+python -m demos.demo_portfolio          # the 6-act tour
 python -m evals.benchmark.runner        # 11 deterministic benchmark cases
 
 # 3. web app (optional)
-python -m runtime.server                 # FastAPI + SSE on http://127.0.0.1:8000
-cd web && npm install && npm run dev     # React UI on http://localhost:5173 (2nd terminal)
+python -m runtime.server                # FastAPI + SSE on 127.0.0.1:8000
+cd web && npm install && npm run dev    # React UI on localhost:5173
 
-# 4. optional real-LLM smoke — requires a configured provider AND network;
-#    fails closed on outage, never silently falls back (see .env.example)
+# 4. optional real-LLM smoke (needs provider + network; fails closed)
 python -m runtime.agent.smoke_test
 ```
 
-Without `.env` the chat runs in **demo/deterministic mode**; with a key it
-runs **agent mode** through the real LLM tool-calling loop
-(OpenAI-compatible endpoint; GLM works through its OpenAI-compatible base URL).
-Never commit real keys — `.env` is git-ignored.
-
-## How do I test it?
+## Testing
 
 ```bash
-pytest tests/runtime -q                  # the pytest-collectible runtime suite
-python tmp/run_regression.py             # all 52 standalone suites (use PYTHONIOENCODING=utf-8 on cp936 consoles)
-python evals/agent-benchmark/run_agent_benchmark.py    # 33-case agent benchmark
-python evals/agent-benchmark/run_golden_cases.py       # golden-case regression
+pytest tests/runtime tests/portfolio -q   # 326 tests
+PYTHONIOENCODING=utf-8 python tmp/run_regression.py
 ```
 
-Test strategy and current known infra issues:
-[docs/development/testing.md](docs/development/testing.md).
-
-## How do I run the demos & the benchmark?
-
-The fastest full experience (6 acts, ~1 minute): `python -m demos.demo_portfolio`
-
-```bash
-python -m demos.demo_basic         # happy path (4 agents → report)
-python -m demos.demo_parallel      # bounded-parallel DAG
-python -m demos.demo_replan        # failure → controlled replanning
-python -m demos.demo_hitl          # human approval gate (approve & resume)
-python -m demos.demo_hotl          # supervisor pause/resume
-python -m demos.demo_four_agent    # the golden four-agent run
-
-python -m evals.benchmark.runner   # 11 deterministic cases + hard gates
-```
-
-All demo output is real runtime state (events/artifacts/checkpoints) —
-never chain-of-thought. Full results:
-[docs/benchmark-report.md](docs/benchmark-report.md); 5-minute interview
-walkthrough: [docs/portfolio-demo.md](docs/portfolio-demo.md).
-
-## Where is the architecture?
-
-| Topic | Document |
-| --- | --- |
-| Big picture, boundaries, phase history | [docs/architecture/overview.md](docs/architecture/overview.md) |
-| Planner & graph validation | [docs/architecture/planner.md](docs/architecture/planner.md) |
-| Harness, task states, recovery, failure model | [docs/architecture/harness.md](docs/architecture/harness.md) |
-| Bounded parallel DAG scheduler | [docs/architecture/parallel-scheduler.md](docs/architecture/parallel-scheduler.md) |
-| Dynamic replanning (Phase 8 V0.1) | [docs/architecture/dynamic-replanning.md](docs/architecture/dynamic-replanning.md) |
-| Human-in-the-loop approval (Phase 9 V0.1) | [docs/architecture/human-in-the-loop.md](docs/architecture/human-in-the-loop.md) |
-| Human-on-the-loop control plane (Phase 10 V0.1) | [docs/architecture/human-on-the-loop.md](docs/architecture/human-on-the-loop.md) |
-| Specialist agents, executor, tools | [docs/architecture/agents.md](docs/architecture/agents.md) |
-| A2A communication & handoffs | [docs/architecture/a2a.md](docs/architecture/a2a.md) |
-| Eval & repair boundary | [docs/architecture/eval.md](docs/architecture/eval.md) |
-| Artifacts, lineage, provenance | [docs/architecture/artifacts-and-provenance.md](docs/architecture/artifacts-and-provenance.md) |
-| Insurance domain, catalog, knowledge | [docs/architecture/insurance-domain.md](docs/architecture/insurance-domain.md) |
-| Key decisions | [docs/adr/](docs/adr/) (7 ADRs, EN + zh-CN) |
-| Future work (not implemented) | [docs/roadmap.md](docs/roadmap.md) |
-| Benchmark & failure injection | [docs/benchmark-report.md](docs/benchmark-report.md) |
-| Generalization (domain vs runtime) | [docs/generalization.md](docs/generalization.md) |
-| Interview demo script | [docs/demo-script.md](docs/demo-script.md) · [portfolio-demo.md](docs/portfolio-demo.md) |
-| Portfolio positioning (2-min read) | [docs/portfolio.md](docs/portfolio.md) |
-| Architecture diagrams | [docs/architecture.md](docs/architecture.md) · [runtime trace](docs/runtime-trace.md) |
-
-## What this is NOT
-
-- Not a distributed Agent platform — single process, thread-based bounded parallelism
-- Not a production insurance recommendation system — demo catalog (`is_demo`), local demo knowledge corpus
-- Not a live insurer product database
-- Not an unrestricted autonomous Agent — every boundary is validated, eval-gated, fail-closed
-- Not a Raft / queue / Kubernetes-grade scheduler
-
-See [overview — scope & limitations](docs/architecture/overview.md#9-what-this-project-is-not).
-
-## Repository layout
+## Project structure
 
 ```text
-runtime/            the Agent runtime (agent loop, planner, harness, agents, state, eval, server)
-.trae/skills/       9 self-contained insurance Skills (SKILL.md + contract + evals + entrypoints)
-contracts/          canonical JSON Schemas for every artifact
-adapters/           native dialogue format → canonical artifact adapters
-knowledge/          RAG engine + shared Evidence Provider (fail-closed provenance)
-catalog/            demo product catalog (versioned, effective-dated, is_demo)
-tests/              runtime suite (pytest) + standalone script suites
-evals/              system-level benchmark + golden cases (skill-level evals live in each skill)
-web/                React/Vite chat UI (SSE event stream, developer console)
-docs/               architecture, ADRs, development guides, demo scripts
+runtime/      the agent runtime (planner, harness, agents, A2A,
+              approval, control plane, state, eval, observability, server)
+.trae/skills/ insurance skills (9, self-contained: contract + evals)
+contracts/    artifact JSON schemas      catalog/  demo product catalog
+knowledge/    RAG + evidence provider    demos/    one-command demos
+evals/benchmark/  deterministic benchmark + fault injection
+tests/        runtime (pytest) + portfolio acceptance (anti-cheat)
+docs/         architecture | portfolio | ADRs | benchmark reports
 ```
 
-## Phase history (engineering evolution)
+## Portfolio / Interview
 
-| Phase | Delivered |
-| --- | --- |
-| V2 Steps 0–4 | Contracts, core insurance Skills, orchestrator, deterministic Eval + Repair, checkpoints |
-| 2.5 / 2.6 | Runtime observability (event stream + SSE), chat-first Agent, real LLM agent mode |
-| 3 | Long-running Harness (projects, task lifecycle, resume across processes) |
-| 4 | Planner + Task Registry + Graph Validator (fail-closed) |
-| 5 | Multi-agent: specialist executors, deterministic assignment, permission validation |
-| 6 | A2A communication: MessageBus, handoff lifecycle, communication policy |
-| 7 | Bounded parallel DAG scheduler (isolated workers, scheduler-owned commit, recovery) + housekeeping freeze |
-| 8 | Dynamic replanning V0.1 (deterministic triggers, safe barriers, immutable graph revisions, bounded budget) |
-| 9 | Human-in-the-loop approval gateway V0.1 (deterministic policy, fail-closed approvals, Harness-owned resume) |
-| 10 | Human-on-the-loop control plane V0.1 (deterministic monitor, intervention policy, audited supervisor commands) |
+[Project overview](docs/portfolio/project-overview.md) |
+[Agent Developer](docs/portfolio/agent-developer.md) |
+[Agent PM](docs/portfolio/agent-pm.md) |
+[Architecture interview](docs/portfolio/architecture-interview.md) |
+[Interview Q&A (30)](docs/portfolio/interview-qa.md) |
+[Resume bullets](docs/portfolio/resume-bullets.md) |
+[Verified results](docs/portfolio/project-results.md) |
+[Demo script](docs/portfolio/demo-script.md)
 
-Each layer froze before the next began; `max_concurrency=1` still runs the
-Phase 6 sequential path byte-for-byte.
+## Development history
 
----
-
-License / authors: see repository metadata. This is an engineering portfolio
-project — the docs deliberately avoid overstating scope.
+Built and frozen in 12 audited phases (deterministic pipeline ->
+observability -> harness -> planner -> multi-agent -> A2A ->
+bounded-parallel scheduler -> dynamic replanning -> HITL -> HOTL ->
+benchmark/red-team -> portfolio), each with its own regression suite still
+passing. Tagged **v0.1.0** as the portfolio stable version. Details:
+[phase history](docs/architecture/overview.md)
