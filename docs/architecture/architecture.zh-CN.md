@@ -2,6 +2,12 @@
 
 # 架构总览（Architecture）
 
+> **⚠ 历史文档（V2 时期）。** 写于多 Agent 各阶段之前。当前架构见
+> [overview.zh-CN.md](overview.zh-CN.md) 及其兄弟页面；本文件仅作历史保留。
+> 注意：文中的 "Phase 7" 指 V2 旧步骤编号（CaseState/Orchestrator），
+> 不是现在的 Phase 7 有界并行调度器。
+
+
 > 面向读者：面试官 / 新协作者。本文回答三件事：**系统长什么样**、**每一层由谁执行**、**为什么这样分层**。
 > 配套：`README.md`（入口）、`docs/adr/`（设计决策）、`docs/architecture/orchestration.md`（编排细节）、
 > `docs/architecture/execution-trace.md`（可观测）、`docs/architecture/failure-taxonomy.md`（失败分类）。

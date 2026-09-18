@@ -1,5 +1,10 @@
 # 保险 Agent V2 — 目标架构（演进基线）
 
+> **⚠ Historical target-architecture document (V2 baseline).** Evolved into
+> the current architecture — see [overview.md](overview.md). Kept as the
+> original design record referenced by the V2 audit notes.
+
+
 > 本文件是 V2 的**目标架构**设计文档，随 Phase 推进持续更新。
 > Phase 0 审计基线：`docs/dev-notes/architecture-v2-audit.md`（只读，不修改）。
 > Phase 1 契约层落地：`docs/architecture/contract-layer.md`。

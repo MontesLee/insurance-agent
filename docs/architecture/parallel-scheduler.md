@@ -1,5 +1,7 @@
 # Phase 7 — DAG-aware Bounded Parallel Scheduler
 
+> 🌐 Language: 🇺🇸 English · 🇨🇳 [中文版](parallel-scheduler.zh-CN.md)
+
 Phase 7 upgrades the Harness from a **sequential scheduler** to a
 **DAG-aware scheduler with bounded concurrency**, on top of the frozen
 Phase 6.2.2 runtime. It changes scheduling only — not responsibility

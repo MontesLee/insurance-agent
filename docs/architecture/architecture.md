@@ -2,6 +2,13 @@
 
 # Architecture Overview
 
+> **⚠ Historical document (V2 era).** Written before the multi-agent phases.
+> The current architecture is documented in [overview.md](overview.md) and its
+> sibling pages; this file is kept for history. Note: "Phase 7" here refers to
+> the old V2 step numbering (CaseState/Orchestrator), NOT the current
+> Phase 7 bounded-parallel scheduler.
+
+
 > Audience: interviewers / new contributors. This document answers three questions: **what the
 > system looks like**, **who executes each layer**, and **why it is layered this way**.
 > Companions: `README.md` (entry point), `docs/adr/` (design decisions),

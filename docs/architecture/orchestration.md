@@ -1,5 +1,11 @@
 # 保险 Agent V2 — Phase 7：CaseState + Orchestrator + E2E
 
+> **⚠ Historical document (V2 "Phase 7" = CaseState/Orchestrator step).**
+> The orchestrator is now one layer inside the current runtime — see
+> [overview.md](overview.md) and [harness.md](harness.md). This file is kept
+> for history. Its "Phase 7" is NOT the current bounded-parallel Phase 7.
+
+
 > 本文件记录 **Phase 7** 的产出与验证结论。
 > 前置：Phase 0 审计 `docs/dev-notes/architecture-v2-audit.md`（只读基线，未修改）· Phase 1 契约层 `docs/architecture/contract-layer.md`。
 > 本阶段**只新增** `state/`、`workflow/`、`tests/e2e/`；**未修改任何 Skill**（见 §7 git 摘要）。

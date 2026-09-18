@@ -13,4 +13,4 @@
 - System-level Eval 验证**系统行为**：多 Skill 编排后的整体质量、安全硬门（Safety Hard Gates）、Golden 回归，不关心单个 Skill 内部实现。
 - 两层命名统一为 `evals/` 是有意的：同一套 Eval 纪律（可机检断言才 PASS、FAIL→Repair→重跑、负向自检）在两层同样适用（见 AGENTS.md §6）。
 
-运行入口见 README §16（`evals/agent-benchmark/run_agent_benchmark.py` / `run_golden_cases.py`）。
+运行入口见 [docs/development/testing.zh-CN.md](../docs/development/testing.zh-CN.md)（`evals/agent-benchmark/run_agent_benchmark.py` / `run_golden_cases.py`）。

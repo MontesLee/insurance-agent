@@ -1,396 +1,176 @@
-> 🌐 **语言 / Language:** 🇺🇸 [English](README.md) · 🇨🇳 中文
->
-> 本文档是英文版 README 的中文翻译。章节标题保留英文锚点以便交叉引用，正文已完整中文化。所有被引用的子文档（ADR、`failure-injection`、`stories`、架构总览等）均已提供中文版（`*.zh-CN.md`），可在文末「文档索引」中直达。
-
 # insurance-agent
 
-一个确定性的多阶段保险分析智能体（Agent），用于展示可靠的 Agent Systems 工程能力。
+> 🌐 语言：🇨🇳 中文 · 🇺🇸 [English](README.md)
+
+**一个 Agent Runtime / Harness 工程项目，以保险分析作为示范负载。**
+
+这个仓库有意思的部分不是保险对话机器人，而是其下方的执行系统：一个
+状态驱动、Eval 把关、可观测、可恢复、有界并行的 Agent 运行时，核心是
+*规划*、*执行*、*质量* 与 *持久事实* 的严格分离。
 
 ```text
-核心能力：
-
-  - 状态驱动编排（State-driven orchestration）
-  - 结构化产物（Structured artifacts）
-  - 确定性 Fail-Closed 评估（Deterministic fail-closed evaluation）
-  - 有界自修复（Bounded self-repair）
-  - 证据溯源（Evidence provenance）
-  - 检查点 / 恢复（Checkpoint / Resume）
-  - 链路追踪与可观测性（Trace & observability）
-
-组合定位：
-  聚焦 Agent Systems 的可靠性，而非保险产品的准确性。
+Insurance Agent            → 示范负载（保险）
+Agent Runtime / Harness    → 工程贡献（运行时）
 ```
-
-> **一句话定位**
-> 一个确定性的多阶段保险分析智能体，具备状态驱动编排、Fail-Closed 评估、有界自修复、证据溯源、Checkpoint/Resume 与可观测性。
-> （A deterministic multi-stage insurance-analysis Agent with state-driven orchestration, fail-closed evaluation, bounded self-repair, evidence provenance, checkpoint/resume, and observability.）
-
-> **核心观点：** *生成很容易，可靠的延续很难。*
 
 ---
 
-## 1. 这是什么？
+## 这是什么？
 
-`insurance-agent` 是一个运行时（runtime），它接收一个**结构化客户状态**，并引导其经过一条固定的数据链 —— 需求 → 风险 → 保障缺口 → 解决方案 → 候选产品 → 推荐 → 报告 —— 同时持续**评估、修复、检查点保存与追踪**每一步。
+一个单进程 Agent 运行时：把用户请求变成**经过校验的 Task Graph**，在
+**长运行 Harness** 上由**专家 Agent** 执行，每个结果都要通过**确定性
+Eval** 与有界 **Repair** 的门禁，一切产出都以**带溯源与血缘的
+Artifact** 持久化——默认串行，`max_concurrency > 1` 时按**有界并行
+DAG** 调度。FastAPI + React 聊天 UI 负责观察与驱动。
 
-它**不是**一个聊天机器人，也**不是**一次单独的 LLM 调用。它是一次工程示范：当输入缺失、相互矛盾、或缺乏证据支撑时，如何让一个智能体**安全地继续，或诚实地停下**。
+## 为什么值得看？
 
-```text
-结构化客户状态
-（在当前组合中由上游提供）
-        │
-        ▼
-   编排器（Orchestrator）── 状态驱动，不含业务判断
-        │
-        ▼
-  技能 → 产物 → 确定性评估 → 修复 → 检查点 → 追踪
-        │
-        ▼
-   推荐方向（演示用目录，is_demo=true）
-```
+多数 LLM 演示优化的是 prompt 循环；本仓库优化的是 **LLM 周边的执行
+工程**：
 
-完整图示：[`docs/architecture/portfolio-architecture.svg`](docs/architecture/portfolio-architecture.svg)
-
-## 2. 我为什么做它
-
-大多数的 Agent 演示只展示*成功的生成*。这个项目提出了一个更难的问题：
-
-> **我们如何让一个智能体知道：何时可以安全地继续 —— 何时必须停下？**
-
-LLM 可以生成看似合理的答案。真正未被解决的问题是*可靠性*：当证据稀薄、某个字段是 `UNKNOWN`、某个产品在目录中不存在时，智能体绝不能悄悄编造一个自信满满的结果。
-
-因此，本项目将以下概念作为**一等运行时概念**来对待：
-
-```text
-状态(State)   产物(Artifact)   评估(Eval)
-修复(Repair)  证据(Evidence)   检查点(Checkpoint)   追踪(Trace)
-```
-
-这才是真正的「产品」。保险领域只是用来演示它的*载体*。
-
-## 3. 核心工程问题
-
-一个永远「成功」的智能体并不可靠 —— 它只是幸运。真正的问题是**延续安全性（continuation safety）**：
-
-- 智能体何时应当推进到下一阶段？
-- 何时必须阻断并等待人工？
-- 何时必须拒绝生成产品，而不是幻觉出一个？
-- 何时已经尝试足够、应当升级（escalate）？
-
-下文每一个设计决策，都是为了让这些问题*可被判定、可被审计*，而不是交给模型的「心情」。
-
-## 4. 架构
-
-![组合架构](docs/architecture/portfolio-architecture.svg)
-
-```text
-                    客户输入（Client Input）
-                          │
-                          ▼
-                 ┌───────────────────────────────┐
-                 │  结构化客户状态（CaseState）    │
-                 │  （在当前组合中由上游提供）       │
-                 └───────────┬───────────────────┘
-                             │
-                             ▼
-                   ┌────────────────────┐
-                   │   编排器 Orchestrator │  ← 状态驱动，不含业务判断
-                   └─────────┬──────────┘
-                             │
-         ┌───────────────────┼────────────────────┐
-         ▼                   ▼                    ▼
-   需求 Requirement     风险 Risk             缺口 Gap
-         └───────────────────┼────────────────────┘
-                             ▼
-                         解决方案 Solution
-                             │
-                             ▼
-                  产品候选 Provider（Product Candidate Provider）
-                       │           │
-                       ▼           ▼
-                     RAG       目录 Catalog
-                       │           │
-                       └─────┬─────┘
-                             ▼
-                      推荐 Recommendation
-                             │
-                             ▼
-                          报告 Report
-
-   ┌────────────────────────────────────────────────────┐
-   │            可靠性层（Reliability Layer）             │
-   │  Eval → Repair → Rerun → Review                   │
-   │  Provenance / Trace / Checkpoint                   │
-   └────────────────────────────────────────────────────┘
-```
-
-该架构图**刻意不**把原始自然语言（raw NL）intake 作为一个已执行的阶段展示。在当前组合中，上游三个阶段（`client-intake`、`requirement-analysis`、`risk-analysis`）是 `executor: provided` —— 由精选的 fixtures 播种。运行时从**结构化客户状态**开始证明自身。
-
-## 5. 智能体执行模型
-
-编排器（`runtime/orchestrator.py`）是唯一的运行时循环。它**不持有任何保险业务逻辑**；其行为由声明式的 `runtime/insurance-analysis.yaml` 驱动。
-
-每一轮，它向状态层询问：
-
-```text
-next_runnable(state, workflow)  →  下一个可运行的阶段是哪个？
-can_run(state, stage)            →  它的前置条件是否满足？
-```
-
-如果不存在任何种子（seed），它会**在 `client-intake` 处阻断** —— 绝不凭空捏造一个客户。如果客户信息是 `INSUFFICIENT`/`CONFLICTING`，它会转入 `WAITING_FOR_USER`，而不是猜测。
-
-两种执行器模式：
-
-| 模式 | 阶段 | 含义 |
-| --- | --- | --- |
-| `provided` | client-intake, requirement-analysis, risk-analysis | 以结构化产物形式到达（在本组合中由 fixtures 播种） |
-| `python` | coverage-gap, solution, product-candidate, product-recommendation, report | 确定性、规则驱动、离线、可回归测试 |
-
-这把**安全关键路径完整保留为机器可校验**，并将 LLM 的非确定性从系统中「必须可信」的部分移除。
-
-## 6. 可靠性模型
-
-```text
-生成 Generate
-   │
-   ▼
-评估 Evaluate  ──────────────── PASS ──────────▶ 继续 Continue
-   │
-   └── FAIL
-        ▼
-     修复 Repair
-        ▼
-     重新评估 Re-evaluate
-        ▼
-   PASS / FAIL
-        │
-   最多 2 次修复尝试
-        │
-        ▼
-   NEEDS_REVIEW（升级给人工）
-```
-
-> **不要求智能体永远成功。它只被要求安全地失败。**
-
-修复只改变某个阶段的*输入* —— 绝不改变一个已冻结的产物。修复预算是一个**上限**，而不是配额：在 2 次修复失败后，案例进入 `NEEDS_REVIEW`，由人工决定。这在 [Demo B](docs/demo/demo-b.zh-CN.md) 中有演示。
-
-## 7. 证据与溯源
-
-每一条证据引用都必须携带 `evidence_id` + `document_id` + `chunk_id`。仅由「知识库」支撑的声明是不可采信的。
-
-属性级溯源（attribute-level grounding）将具体产品属性与具体文本块（chunk）进行核对：
-
-```text
-产品属性 ─► 证据要求 ─► 证据文本块 ─► SUPPORTED / UNSUPPORTED / CONFLICT / NOT_CHECKABLE
-```
-
-- `NOT_CHECKABLE` 是一个**独立的第一等第三态** —— 不确定性永远不会被折叠进 `SUPPORTED`。
-- 一个没有支撑证据的产品**不能**成为「有依据的推荐」。
-
-> 设计取舍（记录在 `knowledge/evidence/resources/config/attribute-grounding.rules.json`）：当前只有 `coverage_type` 是**阻断性（blocking）**的溯源属性；`eligibility_age`、`renewal_period`、`deductible`、`coverage_term` 会被溯源并**上报**，但非阻断（演示语料库是有意不完整的 —— 若对每个属性都阻断，会拒绝一切，什么也讲不清）。非阻断**不等于**「已证实」。
-
-## 8. 失败 → 评估 → 修复 → 复核
-
-运行时使用**刻意对抗性**的输入（F1–F6）进行测试，而非仅走 happy path：
-
-| 失败类型 | 注入方式 | 期望行为 |
-| --- | --- | --- |
-| Schema 违规 | 畸形的产物 | 评估 FAIL / 阻断 |
-| 证据缺失 | 空知识库 | 修复 ×2 → NEEDS_REVIEW |
-| 不合格产品 | 不可能的资格 | `NO_CANDIDATES` / 不推荐 |
-| 幻觉产品 | 未知产品 ID | 被阻断（primary=0, unverified=[]） |
-| 溯源缺失 | 无效的 chunk 引用 | 被拒绝 |
-| 非法延续 | 被篡改的产物 / 检查点 | `CHECKPOINT_INVALID` / 自愈 |
-
-完整说明：[`docs/eval/failure-injection.zh-CN.md`](docs/eval/failure-injection.zh-CN.md)。
-
-## 9. 检查点与恢复
-
-- **保存：** 每个完成的阶段之后（`case_state.json` + `checkpoints[]`）。
-- **信任前先校验：** `load()` 执行 5 项校验（存在性、解析、`case_id` 匹配、schema、注册表指纹、任务→阶段完整性）。任一失败 → `CHECKPOINT_INVALID`；运行绝不会在损坏状态上默默继续。
-- **恢复：** 只有非 `PASS` 的任务会重新运行；任何*将会*重新运行的 `PASS` 任务会被**上报**（通常为 0）。
-
-## 10. 评估结果
-
-评估是**确定性的、且与生产者（producer）无关**的（见 §11）。本仓库当前的真实数据：
-
-| 测试套件 | 结果 |
+| 问题 | 本仓库的回答 |
 | --- | --- |
-| 完整回归（harness） | **30 / 30 GREEN** |
-| 全链路 E2E（`run_full_agent_e2e.py`） | **71 / 71 检查项** |
-| 智能体基准测试 | **33 / 33 用例** 全部 GREEN |
-| 黄金用例 | **9 / 9** |
-| 变异测试 | 全部 GREEN |
-| 安全护栏 | 全部 GREEN |
-| 证据溯源 | 全部 GREEN |
-| 推荐目录守卫 | 全部 PASS |
-| **发现假通过** | **0** |
-| **最大修复次数** | **2**（之后 `NEEDS_REVIEW`） |
+| LLM 输出不可信 | Planner 输出视为不可信 → 严格 Graph Validator（fail-closed） |
+| Agent 自评自夸 | Agent 永远不能判定 PASS —— Eval 与 Repair 归 Harness 所有 |
+| 长任务中途死亡 | 磁盘 checkpoint；新进程可恢复；RUNNING → PENDING 恢复语义 |
+| 并行 Agent 写坏状态 | Worker 只在隔离的 CaseState 副本上执行；只有 scheduler 提交 |
+| 说不清结果从哪来 | Artifact 注册表：血缘、指纹、溯源一查到底 |
+| A2A 沦为失控 actor | MessageBus 只做协调——不能调度、不能建任务、不能绕过依赖 |
 
-这些数字是通过运行测试套件重新核验的，而非从本文档抄录。参见[独立验收](#independent-acceptance)。
+## 能做什么？
 
-## 11. 评估 —— 不是 LLM 自评
+- 意图路由聊天（`GENERAL_KNOWLEDGE / GENERAL_GUIDANCE / CLIENT_ADVISORY / PRODUCT_LOOKUP / TASK_EXECUTION`）
+- LLM Planner → 严格 JSON Task Graph → 10 项检查的 Graph Validator（环检测、artifact/eval 契约）
+- 长运行 Harness：project、任务生命周期、依赖屏障、每个终态 checkpoint
+- **有界并行 DAG 调度**（`max_concurrency`，默认 1 = 保持原串行路径）
+- 4 个专家 Agent：确定性 task→agent 分配、受控工具集、权限校验
+- 基于 MessageBus 的 Agent 间通信：持久化、策略受限、PASS 后才 ACK 的 handoff
+- 确定性 Eval（schema / 必填字段 / 污染 / 溯源 / 跨 artifact / 不变量）+ 最多 2 次 Repair
+- Artifact 注册表：顺序 ID、回溯到客户事实的血缘、指纹冻结校验
+- 本地 RAG 知识检索，证据溯源 fail-closed
+- 演示产品目录（显式 `is_demo`）支撑候选筛选与推荐
+- Web UI（聊天 + 开发者控制台）：SSE 实时事件流 + artifact 检查器
+- 跨进程恢复；52 套回归 runner；33 例 agent benchmark + golden cases
 
-```text
-产物 Artifact
-   │
-   ▼
-确定性规则 Deterministic Rules
-   │
-   ▼
-PASS / FAIL
+## 怎么运作？
+
+```mermaid
+flowchart TD
+    U[用户] --> IR[意图路由<br/>agent_decide]
+    IR -->|通用/查询| QA[直接回答<br/>不进入客户建档]
+    IR -->|咨询规划| PL[Planner LLM]
+    PL --> GV[Graph Validator<br/>10 项检查, fail-closed]
+    GV -->|非法| NR1[NEEDS_REVIEW]
+    GV -->|合法| HA[长运行 Harness<br/>不可变 Task Graph]
+    HA --> SC{Scheduler<br/>max_concurrency}
+    SC -->|串行| A1[任务执行]
+    SC -->|并行轮次| W1[Worker A] & W2[Worker B]
+    W1 & W2 --> CM[scheduler 独占提交<br/>按图序 merge + 事件重放]
+    A1 --> CM
+    CM --> EV[Eval —— Harness 所有]
+    EV -->|PASS| CP[Checkpoint]
+    EV -->|FAIL| RP[Repair ≤ 2 → 重试]
+    RP --> EV
+    RP -->|耗尽| NR2[NEEDS_REVIEW<br/>下游 BLOCKED]
+    CP --> NX[下一批 runnable 任务]
 ```
 
-评估引擎（`runtime/eval_engine.py`）运行六个机器可校验的族：`schema`、`required_fields`、`contamination`（上游边界穿越）、`provenance`、`cross_artifact`、`invariant`。
-
-硬性规则：
-
-- **不可判定 → FAIL。** 不存在 `MANUAL` / `UNKNOWN` 的通过路径。
-- **变异测试：** 一个好的产物必须通过；一个*被刻意破坏*的产物必须失败。如果被破坏的产物也通过了，说明评估是空洞的、测试本身有问题。
-- **显式不变量：** 例如，被推荐的产品 ID 必须存在于目录中（`catalog_has_primary_product`）；候选 ID 必须是已知的（`candidate_known`）。
-
-示例：
+一行版架构：
 
 ```text
-好的产物
-  candidate_id = C001
-  product_id   = P001
-  → PASS
-
-变异
-  candidate_id = C999_BOGUS
-  → FAIL
-
-变异
-  evidence_refs = []
-  → FAIL
+Planner = 做什么 · Agent = 谁来做/怎么做 · Skill = 领域能力 · Tool = 能力接口
+Harness = 何时/可靠性 · Eval = 质量 · Artifact = 持久事实 · Message = 协调信号
 ```
 
-> 一个好产物还不够。评估器还必须*拒绝一个被刻意破坏的产物*。
+完整说明：[docs/architecture/overview.zh-CN.md](docs/architecture/overview.zh-CN.md)。
 
-## 12. 演示
+## 怎么跑？
+
+**环境**：Python 3.11+，仓库根目录为工作目录；核心链路无需安装步骤
+（依赖 PyYAML、jsonschema；server 需要 fastapi/uvicorn，agent 模式需要
+OpenAI 兼容 SDK）。React UI 需要 Node/npm。
 
 ```bash
-python demo.py demo-a     # 成功路径 → 有依据的推荐，is_demo=true
-python demo.py demo-b     # 安全失败路径 → 空知识库 → NEEDS_REVIEW
-python demo.py --list     # 列出可用用例
+# 1. 配置（可选 —— 无 LLM key 时为 demo/确定性模式）
+cp .env.example .env                     # LLM_PROVIDER / LLM_MODEL / LLM_API_KEY / LLM_BASE_URL
+python -m runtime.agent.smoke_test       # 验证 provider
+
+# 2. 启动 Web 应用
+python -m runtime.server                 # FastAPI + SSE, http://127.0.0.1:8000
+cd web && npm install && npm run dev     # React UI, http://localhost:5173（第二个终端）
+
+# 3. 不起 server 跑确定性流水线
+python demo.py demo-a                    # 完整链路 → 有据推荐
+python demo.py demo-b                    # 空知识库 → NEEDS_REVIEW（fail-closed）
 ```
 
-| 演示 | 用例 | 展示内容 |
-| --- | --- | --- |
-| [Demo A](docs/demo/demo-a.zh-CN.md) | `bm-complete-006-single-medical` | 完整链路 PASS → `CASE_COMPLETED`，P001（演示） |
-| [Demo B](docs/demo/demo-b.zh-CN.md) | `bm-noev-001` | 空知识库 → 2 次修复 → `NEEDS_REVIEW` |
-| [5 分钟脚本](docs/demo/5-minute-demo-script.zh-CN.md) | — | 面试走查 |
+## 怎么测？
 
-两个演示都会持久化一份结构化的 `trace.jsonl`（机器可读的执行轨迹）；人类可读的走查是每个演示文档中的带注释叙述。
+```bash
+pytest tests/runtime -q                  # pytest 可收集的 runtime 套件
+python tmp/run_regression.py             # 全部 52 个独立套件（cp936 控制台加 PYTHONIOENCODING=utf-8）
+python evals/agent-benchmark/run_agent_benchmark.py    # 33 例 agent benchmark
+python evals/agent-benchmark/run_golden_cases.py       # golden 回归
+```
 
-**P001 是一个虚构的演示用目录产品**（`is_demo = true`），仅用于运行时校验。它**不是**真实的保险产品、保费或保险公司 offerings。
+测试策略与已知基础设施问题：[docs/development/testing.zh-CN.md](docs/development/testing.zh-CN.md)。
 
-## 13. 诚实的局限
+## 架构文档在哪？
 
-开宗明义地说明，因为它们界定了本组合的范围：
-
-1. **部分端到端（PARTIAL E2E）。** 原始自然语言 → 客户状态 intake **不是**当前已执行边界的一部分。运行时从**结构化客户状态**开始证明。我**不**把它呈现为一个完整的对话式智能体。
-2. **演示目录。** 所有产品都是 `is_demo = true`（12 个虚构产品）。它们不代表真实的保险产品、价格或保险公司。
-3. **证据溯源。** 只有 `coverage_type` 是*阻断性*的溯源属性。`eligibility_age`、`renewal_period`、`deductible`、`coverage_term` 会被溯源并上报，但当前非阻断（设计取舍，见 §7）。
-4. **无生产基础设施。** 没有 Redis、Kafka、Kubernetes、多租户、生产数据库或真实的保险公司 API。这些被**有意排除**在组合范围之外。
-
-其他已知的缺口（保持诚实，不隐藏）：
-
-- `product-candidates` 目前还没有独立的 canonical 契约（仍是 skill 级 schema）—— 这是一项被追踪的技术债，而非运行时正确性问题。
-- 评估不评判主观质量（语气、可读性）。这是有意省略。
-
-## 14. 关键设计决策（ADR）
-
-每个 ADR 都以**问题 / 决策 / 理由 / 取舍**的简短结构写成 —— 面试友好（每份默认为英文版，同目录下有 `*.zh-CN.md` 中文版）。
-
-| # | 主题 | 文件 |
-| --- | --- | --- |
-| ADR-001 | 基于技能的架构 | `docs/adr/ADR-001-skill-based-architecture.zh-CN.md` |
-| ADR-002 | 编排器优于流水线 | `docs/adr/ADR-002-orchestrator-over-pipeline.zh-CN.md` |
-| ADR-003 | 产物血缘 | `docs/adr/ADR-003-artifact-lineage.zh-CN.md` |
-| ADR-004 | 确定性评估 | `docs/adr/ADR-004-deterministic-eval.zh-CN.md` |
-| ADR-005 | 证据溯源 | `docs/adr/ADR-005-evidence-provenance.zh-CN.md` |
-| ADR-006 | 候选 / 推荐分离 | `docs/adr/ADR-006-candidate-recommendation-separation.zh-CN.md` |
-| ADR-007 | 检查点 / 恢复 | `docs/adr/ADR-007-checkpoint-resume.zh-CN.md` |
-
-## 15. 仓库结构
-
-仅列核心目录（仓库还有更多文件；以下是对「故事」最重要的那些）：
-
-| 目录 | 职责 |
+| 主题 | 文档 |
 | --- | --- |
-| `runtime/` | 智能体运行时：`orchestrator.py`、`eval_engine.py`、`repair.py`、`checkpoint.py`、`trace.py`、`observability.py`、`state/`（CaseState + transitions）、`insurance-analysis.yaml` |
-| `.trae/skills/` | 9 个专家技能；`client-intake`、`requirement_analysis`、`risk-analysis` 已冻结（上游） |
-| `domain/insurance/` | 保险领域包：产品分类法、证据层级、RAG 权威语料 |
-| `knowledge/` | `rag/`（检索）+ `evidence/`（属性级溯源 provider） |
-| `catalog/` | 带版本的演示产品目录（`product-catalog.v0.1.json`，`is_demo=true`） |
-| `contracts/` · `adapters/` | canonical 产物契约 · legacy→canonical 适配器 |
-| `evals/` | 系统级基准测试 + 黄金用例 |
-| `test-cases/` · `tests/` | E2E 场景数据集 · 契约 / 变异 / 工作流单元测试 |
-| `docs/` | `architecture/`、`adr/`、`eval/`、`demo/`、`interview/`、`dev-notes/` |
-| `demo.py` | 演示 CLI（A 成功 / B 安全失败） |
+| 总览、边界、阶段史 | [overview.zh-CN.md](docs/architecture/overview.zh-CN.md) |
+| Planner 与图校验 | [planner.zh-CN.md](docs/architecture/planner.zh-CN.md) |
+| Harness、任务状态、恢复、失败模型 | [harness.zh-CN.md](docs/architecture/harness.zh-CN.md) |
+| 有界并行 DAG 调度器 | [parallel-scheduler.zh-CN.md](docs/architecture/parallel-scheduler.zh-CN.md) |
+| 专家 Agent、执行器、工具 | [agents.zh-CN.md](docs/architecture/agents.zh-CN.md) |
+| A2A 通信与 handoff | [a2a.zh-CN.md](docs/architecture/a2a.zh-CN.md) |
+| Eval 与 Repair 边界 | [eval.zh-CN.md](docs/architecture/eval.zh-CN.md) |
+| Artifact、血缘、溯源 | [artifacts-and-provenance.zh-CN.md](docs/architecture/artifacts-and-provenance.zh-CN.md) |
+| 保险领域、目录、知识 | [insurance-domain.zh-CN.md](docs/architecture/insurance-domain.zh-CN.md) |
+| 关键决策 | [docs/adr/](docs/adr/)（7 篇 ADR，中英双语） |
+| 未来方向（未实现） | [docs/roadmap.zh-CN.md](docs/roadmap.zh-CN.md) |
 
-## 16. 如何运行
+## 这不是什么
 
-**环境：** Python 3.11+（核心循环无需第三方运行时依赖；编排层使用 `PyYAML` 读取工作流定义）。仓库根目录即为运行根目录；无需安装步骤。
+- 不是分布式 Agent 平台 —— 单进程、基于线程的有界并行
+- 不是生产级保险推荐系统 —— 演示目录（`is_demo`）、本地演示知识库
+- 不是真实保险产品数据库
+- 不是不受约束的自主 Agent —— 每个边界都有校验、Eval 门禁、fail-closed
+- 不是 Raft / 消息队列 / Kubernetes 级调度器
 
-**运行演示**
+见 [overview — 范围与限制](docs/architecture/overview.zh-CN.md#9-这个项目不是什么)。
 
-```bash
-python demo.py demo-a     # 完整链路 → 有依据的推荐
-python demo.py demo-b     # 空知识库 → NEEDS_REVIEW
-```
-
-**运行基准测试 / 黄金用例**
-
-```bash
-python evals/agent-benchmark/run_agent_benchmark.py     # 33 用例 + 安全硬门
-python evals/agent-benchmark/run_golden_cases.py        # 9 黄金 + 前后门
-```
-
-**运行完整回归**
-
-```bash
-python tmp/run_regression.py        # 运行所有套件，报告 PASS/FAIL/INFRA_ERROR
-```
-
-**运行单个套件**
-
-```bash
-python test-cases/e2e/full-agent/run_full_agent_e2e.py            # 71 检查项
-python tests/eval/test_recommendation_catalog_guard.py            # 目录守卫（正/负）
-python tests/workflow/test_step3_mutation.py                     # 反「橡皮图章」变异
-python tests/workflow/test_step4_phase7_evidence_grounding.py     # 属性级溯源
-python tests/workflow/test_step4_phase13_guardrails.py            # 安全护栏
-```
-
-<a id="independent-acceptance"></a>
-## 独立验收（Independent Acceptance）
-
-本项目经过了**独立的红队（red-team）审查**，而非仅依赖开发者自己写的测试。审查者检查了代码、注入了失败（F1–F6）、变异了产物、阅读了轨迹、把溯源追到 `chunk_id`、并追猎假通过。
-
-结果（见 [`docs/eval/independent-acceptance-report.zh-CN.md`](docs/eval/independent-acceptance-report.zh-CN.md)）：
+## 仓库结构
 
 ```text
-P0 = 0   P1 = 0   P2 = 0   P3 = 0
-假通过 = 0
-回归 = 30 / 30
+runtime/            Agent 运行时（agent 循环、planner、harness、agents、state、eval、server）
+.trae/skills/       9 个自包含保险 Skill（SKILL.md + 契约 + evals + 入口脚本）
+contracts/          每个 artifact 的规范 JSON Schema
+adapters/           对话原生格式 → 规范 artifact 的适配器
+knowledge/          RAG 引擎 + 共享 Evidence Provider（溯源 fail-closed）
+catalog/            演示产品目录（带版本、生效日期、is_demo）
+tests/              runtime 套件（pytest）+ 独立脚本套件
+evals/              系统级 benchmark + golden（Skill 级 eval 在各 Skill 内）
+web/                React/Vite 聊天 UI（SSE 事件流、开发者控制台）
+docs/               架构、ADR、开发指南、演示脚本
 ```
 
-> 独立审查确认了 `PARTIAL E2E` 是一个诚实的边界（原始 NL intake 不在已执行范围内），并要求它被披露 —— 这一点已在 §13 中做到。
+## 阶段史（工程演进）
+
+| 阶段 | 交付 |
+| --- | --- |
+| V2 Steps 0–4 | 契约、核心保险 Skill、orchestrator、确定性 Eval + Repair、checkpoint |
+| 2.5 / 2.6 | 运行时可观测（事件流 + SSE）、聊天优先 Agent、真实 LLM agent 模式 |
+| 3 | 长运行 Harness（project、任务生命周期、跨进程恢复） |
+| 4 | Planner + Task Registry + Graph Validator（fail-closed） |
+| 5 | 多 Agent：专家执行器、确定性分配、权限校验 |
+| 6 | A2A 通信：MessageBus、handoff 生命周期、通信策略 |
+| 7 | 有界并行 DAG 调度器（隔离 worker、scheduler 独占提交、恢复）+ housekeeping 冻结 |
+
+每层冻结后才进入下一层；`max_concurrency=1` 至今逐字节保持 Phase 6
+串行路径。
 
 ---
 
-### 文档索引
-
-| 想了解 | 阅读 |
-| --- | --- |
-| 架构总览 | [`docs/architecture/architecture.zh-CN.md`](docs/architecture/architecture.zh-CN.md) |
-| 设计决策（ADR） | `docs/adr/`（每份均有 `*.zh-CN.md` 中文版） |
-| 失败注入（F1–F6） | [`docs/eval/failure-injection.zh-CN.md`](docs/eval/failure-injection.zh-CN.md) |
-| 独立验收 | [`docs/eval/independent-acceptance-report.zh-CN.md`](docs/eval/independent-acceptance-report.zh-CN.md) |
-| Demo A / B / 5 分钟脚本 | [`docs/demo/`](docs/demo/)（每份均有中文版） |
-| 面试问答 | [`docs/interview/interview-guide.zh-CN.md`](docs/interview/interview-guide.zh-CN.md) |
-| 面试故事 | [`docs/interview/stories.zh-CN.md`](docs/interview/stories.zh-CN.md) |
-| 命名与规范 | `AGENTS.md`（英文） |
+这是一个工程项目组合（portfolio）：文档刻意不夸大范围。
