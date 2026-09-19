@@ -39,7 +39,10 @@ REPO_ROOT = os.path.dirname(HERE)
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from fastapi import FastAPI, HTTPException, Request  # noqa: E402
+from fastapi import FastAPI, HTTPException, Request, Depends, Security  # noqa: E402
+from fastapi.security import APIKeyHeader  # noqa: E402
+
+from runtime import auth as runtime_auth  # noqa: E402
 from fastapi.responses import JSONResponse  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import JSONResponse, StreamingResponse  # noqa: E402
@@ -622,11 +625,80 @@ def _sse_chunk(event: dict) -> str:
     return "event: runtime\ndata: %s\n\n" % json.dumps(event, ensure_ascii=False)
 
 
+_API_KEY_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
+
+
+def _validate_production_defaults() -> None:
+    """P0.1 hardening: fail the app STARTUP in strict modes when the
+    production safety defaults are not satisfiable — an unauthenticated
+    or plaintext pilot must never start by forgetting a flag."""
+    from runtime import mode as _rt_mode
+    _rt_mode.validate_mode(os.environ.get("INSURANCE_AGENT_MODE", "demo"))
+    if not _rt_mode.authentication_required():
+        return
+    identities = runtime_auth.load_identities()
+    if not identities:
+        raise RuntimeError(
+            "AUTHENTICATION_REQUIRED: %s mode requires "
+            "INSURANCE_AGENT_API_KEYS (or _FILE) — refusing to start "
+            "unauthenticated" % _rt_mode.mode())
+    from runtime.state.dataprotection import load_data_key
+    if load_data_key() is None:
+        raise RuntimeError(
+            "ENCRYPTION_REQUIRED: %s mode requires "
+            "INSURANCE_AGENT_DATA_KEY or INSURANCE_AGENT_KEYFILE — "
+            "refusing to persist client data in plaintext" % _rt_mode.mode())
+
+
+def _current_identity(header: Optional[str] = None) -> Optional[runtime_auth.Identity]:
+    """Resolve the authenticated identity; fail closed (401) when keys are
+    configured but credentials are missing/unknown."""
+    identities = runtime_auth.load_identities()
+    if not identities:
+        # P0.1: strict modes blocked keyless startup in
+        # _validate_production_defaults; reaching here means the documented
+        # DEMO/EVALUATION local-dev mode (loopback, no keys configured).
+        return None
+    ident = runtime_auth.authenticate(header, identities)
+    if ident is None:
+        raise HTTPException(status_code=401, detail="unauthenticated")
+    return ident
+
+
+def _identity_dep(request: Request) -> Optional[runtime_auth.Identity]:
+    """FastAPI dependency: the authenticated identity for this request,
+    or None in documented no-keys local-dev mode. Fails closed (401)
+    when keys are configured and credentials are missing/unknown."""
+    return _current_identity(request.headers.get("authorization"))
+
+
+def _require_role(ident, minimum: str) -> None:
+    """Fail closed (403) when the authenticated identity lacks the role.
+    No-keys local-dev mode allows access as before."""
+    if ident is not None and not ident.has_role(minimum):
+        raise HTTPException(status_code=403,
+                            detail="role %r required" % minimum)
+
+
+def _authed_actor(ident, body_actor: str = "human") -> str:
+    """Approval/command actor = authenticated user when authn is on; the
+    legacy body value is honored ONLY in no-keys local-dev mode."""
+    if ident is not None:
+        return "human:%s" % ident.user
+    return body_actor
+
+
 def create_app(manager: Optional[RunManager] = None) -> FastAPI:
+    # Phase 13 P0.1: fail-closed production safety defaults (strict modes
+    # must not start unauthenticated / plaintext / with a typo'd mode)
+    _validate_production_defaults()
     mgr = manager or RunManager()
     app = FastAPI(title="insurance-agent Web UI API", version="0.1.0")
     # local-dev CORS so the Phase 2 React app (separate port) can consume the API
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
+    # Phase 13 R-06: CORS allowlist (never `*` outside explicit dev mode)
+    app.add_middleware(CORSMiddleware,
+                       allow_origins=runtime_auth.cors_origins(),
+                       allow_methods=["*"],
                        allow_headers=["*"], expose_headers=["*"])
 
     @app.get("/api/health")
@@ -740,12 +812,18 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
         return {"project_id": pid, "approval": appr}
 
     @app.post("/api/approvals/{approval_id}/approve")
-    def approve_approval(approval_id: str, req: ApprovalDecisionRequest):
-        return _resolve_approval(mgr, approval_id, "approve", req)
+    def approve_approval(approval_id: str, req: ApprovalDecisionRequest,
+                         ident=Depends(_identity_dep)):
+        _require_role(ident, "REVIEWER")
+        return _resolve_approval(mgr, approval_id, "approve", req,
+                                 actor=_authed_actor(ident, req.actor))
 
     @app.post("/api/approvals/{approval_id}/reject")
-    def reject_approval(approval_id: str, req: ApprovalDecisionRequest):
-        return _resolve_approval(mgr, approval_id, "reject", req)
+    def reject_approval(approval_id: str, req: ApprovalDecisionRequest,
+                        ident=Depends(_identity_dep)):
+        _require_role(ident, "REVIEWER")
+        return _resolve_approval(mgr, approval_id, "reject", req,
+                                 actor=_authed_actor(ident, req.actor))
 
     # ---- Phase 10 §31: supervisor / control-plane endpoints -------------- #
     @app.get("/api/projects/{project_id}/supervisor")
@@ -784,34 +862,35 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
                 "commands": ControlStore(pdir).commands()}
 
     @app.post("/api/projects/{project_id}/control/pause")
-    def control_pause(project_id: str, req: ControlCommandRequest):
-        return _control_command(mgr, project_id, "PAUSE", req)
+    def control_pause(project_id: str, req: ControlCommandRequest, ident=Depends(_identity_dep)):
+        return _control_command(mgr, project_id, "PAUSE", req, ident=ident)
 
     @app.post("/api/projects/{project_id}/control/resume")
-    def control_resume(project_id: str, req: ControlCommandRequest):
-        return _control_command(mgr, project_id, "RESUME", req)
+    def control_resume(project_id: str, req: ControlCommandRequest, ident=Depends(_identity_dep)):
+        return _control_command(mgr, project_id, "RESUME", req, ident=ident)
 
     @app.post("/api/projects/{project_id}/control/retry")
-    def control_retry(project_id: str, req: ControlCommandRequest):
-        return _control_command(mgr, project_id, "RETRY_TASK", req)
+    def control_retry(project_id: str, req: ControlCommandRequest, ident=Depends(_identity_dep)):
+        return _control_command(mgr, project_id, "RETRY_TASK", req, ident=ident)
 
     @app.post("/api/projects/{project_id}/control/replan")
-    def control_replan(project_id: str, req: ControlCommandRequest):
-        return _control_command(mgr, project_id, "REPLAN", req)
+    def control_replan(project_id: str, req: ControlCommandRequest, ident=Depends(_identity_dep)):
+        return _control_command(mgr, project_id, "REPLAN", req, ident=ident)
 
     @app.post("/api/projects/{project_id}/control/cancel")
-    def control_cancel(project_id: str, req: ControlCommandRequest):
-        return _control_command(mgr, project_id, "CANCEL", req)
+    def control_cancel(project_id: str, req: ControlCommandRequest, ident=Depends(_identity_dep)):
+        return _control_command(mgr, project_id, "CANCEL", req, ident=ident)
 
     @app.post("/api/projects/{project_id}/control/information")
-    def control_information(project_id: str, req: ControlCommandRequest):
-        return _control_command(mgr, project_id, "PROVIDE_INFORMATION", req)
+    def control_information(project_id: str, req: ControlCommandRequest, ident=Depends(_identity_dep)):
+        return _control_command(mgr, project_id, "PROVIDE_INFORMATION", req, ident=ident)
 
     return app
 
 
 def _control_command(mgr: "RunManager", project_id: str, command: str,
-                     req: "ControlCommandRequest") -> dict:
+                     req: "ControlCommandRequest",
+                     ident: Optional[runtime_auth.Identity] = None) -> dict:
     """Phase 10 §32: HTTP -> ControlPlane -> Harness. The API never mutates
     runtime state directly; the Harness validates and applies the audited
     command (state-only in this process — agent execution continues in the
@@ -825,9 +904,11 @@ def _control_command(mgr: "RunManager", project_id: str, command: str,
     for key in ("task_id", "reason", "key", "value"):
         if getattr(req, key, ""):
             payload[key] = getattr(req, key)
+    _require_role(ident, "OPERATOR")
     harness = LongRunningHarness(root)
     plane = harness._control_plane(project)
-    out = plane.command(command, actor=req.actor or "human", payload=payload)
+    actor = ("human:%s" % ident.user) if ident is not None else         (req.actor or "human")
+    out = plane.command(command, actor=actor, payload=payload)
     if not out.get("ok"):
         return JSONResponse({"error": out.get("error"),
                              "command": out.get("command")}, status_code=409)
@@ -835,9 +916,10 @@ def _control_command(mgr: "RunManager", project_id: str, command: str,
 
 
 def _resolve_approval(mgr: "RunManager", approval_id: str, op: str,
-                      req: "ApprovalDecisionRequest") -> dict:
-    """Idempotent approve/reject on the approval STATE. Actors other than
-    human/harness are refused (agents, planners, tools cannot resolve)."""
+                      req: "ApprovalDecisionRequest",
+                      actor: Optional[str] = None) -> dict:
+    """Idempotent approve/reject on the approval STATE. The actor comes
+    from the AUTHENTICATED identity (R-06); non-human actors are refused."""
     from runtime.approval import ApprovalManager
     from runtime.harness import load_project
     pid, appr = _find_approval(approval_id, _harness_root(mgr))
@@ -852,10 +934,11 @@ def _resolve_approval(mgr: "RunManager", approval_id: str, op: str,
                     if isinstance(v, (str, int, float, bool)) or v is None}
             _p._event(event_type, **safe)
     manager = ApprovalManager(pdir, emit=emit)
+    actor = actor or req.actor
     if op == "approve":
-        out = manager.approve(approval_id, actor=req.actor)
+        out = manager.approve(approval_id, actor=actor)
     else:
-        out = manager.reject(approval_id, actor=req.actor, reason=req.reason)
+        out = manager.reject(approval_id, actor=actor, reason=req.reason)
     if not out.get("ok"):
         return JSONResponse({"error": out.get("error"), "approval": out.get("approval")},
                             status_code=409)
@@ -863,7 +946,15 @@ def _resolve_approval(mgr: "RunManager", approval_id: str, op: str,
 
 
 def _start_agent_turn(mgr: RunManager, chat_id: str, req: ChatMessageRequest) -> dict:
-    """Create the agent run for one user message (shared by both message routes)."""
+    """Create the agent run for one user message (shared by both message routes).
+
+    Phase 13 R-05: the provider data-policy gate runs BEFORE any user text
+    reaches the LLM — real client data with an unverified provider policy
+    fails closed here."""
+    from runtime.agent.data_policy import client_data_allowed
+    allowed, gate_reason = client_data_allowed()
+    if not allowed:
+        raise HTTPException(status_code=451, detail=gate_reason)
     if not req.text or not req.text.strip():
         raise HTTPException(status_code=422, detail="text must not be empty")
     try:

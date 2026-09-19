@@ -51,7 +51,7 @@ class ApprovalManager:
         """WAITING_HUMAN → APPROVED. Idempotent on APPROVED; refused on any
         other terminal state. Human-only by actor allowlist."""
         rec = self._require(approval_id)
-        if actor not in models.RESOLVE_ACTORS:
+        if not models.can_resolve_actor(actor):
             return self._refused(rec, "approve",
                                  "ACTOR_NOT_AUTHORIZED: %r may not approve "
                                  "(human only)" % actor)
@@ -75,7 +75,7 @@ class ApprovalManager:
         """WAITING_HUMAN → REJECTED. Fail closed: nothing ever resumes on a
         rejected approval. Idempotent on REJECTED."""
         rec = self._require(approval_id)
-        if actor not in models.RESOLVE_ACTORS:
+        if not models.can_resolve_actor(actor):
             return self._refused(rec, "reject",
                                  "ACTOR_NOT_AUTHORIZED: %r may not reject "
                                  "(human only)" % actor)

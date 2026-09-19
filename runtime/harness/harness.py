@@ -67,6 +67,11 @@ TASK_DEFS = {
 # tasks that map to the same workflow stage run only once
 _UNIQUE_STAGES = {"product-candidate-provider"}
 
+# Phase 13 R-02: task types whose artifacts are CUSTOMER DELIVERABLES —
+# in production mode these require an enforced human review gate before
+# the project may report completed (READY_FOR_MANUAL_DELIVERY).
+FINAL_DELIVERABLE_TASK_TYPES = {"report_generation", "recommendation"}
+
 HARNESS_TASK_EVENTS = {
     "project_created", "task_created", "task_started", "task_completed",
     "task_failed", "task_skipped", "checkpoint_created", "checkpoint_loaded",
@@ -147,8 +152,11 @@ class Project:
             "replans": self.replans,
             "source_request": self.source_request,
         }
-        with open(os.path.join(self._dir, "project.json"), "w", encoding="utf-8") as f:
-            json.dump(doc, f, ensure_ascii=False, indent=2)
+        # Phase 13 R-01: atomic project.json (temp+fsync+replace) so a
+        # crash mid-save never leaves truncated JSON, and readers never
+        # observe a partial write.
+        from runtime.state.durable import atomic_write_json
+        atomic_write_json(os.path.join(self._dir, "project.json"), doc)
         _index_upsert(self._root, {
             "project_id": self.project_id, "name": self.name,
             "case_id": self.case_id, "status": self.status,
@@ -156,9 +164,13 @@ class Project:
         })
 
     def _append_jsonl(self, filename: str, record: dict) -> None:
+        # Phase 13 R-04: operational logs never carry sensitive field
+        # values (deny-list redaction). Artifacts remain the durable
+        # record — in the (optionally encrypted) case store, not the log.
+        from runtime.state.dataprotection import redact
         os.makedirs(self._dir, exist_ok=True)
         with open(os.path.join(self._dir, filename), "a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            f.write(json.dumps(redact(record), ensure_ascii=False) + "\n")
 
     def _read_jsonl(self, filename: str) -> list:
         path = os.path.join(self._dir, filename)
@@ -237,20 +249,26 @@ def _index_path(harness_root: str) -> str:
 
 
 def _index_read(harness_root: str) -> list:
-    path = _index_path(harness_root)
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+    # Phase 13 R-01: tolerant read — a concurrent atomic replace can hold
+    # the old inode briefly; genuinely corrupt files raise loudly instead
+    # of returning garbage.
+    from runtime.state.durable import read_json_retry
+    doc = read_json_retry(_index_path(harness_root))
+    return doc if doc is not None else []
 
 
 def _index_upsert(harness_root: str, entry: dict) -> None:
+    # Phase 13 R-01: the index read-modify-write is now under a
+    # cross-process/cross-thread file lock with an atomic replace —
+    # closes the measured silent lost-update (8 concurrent saves -> 3).
+    from runtime.state.durable import locked_update_json
+
+    def _mutate(entries: list):
+        return [e for e in entries
+                if e["project_id"] != entry["project_id"]] + [entry]
+
     os.makedirs(harness_root, exist_ok=True)
-    entries = _index_read(harness_root)
-    entries = [e for e in entries if e["project_id"] != entry["project_id"]]
-    entries.append(entry)
-    with open(_index_path(harness_root), "w", encoding="utf-8") as f:
-        json.dump(entries, f, ensure_ascii=False, indent=2)
+    locked_update_json(_index_path(harness_root), _mutate, default_factory=list)
 
 
 def list_projects(harness_root: str) -> list:
@@ -342,7 +360,8 @@ class LongRunningHarness:
                  approval_policy=None,
                  monitor_enabled: bool = True,
                  monitor_config: Optional[dict] = None,
-                 intervention_policy=None):
+                 intervention_policy=None,
+                 require_final_review: bool = False):
         self.root = harness_root
         self.emit = emit or (lambda event_type, data: None)
         # Phase 5.1: inject a SpecialistAgentExecutor or an LLMProvider for
@@ -361,6 +380,14 @@ class LongRunningHarness:
         self.monitor_enabled = bool(monitor_enabled)
         self.monitor_config = monitor_config
         self.intervention_policy = intervention_policy
+        # Phase 13 R-02 + P0.1 hardening: the final human-review gate on
+        # deliverable artifacts. False preserves the Phase 7-12
+        # validation/benchmark behavior in DEMO/EVALUATION modes; in
+        # CONTROLLED_PILOT/PRODUCTION the gate is MANDATORY and cannot be
+        # disabled by configuration (runtime.mode.final_review_required).
+        from runtime import mode as _rt_mode
+        self.require_final_review = _rt_mode.final_review_required(
+            require_final_review)
         # Phase 7: DAG-aware bounded parallel scheduler. 1 = sequential (Phase 6 compat).
         if not isinstance(max_concurrency, int) or max_concurrency < 1:
             raise ValueError("max_concurrency must be a positive int, got %r" % max_concurrency)
@@ -495,6 +522,23 @@ class LongRunningHarness:
                 return _paused_result(project, executed)
             if sup.get("status") in ("RUNNING", "RESUMING"):
                 plane.set_status("RUNNING")
+        # R-02 FIRST: an open final-review gate blocks execution — retry,
+        # replan and resume cannot slip a deliverable past the human.
+        # (Checked before generic approvals so the status label is exact.)
+        if self.require_final_review:
+            pending_review = self._pending_final_review(project)
+            if pending_review:
+                project.status = "waiting_review"
+                project._save()
+                return {"status": "waiting_review",
+                        "waiting_reviews": [a["approval_id"]
+                                            for a in pending_review],
+                        "executed": executed,
+                        "handoffs": {"checked": 0, "acked": 0, "failed": 0,
+                                     "pending": 0, "invalid": 0},
+                        "replans": {"triggered": 0, "accepted": 0, "failed": 0,
+                                    "no_change": 0},
+                        "project": project.to_public()}
         waiting = self._waiting_approvals(project)
         if waiting:
             project.status = "waiting_approval"
@@ -556,6 +600,15 @@ class LongRunningHarness:
             # ---- Phase 10: one final observation of the settled state ---- #
             if self._monitor_and_intervene(project, state, executed) == "paused":
                 return _paused_result(project, executed)
+            # ---- Phase 13 R-02: deliverable review gate (parallel path) -- #
+            if self.require_final_review:
+                gate = self._final_review_gate(project, state)
+                if gate == "waiting_review":
+                    project.status = "waiting_review"
+                    project._save()
+                    return {"status": "waiting_review", "executed": executed,
+                            "handoffs": handoff_stats, "replans": replan_stats,
+                            "project": project.to_public()}
             project.status = self._final_status(project)
             project._save()
             return {"status": project.status, "executed": executed,
@@ -828,6 +881,17 @@ class LongRunningHarness:
         # ---- Phase 10: one final observation of the settled state -------- #
         if self._monitor_and_intervene(project, state, executed) == "paused":
             return _paused_result(project, executed)
+        # ---- Phase 13 R-02: the deliverable review gate (creates the
+        # FINAL_REVIEW approval when a deliverable passed) ------------- #
+        if self.require_final_review:
+            gate = self._final_review_gate(project, state)
+            if gate == "waiting_review":
+                project.status = "waiting_review"
+                project._save()
+                return {"status": "waiting_review", "executed": executed,
+                        "handoffs": handoff_stats,
+                        "replans": replan_stats,
+                        "project": project.to_public()}
         project.status = self._final_status(project)
         project._save()
         return {"status": project.status, "executed": executed,
@@ -1781,7 +1845,8 @@ class LongRunningHarness:
                 if a["status"] in ("WAITING_HUMAN", "APPROVED")]
 
     def _final_status(self, project: Project) -> str:
-        """Terminal project status, honouring supervisor + approval state."""
+        """Terminal project status, honouring the final-review gate,
+        supervisor + approval state."""
         if self.monitor_enabled:
             from runtime.control.store import ControlStore
             sup = ControlStore(project._dir).load_supervisor(project.project_id)
@@ -1791,6 +1856,16 @@ class LongRunningHarness:
                 return "cancelled"
         if self._waiting_approvals(project):
             return "waiting_approval"
+        if self.require_final_review:
+            from runtime.approval.store import ApprovalStore
+            reviews = [a for a in ApprovalStore(project._dir).all()
+                       if a.get("request_type") == "APPROVAL_FINAL_REVIEW"]
+            if any(a.get("status") == "REJECTED" for a in reviews):
+                return "needs_review"   # human rejected: fail closed
+            if any(a.get("status") in ("PENDING", "WAITING_HUMAN")
+                   for a in reviews):
+                return "waiting_review"
+            # APPROVED → ready_for_delivery is set by approve_final_review
         if all(t["status"] in ("PASSED", "COMPLETED") for t in project.tasks):
             return "completed"
         if any(t["status"] == "NEEDS_REVIEW" for t in project.tasks):
@@ -2141,6 +2216,122 @@ class LongRunningHarness:
                            key=key, actor=actor,
                            conflict=entry["conflict"])
         return entry
+
+    # ------------------------------------------------------------------ #
+    # Phase 13 R-02: enforced final human review on customer deliverables
+    # ------------------------------------------------------------------ #
+    def _pending_final_review(self, project: Project) -> list:
+        """Open (unapproved) FINAL_REVIEW approvals for this project."""
+        from runtime.approval.store import ApprovalStore
+        return [a for a in ApprovalStore(project._dir).all()
+                if a.get("request_type") == "APPROVAL_FINAL_REVIEW"
+                and a.get("status") in ("PENDING", "WAITING_HUMAN")]
+
+    def _final_review_gate(self, project: Project, state) -> Optional[str]:
+        """Enforce the deliverable review gate. Returns "waiting_review"
+        when the project must wait for a human; None when it may complete.
+
+        - Detects deliverable tasks (report/recommendation) that PASSED.
+        - If an open FINAL_REVIEW approval exists → WAITING_HUMAN.
+        - If none exists yet → creates one on the deliverable artifact.
+        - A REJECTED review fail-closes the project (needs_review).
+        The deliverable NEVER auto-completes: approval moves the project to
+        READY_FOR_MANUAL_DELIVERY (delivery itself stays human)."""
+        from runtime.approval import create_request, ApprovalStore
+        deliverables = [t for t in project.tasks
+                        if t.get("task_type") in FINAL_DELIVERABLE_TASK_TYPES
+                        and t.get("status") in ("PASSED", "COMPLETED")]
+        if not deliverables:
+            return None  # no deliverable produced — gate not applicable
+        store = ApprovalStore(project._dir)
+        reviews = [a for a in store.all()
+                   if a.get("request_type") == "APPROVAL_FINAL_REVIEW"]
+        rejected = [a for a in reviews if a.get("status") == "REJECTED"]
+        if rejected:
+            return "needs_review"   # human rejected the deliverable: fail closed
+        open_reviews = [a for a in reviews
+                        if a.get("status") in ("PENDING", "WAITING_HUMAN",
+                                               "APPROVED")]
+        if not open_reviews:
+            # create the review request on the FIRST deliverable artifact
+            d = deliverables[0]
+            art_ids = d.get("output_artifacts") or []
+            rec = self._approval_manager(project).create_request(
+                create_request(
+                    project_id=project.project_id,
+                    request_type="APPROVAL_FINAL_REVIEW",
+                    task_id=d["task_id"],
+                    reason="final deliverable (%s) requires human review "
+                           "before delivery" % d["task_type"],
+                    context={"artifact_ids": art_ids,
+                             "task_types": sorted({t["task_type"] for t
+                                                  in deliverables})}))
+            self._approval_manager(project).wait(rec["approval_id"])
+            self._checkpoint(project, state, task_id=None, approval=rec)
+        # an APPROVED (but not yet resumed) review still waits — the
+        # resume path flips the project to ready_for_delivery
+        if any(a.get("status") == "APPROVED" for a in open_reviews):
+            return None  # approved: allow completion path to finish
+        return "waiting_review"
+
+    def approve_final_review(self, project, approval_id: str = "",
+                             actor: str = "human") -> dict:
+        """Human approves the deliverable review → the project becomes
+        READY_FOR_MANUAL_DELIVERY. Delivery itself is MANUAL — the runtime
+        only records that a human approved the deliverable. Idempotent."""
+        from runtime.approval import ApprovalStore
+        if isinstance(project, str):
+            project = load_project(self.root, project)
+        store = ApprovalStore(project._dir)
+        reviews = [a for a in store.all()
+                   if a.get("request_type") == "APPROVAL_FINAL_REVIEW"]
+        appr = (store.get(approval_id) if approval_id
+                else next((a for a in reviews
+                           if a["status"] in ("PENDING", "WAITING_HUMAN")),
+                          None))
+        if appr is None:
+            approved = [a for a in reviews if a["status"] == "APPROVED"]
+            if approved:
+                project.status = "ready_for_delivery"
+                project._save()
+                return {"status": "ready_for_delivery",
+                        "already": True, "project": project.to_public()}
+            return {"status": "FAILED", "reason": "no open final review"}
+        out = self._approval_manager(project).approve(appr["approval_id"],
+                                                      actor=actor)
+        if not out.get("ok"):
+            return {"status": "FAILED", "reason": out.get("error")}
+        project.status = "ready_for_delivery"
+        project._save()
+        state = self._load_case_state(project)
+        if state is not None:
+            self._checkpoint(project, state, task_id=None)
+        self._emit_runtime(project, "runtime_resumed",
+                          reason="final review approved — ready for MANUAL delivery")
+        return {"status": "ready_for_delivery",
+                "project": project.to_public()}
+
+    def reject_final_review(self, project, reason: str = "",
+                            actor: str = "human") -> dict:
+        """Human rejects the deliverable → project fail-closes to
+        needs_review (no delivery, no retry loop)."""
+        from runtime.approval import ApprovalStore
+        if isinstance(project, str):
+            project = load_project(self.root, project)
+        store = ApprovalStore(project._dir)
+        appr = next((a for a in store.all()
+                     if a.get("request_type") == "APPROVAL_FINAL_REVIEW"
+                     and a["status"] in ("PENDING", "WAITING_HUMAN")), None)
+        if appr is None:
+            return {"status": "FAILED", "reason": "no open final review"}
+        out = self._approval_manager(project).reject(appr["approval_id"],
+                                                     actor=actor,
+                                                     reason=reason)
+        if not out.get("ok"):
+            return {"status": "FAILED", "reason": out.get("error")}
+        project.status = "needs_review"
+        project._save()
+        return {"status": "needs_review", "project": project.to_public()}
 
     def _apply_graph_revision(self, project: Project, new_tasks: list,
                               revision: int) -> dict:

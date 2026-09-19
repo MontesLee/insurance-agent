@@ -8,7 +8,8 @@ Human-in-the-loop as a Runtime CONTROL PLANE capability:
     approval (`LongRunningHarness.resume_approval`).
   - The ApprovalPolicy is deterministic; the LLM never decides.
 """
-from runtime.approval.models import (APPROVAL_REPLAN, APPROVAL_EXTERNAL_ACTION,
+from runtime.approval.models import (APPROVAL_REPLAN, APPROVAL_FINAL_REVIEW,
+                                     APPROVAL_EXTERNAL_ACTION,
                                      APPROVAL_HIGH_IMPACT, REQUEST_TYPES,
                                      APPROVAL_STATUSES, TRANSITIONS,
                                      RESOLVE_ACTORS, create_request)
@@ -17,7 +18,8 @@ from runtime.approval.policy import ApprovalPolicy, AUTO, HUMAN_APPROVAL
 from runtime.approval.manager import ApprovalManager
 
 __all__ = [
-    "APPROVAL_REPLAN", "APPROVAL_EXTERNAL_ACTION", "APPROVAL_HIGH_IMPACT",
+    "APPROVAL_REPLAN", "APPROVAL_FINAL_REVIEW",
+    "APPROVAL_EXTERNAL_ACTION", "APPROVAL_HIGH_IMPACT",
     "REQUEST_TYPES", "APPROVAL_STATUSES", "TRANSITIONS", "RESOLVE_ACTORS",
     "create_request", "ApprovalStore", "ApprovalPolicy", "AUTO",
     "HUMAN_APPROVAL", "ApprovalManager",

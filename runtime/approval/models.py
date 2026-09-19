@@ -18,10 +18,12 @@ from typing import Optional
 
 # request types (V0.1: exactly one auto-produced; two reserved)
 APPROVAL_REPLAN = "APPROVAL_REPLAN"                  # high-impact graph revision
+APPROVAL_FINAL_REVIEW = "APPROVAL_FINAL_REVIEW"        # R-02: deliverable review gate
 APPROVAL_EXTERNAL_ACTION = "APPROVAL_EXTERNAL_ACTION"  # reserved (send_email/…)
 APPROVAL_HIGH_IMPACT = "APPROVAL_HIGH_IMPACT"          # reserved (domain decisions)
 
-REQUEST_TYPES = frozenset({APPROVAL_REPLAN, APPROVAL_EXTERNAL_ACTION,
+REQUEST_TYPES = frozenset({APPROVAL_REPLAN, APPROVAL_FINAL_REVIEW,
+                           APPROVAL_EXTERNAL_ACTION,
                            APPROVAL_HIGH_IMPACT})
 
 # state machine
@@ -38,8 +40,13 @@ TRANSITIONS = {
     "RESUMED": set(),
 }
 
-# who may resolve an approval (deterministic actor allowlist; §18)
+# who may resolve an approval (deterministic actor allowlist; §18).
+# R-06: authenticated identities arrive as "human:<user>" — still human.
 RESOLVE_ACTORS = frozenset({"human", "harness"})
+
+
+def can_resolve_actor(actor: str) -> bool:
+    return actor in RESOLVE_ACTORS or actor.startswith("human:")
 
 
 def _now() -> str:

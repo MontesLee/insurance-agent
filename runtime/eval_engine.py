@@ -276,8 +276,12 @@ def check_invariant(state: dict, artifact: dict, artifact_type: str, rules: dict
             out.append({"check_id": cid, "status": "PASS", "message": "nothing to validate"})
             continue
         must = spec.get("must_be_in", "")
+        catalog = None
         if must == "catalog.product_ids":
-            allowed = {p.get("product_id") for p in load_catalog(rules)}
+            from runtime import catalog_governance as _cg
+            catalog = _cg.load_catalog()   # full dict (governance fields)
+            allowed = {p.get("product_id") for p in
+                       (catalog.get("products") or [])}
         elif must.startswith("artifact:"):
             _, art_type, path = must.split(":", 2)
             target = state.get("artifacts", {}).get(art_type)
@@ -297,6 +301,13 @@ def check_invariant(state: dict, artifact: dict, artifact_type: str, rules: dict
                         "message": "not in %s: %s" % (must, ", ".join(map(str, bad[:5])))})
         else:
             out.append({"check_id": cid, "status": "PASS", "message": ""})
+        # Phase 13 R-03: catalog GOVERNANCE on every candidate — expiry,
+        # demo-in-production, missing evidence (fail-closed, not repairable
+        # away: an expired product BLOCKs, a missing-evidence product needs
+        # review; the LLM never guesses)
+        if catalog is not None:
+            for v in vals:
+                out.append(_cg.check_candidate(catalog, str(v)))
     return out
 
 
