@@ -1,0 +1,569 @@
+{
+ "cases": [
+  {
+   "case_id": "Q-STD-001",
+   "group": "standard",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-STD-002",
+   "group": "standard",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-STD-003",
+   "group": "standard",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-STD-004",
+   "group": "standard",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-STD-005",
+   "group": "standard",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-GAP-001",
+   "group": "gap_quality",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-GAP-002",
+   "group": "gap_quality",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-GAP-003",
+   "group": "gap_quality",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-GAP-004",
+   "group": "gap_quality",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-SOL-001",
+   "group": "solution",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-SUF-001",
+   "group": "sufficiency",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-SUF-002",
+   "group": "sufficiency",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-SUF-003",
+   "group": "sufficiency",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-SUF-004",
+   "group": "sufficiency",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-SUF-005",
+   "group": "sufficiency",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-CON-001",
+   "group": "contradiction",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-CON-002",
+   "group": "contradiction",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-CON-003",
+   "group": "contradiction",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-CON-004",
+   "group": "contradiction",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-CON-005",
+   "group": "contradiction",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-PAR-001",
+   "group": "paraphrase",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-PAR-002",
+   "group": "paraphrase",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-PAR-003",
+   "group": "paraphrase",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-PAR-004",
+   "group": "paraphrase",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-PAR-005",
+   "group": "paraphrase",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-BND-001",
+   "group": "boundary",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-BND-002",
+   "group": "boundary",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-BND-003",
+   "group": "boundary",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-REC-001",
+   "group": "recommendation",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  },
+  {
+   "case_id": "Q-REC-002",
+   "group": "recommendation",
+   "status": "PASS",
+   "dimensions": {
+    "requirement": true,
+    "risk": true,
+    "gap": true,
+    "solution": true,
+    "candidate": true,
+    "recommendation": true,
+    "report": true
+   },
+   "quality_violations": [],
+   "structural_violations": [],
+   "gate_fail": false
+  }
+ ],
+ "metrics": {
+  "requirement_precision": "NOT_MEASURABLE",
+  "requirement_recall": "NOT_MEASURABLE",
+  "risk_precision": "NOT_MEASURABLE",
+  "risk_recall": "NOT_MEASURABLE",
+  "requirement_consistency": "PASS",
+  "risk_consistency": "PASS",
+  "gap_accuracy": "PASS",
+  "solution_alignment": "PASS",
+  "candidate_validity": "PASS",
+  "recommendation_grounding": "PASS",
+  "recommendation_decision_accuracy": "PASS",
+  "question_target_accuracy": "PASS",
+  "report_consistency": "PASS",
+  "abstention_accuracy": "PASS",
+  "contradiction_detection": "PASS",
+  "semantic_invariance": "PASS",
+  "mutation_detection": "8/8"
+ },
+ "hard_gates": {},
+ "mutations": [
+  {
+   "name": "M01-delete-requirement",
+   "status": "PASS"
+  },
+  {
+   "name": "M02-fabricated-requirement",
+   "status": "PASS"
+  },
+  {
+   "name": "M03-delete-risk",
+   "status": "PASS"
+  },
+  {
+   "name": "M04-fabricated-gap",
+   "status": "PASS"
+  },
+  {
+   "name": "M05-phantom-candidate",
+   "status": "PASS"
+  },
+  {
+   "name": "M06-injected-product",
+   "status": "PASS"
+  },
+  {
+   "name": "M07-deleted-evidence",
+   "status": "PASS"
+  },
+  {
+   "name": "M08-tampered-report",
+   "status": "PASS"
+  }
+ ],
+ "invariance": []
+}

@@ -1,0 +1,190 @@
+{
+  "cases": [
+    {"case_id": "Q-STD-001", "group": "standard", "persona": "标准家庭",
+     "mutations": [], "requirements": "ALL", "risks": "ALL",
+     "expected": {"terminal": "COMPLETED",
+                   "recommendation_status": "INCOMPLETE_EVIDENCE",
+                   "note": "F-13 honest partial grounding"}},
+
+    {"case_id": "Q-STD-002", "group": "standard", "persona": "单身高收入",
+     "mutations": [
+       {"op": "set_value", "profile": "family_profile", "field": "marital_status", "value": "未婚"},
+       {"op": "set_unknown", "profile": "family_profile", "field": "children", "reason": "未婚无子女"}],
+     "requirements": ["medical", "critical_illness", "savings"], "risks": ["R1", "R2"],
+     "expected": {"terminal": "COMPLETED",
+                   "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"],
+                   "solution_domains_exclude": ["LIFE"]}},
+
+    {"case_id": "Q-STD-003", "group": "standard", "persona": "有房贷家庭",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "housing_loan", "value": "200万(未还)"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expected": {"terminal": "COMPLETED",
+                   "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"]}},
+
+    {"case_id": "Q-STD-004", "group": "standard", "persona": "多风险并发(MD-001)",
+     "mutations": [], "requirements": ["medical", "critical_illness", "life"], "risks": ["R1", "R2", "R4"],
+     "expected": {"terminal": "COMPLETED",
+                   "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"],
+                   "multi_domain": ["medical", "critical_illness"],
+                   "note": "MD-001:医疗+重疾多域分别成链;现行模型中 life/R4 需求无解决方向输出(真实能力边界,记 F-16,不包装为 PASS);evidence 不足时诚实 INCOMPLETE 而非强推"}},
+
+    {"case_id": "Q-STD-005", "group": "standard", "persona": "单一医疗需求(接地完备)",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "COMPLETED", "recommendation_status": "COMPLETE",
+                   "explainability_fields": ["fit", "reason_codes", "reason", "provenance"]}},
+
+    {"case_id": "Q-GAP-001", "group": "gap_quality", "persona": "全部风险已充分覆盖(GQ-01)",
+     "mutations": [], "requirements": "ALL", "risks": "ALL",
+     "risk_edits": [{"risk_selector": "ALL", "coverage_assessment": {"protected_amount": 2000000, "unprotected_amount": 0, "confidence": 0.9}}],
+     "expected": {"terminal": "COMPLETED", "gap_count": 0,
+                   "note": "NO_GAP:不得为卖产品制造缺口;无缺口则不得产生解决方案(AQ-HG04)"}},
+
+    {"case_id": "Q-GAP-002", "group": "gap_quality", "persona": "部分覆盖(GQ-02)",
+     "mutations": [], "requirements": ["critical_illness"], "risks": ["R2"],
+     "risk_edits": [{"risk_selector": "ALL", "coverage_assessment": {"protected_amount": 300000, "unprotected_amount": 200000, "confidence": 0.8}}],
+     "expected": {"terminal": "COMPLETED",
+                   "gap_statuses_include": "PARTIAL"}},
+
+    {"case_id": "Q-GAP-003", "group": "gap_quality", "persona": "无覆盖(GQ-03)",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "risk_edits": [{"risk_selector": "ALL", "coverage_assessment": {"protected_amount": 0, "unprotected_amount": 1000000, "confidence": 0.9}}],
+     "expected": {"terminal": "COMPLETED",
+                   "gap_statuses_include": "NONE"}},
+
+    {"case_id": "Q-GAP-004", "group": "gap_quality", "persona": "覆盖情况未知(GQ-04)",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "risk_edits": [{"risk_selector": "ALL", "drop_fields": ["coverage_assessment", "existing_protection"]}],
+     "expected": {"terminal": "COMPLETED",
+                   "gap_statuses_include": "UNKNOWN",
+                   "note": "UNKNOWN 不得被当作 NO_GAP(不可作为无缺口)也不得捏造覆盖"}},
+
+    {"case_id": "Q-SOL-001", "group": "solution", "persona": "无缺口则无方案(SQ)",
+     "mutations": [], "requirements": "ALL", "risks": "ALL",
+     "risk_edits": [{"risk_selector": "ALL", "coverage_assessment": {"protected_amount": 2000000, "unprotected_amount": 0, "confidence": 0.9}}],
+     "expected": {"terminal": "COMPLETED", "gap_count": 0, "solution_count": 0,
+                   "recommendation_status_any": true,
+                   "note": "solution 必须可追溯 gap;无 gap 不得造 solution"}},
+
+    {"case_id": "Q-SUF-001", "group": "sufficiency", "persona": "仅年龄+收入(AQ-S001)",
+     "mutations": [
+       {"op": "set_unknown", "profile": "family_profile", "field": "marital_status", "reason": "未提供"},
+       {"op": "set_unknown", "profile": "family_profile", "field": "children", "reason": "未提供"},
+       {"op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance", "reason": "未提供"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "WAITING_FOR_USER",
+                   "missing_fields": ["existing_insurance"],
+                   "note": "关键信息缺失→追问,不得静默继续(AQ-HG08)"}},
+
+    {"case_id": "Q-SUF-002", "group": "sufficiency", "persona": "年龄婚姻收入子女(AQ-S002)",
+     "mutations": [{"op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance", "reason": "未提供"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "WAITING_FOR_USER", "missing_fields": ["existing_insurance"]}},
+
+    {"case_id": "Q-SUF-003", "group": "sufficiency", "persona": "完整家庭信息(AQ-S003)",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "COMPLETED", "recommendation_status": "COMPLETE"}},
+
+    {"case_id": "Q-SUF-004", "group": "sufficiency", "persona": "财务全但缺健康(AQ-S004)",
+     "mutations": [{"op": "set_unknown", "profile": "financial_profile", "field": "health_status", "reason": "未提供"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": ["COMPLETED", "WAITING_FOR_USER"],
+                   "note": "健康信息缺失:按当前规则处理;若继续则报告须列 information_gap"}},
+
+    {"case_id": "Q-SUF-005", "group": "sufficiency", "persona": "保单信息严重缺失(AQ-S005)",
+     "mutations": [
+       {"op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance", "reason": "未提供"},
+       {"op": "add_conflict", "profile": "existing_protection", "field": "existing_insurance", "candidates": ["无保险", "有团体险"]}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "WAITING_FOR_USER",
+                   "note": "UNKNOWN+冲突→人工门,不得随机选一个事实(AQ-HG09)"}},
+
+    {"case_id": "Q-CON-001", "group": "contradiction", "persona": "年龄冲突(30 vs 35)",
+     "mutations": [
+       {"op": "add_conflict", "profile": "family_profile", "field": "age", "candidates": ["30", "35"]},
+       {"op": "set_unknown", "profile": "family_profile", "field": "age", "reason": "前后矛盾"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "WAITING_FOR_USER", "stop_stage": "client-intake"}},
+
+    {"case_id": "Q-CON-002", "group": "contradiction", "persona": "既有保险冲突(无 vs 百万重疾)",
+     "mutations": [
+       {"op": "add_conflict", "profile": "existing_protection", "field": "existing_insurance", "candidates": ["无任何保险", "有一份100万重疾险"]},
+       {"op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance", "reason": "前后矛盾"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "WAITING_FOR_USER", "stop_stage": "client-intake"}},
+
+    {"case_id": "Q-CON-003", "group": "contradiction", "persona": "收入冲突",
+     "mutations": [
+       {"op": "add_conflict", "profile": "financial_profile", "field": "annual_income", "candidates": ["30万", "80万"]},
+       {"op": "set_unknown", "profile": "financial_profile", "field": "annual_income", "reason": "前后矛盾"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": ["WAITING_FOR_USER", "COMPLETED"],
+                   "note": "收入冲突若未触发关键门,至少 UNKNOWN 必须保持,不得随机取值"}},
+
+    {"case_id": "Q-CON-004", "group": "contradiction", "persona": "婚姻状态冲突",
+     "mutations": [
+       {"op": "add_conflict", "profile": "family_profile", "field": "marital_status", "candidates": ["已婚", "离异"]},
+       {"op": "set_unknown", "profile": "family_profile", "field": "marital_status", "reason": "前后矛盾"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": ["WAITING_FOR_USER", "COMPLETED"]}},
+
+    {"case_id": "Q-CON-005", "group": "contradiction", "persona": "子女信息冲突",
+     "mutations": [
+       {"op": "add_conflict", "profile": "family_profile", "field": "children", "candidates": ["无", "2孩"]},
+       {"op": "set_unknown", "profile": "family_profile", "field": "children", "reason": "前后矛盾"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": ["WAITING_FOR_USER", "COMPLETED"]}},
+
+    {"case_id": "Q-PAR-001", "group": "paraphrase", "persona": "房贷表述变体A",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "housing_loan", "value": "200万(未还)"}],
+     "requirements": "ALL", "risks": "ALL", "paraphrase_group": "housing",
+     "expected": {"terminal": "COMPLETED", "invariance": "gap_domains_and_levels"}},
+
+    {"case_id": "Q-PAR-002", "group": "paraphrase", "persona": "房贷表述变体B(同义)",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "housing_loan", "value": "贷款余额约人民币贰佰万元整"}],
+     "requirements": "ALL", "risks": "ALL", "paraphrase_group": "housing",
+     "expected": {"terminal": "COMPLETED", "invariance": "gap_domains_and_levels"}},
+
+    {"case_id": "Q-PAR-003", "group": "paraphrase", "persona": "房贷表述变体C(口语)",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "housing_loan", "value": "还剩两百万房贷没还完"}],
+     "requirements": "ALL", "risks": "ALL", "paraphrase_group": "housing",
+     "expected": {"terminal": "COMPLETED", "invariance": "gap_domains_and_levels"}},
+
+    {"case_id": "Q-PAR-004", "group": "paraphrase", "persona": "子女表述变体A",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "children", "value": "1孩(6岁)"}],
+     "requirements": "ALL", "risks": "ALL", "paraphrase_group": "children",
+     "expected": {"terminal": "COMPLETED", "invariance": "gap_domains_and_levels"}},
+
+    {"case_id": "Q-PAR-005", "group": "paraphrase", "persona": "子女表述变体B(同义)",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "children", "value": "家里有一个六岁的小孩"}],
+     "requirements": "ALL", "risks": "ALL", "paraphrase_group": "children",
+     "expected": {"terminal": "COMPLETED", "invariance": "gap_domains_and_levels"}},
+
+    {"case_id": "Q-BND-001", "group": "boundary", "persona": "医疗域 license UNKNOWN",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "registry_mutation": {"op": "unknown_medical_license"},
+     "expected": {"terminal": ["COMPLETED", "PAUSED_NEEDS_REVIEW", "NEEDS_REVIEW"],
+                   "recommendation_must_not_be": "COMPLETE"}},
+
+    {"case_id": "Q-BND-002", "group": "boundary", "persona": "知识全部过期",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "registry_mutation": {"op": "expire_all"},
+     "expected": {"terminal": ["COMPLETED", "PAUSED_NEEDS_REVIEW", "NEEDS_REVIEW"],
+                   "recommendation_must_not_be": "COMPLETE", "evidence_items": 0}},
+
+    {"case_id": "Q-BND-003", "group": "boundary", "persona": "空知识库",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"], "kb": "empty",
+     "expected": {"terminal": ["COMPLETED", "PAUSED_NEEDS_REVIEW", "NEEDS_REVIEW"],
+                   "recommendation_must_not_be": "COMPLETE"}},
+
+    {"case_id": "Q-REC-001", "group": "recommendation", "persona": "接地完备推荐(RQ1-RQ6)",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "COMPLETED", "recommendation_status": "COMPLETE",
+                   "explainability_fields": ["fit", "reason_codes", "reason", "provenance"],
+                   "primary_in_admissible": true}},
+
+    {"case_id": "Q-REC-002", "group": "recommendation", "persona": "无合格候选(RQ abstention)",
+     "mutations": [{"op": "set_value", "profile": "family_profile", "field": "age", "value": "85"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expected": {"terminal": "COMPLETED", "recommendation_status": "NO_CANDIDATES"}}
+  ]
+}
