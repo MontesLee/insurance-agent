@@ -45,12 +45,18 @@ SENSITIVE_FIELDS = frozenset({
     "id_card", "passport", "ssn", "income", "annual_income", "salary",
     "health_status", "health_declaration", "medical_history",
     "diagnosis", "date_of_birth", "birth_date",
+    # Phase 17 (T07): financial-account and policy identifiers are
+    # sensitive client data — surfaced by the security evaluation
+    "bank_card", "card_number", "bank_account", "account_number",
+    "policy_number", "policy_no",
 })
 _SENSITIVE_PATTERN = re.compile(
     r"^(?:name|full_name|client_name|phone|mobile|telephone|email|"
     r"address|home_address|id_number|identity_number|id_card|passport|"
     r"ssn|income|annual_income|salary|health_status|health_declaration|"
-    r"medical_history|diagnosis|date_of_birth|birth_date)$", re.I)
+    r"medical_history|diagnosis|date_of_birth|birth_date|"
+    r"bank_card|card_number|bank_account|account_number|"
+    r"policy_number|policy_no)$", re.I)
 
 
 def redact(value, depth: int = 0):
