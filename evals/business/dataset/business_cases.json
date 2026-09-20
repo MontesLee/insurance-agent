@@ -1,0 +1,121 @@
+{
+  "golden_cases": [
+    {"case_id": "B001-standard-family", "persona": "标准家庭(基线 fixture)",
+     "mutations": [],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": "INCOMPLETE_EVIDENCE",
+                 "expect_note": "多需求证据部分落地=诚实结果(F-13);refs>=1 且可解析"}},
+
+    {"case_id": "B002-single-high-income", "persona": "单身高收入",
+     "mutations": [
+       {"op": "set_value", "profile": "family_profile", "field": "marital_status", "value": "未婚"},
+       {"op": "set_unknown", "profile": "family_profile", "field": "children", "reason": "未婚,无子女"}],
+     "requirements": ["medical", "critical_illness", "savings"],
+     "risks": ["R1", "R2"],
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"],
+                 "no_domains": ["life"],
+                 "missing_fields_grow": ["children"]}},
+
+    {"case_id": "B003-mortgage-family", "persona": "有房贷家庭",
+     "mutations": [
+       {"op": "set_value", "profile": "family_profile", "field": "housing_loan", "value": "200万(未还)"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"],
+                 "missing_fields_grow": []}},
+
+    {"case_id": "B004-children-family", "persona": "有子女家庭",
+     "mutations": [
+       {"op": "set_value", "profile": "family_profile", "field": "children", "value": "2孩(3岁、7岁)"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"]}},
+
+    {"case_id": "B005-dual-income", "persona": "双职工家庭",
+     "mutations": [
+       {"op": "set_value", "profile": "employment_profile", "field": "spouse_employment", "value": "事业单位在职"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"]}},
+
+    {"case_id": "B006-high-medical-risk", "persona": "高医疗风险暴露",
+     "mutations": [
+       {"op": "set_value", "profile": "financial_profile", "field": "health_status", "value": "慢性病(高血压,ESTIMATED)"}],
+     "requirements": ["medical", "critical_illness"],
+     "risks": ["R1", "R2"],
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"],
+                 "domains_include": ["medical"]}},
+
+    {"case_id": "B007-well-covered", "persona": "保障已较完整",
+     "mutations": [
+       {"op": "set_value", "profile": "existing_protection", "field": "existing_insurance", "value": "已持有重疾险50万+定期寿险100万+意外险(公司团险)"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE", "NO_CANDIDATES"],
+                 "expect_note": "缺口须与既有保障自洽(current_coverage 不得无视既有保障捏造 NONE 且无证据)"}},
+
+    {"case_id": "B008-insufficient-info", "persona": "信息严重不足",
+     "mutations": [
+       {"op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance", "reason": "客户未提供"},
+       {"op": "set_unknown", "profile": "family_profile", "field": "housing_loan", "reason": "客户未提供"},
+       {"op": "set_unknown", "profile": "family_profile", "field": "children", "reason": "客户未提供"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "WAITING_FOR_USER",
+                 "expect_note": "必须停下追问;不得假设无保单;不得继续到产品推荐"}},
+
+    {"case_id": "B009-no-product", "persona": "产品无法匹配(85岁)",
+     "mutations": [
+       {"op": "set_value", "profile": "family_profile", "field": "age", "value": "85"}],
+     "requirements": ["medical"], "risks": ["R1"],
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": "NO_CANDIDATES",
+                 "expect_note": "NO_CANDIDATES 不得与 INCOMPLETE_EVIDENCE 混淆(R4)"}},
+
+    {"case_id": "B010-multi-risk", "persona": "多风险并发(全维度高优先级)",
+     "mutations": [],
+     "requirements": "ALL_P0", "risks": "ALL",
+     "expect": {"terminal": "COMPLETED",
+                 "recommendation_status": ["COMPLETE", "INCOMPLETE_EVIDENCE"],
+                 "domains_include": ["medical", "critical_illness"]}}
+  ],
+
+  "negative_cases": [
+    {"case_id": "N001-missing-critical-info", "scenario": "缺失关键客户信息",
+     "mutations": [
+       {"op": "set_unknown", "profile": "existing_protection", "field": "existing_insurance", "reason": "客户未提供已有商业保险信息"}],
+     "requirements": "ALL", "risks": "ALL",
+     "expect": {"terminal": "WAITING_FOR_USER",
+                 "no_recommendation_artifact_final": true,
+                 "expect_note": "不得假设「没有保单」(HG-B10)"}},
+
+    {"case_id": "N002-expired-knowledge", "scenario": "过期知识不得入证据",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "registry_mutation": {"op": "expire_all", "as_of_check": "2026-09-20"},
+     "expect": {"terminal": ["COMPLETED", "PAUSED_NEEDS_REVIEW", "NEEDS_REVIEW"],
+                 "evidence_items": 0,
+                 "expect_note": "全部窗口过期→检索必须弃权;推荐不得使用过期知识(HG-B08)"}},
+
+    {"case_id": "N003-unknown-license", "scenario": "UNKNOWN license 不得入证据",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "registry_mutation": {"op": "unknown_medical_license"},
+     "expect": {"terminal": ["COMPLETED", "PAUSED_NEEDS_REVIEW", "NEEDS_REVIEW"],
+                 "expect_note": "医疗域知识 license=UNKNOWN→该域证据缺失→推荐不得落地该域(HG-B09)"}},
+
+    {"case_id": "N004-product-not-in-catalog", "scenario": "请求的产品不存在",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "requested_product_ids": ["P999"],
+     "expect": {"terminal": "COMPLETED",
+                 "fabricated_product_must_be_absent": "P999",
+                 "expect_note": "P999 不得出现在任何候选/推荐(HG-B05)"}},
+
+    {"case_id": "N005-evidence-missing", "scenario": "关键证据缺失(空KB)",
+     "mutations": [], "requirements": ["medical"], "risks": ["R1"],
+     "kb": "empty",
+     "expect": {"terminal": ["COMPLETED", "PAUSED_NEEDS_REVIEW", "NEEDS_REVIEW"],
+                 "recommendation_status_must_not_be": "COMPLETE",
+                 "expect_note": "空证据必须阻断/复核;绝不虚构知识(HG-B06)"}}
+  ]
+}
