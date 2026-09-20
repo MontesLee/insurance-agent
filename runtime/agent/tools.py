@@ -328,35 +328,29 @@ def _knowledge_search(args: dict, ctx: ToolContext) -> dict:
     Phase 6.2.2: the tool produces the artifact; the Harness runs eval (skip_eval).
     Empty RAG results fail closed — no fabricated evidence is ever stored.
     """
-    from knowledge.evidence.provider import build_engine
+    # Stage 14.4 (F-07): the tool consumes the ONE runtime knowledge
+    # path — KnowledgeService = Provider → Governance → evidence.
+    # Ungoverned hits never become evidence (K002); provider failures
+    # FAIL CLOSED with no fallback (K003); the tool never decides
+    # backend or eligibility itself.
+    from knowledge.service import default_service
+    from knowledge.provider import ProviderError
 
     query = args["query"]
-    engine = build_engine()
-    res = engine.search(query)
-    hits = getattr(res, "chunks", None) or getattr(res, "results", None) or []
-    if not hits:
-        return _fail("no valid evidence found for query %r — cannot fabricate knowledge"
-                     % query[:60])
+    try:
+        items, governed, decisions, gctx = default_service() \
+            .build_evidence(query, top_k=5)
+    except ProviderError as e:
+        return _fail("knowledge provider failed (fail-closed, no fallback):"
+                     " %s" % str(e)[:160])
+    if not items:
+        reasons = sorted({r for d in decisions if not d.get("allowed")
+                          for r in d.get("reasons", [])})[:6]
+        return _fail("no valid governed evidence for query %r — cannot "
+                     "fabricate knowledge (governance: %s)"
+                     % (query[:60], ",".join(reasons) or "no hits"))
 
-    evidence = []
-    for i, c in enumerate(hits[:5]):
-        doc_id = getattr(c, "document_id", None) or ""
-        chunk_id = getattr(c, "chunk_id", None) or ""
-        score = getattr(c, "final_score", None) or getattr(c, "score", None)
-        confidence = min(1.0, score) if isinstance(score, (int, float)) else None
-        evidence.append({
-            "evidence_id": "E%03d" % (i + 1),
-            "content": (getattr(c, "content", None) or "")[:400],
-            "source": doc_id or chunk_id or "unknown",
-            "source_type": getattr(c, "source_type", "internal"),
-            "relevance": score,
-            "confidence": confidence,
-            "document_id": doc_id,
-            "document_name": getattr(c, "document_name", None),
-            "chunk_id": chunk_id,
-            "section": getattr(c, "section", None),
-            "source_level": getattr(c, "source_level", None),
-        })
+    evidence = items
 
     state = ctx.state
     now = cs.now()
@@ -367,14 +361,15 @@ def _knowledge_search(args: dict, ctx: ToolContext) -> dict:
         "schema_version": "1.0",
         "generated_at": now,
         "payload": {
-            "status": "success",
+            "status": governed.status,
             "query": query,
             "evidence": evidence,
-            "conflict": False,
+            "conflict": bool(governed.conflict),
         },
         "provenance": [
-            {"source_type": "knowledge", "source_id": e["source"], "confidence": e["confidence"]}
-            for e in evidence if e["source"]
+            {"source_type": "knowledge", "source_id": e.get("document_id")
+             or e.get("source") or "", "confidence": e.get("confidence")}
+            for e in evidence
         ],
     }
 

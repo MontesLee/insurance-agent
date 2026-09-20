@@ -66,8 +66,13 @@ def request_evidence(
     kb_dir: Optional[str] = None,
     rules: Optional[dict] = None,
     do_validate: bool = True,
+    service: Any = None,
 ) -> dict:
-    """Run one Evidence round. Returns an EvidenceRound dict (see module docstring)."""
+    """Run one Evidence round. Returns an EvidenceRound dict (see module docstring).
+
+    Phase 14.4: the round is served by the KnowledgeService (Provider →
+    Governance → evidence); `service=` is the composition/test injection
+    point. The loop itself never constructs a retrieval engine (F-01)."""
     before = copy.deepcopy(source_artifact)
 
     query_artifact = _build_request(source_artifact, source_kind, purpose, requester, rules)
@@ -77,6 +82,7 @@ def request_evidence(
         engine=engine,
         kb_dir=kb_dir,
         do_validate=do_validate,
+        service=service,
     )
 
     return {

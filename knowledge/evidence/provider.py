@@ -45,8 +45,16 @@ def _load_ks_module():
 
 
 def build_engine(kb_dir: Optional[str] = None):
+    """Legacy construction helper — NOT on the runtime evidence path
+    since Phase 14.4 (F-01). Retained as the mock provider's lazy
+    build seam and for test injection; runtime retrieval goes through
+    knowledge.service.KnowledgeService. The constructed engine carries
+    `_kb_dir` so a governed service can pair it with the right
+    registry (a KB without its registry fails closed)."""
     mod = _load_ks_module()
-    return mod.build_engine(kb_dir) if kb_dir else mod.build_engine()
+    eng = mod.build_engine(kb_dir) if kb_dir else mod.build_engine()
+    eng._kb_dir = kb_dir
+    return eng
 
 
 def extract_payload(artifact: Any) -> Any:
@@ -73,12 +81,23 @@ def provide_evidence(
     engine: Any = None,
     kb_dir: Optional[str] = None,
     do_validate: bool = True,
+    service: Any = None,
 ) -> tuple:
     """Consume a canonical KnowledgeQuery and return a canonical KnowledgeEvidence.
+
+    Phase 14.4 (F-01 closed): the evidence round goes through the
+    KnowledgeService — Provider → Governance → evidence — NEVER
+    directly through the deterministic engine. `engine=` survives as a
+    TEST-INJECTION seam only (wrapped as a provider; its documents
+    must be registry-covered or every hit fails closed);
+    `kb_dir=` composes a governed service over that KB (unregistered
+    documents are rejected by governance — fail-closed by design);
+    `service=` is the composition-root injection point.
 
     Returns (evidence_artifact, ok, errors).
     """
     from adapters.knowledge_search_adapter import to_canonical
+    from knowledge.service import KnowledgeService, default_service
 
     query = extract_payload(query_artifact) or {}
     query_text = query.get("query") or ""
@@ -88,9 +107,35 @@ def provide_evidence(
         if not ok:
             return (None, False, ["QUERY_INVALID: " + e for e in errs])
 
-    eng = engine if engine is not None else build_engine(kb_dir)
-    result = eng.search(query_text, top_k=top_k) if top_k else eng.search(query_text)
-    ks_output = result.to_dict() if hasattr(result, "to_dict") else result
+    if service is not None:
+        svc = service
+    elif engine is not None:
+        # TEST-INJECTION seam: wrap the (possibly dict-shaped) test
+        # engine as a provider. If the engine records its KB (see
+        # build_engine._kb_dir), pair it with THAT KB's registry —
+        # otherwise the default registry applies and unregistered
+        # documents fail governance (no ungoverned escape).
+        from knowledge.provider import MockKnowledgeProvider
+        from knowledge.service import wrap_test_engine, registry_for
+        eng_kb = getattr(engine, "_kb_dir", None)
+        reg = registry_for(eng_kb) if eng_kb else None
+        svc = KnowledgeService(
+            provider=MockKnowledgeProvider(
+                engine=wrap_test_engine(engine),
+                **({"stamps": reg.provider_stamps()} if reg else {})),
+            **({"registry": reg} if reg else {}))
+    elif kb_dir is not None:
+        from knowledge.provider import MockKnowledgeProvider
+        from knowledge.service import registry_for
+        reg = registry_for(kb_dir)
+        svc = KnowledgeService(
+            provider=MockKnowledgeProvider(
+                kb_dir=kb_dir, stamps=reg.provider_stamps()),
+            registry=reg)
+    else:
+        svc = default_service()
+
+    ks_output = svc.governed_output(query_text, top_k=top_k)
 
     artifact = to_canonical(ks_output)
     if do_validate:

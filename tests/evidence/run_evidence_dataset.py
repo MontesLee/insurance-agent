@@ -73,15 +73,50 @@ class FakeConflictEngine:
         )
 
 
+def _fake_conflict_service():
+    """Phase 14.4: the fake-conflict engine now runs INSIDE the
+    governed service — registry entries derived from the engine's own
+    canned output (hashes match by construction). Assertions unchanged."""
+    import hashlib
+    from knowledge.governance import SourceRegistry
+    from knowledge.provider import MockKnowledgeProvider
+    from knowledge.service import KnowledgeService
+
+    canned = FakeConflictEngine().search("warmup").to_dict()["results"]
+    entries = [{
+        "document_id": r["document_id"],
+        "source_id": "evidence-dataset-" + r["document_id"].lower(),
+        "source_name": r["document_name"],
+        "source_type": "internal",
+        "authority_level": r["source_level"],
+        "jurisdiction": "CN",
+        "version": "1",
+        "effective_from": "2023-01-01",
+        "effective_to": None,
+        "status": "ACTIVE",
+        "license_status": "ALLOWED",
+        "canonical_uri": "synthetic://evidence-dataset/" + r["document_id"],
+        "content_hashes": {r["chunk_id"]: hashlib.sha256(
+            r["content"].encode("utf-8")).hexdigest()},
+    } for r in canned]
+    reg = SourceRegistry(entries)
+    from knowledge.service import wrap_test_engine
+    return KnowledgeService(
+        provider=MockKnowledgeProvider(
+            engine=wrap_test_engine(FakeConflictEngine()),
+            stamps=reg.provider_stamps()),
+        registry=reg)
+
+
 def check_case(case: dict) -> tuple:
     source_kind = case["source_kind"]
     fixture_path = os.path.join(CASES_DIR, case["fixture"])
     with open(fixture_path, encoding="utf-8") as f:
         source = json.load(f)
 
-    engine = FakeConflictEngine() if case.get("engine") == "fake_conflict" else None
+    service = _fake_conflict_service() if case.get("engine") == "fake_conflict" else None
     round_result = loop_mod.request_evidence(
-        source, source_kind=source_kind, purpose=case.get("purpose"), engine=engine
+        source, source_kind=source_kind, purpose=case.get("purpose"), service=service
     )
 
     fails = []
