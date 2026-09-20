@@ -1,0 +1,32 @@
+{
+  "provenance_cases": [
+    {"case_id": "PROV-001", "category": "provenance",
+     "input": {"base_document": "gov_reg_medical_2026", "as_of": "2026-06-01", "mutate": null},
+     "expected": {"valid": true},
+     "hard_gate": "invalid_provenance_pass"},
+    {"case_id": "PROV-002", "category": "provenance",
+     "input": {"base_document": "gov_industry_guide", "as_of": "2026-06-01", "mutate": null},
+     "expected": {"valid": true},
+     "hard_gate": "invalid_provenance_pass"},
+    {"case_id": "PROV-003", "category": "provenance",
+     "input": {"base_document": "gov_reg_medical_2026", "as_of": "2026-06-01",
+                "mutate": "remove_hit_id"},
+     "expected": {"valid": false, "rule": "P002"},
+     "hard_gate": "invalid_provenance_pass"},
+    {"case_id": "PROV-004", "category": "provenance",
+     "input": {"base_document": "gov_reg_medical_2026", "as_of": "2026-06-01",
+                "mutate": "bogus_document"},
+     "expected": {"valid": false, "rule": "P003"},
+     "hard_gate": "invalid_provenance_pass"},
+    {"case_id": "PROV-005", "category": "provenance",
+     "input": {"base_document": "gov_reg_medical_2026", "as_of": "2026-06-01",
+                "mutate": "remove_retrieved_at"},
+     "expected": {"valid": false, "rule": "P010"},
+     "hard_gate": "invalid_provenance_pass"},
+    {"case_id": "PROV-006", "category": "provenance",
+     "input": {"base_document": "gov_bj_claim_rule", "as_of": "2026-06-01",
+                "mutate": "jurisdiction_swap", "jurisdiction": "CN-BJ"},
+     "expected": {"valid": false, "rule": "P008"},
+     "hard_gate": "invalid_provenance_pass"}
+  ]
+}

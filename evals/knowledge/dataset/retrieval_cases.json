@@ -1,0 +1,82 @@
+{
+  "retrieval_cases": [
+    {
+      "case_id": "RET-001",
+      "category": "retrieval",
+      "input": {"query": "百万医疗险 等待期 免赔额", "top_k": 5, "as_of": "2026-06-01"},
+      "expected": {"top_k_contains_document": "gov_reg_medical_2026"},
+      "hard_gate": "none"
+    },
+    {
+      "case_id": "RET-002",
+      "category": "retrieval",
+      "input": {"query": "合成医疗监管条例 免赔额上限", "top_k": 5, "as_of": "2026-06-01"},
+      "expected": {"top_k_contains_document": "gov_reg_medical_2026"},
+      "hard_gate": "none"
+    },
+    {
+      "case_id": "RET-003",
+      "category": "retrieval",
+      "input": {"query": "百万医疗险 等待期", "top_k": 5, "as_of": "2026-06-01"},
+      "expected": {"rank1_section_contains": "等待期"},
+      "hard_gate": "none"
+    },
+    {
+      "case_id": "RET-004",
+      "category": "retrieval",
+      "input": {"query": "量子计算机 显卡 价格 评测", "top_k": 5, "as_of": "2026-06-01"},
+      "expected": {"empty": true},
+      "hard_gate": "irrelevant_retrieval"
+    },
+    {
+      "case_id": "RET-005",
+      "category": "retrieval",
+      "input": {"query": "合成北京理赔规则 理赔申请时限 180 天", "top_k": 5, "as_of": "2026-06-01", "jurisdiction": "CN-BJ"},
+      "expected": {"top_k_contains_document": "gov_bj_claim_rule"},
+      "hard_gate": "none"
+    },
+    {
+      "case_id": "RET-006",
+      "category": "retrieval",
+      "input": {"query": "健康告知 既往症 拒赔", "top_k": 5, "as_of": "2026-06-01"},
+      "expected": {"top_k_contains_document": "gov_industry_guide"},
+      "hard_gate": "none"
+    },
+    {
+      "case_id": "PAR-001",
+      "category": "parity",
+      "input": {"query": "百万医疗险 等待期 免赔额", "as_of": "2026-06-01"},
+      "expected": {
+        "fields_equal": ["source_id", "document_id", "version_id",
+                          "version", "effective_from", "effective_to",
+                          "authority_level", "jurisdiction",
+                          "license_status", "content_hash",
+                          "knowledge_hit_id"]
+      },
+      "hard_gate": "contract_equivalence"
+    },
+    {
+      "case_id": "PAR-002",
+      "category": "parity",
+      "input": {"query": "健康告知 既往症", "as_of": "2026-06-01"},
+      "expected": {
+        "fields_equal": ["source_id", "document_id", "version_id",
+                          "content_hash", "authority_level",
+                          "license_status"]
+      },
+      "hard_gate": "contract_equivalence"
+    },
+    {
+      "case_id": "PAR-003",
+      "category": "parity",
+      "input": {"query": "百万医疗险 等待期 免赔额", "as_of": "2026-06-01",
+                 "paths": ["tool", "orchestrator"]},
+      "expected": {
+        "fields_equal": ["source_id", "document_id", "version_id",
+                          "content_hash", "jurisdiction",
+                          "license_status"]
+      },
+      "hard_gate": "contract_equivalence"
+    }
+  ]
+}
