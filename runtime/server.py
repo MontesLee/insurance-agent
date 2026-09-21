@@ -30,6 +30,7 @@ import os
 import queue as queue_mod
 import sys
 import threading
+import time
 import traceback
 import uuid
 from typing import Optional
@@ -298,8 +299,58 @@ class RunManager:
         }
 
     # ---------------- the worker: invoke the EXISTING orchestrator ------------- #
+    def _observe_run(self, run_id: str, case_id: str, state,
+                     run_status: str, duration_ms: float,
+                     error=None) -> None:
+        """Phase 25: run-level task/skill metrics + structured log.
+        Observation ONLY — reads the finished state, never mutates it;
+        failures here can never affect the run's own result."""
+        import runtime.obs as obs
+        try:
+            m = obs.default_metrics()
+            trace = (state or {}).get("trace") or []
+            per = {}
+            for r in trace:
+                ev, skill = r.get("event"), r.get("skill")
+                if not skill:
+                    continue
+                s = per.setdefault(skill, {"calls": 0, "ok": 0,
+                                           "fail": 0})
+                if ev == "SKILL_STARTED":
+                    s["calls"] += 1
+                elif ev == "SKILL_COMPLETED":
+                    s["ok"] += 1
+                    ms = r.get("duration_ms")
+                    if isinstance(ms, (int, float)):
+                        m.observe("skill_duration", ms)
+                elif ev == "TASK_FAILED":
+                    s["fail"] += 1
+            tasks = (state or {}).get("tasks") or []
+            retries = sum(max(0, (t.get("attempt") or 1) - 1)
+                          for t in tasks if isinstance(t, dict))
+            m.inc("tasks_total", by=len(tasks))
+            m.inc("tasks_success_total",
+                  by=sum(s["ok"] for s in per.values()))
+            m.inc("tasks_failed_total",
+                  by=sum(s["fail"] for s in per.values()))
+            m.inc("tasks_retried_total", by=retries)
+            m.inc("skill_calls_total",
+                  by=sum(s["calls"] for s in per.values()))
+            m.inc("skill_success_total",
+                  by=sum(s["ok"] for s in per.values()))
+            m.inc("skill_failure_total",
+                  by=sum(s["fail"] for s in per.values()))
+            m.observe("task_duration", duration_ms)
+            obs.log("run.completed",
+                        status=run_status, duration_ms=duration_ms,
+                        skills={k: v for k, v in per.items()},
+                        retries=retries, error=error)
+        except Exception:  # noqa: BLE001 — observability must not break runs
+            pass
+
     def _worker(self, run_id: str, case: dict) -> None:
         case_id = case["id"]
+        _obs_t0 = time.perf_counter()
         self._set(run_id, status="running", started_at=events_mod.now_iso())
         # NOTE: _active[case_id] was reserved by create_run() under the lock (M-1);
         # the worker only releases it here in `finally`.
@@ -341,6 +392,8 @@ class RunManager:
                                                  for e in rep.get("executed", [])]})
             self._set(run_id, status=run_status, completed_at=events_mod.now_iso(),
                       result_status=rep["status"], reasons=reasons)
+            self._observe_run(run_id, case_id, state, run_status,
+                              (time.perf_counter() - _obs_t0) * 1000)
         except Exception as e:  # noqa: BLE001 — the run wrapper must always terminate
             print("[server] run %s crashed: %r" % (run_id, e), file=sys.stderr)
             traceback.print_exc()
@@ -349,6 +402,9 @@ class RunManager:
                        data={"error_type": type(e).__name__})
             self._set(run_id, status="failed", completed_at=events_mod.now_iso(),
                       result_status="CRASHED", reasons=[repr(e)[:300]])
+            self._observe_run(run_id, case_id, None, "failed",
+                              (time.perf_counter() - _obs_t0) * 1000,
+                              error=e)
         finally:
             remove_tap()
             self._active.pop(case_id, None)      # M-1: release the case slot
@@ -701,9 +757,82 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
                        allow_methods=["*"],
                        allow_headers=["*"], expose_headers=["*"])
 
+    # ---- Phase 25: request-level observability middleware ----------- #
+    @app.middleware("http")
+    async def _obs_middleware(request: Request, call_next):
+        import runtime.obs as obs
+        from runtime.obs import context as obs_ctx
+        m = obs.default_metrics()
+        m.inc("requests_total")
+        with obs_ctx.start_request() as ctx:
+            t0 = time.perf_counter()
+            try:
+                response = await call_next(request)
+            except Exception as e:  # noqa: BLE001 — observed, re-raised
+                ms = (time.perf_counter() - t0) * 1000
+                m.inc("requests_failed_total")
+                obs.log("http.request", level="ERROR", status="ERROR",
+                            duration_ms=ms, method=request.method,
+                            path=request.url.path, error=e)
+                raise
+            ms = (time.perf_counter() - t0) * 1000
+            m.observe("request_duration", ms)
+            if response.status_code < 400:
+                m.inc("requests_success_total")
+            else:
+                m.inc("requests_failed_total")
+            response.headers["X-Request-Id"] = ctx.request_id
+            obs.log("http.request", status="OK",
+                        duration_ms=ms, method=request.method,
+                        path=request.url.path,
+                        http_status=response.status_code)
+            return response
+
     @app.get("/api/health")
     def health():
-        return {"status": "ok", "version": "0.1.0", "bus": mgr.bus.stats()}
+        """LIVENESS (Phase 25F): the process answering means the
+        process is alive. Downstream dependencies are deliberately NOT
+        consulted here — see /api/ready. The `status: "ok"` field is
+        the historical Phase-1 API contract (WebUI + existing tests);
+        the Phase 25 liveness vocabulary lives under `liveness`."""
+        from runtime.obs.health import liveness
+        out = liveness()
+        out.update({"status": "ok",      # backward-compatible contract
+                    "liveness": "LIVE",  # Phase 25F vocabulary
+                    "version": "0.1.0", "bus": mgr.bus.stats()})
+        return out
+
+    @app.get("/api/ready")
+    def ready():
+        """READINESS (Phase 25F): can this instance accept production
+        workload NOW — mode-aware dependency checks with short
+        timeouts; READY / NOT_READY / DEGRADED."""
+        from runtime.obs.health import readiness
+        r = readiness()
+        return JSONResponse(status_code=200 if r["status"] == "READY"
+                            else (503 if r["status"] == "NOT_READY"
+                                  else 200), content=r)
+
+    @app.get("/api/diagnostics")
+    def diagnostics(ident=Depends(_identity_dep)):
+        """Phase 25G: read-only runtime diagnostics. OPERATOR role
+        required when authentication is active; the payload is scrubbed
+        (no secrets, no env dump)."""
+        _require_role(ident, "OPERATOR")
+        from runtime.obs import diagnostics_snapshot
+        from runtime.obs.metrics import default_metrics
+        out = diagnostics_snapshot(include_readiness=True)
+        out["metrics"] = default_metrics().snapshot()
+        return out
+
+    @app.get("/api/metrics")
+    def metrics(ident=Depends(_identity_dep)):
+        """Phase 25D: the metrics snapshot (counters + latency
+        percentiles + honest UNKNOWNs). OPERATOR role required when
+        authentication is active."""
+        _require_role(ident, "OPERATOR")
+        from runtime.obs.metrics import default_metrics
+        return default_metrics().snapshot()
 
     @app.get("/api/cases")
     def list_cases():

@@ -320,12 +320,42 @@ class KnowledgeService:
                jurisdiction: str = "CN"):
         """Provider retrieval + mandatory governance. Returns
         (governed_result, decisions, ctx). Every rejected hit carries
-        machine-readable rule ids; nothing ungoverned escapes."""
-        ctx = QueryContext(as_of=as_of or time.strftime("%Y-%m-%d"),
-                           jurisdiction=jurisdiction)
-        raw = self.provider.search(query, top_k=top_k)
-        governed, decisions = govern_search_result(raw, ctx,
-                                                   self.registry())
+        machine-readable rule ids; nothing ungoverned escapes.
+        Phase 25: the single knowledge choke point is INSTRUMENTED
+        (duration, allow/deny/abstention counters, structured log) —
+        observation only, identical business result."""
+        import runtime.obs as obs
+        m = obs.default_metrics()
+        m.inc("knowledge_search_total")
+        t0 = time.perf_counter()
+        try:
+            ctx = QueryContext(as_of=as_of or time.strftime("%Y-%m-%d"),
+                               jurisdiction=jurisdiction)
+            raw = self.provider.search(query, top_k=top_k)
+            governed, decisions = govern_search_result(raw, ctx,
+                                                       self.registry())
+        except Exception as e:  # noqa: BLE001 — observed, then re-raised
+            ms = (time.perf_counter() - t0) * 1000
+            m.inc("knowledge_search_failure_total")
+            m.observe("knowledge_duration", ms)
+            obs.log("knowledge.search", level="ERROR",
+                        status="FAILURE", duration_ms=ms, error=e,
+                        provider=getattr(self.provider, "name", ""))
+            raise
+        ms = (time.perf_counter() - t0) * 1000
+        m.observe("knowledge_duration", ms)
+        m.inc("knowledge_search_success_total")
+        gm = (governed.retrieval_metadata or {}).get("governance", {})
+        allowed = gm.get("allowed", 0) or 0
+        denied = gm.get("rejected", 0) or 0
+        if denied:
+            m.inc("knowledge_governance_denied_total", by=denied)
+        if governed.status == "insufficient_evidence":
+            m.inc("knowledge_abstention_total")
+        obs.log("knowledge.search", status=governed.status,
+                    duration_ms=ms,
+                    provider=getattr(self.provider, "name", ""),
+                    allowed=allowed, denied=denied)
         return governed, decisions, ctx
 
     def build_evidence(self, query: str, top_k: Optional[int] = None,

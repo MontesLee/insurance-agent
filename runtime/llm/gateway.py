@@ -244,7 +244,11 @@ class LLMGateway:
 
     def _log(self, request, response, *, attempt=1, status="OK",
              error=""):
-        """Metadata-only logging: no raw prompts, no secrets."""
+        """Metadata-only logging: no raw prompts, no secrets.
+        Phase 25: the single observability choke point — every terminal
+        outcome and every retry passes here exactly once, so metrics
+        and the structured log see the complete LLM story (observation
+        only; this method cannot change the business result)."""
         self.call_log.append({
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                        time.gmtime()),
@@ -261,6 +265,46 @@ class LLMGateway:
             "cost_status": (response.cost.status if response
                             else UNKNOWN),
         })
+        try:
+            self._observe(request, response, attempt, status, error)
+        except Exception:  # noqa: BLE001 — observability must not break calls
+            pass
+
+    def _observe(self, request, response, attempt, status, error):
+        """Phase 25 instrumentation (pure side-observation)."""
+        import runtime.obs as obs
+        m = obs.default_metrics()
+        if status == "OK":
+            m.inc("llm_calls_total")
+            m.inc("llm_success_total")
+        elif status == "EXHAUSTED":
+            # terminal summary AFTER the last RETRY line — the final
+            # failure was already counted by that RETRY; recounting
+            # here would double-count one provider call
+            pass
+        else:                       # RETRY / FAIL (one provider call)
+            m.inc("llm_calls_total")
+            m.inc("llm_failure_total")
+            m.inc("llm_failure_total", error=str(error))
+            if "Timeout" in str(error):
+                m.inc("llm_timeout_total")
+            elif "RateLimit" in str(error):
+                m.inc("llm_rate_limit_total")
+        if response is not None and response.latency_ms is not None:
+            m.observe("llm_duration", response.latency_ms)
+        usage = (response.usage.to_dict()
+                 if response and response.usage else None)
+        m.record_tokens(self.provider.name,
+                        usage.get("total_tokens") if usage else None)
+        obs.log(
+            "llm.call", level=("INFO" if status == "OK" else "WARN"),
+            status=status, duration_ms=(response.latency_ms
+                                        if response else None),
+            provider=self.provider.name, model=request.model,
+            attempt=attempt, max_attempts=1 + self.max_retries,
+            error_type=str(error) if error else None,
+            tokens=(usage.get("total_tokens") if usage
+                    else obs.UNKNOWN))
 
     def describe(self) -> dict:
         """Safe info dump: no secrets."""
