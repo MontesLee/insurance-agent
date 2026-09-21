@@ -39,11 +39,14 @@ _lock = threading.Lock()
 
 class JsonlLogger:
     """Append-only JSONL structured log. Process-local file sink (the
-    operator ships the file); stdout mirror optional for dev."""
+    operator ships the file); stderr mirror optional for dev.
 
-    def __init__(self, path: Optional[str] = None, mirror_stdout=False):
+    The mirror goes to STDERR, never stdout: stdout is the product/demo
+    output channel (Phase 25.1 — F-GATE-03)."""
+
+    def __init__(self, path: Optional[str] = None, mirror_stderr=False):
         self._path = path
-        self._mirror = mirror_stdout
+        self._mirror = mirror_stderr
         self._fh = None
         if path:
             os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
@@ -100,7 +103,7 @@ class JsonlLogger:
                     pass
             if self._mirror:
                 try:
-                    sys.stdout.write(line + "\n")
+                    sys.stderr.write(line + "\n")
                 except Exception:  # noqa: BLE001
                     pass
         return rec
@@ -134,13 +137,13 @@ _default: Optional[JsonlLogger] = None
 
 def default_logger() -> JsonlLogger:
     """Process default: tmp/obs/agent.jsonl (gitignored), mirrored to
-    stdout only in DEMO mode. Explicitly settable for tests."""
+    stderr only in DEMO mode. Explicitly settable for tests."""
     global _default
     if _default is None:
         from runtime import mode as rt_mode
         path = os.path.join("tmp", "obs", "agent.jsonl")
         _default = JsonlLogger(
-            path, mirror_stdout=(rt_mode.mode() == rt_mode.DEMO))
+            path, mirror_stderr=(rt_mode.mode() == rt_mode.DEMO))
     return _default
 
 

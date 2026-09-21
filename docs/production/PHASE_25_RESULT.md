@@ -3,6 +3,14 @@
 Date: 2026-09-21 · Baseline c7312bb verified before start (11-point
 check). Regression 513/12/42 · p25 suites 122/33/8 · audit 16/16.
 
+> **Correction (Phase 25.1, 2026-09-21):** the portfolio leg of "513/**12**/42"
+> was recorded as a clean **12**, but the actual pre-hotfix result was
+> **12 passed + 2 teardown ERRORS** — Phase 25's observability mirror wrote to
+> stdout and contaminated demo output, breaking the two repeatability suites.
+> This is the historical record and is preserved, not rewritten. Closed by
+> [PHASE_25_1_RESULT.md](PHASE_25_1_RESULT.md) (F-GATE-03): the portfolio is now
+> **12 passed / 0 errors**.
+
 ## Status
 
 ```
@@ -76,7 +84,7 @@ fake-READY mutation; diagnostics authenticated/authorized; cross-
 project isolation (aggregate-only + contextvar isolation); failure
 injection observable; retry behavior observable; no mock fallback in
 production (unchanged, re-verified); no business-skill regression
-(513/12/42); governance/evidence/provenance UNCHANGED (diffs are pure
+(513/12/42 — see the Phase 25.1 Correction above); governance/evidence/provenance UNCHANGED (diffs are pure
 instrumentation — verified line-by-line; E25-15 deep-equality on
 governance outcomes); LLM Gateway contract unchanged (only _log
 extension); PostgreSQL authoritative behavior unchanged (zero schema
