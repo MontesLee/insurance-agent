@@ -292,6 +292,26 @@ class TaskQueueStore:
                 """)
                 return [r["task_id"] for r in cur.fetchall()]
 
+    def requeue(self, task_id: str) -> dict:
+        """FAILED -> PENDING (26B): the legal retry/waiting hand-back.
+        Clears the lease columns; the NEXT claim increments the
+        attempt (no attempt bump without a real claim). Refused for
+        any non-FAILED state — this is the only public path back from
+        FAILED, and it never touches terminal tasks."""
+        with self._connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    UPDATE queue_tasks SET
+                        status='PENDING', lease_id=NULL, lease_owner=NULL,
+                        lease_expires_at=NULL, updated_at=now()
+                    WHERE task_id=%s AND status='FAILED'
+                """, (task_id,))
+                if cur.rowcount != 1:
+                    raise IllegalTransition(
+                        "requeue refused for %s (only FAILED tasks "
+                        "requeue)" % task_id)
+                return self._get(cur, task_id)
+
     def cancel(self, task_id: str) -> dict:
         with self._connect() as conn:
             with conn.cursor() as cur:

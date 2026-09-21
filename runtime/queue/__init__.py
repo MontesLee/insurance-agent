@@ -14,6 +14,9 @@ from .model import (ALL_STATES, CANCELLED, FAILED, LEASED, LEASE_EXPIRED,
 from .store import (IllegalTransition, LeaseRejected, OutcomeUnknown,
                     QueueError, TaskQueueStore)
 from .worker import TaskWorker
+from .agent_runtime import (AgentTaskWorker, defer_reason,
+                            make_agent_executor, parse_defer_reason)
+from .ops import OpsDenied, QueueOps
 
 __all__ = [
     "ALL_STATES", "CANCELLED", "FAILED", "LEASED", "LEASE_EXPIRED",
@@ -21,5 +24,6 @@ __all__ = [
     "idempotency_key", "new_lease_id", "new_task_id",
     "new_worker_instance_id", "transition_allowed",
     "IllegalTransition", "LeaseRejected", "OutcomeUnknown", "QueueError",
-    "TaskQueueStore", "TaskWorker",
+    "TaskQueueStore", "TaskWorker", "AgentTaskWorker", "defer_reason",
+    "make_agent_executor", "parse_defer_reason", "OpsDenied", "QueueOps",
 ]

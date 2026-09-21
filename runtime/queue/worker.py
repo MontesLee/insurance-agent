@@ -39,7 +39,8 @@ class TaskWorker:
                  executor: Callable[[dict], dict],
                  lease_seconds: float = 30.0,
                  heartbeat_every_s: float = 10.0,
-                 max_concurrent_tasks: int = 1):
+                 max_concurrent_tasks: int = 1,
+                 task_types: Optional[list] = None):
         self.store = store
         self.worker_id = worker_id
         self.worker_instance_id = model.new_worker_instance_id(worker_id)
@@ -47,6 +48,7 @@ class TaskWorker:
         self.lease_seconds = lease_seconds
         self.heartbeat_every_s = heartbeat_every_s
         self.max_concurrent = max(1, max_concurrent_tasks)
+        self.task_types = task_types        # claim filter (isolation)
         self._stop = threading.Event()
         self._inflight = 0
         self._lock = threading.Lock()
@@ -86,7 +88,8 @@ class TaskWorker:
             return None
         task = self.store.claim(self.worker_id,
                                 self.worker_instance_id,
-                                lease_seconds=self.lease_seconds)
+                                lease_seconds=self.lease_seconds,
+                                task_types=self.task_types)
         if task is None:
             return None
         with self._lock:
