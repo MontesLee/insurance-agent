@@ -41,6 +41,11 @@ backend claims X and the registry says Y, the hit is denied
 - STRICT modes (CONTROLLED_PILOT/PRODUCTION) require the real WeKnora
   provider; mock knowledge is refused at construction with the
   HG-24-03 policy reason — no silent fallback exists anywhere.
+  A selected WeKnora provider with a missing/empty/invalid
+  `INSURANCE_AGENT_WEKNORA_URL` is likewise a CONSTRUCTION-time
+  failure in strict modes (RV-P2-01 fail fast). This is configuration
+  validation only: a valid URL says nothing about reachability —
+  retrieval-time failures stay `ProviderUnavailable` (fail closed).
 - Provider failures (connection refused, timeout, 401/403/5xx, wrong
   endpoint, malformed JSON, missing fields) raise ProviderError
   subclasses — never an empty success, never a mock fallback.

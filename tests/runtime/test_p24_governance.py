@@ -300,6 +300,145 @@ def test_s4_service_strict_policy(c):
                 os.environ[k] = v
 
 
+# --------------------------------------------------------------------- #
+@section
+def test_s5_rv_p2_01_fail_fast(c):
+    """RV-P2-01 hotfix: strict mode + weknora + missing/empty/
+    whitespace/invalid URL must FAIL at construction (never fall
+    through to the no-transport seam, never to mock). Configuration
+    validation ONLY — a VALID but unreachable URL must still construct
+    and keep failing closed at retrieval (T7)."""
+    from knowledge.service import KnowledgeService
+    from knowledge.governance.registry import SourceRegistry
+    from knowledge.provider.base import (ProviderConfigError,
+                                         ProviderUnavailable)
+
+    mode_env = "INSURANCE_AGENT_MODE"
+    prov_env = "INSURANCE_AGENT_KNOWLEDGE_PROVIDER"
+    url_env = "INSURANCE_AGENT_WEKNORA_URL"
+    key_env = "INSURANCE_AGENT_WEKNORA_API_KEY"
+    kb_env = "INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID"
+    keys = (mode_env, prov_env, url_env, key_env, kb_env,
+            "INSURANCE_AGENT_KNOWLEDGE_REGISTRY",
+            "INSURANCE_AGENT_KNOWLEDGE_REGISTRY_BACKEND")
+    saved = {k: os.environ.get(k) for k in keys}
+
+    def set_env(mode, url, key="k", kb="kb"):
+        os.environ[mode_env] = mode
+        os.environ[prov_env] = "weknora"
+        if url is None:
+            os.environ.pop(url_env, None)
+        else:
+            os.environ[url_env] = url
+        os.environ[key_env] = key
+        os.environ[kb_env] = kb
+        os.environ.pop("INSURANCE_AGENT_KNOWLEDGE_REGISTRY", None)
+        os.environ.pop("INSURANCE_AGENT_KNOWLEDGE_REGISTRY_BACKEND",
+                       None)
+
+    # an explicit registry keeps T5/T7 hermetic (skips the PG
+    # registry resolution inside the live composition branch)
+    reg = SourceRegistry([_entry()])
+
+    def construct(mode, url):
+        set_env(mode, url)
+        return KnowledgeService(registry=reg)
+
+    try:
+        # T1 missing / T2 empty / T3 whitespace / T4 invalid
+        for label, url in (("T1 missing", None), ("T2 empty", ""),
+                           ("T3 whitespace", "   "),
+                           ("T4 no-scheme", "127.0.0.1:8080"),
+                           ("T4 bogus-scheme", "ftp://x"),
+                           ("T4 no-host", "http://")):
+            try:
+                construct("production", url)
+                c.chk("RV-P2-01 %s -> construction refused" % label,
+                      False, "constructed")
+            except ProviderConfigError as e:
+                c.chk("RV-P2-01 %s -> construction refused" % label,
+                      "RV-P2-01" in str(e)
+                      and "WEKNORA_URL" in str(e), str(e)[:90])
+        for mode in ("production", "controlled_pilot"):
+            try:
+                construct(mode, None)
+                c.chk("RV-P2-01 %s missing URL refused" % mode, False)
+            except ProviderConfigError:
+                c.chk("RV-P2-01 %s missing URL refused" % mode, True)
+
+        # T5 valid URL -> construction PASSES (config valid, no network
+        # at construction)
+        try:
+            svc = construct("production", "http://127.0.0.1:8080")
+            c.chk("T5 valid URL constructs", True)
+            c.chk("T5 provider is the live WeKnora provider",
+                  svc.provider.name == "weknora"
+                  and type(svc.provider).__name__
+                  == "WeKnoraLiveProvider")
+        except ProviderConfigError as e:
+            c.chk("T5 valid URL constructs", False, str(e)[:90])
+
+        # T7 valid-but-UNREACHABLE URL: startup validation PASSES
+        # (validation is NOT a network probe) and retrieval stays
+        # fail-closed
+        try:
+            svc7 = construct("controlled_pilot",
+                             "http://10.255.255.1:9999")
+            c.chk("T7 unreachable URL still constructs "
+                  "(no network at startup)", True)
+            try:
+                svc7.provider.search("测试", top_k=1)
+                c.chk("T7 retrieval stays fail-closed", False,
+                      "search returned")
+            except ProviderUnavailable:
+                c.chk("T7 retrieval stays fail-closed", True)
+            except Exception as e:  # noqa: BLE001
+                c.chk("T7 retrieval stays fail-closed", False,
+                      "%s: %s" % (type(e).__name__, str(e)[:80]))
+        except ProviderConfigError as e:
+            c.chk("T7 unreachable URL still constructs "
+                  "(no network at startup)", False, str(e)[:90])
+
+        # T6 mock needs no URL (non-strict unaffected by the hotfix)
+        os.environ[mode_env] = "evaluation"
+        os.environ[prov_env] = "mock"
+        os.environ.pop(url_env, None)
+        try:
+            svc6 = KnowledgeService(registry=reg)
+            c.chk("T6 evaluation + mock constructs without URL",
+                  svc6.provider.name == "mock")
+        except ProviderConfigError as e:
+            c.chk("T6 evaluation + mock constructs without URL",
+                  False, str(e)[:90])
+
+        # unchanged-by-design guard: NON-strict weknora without URL
+        # keeps the Phase-14.1 seam behavior (constructs; fails closed
+        # at search) — this hotfix changes STRICT mode only
+        os.environ[prov_env] = "weknora"
+        os.environ.pop(url_env, None)
+        try:
+            svc8 = KnowledgeService(registry=reg)
+            c.chk("non-strict weknora missing URL unchanged (seam)",
+                  type(svc8.provider).__name__
+                  == "WeKnoraKnowledgeProvider")
+            try:
+                svc8.provider.search("测试")
+                c.chk("non-strict seam still fails closed at search",
+                      False)
+            except ProviderUnavailable:
+                c.chk("non-strict seam still fails closed at search",
+                      True)
+        except ProviderConfigError as e:
+            c.chk("non-strict weknora missing URL unchanged (seam)",
+                  False, str(e)[:90])
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
 def main() -> int:
     from _common import REPO as _REPO
     os.chdir(_REPO)

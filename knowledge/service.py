@@ -107,6 +107,30 @@ def resolve_registry_backend() -> str:
     return explicit or BACKEND_JSON
 
 
+def _validate_weknora_config() -> None:
+    """RV-P2-01 hotfix: startup CONFIGURATION validation for the
+    selected WeKnora provider in strict modes — a missing/empty/
+    whitespace/invalid INSURANCE_AGENT_WEKNORA_URL fails FAST at
+    construction instead of deferring ProviderUnavailable to the first
+    search. Pure env-shape check: a VALID URL does NOT mean WeKnora is
+    reachable (reachability stays the transport's fail-closed job at
+    query time; this function never opens a network connection)."""
+    url = os.environ.get("INSURANCE_AGENT_WEKNORA_URL", "").strip()
+    if not url:
+        raise ProviderConfigError(
+            "WeKnora provider is configured but "
+            "INSURANCE_AGENT_WEKNORA_URL is missing/empty — refusing "
+            "to construct (RV-P2-01 fail fast; no fallback to another "
+            "provider)")
+    from urllib.parse import urlparse
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        raise ProviderConfigError(
+            "INSURANCE_AGENT_WEKNORA_URL=%r is not a valid endpoint "
+            "(http/https scheme + host required) — refusing to "
+            "construct (RV-P2-01 fail fast)" % url[:60])
+
+
 def pg_registry() -> tuple:
     """(SourceRegistry, KnowledgeRegistryStore) from PostgreSQL — the
     authoritative registry in strict modes. Fail closed on ANY driver/
@@ -226,6 +250,10 @@ class KnowledgeService:
                 "mode %s requires the real WeKnora provider (%s=%r is "
                 "not weknora) — mock knowledge is FORBIDDEN (HG-24-03, "
                 "fail closed)" % (mode, PROVIDER_ENV, name))
+        if strict and name == "weknora":
+            # RV-P2-01: complete WeKnora configuration is a STARTUP
+            # requirement in strict modes, not a first-search surprise
+            _validate_weknora_config()
         if provider is not None:
             self.provider = provider
         elif injected_provider() is not None:
