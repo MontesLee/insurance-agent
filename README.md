@@ -133,7 +133,7 @@ export INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID=<kb-id>
 | Security (auth, RBAC, PII, encryption, retention) | **Real** |
 | Product catalog | **Demo** (12 fictional products) |
 | LLM provider | **Not validated** (R-05 gate BLOCKED) |
-| Production database | **Not implemented** (JSON/JSONL) |
+| PostgreSQL persistence + knowledge registry | **Real** (strict modes: authoritative, fail-closed) |
 | Multi-tenant / public deployment | **Not implemented** |
 
 → Full audit: [docs/portfolio/REAL_VS_DEMO.md](docs/portfolio/REAL_VS_DEMO.md)
@@ -204,14 +204,15 @@ check → DENY. Unknown license → DENY. Wrong jurisdiction → DENY.
 
 - Product catalog is **demo** (12 fictional products)
 - No real customer deployment
-- No production database (JSON/JSONL + FileLock)
+- No production-scale database deployment (PostgreSQL layer implemented
+  and verified; single-node dev instance only)
 - No production-scale benchmark (single dev box)
 - LLM cost not measured (deterministic path: 0 LLM calls)
 - WeKnora lacks governance metadata → agent-side registry required
 - Event log lacks cryptographic chaining (P2 technical debt)
-- No solution direction for life/R4 in the current model
 - R-05 provider-policy still BLOCKED (operator verification pending)
-- 7 P2 + 4 P3 findings documented, none blocking
+- 3 P2 + 3 P3 findings documented, none blocking
+  (F-16 and F-24 closed in Phase 24)
 
 → Full list: [docs/portfolio/LIMITATIONS.md](docs/portfolio/LIMITATIONS.md)
 

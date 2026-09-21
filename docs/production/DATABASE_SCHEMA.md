@@ -119,7 +119,7 @@ CREATE INDEX idx_approvals_org ON approvals(org_id);
 CREATE INDEX idx_approvals_status ON approvals(status);
 ```
 
-### knowledge_sources (from JSON registry files)
+### knowledge_sources / knowledge_versions / knowledge_chunks / knowledge_registry_events (Phase 24A authoritative knowledge registry)
 
 ```sql
 CREATE TABLE knowledge_sources (
@@ -127,11 +127,14 @@ CREATE TABLE knowledge_sources (
     source_name     VARCHAR(200),
     source_type     VARCHAR(50) NOT NULL,
     publisher       VARCHAR(200),
-    authority_level CHAR(1) NOT NULL,
-    jurisdiction    VARCHAR(10) NOT NULL,
-    license_status  VARCHAR(20) NOT NULL,
+    authority_level CHAR(1) NOT NULL,          -- S/A/B/C/D
+    jurisdiction    VARCHAR(10) NOT NULL,      -- CN | CN-<REGION>
+    license_status  VARCHAR(20) NOT NULL,      -- ALLOWED|RESTRICTED|UNKNOWN
     canonical_uri   VARCHAR(500),
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    scope           VARCHAR(20) NOT NULL DEFAULT 'GLOBAL',  -- GLOBAL|TENANT|PRIVATE
+    document_hash   VARCHAR(64),               -- ingestion anchor
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE knowledge_versions (
@@ -141,12 +144,41 @@ CREATE TABLE knowledge_versions (
     version         VARCHAR(50) NOT NULL,
     effective_from  DATE NOT NULL,
     effective_to    DATE,
-    status          VARCHAR(20) DEFAULT 'ACTIVE',
+    status          VARCHAR(20) NOT NULL DEFAULT 'DISCOVERED',
+    -- lifecycle: DISCOVERED→INGESTED→REGISTERED→VALIDATED→ACTIVE;
+    --             REJECTED/EXPIRED/SUPERSEDED/INVALID/RETIRED
     license_status  VARCHAR(20) NOT NULL,
-    content_hashes  JSONB NOT NULL,
+    superseded_by   VARCHAR(200),
+    version_hash    VARCHAR(64),               -- sha256(ordered chunk hashes)
+    content_hashes  JSONB NOT NULL DEFAULT '{}',
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX idx_kv_document_active ON knowledge_versions(document_id)
+    WHERE status = 'ACTIVE';
+
+CREATE TABLE knowledge_chunks (               -- canonical contents (F-24)
+    chunk_id        VARCHAR(100) PRIMARY KEY,
+    version_id      VARCHAR(200) NOT NULL REFERENCES knowledge_versions(version_id),
+    chunk_index     INTEGER NOT NULL,
+    content         TEXT NOT NULL,
+    content_hash    VARCHAR(64) NOT NULL,      -- sha256(content)
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE knowledge_registry_events (      -- lifecycle audit (operator domain)
+    event_id    BIGSERIAL PRIMARY KEY,
+    version_id  VARCHAR(200),
+    event_type  VARCHAR(50) NOT NULL,
+    payload     JSONB NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 ```
+
+Migration from the Phase 22A shape is idempotent
+(`ALTER TABLE ... ADD COLUMN IF NOT EXISTS` in
+`knowledge/governance/pg_registry.py: KNOWLEDGE_MIGRATION`). Details:
+[KNOWLEDGE_REGISTRY.md](KNOWLEDGE_REGISTRY.md).
 
 ## Schema Design Principles
 

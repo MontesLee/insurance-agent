@@ -29,6 +29,16 @@ STATUS_EXPIRED = "EXPIRED"
 STATUS_FUTURE = "FUTURE"
 STATUS_UNKNOWN = "UNKNOWN"
 
+# Registration lifecycle (Phase 24 §14) — REGISTRATION state of a
+# version, distinct from the window status above. Only ACTIVE versions
+# may ground evidence; everything else fails closed (governance R2).
+REGISTRATION_STATES = (
+    "ACTIVE", "RETIRED",
+    "DISCOVERED", "INGESTED", "REGISTERED", "VALIDATED",
+    "REJECTED", "EXPIRED", "SUPERSEDED", "INVALID",
+)
+ELIGIBLE_REGISTRATION = "ACTIVE"
+
 
 class RegistryError(Exception):
     """Malformed registry — fail-closed at LOAD time, never at query

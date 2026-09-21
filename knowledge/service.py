@@ -70,15 +70,79 @@ def mock_registry() -> SourceRegistry:
 
 
 REGISTRY_ENV = "INSURANCE_AGENT_KNOWLEDGE_REGISTRY"
+REGISTRY_BACKEND_ENV = "INSURANCE_AGENT_KNOWLEDGE_REGISTRY_BACKEND"
+BACKEND_JSON = "json"
+BACKEND_POSTGRES = "postgres"
+
+
+def _runtime_mode():
+    """(mode, is_strict). Lazy import — the knowledge layer must not
+    import runtime at module load (runtime imports knowledge)."""
+    from runtime import mode as rt_mode
+    return rt_mode.mode(), rt_mode.is_strict()
+
+
+def resolve_registry_backend() -> str:
+    """Registry-of-record backend. STRICT modes: PostgreSQL REQUIRED
+    (HG-24-02) — a JSON file override is refused, not silently honored.
+    Non-strict: JSON default (back-compat), PG opt-in via env."""
+    explicit = os.environ.get(REGISTRY_BACKEND_ENV, "").strip().lower()
+    if explicit and explicit not in (BACKEND_JSON, BACKEND_POSTGRES):
+        raise ProviderConfigError(
+            "%s=%r unsupported (json|postgres)" % (REGISTRY_BACKEND_ENV,
+                                                   explicit))
+    mode, strict = _runtime_mode()
+    if strict:
+        if explicit == BACKEND_JSON:
+            raise ProviderConfigError(
+                "registry backend json is FORBIDDEN in mode %s — "
+                "PostgreSQL is the authoritative registry (HG-24-02)"
+                % mode)
+        if os.environ.get(REGISTRY_ENV, "").strip():
+            raise ProviderConfigError(
+                "%s (registry file override) is FORBIDDEN in mode %s — "
+                "the PostgreSQL registry is authoritative (HG-24-02)"
+                % (REGISTRY_ENV, mode))
+        return BACKEND_POSTGRES
+    return explicit or BACKEND_JSON
+
+
+def pg_registry() -> tuple:
+    """(SourceRegistry, KnowledgeRegistryStore) from PostgreSQL — the
+    authoritative registry in strict modes. Fail closed on ANY driver/
+    connectivity/schema failure (never falls back to JSON)."""
+    from knowledge.governance.pg_registry import KnowledgeRegistryStore
+    try:
+        from runtime.state.pg import PostgresStore
+        store = PostgresStore()
+        krs = KnowledgeRegistryStore(store.connect)
+        registry = krs.load_registry()
+    except ProviderConfigError:
+        raise
+    except Exception as e:  # noqa: BLE001 — driver/connect/schema failure
+        raise ProviderConfigError(
+            "PostgreSQL knowledge registry unavailable: %s — refusing to "
+            "fall back (fail closed)" % str(e)[:160])
+    if not registry.entries:
+        raise ProviderConfigError(
+            "PostgreSQL knowledge registry is EMPTY — no knowledge can "
+            "ground decisions; refusing to continue (fail closed)")
+    return registry, krs
 
 
 def default_registry() -> SourceRegistry:
     """The registry of record for the DEFAULT service composition.
 
+    Strict modes (CONTROLLED_PILOT/PRODUCTION): PostgreSQL — the
+    authoritative governance registry (Phase 24A). Non-strict:
     INSURANCE_AGENT_KNOWLEDGE_REGISTRY may point at a projection
     registry file (Phase 18: the WeKnora projection — same governance
-    metadata, WeKnora-chunking hashes). Unset → the agent-chunker
-    mock registry (unchanged default)."""
+    metadata, WeKnora-chunking hashes); unset → the agent-chunker mock
+    registry (unchanged default)."""
+    backend = resolve_registry_backend()
+    if backend == BACKEND_POSTGRES:
+        registry, _ = pg_registry()
+        return registry
     path = os.environ.get(REGISTRY_ENV, "").strip()
     if path:
         if not os.path.isfile(path):
@@ -146,6 +210,22 @@ class KnowledgeService:
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
         from knowledge.provider import injected_provider
         self._registry = registry
+        # Phase 24C (HG-24-03): in STRICT modes the knowledge provider
+        # is the REAL WeKnora service — decide the provider NAME first
+        # and refuse mock (or unconfigured weknora) BEFORE touching the
+        # registry, so the failure carries the policy reason.
+        mode, strict = _runtime_mode()
+        name = (getattr(provider, "name", None)
+                if provider is not None
+                else (getattr(injected_provider(), "name", None)
+                      if injected_provider() is not None
+                      else os.environ.get(PROVIDER_ENV,
+                                          DEFAULT_PROVIDER_NAME)))
+        if strict and name != "weknora":
+            raise ProviderConfigError(
+                "mode %s requires the real WeKnora provider (%s=%r is "
+                "not weknora) — mock knowledge is FORBIDDEN (HG-24-03, "
+                "fail closed)" % (mode, PROVIDER_ENV, name))
         if provider is not None:
             self.provider = provider
         elif injected_provider() is not None:
@@ -155,7 +235,6 @@ class KnowledgeService:
         else:
             # composition boundary: env-selected provider; the default
             # mock receives the registry projection stamps
-            name = os.environ.get(PROVIDER_ENV, DEFAULT_PROVIDER_NAME)
             if name == DEFAULT_PROVIDER_NAME:
                 self.provider = MockKnowledgeProvider(
                     stamps=self.registry().provider_stamps())
@@ -167,6 +246,10 @@ class KnowledgeService:
                 # the real WeKnora chunking) — selected via
                 # INSURANCE_AGENT_KNOWLEDGE_REGISTRY. Stamps are the same
                 # data PROJECTION the mock uses; governance re-verifies.
+                # Phase 24C/F-24: with the PostgreSQL registry backend the
+                # provider additionally receives the canonical chunk
+                # CONTENTS for deterministic re-anchoring of search
+                # windows.
                 from knowledge.provider.weknora import (
                     WeKnoraLiveProvider, WeKnoraLiveTransport)
                 url = os.environ["INSURANCE_AGENT_WEKNORA_URL"].strip()
@@ -181,10 +264,17 @@ class KnowledgeService:
                         "INSURANCE_AGENT_WEKNORA_API_KEY and "
                         "INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID — "
                         "refusing to guess (fail closed)")
+                content_map = None
+                if (self._registry is None
+                        and resolve_registry_backend() == BACKEND_POSTGRES):
+                    _reg, krs = pg_registry()
+                    self._registry = _reg
+                    content_map = krs.content_map(only_active=True)
                 self.provider = WeKnoraLiveProvider(
                     transport=WeKnoraLiveTransport(url, key),
                     kb_id=kb,
-                    stamps=self.registry().provider_stamps())
+                    stamps=self.registry().provider_stamps(),
+                    content_map=content_map)
             else:
                 # weknora seam (or future): stamps come from the backend's
                 # own metadata; unknown names fail closed HERE

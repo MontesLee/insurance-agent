@@ -133,7 +133,7 @@ export INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID=<kb-id>
 | 安全（认证、RBAC、PII、加密、保留） | **真实** |
 | 产品目录 | **Demo**（12 个虚构产品） |
 | LLM provider | **未验证**（R-05 门 BLOCKED） |
-| 生产数据库 | **未实现**（JSON/JSONL） |
+| PostgreSQL 持久化 + 知识注册表 | **真实**（严格模式：权威存储，fail-closed） |
 | 多租户 / 公网部署 | **未实现** |
 
 → 完整审计：[docs/portfolio/REAL_VS_DEMO.md](docs/portfolio/REAL_VS_DEMO.md)
@@ -203,14 +203,14 @@ DENY。授权未知 → DENY。管辖错误 → DENY。
 
 - 产品目录是 **demo**（12 个虚构产品）
 - 没有真实客户部署
-- 没有生产数据库（JSON/JSONL + FileLock）
+- 没有生产规模数据库部署（PostgreSQL 层已实现并验证；仅单节点开发实例）
 - 没有生产规模 benchmark（单台开发机）
 - LLM 成本未度量（确定性路径：0 次 LLM 调用）
 - WeKnora 缺少治理元数据 → 需要 Agent 侧 registry
 - 事件日志缺少密码学链（P2 技术债）
-- 当前模型没有 life/R4 的方案方向
 - R-05 provider 政策仍 BLOCKED（等待运维验证）
-- 7 项 P2 + 4 项 P3 发现已记录，均不阻塞
+- 3 项 P2 + 3 项 P3 发现已记录，均不阻塞
+  （F-16 与 F-24 已在 Phase 24 关闭）
 
 → 完整清单：[docs/portfolio/LIMITATIONS.md](docs/portfolio/LIMITATIONS.md)
 

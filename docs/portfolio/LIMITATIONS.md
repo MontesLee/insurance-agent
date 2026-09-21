@@ -12,6 +12,12 @@ F-28 (GLM usage parsing — adapter fixed).
 
 ### F-09 — Risk/Gap/Solution evidence_refs convention
 
+> **2026-09-21 (Phase 24)**: still DEFERRED — adding evidence_refs to
+> the Risk artifact is an artifact-contract change (schema + engine +
+> evals), orthogonal to the Phase 24 knowledge-productionization goal.
+> Knowledge-side grounding is complete; the artifact-side convention
+> remains future work.
+
 **Finding**: The evidence_refs convention exists only for
 Recommendation artifacts. Risk, Gap, and Solution artifacts don't
 declare their evidence dependencies.
@@ -32,6 +38,20 @@ analysis artifacts + corresponding eval invariants.
 ---
 
 ### F-16 — Gap-engine routes life/R4 to savings instead of life
+
+> **2026-09-21 (Phase 24D) — CLOSED, NOT REPRODUCIBLE.** The finding
+> does not reproduce against the actual engines:
+> `risk_category_to_domain` maps R4→life (original commit 0459f00,
+> never modified) and `solution-mapping.rules.json` maps life→
+> TERM_LIFE. End-to-end R4 → gap domain "life" → direction
+> "建立定期寿险…" → solution TERM_LIFE verified on the real engines,
+> including the multi-requirement case the finding described. The
+> Phase 24D matrix (tests/runtime/test_p24_f16_routing.py, 47 checks)
+> freezes the full routing table — single domains, combinations,
+> multi-demand, unknown and conflicting categories, and a
+> free-text-cannot-move-routing case — so a regression cannot silently
+> reintroduce cross-domain routing. The original description below is
+> retained as the historical record.
 
 **Finding**: `life → TERM_LIFE` mapping EXISTS in
 `solution-mapping.rules.json` (line 9), but the gap engine's domain
@@ -133,6 +153,20 @@ the artifact.
 ---
 
 ### F-24 — Multi-chunk hash mismatch (search vs chunks API)
+
+> **2026-09-21 (Phase 24C) — CLOSED.** Root cause characterized live:
+> WeKnora search returns a WINDOW over the original document anchored
+> at the hit's chunk (chunks have overlapping boundaries), so raw
+> window text cannot hash to the registered chunk hash — identity was
+> always correct (hit.id = registered canonical chunk_id). Fix: with
+> the PostgreSQL registry the provider re-anchors aligned windows to
+> the CANONICAL REGISTERED CHUNK (exact whitespace-normalized prefix
+> rule, no fuzzy matching; raw window preserved in metadata for
+> audit); unalignable windows still fail closed on HASH_MISMATCH.
+> Verified live on the 78-chunk pilot regulation: without re-anchoring
+> the span windows DENY, with it they ALLOW and pass full provenance
+> (tests/runtime/test_p24_live_eval.py). The original description
+> below is retained as the historical record.
 
 **Finding**: For multi-chunk documents, the WeKnora search response
 content may differ from the chunks-API content (sub-chunk vs

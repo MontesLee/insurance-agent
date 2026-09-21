@@ -230,6 +230,58 @@ class WeKnoraLiveTransport:
                 "WeKnora success!=true: %s" % str(reason)[:120])
         return doc
 
+    def health(self) -> bool:
+        """Reachability ONLY (Phase 24 §27): ANY HTTP answer — including
+        401/404/403 — proves the service is up and answering. Only
+        connection-level failures (refused/timeout/DNS) are unhealthy.
+        This proves NOTHING about retrieval correctness (that is the
+        governance/evidence/provenance path's job)."""
+        req = _urlreq.Request(
+            self.base_url + "/api/v1/health",
+            headers={"X-API-Key": self.api_key}, method="GET")
+        try:
+            with _urlreq.urlopen(req, timeout=min(self.timeout, 5.0)):
+                return True
+        except _urlerr.HTTPError:
+            return True                  # the service answered
+        except Exception:  # noqa: BLE001 — health is a boolean probe
+            return False
+
+
+def _normalized(text: str) -> str:
+    """Deterministic comparison form for window alignment: ALL
+    whitespace removed. This is an exact documented rule, not fuzzy
+    matching (Phase 24 §13)."""
+    return "".join((text or "").split())
+
+
+def reanchor_hit(hit, canonical_content: str) -> None:
+    """F-24 canonical re-anchoring, IN PLACE, deterministic.
+
+    WeKnora search returns a WINDOW over the original document that
+    starts at the hit's anchor chunk and may span further chunks with
+    overlapping boundaries — so the raw window text can never hash to
+    the registered chunk hash. The canonical identity is hit.chunk_id
+    (verified registered); when the window provably starts at that
+    chunk's boundary (whitespace-normalized prefix rule), the hit's
+    content becomes the CANONICAL REGISTERED CHUNK — the unit the
+    registry hash-anchors — and the raw window is preserved verbatim
+    in metadata for audit. Windows that cannot be aligned are left
+    UNTOUCHED: governance then denies them on HASH_MISMATCH (fail
+    closed; never guessed)."""
+    canonical = canonical_content or ""
+    if not canonical:
+        return
+    if hit.content_hash and hit.content == canonical:
+        return                                    # already canonical
+    if _normalized(hit.content).startswith(_normalized(canonical)):
+        hit.metadata = dict(hit.metadata or {})
+        hit.metadata["search_window"] = hit.content
+        hit.metadata["window_aligned"] = True
+        hit.metadata["canonical_chunk_id"] = hit.chunk_id
+        hit.content = canonical
+        hit.content_hash = KnowledgeHit.hash_content(canonical)
+
 
 def map_live_response(raw, query, stamps=None):
     """Real response -> candidate KnowledgeHits (pre-scoring). Document
@@ -315,11 +367,17 @@ class WeKnoraLiveProvider:
 
     name = "weknora"
 
-    def __init__(self, transport, kb_id, stamps=None, rules=None):
+    def __init__(self, transport, kb_id, stamps=None, rules=None,
+                 content_map=None):
         self._transport = transport
         self._kb_id = kb_id
         self._stamps = stamps or {}
         self._rules = rules if rules is not None else _load_live_rules()
+        # Phase 24 F-24: {document_id: {chunk_id: canonical content}}
+        # from the authoritative registry (PostgreSQL backend). Absent
+        # (None or empty) → no re-anchoring; multi-chunk windows keep
+        # failing on HASH_MISMATCH (the documented Phase-18 behavior).
+        self._content_map = content_map or {}
 
     def search(self, query, filters=None, top_k=None):
         from knowledge.rag.engine import SparseRetriever, DefaultReranker
@@ -327,6 +385,12 @@ class WeKnoraLiveProvider:
         raw = self._transport({"query": query, "kb_id": self._kb_id,
                                "top_k": top_k or 20})
         candidates = map_live_response(raw, query, self._stamps)
+        if self._content_map:
+            for c in candidates:
+                canon = self._content_map.get(c.document_id, {}).get(
+                    c.chunk_id)
+                if canon is not None:
+                    reanchor_hit(c, canon)
         meta = {"provider": self.name, "retrieval_method": "sparse_rrf",
                 "backend": "weknora", "backend_hits": len(candidates)}
         if not candidates:

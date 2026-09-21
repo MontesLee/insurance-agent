@@ -27,7 +27,8 @@ import json
 import os
 from typing import Optional
 
-from .model import (AUTHORITY_LEVELS, LICENSE_STATUSES, RegistryError)
+from .model import (AUTHORITY_LEVELS, LICENSE_STATUSES, REGISTRATION_STATES,
+                    RegistryError)
 
 
 def _valid_date(s) -> bool:
@@ -82,7 +83,7 @@ class SourceRegistry:
             raise RegistryError(
                 "entry %s: effective_to before effective_from"
                 % e["document_id"])
-        if e.get("status", "ACTIVE") not in ("ACTIVE", "RETIRED"):
+        if e.get("status", "ACTIVE") not in REGISTRATION_STATES:
             raise RegistryError("entry %s: bad status" % e["document_id"])
         hashes = e.get("content_hashes")
         if not isinstance(hashes, dict) or not hashes:
@@ -143,6 +144,20 @@ class SourceRegistry:
                     or as_of <= e["effective_to"]):
                 return e
         return None
+
+    def concurrent_versions(self, source_id: str, as_of: str) -> list:
+        """ACTIVE version_ids of one source whose effective windows
+        cover as_of. More than one = ambiguous currency (Phase 24 §21):
+        callers must fail closed, never pick by version-string order."""
+        out = []
+        for e in self.versions_of(source_id):
+            if e.get("status", "ACTIVE") != "ACTIVE":
+                continue
+            if e["effective_from"] <= as_of and (
+                    e.get("effective_to") is None
+                    or as_of <= e["effective_to"]):
+                out.append("%s@%s" % (e["source_id"], e["version"]))
+        return out
 
     def provider_stamps(self) -> dict:
         """Metadata PROJECTION for providers (the WeKnora upload model):

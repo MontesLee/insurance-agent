@@ -59,9 +59,24 @@ def validate_hit(hit: Any, ctx: QueryContext,
         reasons.append("REGISTRY_MISS:%s" % getattr(hit, "document_id", ""))
         return GovernanceDecision(False, STATUS_UNKNOWN, reasons, None)
 
-    # R2 lifecycle
-    if entry.get("status", "ACTIVE") == "RETIRED":
+    # R2 lifecycle — only an ACTIVE registration may ground evidence;
+    # pre-activation states (DISCOVERED/INGESTED/REGISTERED/VALIDATED)
+    # and anomaly states (REJECTED/EXPIRED/SUPERSEDED/INVALID) fail
+    # closed with the state visible in the reason (Phase 24 §14/§20)
+    reg_state = entry.get("status", "ACTIVE")
+    if reg_state == "RETIRED":
         reasons.append("SOURCE_RETIRED")
+    elif reg_state != "ACTIVE":
+        reasons.append("SOURCE_NOT_ACTIVE:%s" % reg_state)
+
+    # R2b version currency — if the registry holds MORE THAN ONE active
+    # version of this source covering as_of, the current version is
+    # ambiguous and must not ground a decision (never resolved by
+    # version-string ordering — Phase 24 §21)
+    if reg_state == "ACTIVE" and len(
+            registry.concurrent_versions(entry["source_id"],
+                                         ctx.as_of)) > 1:
+        reasons.append("VERSION_AMBIGUOUS")
 
     # R3 version identity — which version of the source is this hit?
     hit_version = getattr(hit, "version_id", "") or ""
