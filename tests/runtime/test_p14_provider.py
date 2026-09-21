@@ -296,11 +296,10 @@ def test_s5_ask_isolation_and_boundaries(c: Checks):
     c.chk("C07: adapter source defines no LLM-answer entry point",
           "def ask" not in src and "def chat" not in src
           and "def react" not in src and "def answer" not in src)
-    c.chk("C07: adapter performs no network I/O in 14.1 (no client "
-          "imports)",
+    c.chk("C07: adapter SEAM performs no network I/O (live transport "
+          "is a separate Phase-18 class)",
           "import requests" not in src and "import httpx" not in src
-          and "import urllib" not in src and "import mcp" not in src
-          and "from mcp" not in src
+          and "import mcp" not in src and "from mcp" not in src
           and "from requests" not in src and "from httpx" not in src)
 
     # boundary direction: the provider package never imports runtime

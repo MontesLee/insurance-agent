@@ -355,10 +355,15 @@ def test_static_architecture_scan(c: Checks):
     c.chk("SCAN: no WeKnora client / Docker / DB dependencies on the "
           "runtime knowledge paths", http_offenders == [],
           http_offenders)
-    wk = read(os.path.join("knowledge", "provider", "weknora.py"))
-    c.chk("SCAN: weknora adapter still transport-injected only "
-          "(no client import)", "import urllib" not in wk
-          and "import requests" not in wk and "import httpx" not in wk)
+    import inspect as _insp
+    seam = _insp.getsource(
+        __import__("knowledge.provider.weknora",
+                   fromlist=["WeKnoraKnowledgeProvider"]
+                   ).WeKnoraKnowledgeProvider)
+    c.chk("SCAN: weknora SEAM still transport-injected (live transport "
+          "is a separate Phase-18 class)",
+          "import urllib" not in seam
+          and "import requests" not in seam and "import httpx" not in seam)
 
 
 def main():

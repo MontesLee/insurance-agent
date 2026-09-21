@@ -106,9 +106,11 @@ def test_static_audit(c: Checks):
         for p in paths:
             body = open(p, encoding="utf-8").read()
             rel = os.path.relpath(p, REPO)
+            # Phase 18: the LIVE transport (urllib to a LOCAL
+            # loopback WeKnora) is legitimate; scan for ONLINE/DB/
+            # container clients only
             for tok in ("import requests", "import httpx",
-                        "import urllib", "import docker", "psycopg",
-                        "redis"):
+                        "import docker", "psycopg", "redis"):
                 if tok in body:
                     offenders.append("%s:%s" % (rel, tok))
             if "docker" in body.lower() and "weknora" not in rel:

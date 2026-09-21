@@ -195,9 +195,12 @@ def test_w3_ask_isolation_evidence(c: Checks):
     c.chk("W3: adapter source builds no ask/chat/react endpoint",
           "def ask" not in src and "def chat" not in src
           and "def react" not in src and "def answer" not in src)
-    c.chk("W3: no network client in the adapter module",
-          "import requests" not in src and "import httpx" not in src
-          and "import urllib" not in src and "import mcp" not in src)
+    seam = inspect.getsource(
+        sys.modules["knowledge.provider.weknora"].WeKnoraKnowledgeProvider)
+    c.chk("W3: no network client in the SEAM class (Phase 18 live "
+          "transport is a separate class)",
+          "import requests" not in seam and "import httpx" not in seam
+          and "import urllib" not in seam and "import mcp" not in seam)
 
 
 # ------------------------------------------------------------------ #

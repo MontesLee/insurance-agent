@@ -33,7 +33,9 @@ URL_ENV = "INSURANCE_AGENT_WEKNORA_URL"
 KEY_ENV = "INSURANCE_AGENT_WEKNORA_API_KEY"
 KB_ENV = "INSURANCE_AGENT_WEKNORA_KB_ID"
 PATH_ENV = "INSURANCE_AGENT_WEKNORA_SEARCH_PATH"
-DEFAULT_SEARCH_PATH = "/api/knowledge/search"   # ASSUMPTION — pin live
+# Phase 18: the REAL endpoint is pinned from the live environment
+# (verified 2026-09-20): POST /api/v1/knowledge-search, X-API-Key auth.
+DEFAULT_SEARCH_PATH = "/api/v1/knowledge-search"
 
 SECTIONS = []
 
@@ -51,10 +53,13 @@ def make_transport(url: str, api_key: str, search_path: str):
     def transport(payload: dict) -> dict:
         req = urllib.request.Request(
             url.rstrip("/") + search_path,
-            data=json.dumps(payload).encode("utf-8"),
+            data=json.dumps({"query": payload.get("query", ""),
+                             "knowledge_base_id":
+                                 payload.get("kb_id",
+                                             payload.get("kb_id", ""))},
+                            ensure_ascii=False).encode("utf-8"),
             headers={"Content-Type": "application/json",
-                     **({"Authorization": "Bearer " + api_key}
-                        if api_key else {})},
+                     **({"X-API-Key": api_key} if api_key else {})},
             method="POST")
         with urllib.request.urlopen(req, timeout=15) as resp:
             return json.loads(resp.read().decode("utf-8"))

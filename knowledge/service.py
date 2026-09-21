@@ -59,14 +59,35 @@ def _skill_fixtures_kb() -> str:
                         "evals", "fixtures", "kb")
 
 
-def default_registry() -> SourceRegistry:
+def mock_registry() -> SourceRegistry:
     """Registry over the project-owned synthetic KBs (fixtures + gov
-    fixtures). Deterministic; hashes computed with the existing
-    chunker so they always match what retrieval returns."""
+    fixtures) with AGENT-CHUNKER hashes — the registry that pairs with
+    the MOCK provider (same chunker). Deterministic."""
     a = SourceRegistry.from_kb(_skill_fixtures_kb(), _FIXTURES_TABLE)
     b = SourceRegistry.from_kb(os.path.join(_GOV_FIXTURES, "kb"),
                                _GOV_TABLE)
     return SourceRegistry(a.entries + b.entries)
+
+
+REGISTRY_ENV = "INSURANCE_AGENT_KNOWLEDGE_REGISTRY"
+
+
+def default_registry() -> SourceRegistry:
+    """The registry of record for the DEFAULT service composition.
+
+    INSURANCE_AGENT_KNOWLEDGE_REGISTRY may point at a projection
+    registry file (Phase 18: the WeKnora projection — same governance
+    metadata, WeKnora-chunking hashes). Unset → the agent-chunker
+    mock registry (unchanged default)."""
+    path = os.environ.get(REGISTRY_ENV, "").strip()
+    if path:
+        if not os.path.isfile(path):
+            from knowledge.provider import ProviderConfigError
+            raise ProviderConfigError(
+                "%s=%s points at a missing registry file — refusing to "
+                "fall back (fail closed)" % (REGISTRY_ENV, path))
+        return SourceRegistry.from_json(path)
+    return mock_registry()
 
 
 _KB_REGISTRY_CACHE: dict = {}
@@ -138,8 +159,34 @@ class KnowledgeService:
             if name == DEFAULT_PROVIDER_NAME:
                 self.provider = MockKnowledgeProvider(
                     stamps=self.registry().provider_stamps())
+            elif name == "weknora" and os.environ.get(
+                    "INSURANCE_AGENT_WEKNORA_URL", "").strip():
+                # Phase 18 LIVE composition: real HTTP transport; the
+                # registry of record is the WeKnora PROJECTION (governance
+                # metadata from the agent registries, chunk hashes from
+                # the real WeKnora chunking) — selected via
+                # INSURANCE_AGENT_KNOWLEDGE_REGISTRY. Stamps are the same
+                # data PROJECTION the mock uses; governance re-verifies.
+                from knowledge.provider.weknora import (
+                    WeKnoraLiveProvider, WeKnoraLiveTransport)
+                url = os.environ["INSURANCE_AGENT_WEKNORA_URL"].strip()
+                key = os.environ.get("INSURANCE_AGENT_WEKNORA_API_KEY",
+                                     "").strip()
+                kb = os.environ.get(
+                    "INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID",
+                    "").strip()
+                if not key or not kb:
+                    raise ProviderConfigError(
+                        "weknora live provider requires "
+                        "INSURANCE_AGENT_WEKNORA_API_KEY and "
+                        "INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID — "
+                        "refusing to guess (fail closed)")
+                self.provider = WeKnoraLiveProvider(
+                    transport=WeKnoraLiveTransport(url, key),
+                    kb_id=kb,
+                    stamps=self.registry().provider_stamps())
             else:
-                # weknora (or future): stamps come from the backend's
+                # weknora seam (or future): stamps come from the backend's
                 # own metadata; unknown names fail closed HERE
                 self.provider = build_named_provider(name)
 

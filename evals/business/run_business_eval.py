@@ -27,7 +27,8 @@ from runtime import orchestrator as orch  # noqa: E402
 from knowledge.governance import SourceRegistry, validate_decision_provenance  # noqa: E402
 from knowledge.provider import MockKnowledgeProvider  # noqa: E402
 from knowledge.service import (KnowledgeService, default_registry,  # noqa: E402
-                               reset_default_service, set_default_service)
+                               mock_registry, reset_default_service,
+                               set_default_service)
 
 FIXTURE = os.path.join(REPO, "tests", "e2e", "fixtures",
                        "case-full-chain.json")
@@ -107,7 +108,12 @@ def build_seeds(case):
 
 
 def registry_mutation_service(mutation):
-    reg = default_registry()
+    # The mutation service pairs a MOCK provider with the agent-chunker
+    # registry — regardless of the default backend — so its hashes must
+    # come from mock_registry() (the mock's chunker), not from a WeKnora
+    # projection (Phase 18: default_registry may point at the live
+    # projection whose WeKnora chunk ids would never match mock chunking).
+    reg = mock_registry()
     entries = copy.deepcopy(reg.entries)
     if mutation["op"] == "expire_all":
         for e in entries:
@@ -250,11 +256,16 @@ def structural_checks(state, seeds, case):
     if pr.get("candidate_id") and adm and \
             pr["candidate_id"] not in adm:
         v.append(("HG-B12", "primary recommendation not admissible"))
-    # I7 / HG-B06 / HG-B07 — evidence binding + provenance validity
+    # I7 / HG-B06 / HG-B07 — evidence binding + provenance validity.
+    # The registry of record is whatever the ACTIVE service composition
+    # uses (mock registry in mock mode; the WeKnora projection in live
+    # mode — Phase 18), fetched lazily so tests that inject services
+    # still validate against the deployment's registry.
     if rec:
+        from knowledge.service import default_service
         index = {e.get("evidence_id"): e for e in evidence}
         ok, why = validate_business_decision(
-            rec, index, default_registry(),
+            rec, index, default_service().registry(),
             require_evidence=(rec.get("status") == "COMPLETE"))
         if not ok and rec.get("status") == "COMPLETE":
             v.append(("HG-B07", "COMPLETE recommendation with invalid "

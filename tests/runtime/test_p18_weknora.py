@@ -106,7 +106,11 @@ def registry_matched_transport(payload):
 # ------------------------------------------------------------------ #
 @section
 def test_w1_seam_audit(c: Checks):
-    src = inspect.getsource(sys.modules["knowledge.provider.weknora"])
+    # scope to the SEAM class only: Phase 18 adds a legitimate LIVE
+    # transport (separate class, urllib) — the seam contract itself
+    # (WeKnoraKnowledgeProvider, injected transport) must stay clean
+    src = inspect.getsource(
+        sys.modules["knowledge.provider.weknora"].WeKnoraKnowledgeProvider)
     for banned in ("def ask", "def chat", "def react", "def answer",
                    "def agent", "def llm"):
         c.chk("W1: adapter exposes no %s path" % banned.strip("def "),

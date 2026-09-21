@@ -1,0 +1,104 @@
+[
+ {
+  "document_id": "06_claims",
+  "source_id": "fixtures-claims",
+  "source_name": "合成理赔知识(项目自有测试语料)",
+  "source_type": "internal",
+  "authority_level": "B",
+  "jurisdiction": "CN",
+  "version": "1",
+  "effective_from": "2023-01-01",
+  "effective_to": null,
+  "status": "ACTIVE",
+  "license_status": "ALLOWED",
+  "canonical_uri": "synthetic://fixtures/kb/06_claims",
+  "content_hashes": {
+   "bc04b8c0-9a47-497e-a05a-3bbebaa9e407": "1df50a04a7adde755be17235274d3cead039d6ec7514b2a8ad6c54d706998207"
+  }
+ },
+ {
+  "document_id": "05_health_underwriting",
+  "source_id": "fixtures-health-underwriting",
+  "source_name": "合成健康告知与核保知识(项目自有测试语料)",
+  "source_type": "internal",
+  "authority_level": "B",
+  "jurisdiction": "CN",
+  "version": "1",
+  "effective_from": "2023-01-01",
+  "effective_to": null,
+  "status": "ACTIVE",
+  "license_status": "ALLOWED",
+  "canonical_uri": "synthetic://fixtures/kb/05_health_underwriting",
+  "content_hashes": {
+   "d647aa5f-5be1-471b-a249-5aa97f8a4893": "2b4a8f8693b89c61ea2d666f5d8187d82d37e2c3a92baaad614cdd5ec9abcd8e"
+  }
+ },
+ {
+  "document_id": "04_life_insurance",
+  "source_id": "fixtures-life-insurance",
+  "source_name": "合成寿险基础知识(项目自有测试语料)",
+  "source_type": "internal",
+  "authority_level": "B",
+  "jurisdiction": "CN",
+  "version": "1",
+  "effective_from": "2023-01-01",
+  "effective_to": null,
+  "status": "ACTIVE",
+  "license_status": "ALLOWED",
+  "canonical_uri": "synthetic://fixtures/kb/04_life_insurance",
+  "content_hashes": {
+   "433a39ed-493c-4694-94a8-d0c4fa33427f": "33bdbe7e51e96ad726fe58d995a609343e40fbc774aa6f9273d77b75b4ae288e"
+  }
+ },
+ {
+  "document_id": "03_accident_insurance",
+  "source_id": "fixtures-accident-insurance",
+  "source_name": "合成意外险基础知识(项目自有测试语料)",
+  "source_type": "internal",
+  "authority_level": "B",
+  "jurisdiction": "CN",
+  "version": "1",
+  "effective_from": "2023-01-01",
+  "effective_to": null,
+  "status": "ACTIVE",
+  "license_status": "ALLOWED",
+  "canonical_uri": "synthetic://fixtures/kb/03_accident_insurance",
+  "content_hashes": {
+   "c83407e4-77fd-460c-a360-546f6823a18f": "c7009c5057a24b4ea98a43f89dc30e403023744dda01c5c331f32c9baea8177b"
+  }
+ },
+ {
+  "document_id": "02_critical_illness",
+  "source_id": "fixtures-critical-illness",
+  "source_name": "合成重疾险基础知识(项目自有测试语料)",
+  "source_type": "internal",
+  "authority_level": "B",
+  "jurisdiction": "CN",
+  "version": "1",
+  "effective_from": "2023-01-01",
+  "effective_to": null,
+  "status": "ACTIVE",
+  "license_status": "ALLOWED",
+  "canonical_uri": "synthetic://fixtures/kb/02_critical_illness",
+  "content_hashes": {
+   "9b08633a-6f08-42c6-9fe1-1684367d973e": "2416f67b4586c581f1747e1fcb01d474a94f507dbdf59c2fbd659dac64e572fd"
+  }
+ },
+ {
+  "document_id": "01_medical_insurance",
+  "source_id": "fixtures-medical-insurance",
+  "source_name": "合成百万医疗险基础知识(项目自有测试语料)",
+  "source_type": "internal",
+  "authority_level": "B",
+  "jurisdiction": "CN",
+  "version": "1",
+  "effective_from": "2023-01-01",
+  "effective_to": null,
+  "status": "ACTIVE",
+  "license_status": "ALLOWED",
+  "canonical_uri": "synthetic://fixtures/kb/01_medical_insurance",
+  "content_hashes": {
+   "6b0e45fb-766f-4d53-9c69-51f5dd62bdd9": "89fe30257bd0371dd983fef05b37859d1d7393a84fa4fe06def91404a07967ad"
+  }
+ }
+]
