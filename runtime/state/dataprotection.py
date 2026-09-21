@@ -171,6 +171,41 @@ def read_protected(path: str, key: Optional[bytes]) -> Optional[str]:
     return maybe_decrypt_bytes(raw, key).decode("utf-8")
 
 
+# ---- 2b. credential-shaped VALUE detection (Phase 23.5 F-20) ---------------- #
+import re as _re
+
+# Deterministic value-shape patterns for common credential formats.
+# Conservative: only patterns that are virtually never legitimate
+# business text. False-positive-safe by design.
+_CREDENTIAL_VALUE_PATTERNS = [
+    # OpenAI-style: sk- followed by 20+ alphanumeric chars
+    (_re.compile(r'\bsk-[A-Za-z0-9]{20,}'), "[REDACTED_CRED]"),
+    # GitHub-style: ghp_ followed by 30+ chars
+    (_re.compile(r'\bghp_[A-Za-z0-9]{30,}'), "[REDACTED_CRED]"),
+    # Bearer token in text
+    (_re.compile(r'\bBearer\s+[A-Za-z0-9\-_.=]{20,}'), "[REDACTED_CRED]"),
+    # JWT (three base64url segments)
+    (_re.compile(
+        r'\beyJ[A-Za-z0-9\-_]{10,}\.[A-Za-z0-9\-_]{10,}\.[A-Za-z0-9\-_]{5,}'),
+     "[REDACTED_CRED]"),
+    # Private key header
+    (_re.compile(r'-----BEGIN [A-Z ]*PRIVATE KEY-----'), "[REDACTED_CRED]"),
+    # 智谱 GLM API key format: 32hex.16alnum
+    (_re.compile(r'\b[0-9a-f]{32}\.[A-Za-z0-9]{16}\b'), "[REDACTED_CRED]"),
+]
+
+
+def redact_credential_values(text: str) -> str:
+    """Redact credential-shaped VALUES in free text (F-20).
+    Complements the field-name deny-list: this catches secrets
+    embedded in non-sensitive fields (e.g., a GLM key in a 'note').
+    Conservative patterns only — normal IDs, UUIDs, and URLs pass
+    through."""
+    for pattern, replacement in _CREDENTIAL_VALUE_PATTERNS:
+        text = pattern.sub(replacement, text)
+    return text
+
+
 # ---- 3. retention / deletion ------------------------------------------------ #
 def delete_project(harness_root: str, project_id: str,
                     key: Optional[bytes] = None) -> dict:
