@@ -20,6 +20,10 @@ What is NOT being done now, why, and when.
 | RV-P3-02: backup restore verification | pg_dump verified generatable + content-complete; restore never exercised | DR scheduling decision (with automated backup) | P26 |
 | RV-P3-03: document_hash self-check | source-level ingestion anchor is recorded but verified by neither selfcheck nor runtime | Next registry hardening round | P25+ |
 | RV-INFO-01: full compose restart exercise | app-container restart + named-volume static verification done; docker compose down/up not run | Ops window on the dev stack | P25 |
+| F26A-P2-01: queue cancel() auth gate | cancel is operator-authority via DB access only (single-operator pilot acceptable) | Multi-party operation / operator-role integration | P26B |
+| F26A-P3-01: lease-recovery reaper | recovery is pull-based (claims pick up expired leases directly, so nothing blocks); no background timer | Phase 26B worker deployment design | P26B |
+| F26A-P3-02: dead-letter queue | max_attempts-exhausted tasks stay FAILED in-place (queryable) — no separate DLQ surface | Operator tooling round | P26B+ |
+| F26A-INFO-01: idle drain polling | run_until_empty polls list() per idle cycle — fine at pilot scale | LISTEN/NOTIFY or backoff when scale demands it | P26B |
 
 ## Principle
 
