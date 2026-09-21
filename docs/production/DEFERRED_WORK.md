@@ -16,6 +16,10 @@ What is NOT being done now, why, and when.
 | Multi-tenant implementation | Single-tenant pilot is the current scope | P22 data model supports it | P27 |
 | Prometheus/Grafana | Existing evaluator covers correctness | Production deployment | P25 |
 | TLS everywhere | Local loopback is pilot | Public deployment | P27 |
+| RV-P3-01: live-eval test determinism | F-24 A/B assertion depends on live hit mix (safety property itself unit-proven deterministically) | Next revision of tests/runtime/test_p24_live_eval.py | P25+ |
+| RV-P3-02: backup restore verification | pg_dump verified generatable + content-complete; restore never exercised | DR scheduling decision (with automated backup) | P26 |
+| RV-P3-03: document_hash self-check | source-level ingestion anchor is recorded but verified by neither selfcheck nor runtime | Next registry hardening round | P25+ |
+| RV-INFO-01: full compose restart exercise | app-container restart + named-volume static verification done; docker compose down/up not run | Ops window on the dev stack | P25 |
 
 ## Principle
 
