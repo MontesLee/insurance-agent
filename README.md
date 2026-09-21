@@ -1,203 +1,294 @@
-# Long-running Multi-Agent Runtime
+# Insurance Agent — Evidence-Grounded Agent Runtime
 
 > Language: English | [中文版](README.zh-CN.md)
 
-**A state-driven runtime that plans, executes, evaluates, repairs, replans
-and supervises long-running agent workflows.**
-Insurance is the first domain adapter — a software-engineering workflow
-runs on the same runtime to prove the runtime is generic.
+**An evidence-grounded insurance Agent runtime that separates LLM
+reasoning from deterministic governance, provenance, and evaluation.**
 
 ```text
-Traditional LLM app:    Prompt -> LLM -> Answer
+Traditional LLM app:    User → LLM → Answer
 
-This runtime:           Request -> Planner -> Task Graph -> Long-running Harness
-                        -> Specialist Agents -> Artifacts -> Eval -> Repair
-                        -> Replanning -> Human Control -> Recoverable Result
+This runtime:           User → Agent Runtime → Skills → Knowledge
+                        → Governance → Evidence → Provenance
+                        → Decision → Report
 ```
 
-```text
-Insurance Agent          -> the demonstration workload
-Agent Runtime / Harness -> the engineering contribution
-```
-
-**My contribution** — the architecture and semantics: planner/validation
-design, task lifecycle, scheduler semantics, agent/skill/tool boundaries,
-eval strategy, repair/replan semantics, HITL/HOTL control design,
-checkpoint/recovery, benchmark & red-team design, domain-adapter
-generalization, productization. (AI coding tools were used as dev tooling;
-the system design and its proofs are the point.)
+| | |
+|---|---|
+| Runtime tests | 474 PASS |
+| Benchmark | 42/42 (unsupported-claim-rate = 0) |
+| Adversarial tests | 42/42 |
+| Live WeKnora retrieval | PASS (v0.8.0, real HTTP) |
+| Full regression | 51 suites, 0 FAIL |
+| Mutation tests | 26/26 (evaluator catches injected defects) |
 
 ---
 
-## Why I built it
+## Why I Built This
 
-A single LLM call cannot deliver **work**: multi-step tasks that run long,
-need several specialists, fail partially, require evidence, and need a
-human who can intervene without becoming a bottleneck. This project builds
-the missing execution layer — the agent *runtime*, not another prompt.
+A single LLM call cannot deliver insurance advice because it cannot:
 
-## 5-minute demo
+- **Prove traceability** — which regulation? which version? which source?
+- **Enforce governance** — is the source authoritative? licensed? current?
+- **Fail closed** — the LLM always answer, even when it shouldn't.
+- **Recover** — partial failures cascade; no checkpoint, no retry.
+- **Be evaluated** — you can't regression-test a prompt.
 
-```bash
-python -m demos.demo_portfolio
-```
+This project builds the **execution layer** — the agent *runtime*,
+not another prompt. The LLM is a bounded tool-caller inside a governed
+stage; deterministic rules decide what evidence may inform a decision.
 
-Six acts, all real execution: problem -> planner -> 4-agent parallel run ->
-runtime trace from the durable event log -> failure/replan/HITL/HOTL
-recovery -> deliverable with provenance -> second-domain swap.
-[Narrated script (5 & 10 min)](docs/portfolio/demo-script.md).
+---
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    U[User] --> PL[Planner: WHAT]
-    PL --> GV{Graph Validator: fail-closed}
-    GV --> HA[Harness: WHEN - Runtime Authority]
-    HA --> SC[Bounded DAG Scheduler: isolated workers, deterministic commits]
-    SC --> A1[insurance_analyst] & A2[knowledge_specialist] & A3[product_specialist] & A4[report_specialist]
-    A1 & A2 & A3 & A4 --> BUS[MessageBus: A2A coordination]
-    A1 & A2 & A3 & A4 --> ART[Artifacts: truth + lineage + provenance]
-    ART --> EV{Eval: Harness-owned}
-    EV -->|PASS| CP[Checkpoint]
-    EV -->|FAIL| RP[Repair max 2]
-    RP --> EV
-    CP --> NXT[Replan / next tasks]
-    MON[Monitor: observe only] -.signals.-> H
-    H[Human: above the DAG] -->|HITL approve / HOTL pause-resume| HA
+```text
+                        User
+                         │
+                         ▼
+                ┌─────────────────┐
+                │  Agent Runtime  │  (orchestrator, scheduler,
+                └────────┬────────┘   checkpoint, replan, HITL/HOTL)
+                         │
+                         ▼
+                ┌─────────────────┐
+                │     Skills      │  (8 stages, schema contracts,
+                └────────┬────────┘   data-chain invariant)
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ Knowledge Layer │
+                └────────┬────────┘
+                         │
+             ┌───────────┴───────────┐
+             ▼                       ▼
+      Mock Provider             WeKnora v0.8.0
+      (offline tests)       (live HTTP retrieval)
+             │                       │
+             └───────────┬───────────┘
+                         ▼
+                ┌─────────────────┐
+                │ KnowledgeHit    │  (document_id, chunk_id,
+                └────────┬────────┘   content, score, hash)
+                         ▼
+                ┌─────────────────┐
+                │   Governance    │  (9 rules: authority, license,
+                └────────┬────────┘   window, jurisdiction, hash…)
+                         ▼
+                ┌─────────────────┐
+                │    Evidence     │  (citation tuple: source, version,
+                └────────┬────────┘   window, authority, hash, time)
+                         ▼
+                ┌─────────────────┐
+                │   Provenance    │  (P001–P010: the 4-hop chain
+                └────────┬────────┘   from decision to source)
+                         ▼
+                ┌─────────────────┐
+                │    Decision     │  (recommendation, report)
+                └────────┬────────┘
+                         ▼
+                     Report
 ```
 
-Authority boundaries: **Harness** = runtime authority (sole state writer);
-**Planner** = plan authority (untrusted -> validated); **Agents** =
-execute/request (never PASS); **Eval** = quality gate (never inside a
-tool); **Artifacts** = source of truth; **Monitor** = observe only;
-**Human** = approve/intervene via the control plane, never direct edits.
+> **WeKnora provides retrieval infrastructure.** The Agent owns
+> governance, evidence validation, provenance, and decision constraints.
 
-## Multi-agent collaboration
+---
 
-4 specialists with deterministic assignment and scoped tools (the analyst
-physically cannot name products); coordination only through a validated,
-persistent A2A MessageBus (ACK after PASS); parallel branches on the
-bounded DAG scheduler with worker isolation — the scheduler is the only
-state writer, so results stay deterministic under concurrency.
-
-## Evaluation & reliability
-
-Every artifact passes a deterministic, harness-owned eval (schema, required
-fields, product-leakage contamination, provenance, cross-artifact refs,
-catalog invariants) with bounded repair (max 2), then fail-closed
-NEEDS_REVIEW. Failures never fake success: empty knowledge stores no
-fabricated evidence; LLM outages fail closed; an adversarial false-pass
-suite proves bad inputs are rejected (count 0).
-
-## Human control
-
-- **HITL** — human as decision gate: high-impact graph changes pause in
-  WAITING_HUMAN; approve/reject; rejection fails closed.
-- **HOTL** — human as supervisor above the DAG: a deterministic monitor
-  raises risk signals; policy decides NOTIFY/PAUSE; pause lands at a safe
-  barrier (never mid-commit); audited idempotent commands.
-
-## Insurance case study (first domain adapter)
-
-A realistic (fictional) family case — 30-year-old married father,
-newborn, 500k income, planned 2M mortgage — runs the full pipeline:
-facts -> requirements -> risk -> gap -> solution -> knowledge ->
-candidates -> report, with provenance from report back to client facts.
-`python -m demos.demo_insurance` · [runtime trace](docs/runtime-trace.md)
-
-## Generalization: software engineering (second domain)
-
-Same planner/harness/scheduler/eval/artifact stack; a ~40-line
-declarative domain adapter (task catalog, agents, workflow, eval rules);
-zero runtime fork. 5/5 tasks, 5/5 evals, lineage verified, COMPLETED.
-`python -m demos.demo_generalization` · [audit](docs/generalization.md)
-
-## Benchmark
+## 3-Minute Demo
 
 ```bash
-python -m evals.benchmark.runner     # 11/11 cases, hard gates all 0
+./scripts/portfolio/run_demo.sh
 ```
 
-11 deterministic scenario cases (happy path, missing info, knowledge/
-product failures, repair exhaustion, replanning, parallel equivalence,
-HITL, HOTL notify/pause, 4-agent golden) + an 18-row fault-injection
-matrix + adversarial false-pass testing + tamper testing (breaking the
-runtime breaks the benchmark). [Report](docs/benchmark-report.md)
+Three scenarios, all running the REAL system:
 
-## Design decisions
+| Demo | What it shows | Result |
+|---|---|---|
+| **A — Normal Decision** | Full chain: client → requirement → risk → gap → solution → knowledge → governance → evidence → recommendation → report | PASS |
+| **B — Evidence Tampering** | Valid evidence → 1-byte hash mutation → provenance DENY (P007) | DENY |
+| **C — Insufficient Evidence** | Unrelated query → agent-side abstention → no unsupported claim | ABSTAIN |
 
-13 trade-off records (why not one big agent; why eval is not in the tool;
-why the scheduler is local; why HITL and HOTL differ; why no Redis...):
-[design-decisions.md](docs/portfolio/design-decisions.md) ·
-7 ADRs in [docs/adr/](docs/adr/)
+For live WeKnora mode:
+```bash
+export INSURANCE_AGENT_KNOWLEDGE_PROVIDER=weknora
+export INSURANCE_AGENT_WEKNORA_URL=http://127.0.0.1:8080
+export INSURANCE_AGENT_WEKNORA_API_KEY=<your-key>
+export INSURANCE_AGENT_WEKNORA_KNOWLEDGE_BASE_ID=<kb-id>
+./scripts/portfolio/run_demo.sh
+```
 
-## Limitations (honest)
+---
 
-Validated **portfolio prototype** — single-process, thread-based;
-JSON-file persistence (no Redis/Postgres/K8s by design); demo product
-catalog (not real insurer data, clearly labelled); real-LLM smoke depends
-on external API and fails closed on outage; not production insurance
-advice.
+## What's Real vs Demo
+
+| Area | Status |
+|---|---|
+| Agent Runtime (orchestrator, scheduler, checkpoint) | **Real** |
+| Skills (9, with schema contracts) | **Real** |
+| Knowledge Governance (9 rules, registry-authoritative) | **Real** |
+| Evidence + Provenance (P001–P010, hash-anchored) | **Real** |
+| WeKnora retrieval (v0.8.0, live HTTP, Docker) | **Real** |
+| Evaluation (6 suites, 300+ cases, mutation testing) | **Real** |
+| Security (auth, RBAC, PII, encryption, retention) | **Real** |
+| Product catalog | **Demo** (12 fictional products) |
+| LLM provider | **Not validated** (R-05 gate BLOCKED) |
+| Production database | **Not implemented** (JSON/JSONL) |
+| Multi-tenant / public deployment | **Not implemented** |
+
+→ Full audit: [docs/portfolio/REAL_VS_DEMO.md](docs/portfolio/REAL_VS_DEMO.md)
+
+---
+
+## Key Design Decisions
+
+| Decision | Why |
+|---|---|
+| **Skills, not one prompt** | Data-chain invariant (FACT→REQ→RISK→GAP→SOL→PRODUCT); per-stage contracts, eval, and repair |
+| **Deterministic rules, no LLM judge** | Reproducible, testable, auditable; externalized `*.rules.json`; AGENTS.md §5 |
+| **Provider abstraction** | Mock ↔ WeKnora swap below the KnowledgeHit boundary; governance/evidence/provenance unchanged |
+| **Governance registry** | The Agent, not the backend, owns authority/license/window/jurisdiction |
+| **Evidence ≠ LLM answer** | Only engine-retrieved verbatim chunks become evidence; LLM text never enters the chain |
+| **Provenance (P001–P010)** | Hash-anchored 4-hop chain: decision → evidence → chunk → source |
+| **Fail-closed everywhere** | Insurance domain: "I don't know" > wrong answer |
+| **WeKnora ≠ Agent brain** | WeKnora finds documents; the Agent decides what may inform a recommendation |
+
+→ Full reasoning: [docs/portfolio/ARCHITECTURE_DECISIONS.md](docs/portfolio/ARCHITECTURE_DECISIONS.md)
+
+---
+
+## Evaluation
+
+```text
+Test Pyramid:
+Unit → Contract → Integration → Business E2E → Mutation → Security → Live WeKnora
+
+Runtime tests:           474 PASS
+Benchmark:              42/42 (unsupported-claim-rate = 0)
+Adversarial:            42/42 (knowledge + agent + security + eval attacks)
+Phase 14–18 regression: PASS (all suites, mock + live modes)
+Mutation testing:       26/26 (evaluator catches injected defects)
+Security evaluation:    98/98 (auth, RBAC, PII, approval, provider)
+Live WeKnora:           48/48 (retrieval, governance, provenance, failures)
+```
+
+> These are project-level validation results, not production SLA or
+> industry benchmark results.
+
+→ Details: [docs/portfolio/EVALUATION.md](docs/portfolio/EVALUATION.md)
+
+---
+
+## Provenance Chain
+
+Every recommendation traces to a real source:
+
+```text
+Decision
+  → Evidence (evidence_id)
+    → KnowledgeHit (chunk_id, content_hash)
+      → WeKnora Chunk (live retrieval)
+        → Document (document_id)
+          → Version (source_id@version, effective window)
+            → Source (authority, license, jurisdiction, canonical_uri)
+```
+
+Tamper any byte → hash mismatch → DENY. Expired regulation → window
+check → DENY. Unknown license → DENY. Wrong jurisdiction → DENY.
+
+→ 3 manually-verified chains: [docs/portfolio/PROVENANCE_WALKTHROUGH.md](docs/portfolio/PROVENANCE_WALKTHROUGH.md)
+
+---
+
+## Honest Limitations
+
+- Product catalog is **demo** (12 fictional products)
+- No real customer deployment
+- No production database (JSON/JSONL + FileLock)
+- No production-scale benchmark (single dev box)
+- LLM cost not measured (deterministic path: 0 LLM calls)
+- WeKnora lacks governance metadata → agent-side registry required
+- Event log lacks cryptographic chaining (P2 technical debt)
+- No solution direction for life/R4 in the current model
+- R-05 provider-policy still BLOCKED (operator verification pending)
+- 7 P2 + 4 P3 findings documented, none blocking
+
+→ Full list: [docs/portfolio/LIMITATIONS.md](docs/portfolio/LIMITATIONS.md)
+
+---
+
+## Portfolio Package
+
+| Document | Purpose |
+|---|---|
+| [PORTFOLIO_STORY.md](docs/portfolio/PORTFOLIO_STORY.md) | 10-minute narrative |
+| [ARCHITECTURE_DECISIONS.md](docs/portfolio/ARCHITECTURE_DECISIONS.md) | 8 key "why" answers |
+| [PROVENANCE_WALKTHROUGH.md](docs/portfolio/PROVENANCE_WALKTHROUGH.md) | 3 real chains (valid/tampered/abstain) |
+| [EVALUATION.md](docs/portfolio/EVALUATION.md) | Test pyramid + metrics |
+| [REAL_VS_DEMO.md](docs/portfolio/REAL_VS_DEMO.md) | Capability classification |
+| [LIMITATIONS.md](docs/portfolio/LIMITATIONS.md) | All P2/P3 findings |
+| [INTERVIEW_SCRIPT_10MIN.md](docs/portfolio/INTERVIEW_SCRIPT_10MIN.md) | Timed presentation script |
+| [INTERVIEW_QA.md](docs/portfolio/INTERVIEW_QA.md) | 30 interview Q&A |
+| [INTERVIEW_ATTACK_SURFACE.md](docs/portfolio/INTERVIEW_ATTACK_SURFACE.md) | 30 attack questions |
+| [ADVERSARIAL_FINDINGS.md](docs/portfolio/ADVERSARIAL_FINDINGS.md) | 42 attacks, all PASS |
+| [OVER_ENGINEERING_REVIEW.md](docs/portfolio/OVER_ENGINEERING_REVIEW.md) | What's essential vs showcase |
+| [PROJECT_FACT_BASELINE.md](docs/portfolio/PROJECT_FACT_BASELINE.md) | REAL/MOCK/DEMO classification |
+| [PHASE_19_FINAL_AUDIT.md](docs/portfolio/PHASE_19_FINAL_AUDIT.md) | Independent audit report |
+
+---
 
 ## Quick Start
 
 ```bash
-# 1. deterministic Quick Start — no LLM key, no network, encoding-safe
-python -m demos.demo_basic
+# Run the demo (offline mode — no WeKnora needed)
+python demo/portfolio_demo/run_all.py
 
-# 2. more demos (offline, real runtime)
-python -m demos.demo_four_agent         # golden 4-agent parallel run
-python -m demos.demo_replan             # failure -> controlled replanning
-python -m demos.demo_hitl               # human approval gate
-python -m demos.demo_hotl               # supervisor pause/resume
-python -m demos.demo_portfolio          # the 6-act tour
-python -m evals.benchmark.runner        # 11 deterministic benchmark cases
+# Run the full test battery
+python -m pytest tests/runtime -q
+python -m pytest tests/portfolio -q
 
-# 3. web app (optional)
-python -m runtime.server                # FastAPI + SSE on 127.0.0.1:8000
-cd web && npm install && npm run dev    # React UI on localhost:5173
+# Run the benchmark
+python tests/runtime/test_benchmark.py
 
-# 4. optional real-LLM smoke (needs provider + network; fails closed)
-python -m runtime.agent.smoke_test
+# Full regression (52 suites)
+python tmp/run_regression.py
 ```
 
-## Testing
+---
 
-```bash
-pytest tests/runtime tests/portfolio -q   # 326 tests
-PYTHONIOENCODING=utf-8 python tmp/run_regression.py
-```
-
-## Project structure
+## Repository Structure
 
 ```text
-runtime/      the agent runtime (planner, harness, agents, A2A,
-              approval, control plane, state, eval, observability, server)
-.trae/skills/ insurance skills (9, self-contained: contract + evals)
-contracts/    artifact JSON schemas      catalog/  demo product catalog
-knowledge/    RAG + evidence provider    demos/    one-command demos
-evals/benchmark/  deterministic benchmark + fault injection
-tests/        runtime (pytest) + portfolio acceptance (anti-cheat)
-docs/         architecture | portfolio | ADRs | benchmark reports
+insurance-agent/
+├── README.md                  ← this file
+├── AGENTS.md                  ← project conventions (deterministic-first)
+├── runtime/                   ← agent runtime (orchestrator, harness, tools)
+├── knowledge/                 ← knowledge layer (provider, governance,
+│                                  evidence, provenance, pilot corpus)
+├── adapters/                  ← canonical artifact adapters
+├── contracts/                 ← 11 schema files (skill contracts)
+├── .trae/skills/              ← 9 skill definitions
+├── catalog/                   ← demo product catalog
+├── evals/                     ← 6 evaluator suites
+├── tests/                     ← 80 test files
+├── demos/                     ← 10 demo scripts
+├── demo/portfolio_demo/       ← 3-scenario portfolio demo
+├── scripts/portfolio/         ← demo runner
+├── docs/
+│   ├── architecture/          ← architecture docs
+│   ├── production/            ← 38 phase reports
+│   └── portfolio/             ← 19 portfolio documents
+└── tmp/                       ← runtime artifacts (gitignored)
 ```
 
-## Portfolio / Interview
+---
 
-[Project overview](docs/portfolio/project-overview.md) |
-[Agent Developer](docs/portfolio/agent-developer.md) |
-[Agent PM](docs/portfolio/agent-pm.md) |
-[Architecture interview](docs/portfolio/architecture-interview.md) |
-[Interview Q&A (30)](docs/portfolio/interview-qa.md) |
-[Resume bullets](docs/portfolio/resume-bullets.md) |
-[Verified results](docs/portfolio/project-results.md) |
-[Demo script](docs/portfolio/demo-script.md)
+## My Contribution
 
-## Development history
+The architecture and semantics: skill boundaries, canonical client
+state, provider abstraction, governance rules, provenance validators,
+evaluation strategy, HITL/HOTL control design, checkpoint/recovery,
+benchmark & red-team design, WeKnora integration.
 
-Built and frozen in 12 audited phases (deterministic pipeline ->
-observability -> harness -> planner -> multi-agent -> A2A ->
-bounded-parallel scheduler -> dynamic replanning -> HITL -> HOTL ->
-benchmark/red-team -> portfolio), each with its own regression suite still
-passing. Tagged **v0.1.0** as the portfolio stable version. Details:
-[phase history](docs/architecture/overview.md)
+AI coding tools were used as development tooling; the system design
+and its proofs are the point.
