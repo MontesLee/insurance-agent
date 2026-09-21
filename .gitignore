@@ -25,3 +25,5 @@ client-intake-data/clients/*
 # LLM 密钥配置（.env.example 为模板，可入库；.env 永不入库）
 .env
 .env.local
+.pytest_cache/
+*.pyc
