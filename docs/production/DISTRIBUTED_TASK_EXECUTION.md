@@ -93,11 +93,37 @@ bounded per call.
 
 ## Backpressure + graceful shutdown
 
-`max_concurrent_tasks` caps in-flight claims (a worker at capacity
-stops claiming). SIGTERM / `request_stop()` stops new claims; the
+`max_concurrent_tasks` caps the CONCURRENT ACTIVE EXECUTIONS of ONE
+worker instance (worker-instance-local — global concurrency is NOT
+bounded by it; audited 26C-1). The slot is reserved atomically
+BEFORE the claim: a worker at capacity does not claim, so queued
+tasks keep `PENDING` with no lease and no attempt consumed —
+backpressure happens before the lease, never after it. The slot is
+released on every settle path; introspection via `active_tasks` /
+`capacity_rejections` (+ edge-triggered `worker.backpressure` event).
+SIGTERM / `request_stop()` stops new claims; the
 in-flight task runs to a safe point and settles — or is RELEASED
 (`release` → PENDING immediately) so another worker takes it without
 waiting for expiry. A task is never silently lost.
+
+## Agent run lifecycle + deadline (26C-2)
+
+The TASK stays the queue/execution authority. The RUN (PG table
+`agent_runs`, `runtime.queue.RunControl`) is the BUSINESS lifecycle
+authority: QUEUED → RUNNING → {SUCCEEDED, FAILED, TIMED_OUT,
+CANCELLED}, with WAITING_HUMAN for HITL and CANCEL_REQUESTED for
+operator intent. Every terminal-destiny decision (success, defer,
+failure/retry, cancel, expiry) writes run + task in ONE PostgreSQL
+transaction — a late worker, duplicate command or racing operator
+can never leave them contradictory. The run deadline is ABSOLUTE
+(set once at submit, DB clock; retry never resets it) and is
+enforced at control points (before start / settle-success / retry /
+approval-resume + pull-based `expire_overdue()`, no daemon). A
+completion after the deadline is never accepted (TIMED_OUT);
+terminal runs cannot be revived by approval, retry, lease recovery
+or late workers. Workers opt in via `AgentTaskWorker(run_control=…)`;
+without it the 26A/26B path is unchanged. See
+PHASE_26C2_RESULT.md.
 
 ## DB failure (fail closed)
 

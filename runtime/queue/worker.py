@@ -10,8 +10,11 @@ The EXECUTOR is injected (`executor(task) -> dict`): business skills
 and agent logic stay untouched and queue-agnostic — they never see
 worker/lease/queue concepts.
 
-Backpressure (26A-19): max_concurrent_tasks caps in-flight claims; a
-worker at capacity stops claiming (never queues unbounded work).
+Backpressure (26A-19, audited 26C-1): max_concurrent_tasks caps the
+CONCURRENT ACTIVE EXECUTIONS of ONE worker instance (worker-local —
+global concurrency is NOT bounded by it). The slot is reserved
+atomically BEFORE the claim: a worker at capacity does not claim, so
+queued tasks keep status PENDING with no lease/attempt consumed.
 
 Graceful shutdown (26A-20): SIGTERM (or request_stop()) stops new
 claims; the in-flight task runs to a safe point, heartbeats, then
@@ -51,6 +54,8 @@ class TaskWorker:
         self.task_types = task_types        # claim filter (isolation)
         self._stop = threading.Event()
         self._inflight = 0
+        self._capacity_rejections = 0
+        self._at_capacity_edge = False
         self._lock = threading.Lock()
         self._installed_handler = None
 
@@ -79,26 +84,70 @@ class TaskWorker:
         with self._lock:
             return self._inflight >= self.max_concurrent
 
+    def _reserve(self) -> bool:
+        """Atomically reserve ONE execution slot (26C-1): the capacity
+        check and the increment happen under a SINGLE lock
+        acquisition. A check-then-act split (at_capacity() here,
+        increment after the claim) let two concurrent run_once()
+        callers both pass the check and overshoot max_concurrent_tasks."""
+        with self._lock:
+            if self._inflight >= self.max_concurrent:
+                self._capacity_rejections += 1
+                return False
+            self._inflight += 1
+            self._at_capacity_edge = False
+            return True
+
+    def _release_slot(self) -> None:
+        with self._lock:
+            self._inflight -= 1
+
+    @property
+    def active_tasks(self) -> int:
+        """Executions currently holding a slot on THIS instance."""
+        with self._lock:
+            return self._inflight
+
+    @property
+    def capacity_rejections(self) -> int:
+        """run_once() refusals due to full capacity (26C-1 metric)."""
+        return self._capacity_rejections
+
     # ---- one task ------------------------------------------------------ #
     def run_once(self) -> Optional[dict]:
         """Claim + execute + settle ONE task. Returns the settle
         outcome dict, or None when no task was claimable / at
-        capacity / stopping."""
-        if self.stopping or self.at_capacity():
+        capacity / stopping. Capacity is reserved BEFORE the claim
+        (26C-1): backpressure keeps tasks QUEUED — a task never takes
+        a lease this worker cannot yet execute."""
+        if self.stopping:
             return None
-        task = self.store.claim(self.worker_id,
-                                self.worker_instance_id,
-                                lease_seconds=self.lease_seconds,
-                                task_types=self.task_types)
-        if task is None:
+        if not self._reserve():
+            self._log_capacity()
             return None
-        with self._lock:
-            self._inflight += 1
         try:
+            task = self.store.claim(self.worker_id,
+                                    self.worker_instance_id,
+                                    lease_seconds=self.lease_seconds,
+                                    task_types=self.task_types)
+            if task is None:
+                return None
             return self._execute(task)
         finally:
-            with self._lock:
-                self._inflight -= 1
+            self._release_slot()
+
+    def _log_capacity(self):
+        """Edge-triggered backpressure event (26C-1): log a capacity
+        refusal ONCE per busy period — a polling loop sitting at
+        capacity must not spam the obs sink."""
+        with self._lock:
+            if self._at_capacity_edge:
+                return
+            self._at_capacity_edge = True
+        self._log("worker.backpressure", status="AT_CAPACITY",
+                  reason="capacity_full",
+                  max_capacity=self.max_concurrent,
+                  active=self._inflight)
 
     def _execute(self, task: dict) -> dict:
         tid, lease = task["task_id"], task["lease_id"]

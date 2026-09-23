@@ -52,10 +52,52 @@ def parse_defer_reason(reason: Optional[str]) -> Optional[str]:
 
 class AgentTaskWorker(TaskWorker):
     """TaskWorker + the agent settle policy: a run that pauses at a
-    human gate is DEFERRED (lease released) instead of completed."""
+    human gate is DEFERRED (lease released) instead of completed.
+
+    26C-2: when a `run_control` is attached AND the task carries a
+    managed run, every settle goes through the run-control boundary
+    (deadline gates + one-transaction run/task terminal decisions).
+    Without it the 26A/26B behavior is unchanged."""
+
+    def __init__(self, store, worker_id, executor, run_control=None,
+                 **kw):
+        super().__init__(store, worker_id, executor, **kw)
+        self.run_control = run_control
+
+    def _managed_run(self, task: dict):
+        rc = getattr(self, "run_control", None)
+        if rc is None or not task.get("run_id"):
+            return None
+        return rc if rc.run_for_task(task["task_id"]) else None
 
     def _execute(self, task: dict) -> dict:
         tid, lease = task["task_id"], task["lease_id"]
+        rc = self._managed_run(task)
+        if rc is not None:
+            # 26C-2 control point: BEFORE start (deadline / terminal)
+            verdict = rc.pre_start(task["run_id"], task)
+            if verdict == "timed_out":
+                self._log("task.settled", status="RUN_TIMED_OUT",
+                          task_id=tid, lease_id=lease,
+                          attempt=task["attempt"])
+                return {"outcome": "RUN_TIMED_OUT", "task_id": tid,
+                        "changed": True}
+            if verdict == "terminal":
+                try:
+                    self.store.release(tid, lease)
+                except Exception:  # noqa: BLE001 — lease will expire
+                    pass
+                self._log("task.settled",
+                          status="RUN_TERMINAL_REJECTED", task_id=tid,
+                          lease_id=lease, attempt=task["attempt"])
+                return {"outcome": "RUN_TERMINAL_REJECTED",
+                        "task_id": tid, "changed": False}
+            if verdict == "budget":
+                self._log("task.settled", status="RUN_BUDGET_EXCEEDED",
+                          task_id=tid, lease_id=lease,
+                          attempt=task["attempt"])
+                return {"outcome": "RUN_BUDGET_EXCEEDED",
+                        "task_id": tid, "changed": True}
         executor = self.executor          # bound agent executor
         try:
             self.store.start(tid, lease)
@@ -65,6 +107,8 @@ class AgentTaskWorker(TaskWorker):
                       task_id=tid, lease_id=lease, error=e)
             return {"outcome": "RECOVERY_REQUIRED", "task_id": tid,
                     "changed": False}
+        if rc is not None:
+            rc.on_started(task["run_id"])
         self._log("task.claimed", status="RUNNING", task_id=tid,
                   lease_id=lease, attempt=task["attempt"],
                   task_type=task["task_type"])
@@ -91,13 +135,18 @@ class AgentTaskWorker(TaskWorker):
             result = self._with_trace_context(task)
             if isinstance(result, dict) and "__defer__" in result:
                 stage = result["__defer__"]
-                outcome = self.store.fail(
-                    tid, lease, defer_reason(stage), retry=False)
+                if rc is not None:
+                    outcome = rc.settle_defer(task, stage)
+                else:
+                    outcome = self.store.fail(
+                        tid, lease, defer_reason(stage), retry=False)
                 self._log("task.deferred", status="WAITING_FOR_"
                           "APPROVAL", task_id=tid, lease_id=lease,
                           attempt=task["attempt"], stage=stage)
             else:
-                outcome = self.store.succeed(tid, lease, result)
+                outcome = (rc.settle_success(task, result)
+                           if rc is not None
+                           else self.store.succeed(tid, lease, result))
         except LeaseRejected as e:
             self._log("task.settle", level="ERROR",
                       status="STALE_LEASE_REJECTED", task_id=tid,
@@ -111,10 +160,14 @@ class AgentTaskWorker(TaskWorker):
             outcome = {"outcome": "RECOVERY_REQUIRED", "task_id": tid,
                        "changed": False}
         except Exception as e:  # noqa: BLE001 — agent failure
+            reason = "%s: %s" % (type(e).__name__, str(e)[:200])
             try:
-                outcome = self.store.fail(
-                    tid, lease, "%s: %s" % (type(e).__name__,
-                                            str(e)[:200]), retry=True)
+                if rc is not None:
+                    outcome = rc.settle_failure(task, reason,
+                                                retry_allowed=True)
+                else:
+                    outcome = self.store.fail(tid, lease, reason,
+                                              retry=True)
             except LeaseRejected:
                 outcome = {"outcome": "STALE_REJECTED",
                            "task_id": tid, "changed": False}
@@ -196,6 +249,15 @@ def make_agent_executor(*, workflow: dict, case_id: str, seeds: dict,
             "attempt": attempt,
             "resumed_from_attempt": resumed_from,
             "checkpoints": len(state.get("checkpoints") or []),
+            # 26C-3 metering (REAL counts from orchestrator state —
+            # repairs = stage attempts beyond the first; the queue
+            # path performs no replans today)
+            "budget_usage": {
+                "repair_attempts": sum(
+                    max(0, (st.get("attempts") or 1) - 1)
+                    for st in (state.get("stages") or {}).values()),
+                "replans": 0,
+            },
         }
 
     return execute

@@ -151,9 +151,9 @@ class TaskQueueStore:
                 updated_at = now()
             WHERE task_id = (
                 SELECT task_id FROM queue_tasks
-                WHERE status = 'PENDING'
-                   OR (status IN ('LEASED','RUNNING')
-                       AND lease_expires_at < now())
+                WHERE (status = 'PENDING'
+                       OR (status IN ('LEASED','RUNNING')
+                           AND lease_expires_at < now()))
                 {type_filter}
                 ORDER BY created_at
                 FOR UPDATE {skip} LIMIT 1

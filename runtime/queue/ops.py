@@ -51,10 +51,11 @@ class QueueOps:
     the 26A TaskQueueStore semantics."""
 
     def __init__(self, store: TaskQueueStore, connect: Optional = None,
-                 run_root: Optional[str] = None):
+                 run_root: Optional[str] = None, run_control=None):
         self.store = store
         self._connect = connect
         self.run_root = run_root
+        self.run_control = run_control     # 26C-2 (optional)
         if connect is not None:
             with connect() as conn:
                 with conn.cursor() as cur:
@@ -110,7 +111,13 @@ class QueueOps:
         task = self.store.get(task_id)
         if task is None:
             raise QueueError("task %s not found" % task_id)
-        out = self.store.cancel(task_id)
+        rc = self.run_control
+        if rc is not None and rc.run_for_task(task_id) is not None:
+            # 26C-2: run-aware cancel — task CAS + run CANCELLED in
+            # ONE transaction (exactly one terminal winner)
+            out = rc.cancel_run(task_id)
+        else:
+            out = self.store.cancel(task_id)
         self._audit("CANCEL", actor, role, task, reason=reason)
         return out
 
@@ -145,6 +152,28 @@ class QueueOps:
             raise QueueError(
                 "approval stage mismatch: task waits at %r, approval "
                 "names %r" % (pending, stage))
+        rc = self.run_control
+        if rc is not None and rc.run_for_task(task_id) is not None:
+            # 26C-2 deadline gate on the approval's own transaction
+            # timestamp: WAITING_HUMAN -> RUNNING only while
+            # now() <= deadline_at; terminal/expired runs never resume
+            gate = rc.approve_resume_gate(task.get("run_id"))
+            if gate == "budget":
+                raise QueueError(
+                    "run %s budget exceeded — approval refused"
+                    % task.get("run_id"))
+            if gate == "timed_out":
+                raise QueueError(
+                    "run %s deadline exceeded — approval refused, "
+                    "run TIMED_OUT" % task.get("run_id"))
+            if gate == "terminal":
+                raise QueueError(
+                    "run %s is terminal — approval refused"
+                    % task.get("run_id"))
+            if gate != "ok":
+                raise QueueError(
+                    "run %s is not WAITING_HUMAN — approval refused"
+                    % task.get("run_id"))
         self._write_marker(task, pending, actor, "APPROVED")
         out = self.store.requeue(task_id)
         self._audit("APPROVE", actor, role, task, stage=pending)
