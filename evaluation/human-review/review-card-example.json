@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "card_id": "HRC-de470378",
+  "case_id": "bm-complete-006-single-medical",
+  "run_id": "run_9de5882e",
+  "generated_at": "2026-09-24T12:17:43.663064+00:00",
+  "generator": "evaluation/human-review/review_card_generator.py@1.0",
+  "source": {
+    "state_path": "tmp/webui-runs/run_9de5882e/bm-complete-006-single-medical/case_state.json",
+    "trace_path": "tmp/webui-runs/run_9de5882e/bm-complete-006-single-medical/trace.jsonl",
+    "state_persisted": true
+  },
+  "customer_summary": {
+    "age": "35",
+    "gender": "男",
+    "marital_status": "已婚",
+    "children": "1孩（6岁）",
+    "housing": "自有住房，有房贷",
+    "occupation": "企业中层管理",
+    "annual_income": "80万",
+    "annual_expense": "36万",
+    "mortgage": "200万",
+    "insurance_budget": "3万",
+    "social_security": "职工社保+医保",
+    "existing_insurance": "一份百万医疗险",
+    "unresolved": []
+  },
+  "agent_summary": {
+    "case_status": "COMPLETED",
+    "objective": [
+      "REQ-MED · 大额医疗支出保障 (P1_HIGH)"
+    ],
+    "recommendation_status": "COMPLETE",
+    "primary": {
+      "candidate_id": "C001",
+      "product_id": "P001",
+      "product_name": "demo-百万医疗险A（标准版）"
+    },
+    "recommendation": [
+      "demo-百万医疗险A（标准版）"
+    ],
+    "risk_highlights": [
+      {
+        "risk_id": "R1-001",
+        "risk_name": "大额医疗费用支出",
+        "severity": "HIGH",
+        "residual_risk": "HIGH",
+        "unprotected_amount": 500000
+      }
+    ],
+    "waiting_for_user": null
+  },
+  "automatic_validation": {
+    "schema_check": "PASS",
+    "trace_check": "PASS",
+    "evidence_check": "PASS",
+    "logic_check": "PASS",
+    "eval_summary": {
+      "total": 9,
+      "passed": 9,
+      "failed": 0,
+      "failed_eval_ids": []
+    },
+    "failed_checks": []
+  },
+  "risk_flags": [],
+  "review_action": {
+    "required": false,
+    "level": "AUTO_PASS",
+    "reasons": [
+      "all checks PASS, no HIGH/MEDIUM flags, sampling not triggered"
+    ]
+  },
+  "validation_status": "PASS",
+  "sampling": {
+    "rate": 0.1,
+    "triggered": false,
+    "seed": "bm-complete-006-single-medical:run_9de5882e"
+  }
+}

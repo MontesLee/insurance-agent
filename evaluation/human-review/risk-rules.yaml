@@ -1,0 +1,90 @@
+# Human Review risk rules — Phase 27.7.6 v2 (Risk-based System Validator)
+#
+# Configuration ONLY. The evaluation layer (evaluation/human-review/
+# review_card_generator.py) consumes this file exactly the way the eval
+# engine consumes runtime/resources/config/eval.rules.json: the rule
+# bindings live here, the deterministic predicates live in the generator.
+#
+# Honesty rules (inherited from runtime/eval_engine.py §19):
+#   * a rule whose condition cannot be evaluated NEVER fires PASS or
+#     AUTO-PASS — un-evaluable validation aggregates to FAIL;
+#   * rules marked emit: human_only are never auto-emitted by the
+#     generator; only a human reviewer may attach them (as feedback).
+#   * every emitted flag must carry an evidence_ref pointing at the
+#     exact eval record / field that triggered it — no vague flags.
+
+version: "1.0"
+
+# Deterministic audit sampling: sha1(case_id + ":" + run_id) mod 10000
+# < rate * 10000. Same input -> same verdict (reproducible, no runtime
+# randomness). Level-0 AUTO_PASS only holds when sampling is NOT hit.
+sampling:
+  rate: 0.10
+
+decision:
+  # Evaluation order is strict; a stronger trigger never gets downgraded:
+  #   validation FAIL  -> DEEP_REVIEW (validation_status FAIL)
+  #   any HIGH flag    -> DEEP_REVIEW
+  #   any MEDIUM flag or sampling -> SUMMARY_REVIEW
+  #   otherwise        -> AUTO_PASS (review not required)
+  levels: [AUTO_PASS, SUMMARY_REVIEW, DEEP_REVIEW]
+
+# ---------------------------------------------------------------------------
+# HIGH — one of these means the case must not pass without a human reading
+# the full artifact chain (Workspace sections C/D/E via the linked run_id).
+# ---------------------------------------------------------------------------
+high_risk:
+  - id: missing_evidence
+    condition: eval_check_failed
+    check_ids: ["required_non_empty", "provenance_*"]
+    artifact_types: ["knowledge-evidence", "product-recommendation"]
+    message: "知识证据链断裂：证据/溯源评估检查未通过"
+
+  - id: false_product_information
+    condition: eval_check_failed
+    check_ids: ["contamination", "catalog_*", "cross_artifact_*"]
+    message: "产品信息可疑：目录/污染/跨产物一致性检查未通过"
+
+  - id: unresolved_task_failure
+    condition: task_not_pass
+    message: "存在未恢复到 PASS 的任务（执行链不完整）"
+
+  - id: case_not_finalized
+    condition: case_status_not_in
+    statuses: ["COMPLETED", "NEEDS_REVIEW"]
+    message: "案例未到达可审终点（等待用户/失败/中断）"
+
+# ---------------------------------------------------------------------------
+# MEDIUM — review the Review Card summary only (< 3 min), no deep dive.
+# ---------------------------------------------------------------------------
+medium_risk:
+  - id: no_primary_recommendation
+    condition: no_primary_recommendation
+    message: "业务结论为『无主推荐』（NO_CANDIDATES/证据不足/无产物）——人工确认该结论本身"
+
+  - id: insufficient_customer_context
+    condition: customer_context_incomplete
+    message: "客户画像存在 UNKNOWN/冲突字段——人工确认追问是否恰当"
+
+  - id: high_exposure
+    condition: risk_exposure
+    min_severity: "CRITICAL"
+    min_unprotected_amount: 1000000
+    message: "存在 CRITICAL 风险或未保额缺口 ≥ 100万——高敞口案例"
+
+  - id: repair_used
+    condition: task_repaired
+    message: "执行过程中发生过修复重跑——确认修复后结论仍成立"
+
+# ---------------------------------------------------------------------------
+# LOW — recorded for taxonomy completeness. The generator CANNOT detect
+# these (no such detector exists — inventing one would fabricate a
+# capability); only a human reviewer may attach them as feedback.
+# ---------------------------------------------------------------------------
+low_risk:
+  - id: style_issue
+    emit: human_only
+    message: "表述/用词风格问题"
+  - id: formatting_issue
+    emit: human_only
+    message: "格式/排版问题"

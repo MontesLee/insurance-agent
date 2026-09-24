@@ -177,6 +177,36 @@ Live WeKnora:           48/48 (retrieval, governance, provenance, failures)
 
 → Details: [docs/portfolio/EVALUATION.md](docs/portfolio/EVALUATION.md)
 
+### Human Review Layer — Risk-based Reviewer Validation v2
+
+人工审核不再阅读全量产物,而是审核一张风险分级的 Review Card
+(Human reviewers read one risk-ranked card instead of the full
+artifact pile). For every finished run, an offline generator aggregates
+the existing eval records + case state into `human_review_card.json`
+and assigns a review level:
+
+```text
+AUTO_PASS        4 automatic checks PASS + no HIGH/MEDIUM flags + not sampled
+SUMMARY_REVIEW   MEDIUM flag or audit-sampling hit — read the card only (<3 min)
+DEEP_REVIEW      validation FAIL or HIGH flag — open the full evidence chain
+```
+
+- Four automatic dimensions (`schema / trace / evidence / logic`) are
+  pure projections of the eval engine's own checks — no new validators.
+- Fail-closed honesty: a dimension with zero underlying checks reports
+  FAIL, never a silent PASS; UNKNOWN customer fields render as null,
+  never a guess (inherited from the eval engine §19 rules).
+- Deterministic audit sampling (`sha1(case:run)` mod, default 10%) —
+  reproducible, no runtime randomness.
+- Zero runtime coupling: lives in `evaluation/human-review/`, imports
+  nothing from `runtime/`, touches no state.
+
+→ `evaluation/human-review/` — card schema, `risk-rules.yaml`,
+  generator, [reviewer guide](evaluation/human-review/reviewer-guide.md)
+  (人工审核操作规范)
+→ Tests: `tests/eval/test_review_card.py` (9/9; verified against all 6
+  real pilot runs)
+
 ---
 
 ## Provenance Chain
@@ -271,7 +301,8 @@ insurance-agent/
 ├── .trae/skills/              ← 9 skill definitions
 ├── catalog/                   ← demo product catalog
 ├── evals/                     ← 6 evaluator suites
-├── tests/                     ← 80 test files
+├── evaluation/human-review/   ← risk-based human review layer (Review Card)
+├── tests/                     ← 97 test files
 ├── demos/                     ← 10 demo scripts
 ├── demo/portfolio_demo/       ← 3-scenario portfolio demo
 ├── scripts/portfolio/         ← demo runner

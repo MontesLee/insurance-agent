@@ -1,0 +1,201 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "evaluation/human-review/review-card.schema.json",
+  "title": "Human Review Card",
+  "description": "Phase 27.7.6 v2 — the single artifact a human reviewer reads for Level-1 (SUMMARY) review. Everything in it is a verbatim projection of the finished run's persisted state (case_state.json / trace.jsonl); nothing is recomputed, guessed or generated beyond the documented aggregations.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "card_id",
+    "case_id",
+    "run_id",
+    "generated_at",
+    "source",
+    "customer_summary",
+    "agent_summary",
+    "automatic_validation",
+    "risk_flags",
+    "review_action"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "card_id": { "type": "string", "pattern": "^HRC-[0-9a-f]{8}$" },
+    "case_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "generator": { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["state_path"],
+      "additionalProperties": false,
+      "properties": {
+        "state_path": { "type": ["string", "null"] },
+        "trace_path": { "type": ["string", "null"] },
+        "state_persisted": { "type": "boolean" }
+      }
+    },
+    "customer_summary": {
+      "type": "object",
+      "description": "Verbatim client-profile projection. UNKNOWN fields are null and listed in 'unresolved' — never fabricated.",
+      "additionalProperties": false,
+      "properties": {
+        "age": { "type": ["string", "null"] },
+        "gender": { "type": ["string", "null"] },
+        "marital_status": { "type": ["string", "null"] },
+        "children": { "type": ["string", "null"] },
+        "housing": { "type": ["string", "null"] },
+        "occupation": { "type": ["string", "null"] },
+        "annual_income": { "type": ["string", "null"] },
+        "annual_expense": { "type": ["string", "null"] },
+        "mortgage": { "type": ["string", "null"] },
+        "insurance_budget": { "type": ["string", "null"] },
+        "social_security": { "type": ["string", "null"] },
+        "existing_insurance": { "type": ["string", "null"] },
+        "unresolved": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Fields whose profile status is UNKNOWN or which carry conflicts."
+        }
+      }
+    },
+    "agent_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "case_status": { "type": "string" },
+        "objective": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Requirement ids + verbatim summaries from requirement-analysis."
+        },
+        "recommendation_status": { "type": ["string", "null"] },
+        "primary": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "candidate_id": { "type": "string" },
+            "product_id": { "type": ["string", "null"] },
+            "product_name": { "type": ["string", "null"] }
+          }
+        },
+        "recommendation": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Recommended product names (primary first), verbatim."
+        },
+        "risk_highlights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "risk_id": { "type": "string" },
+              "risk_name": { "type": ["string", "null"] },
+              "severity": { "type": ["string", "null"] },
+              "residual_risk": { "type": ["string", "null"] },
+              "unprotected_amount": { "type": ["number", "string", "null"] }
+            }
+          }
+        },
+        "waiting_for_user": {
+          "type": ["object", "null"],
+          "description": "Verbatim waiting_for_user block when the case stopped to ask."
+        }
+      }
+    },
+    "automatic_validation": {
+      "type": "object",
+      "required": [
+        "schema_check",
+        "trace_check",
+        "evidence_check",
+        "logic_check",
+        "eval_summary",
+        "failed_checks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema_check": { "$ref": "#/definitions/checkStatus" },
+        "trace_check": { "$ref": "#/definitions/checkStatus" },
+        "evidence_check": { "$ref": "#/definitions/checkStatus" },
+        "logic_check": { "$ref": "#/definitions/checkStatus" },
+        "eval_summary": {
+          "type": "object",
+          "required": ["total", "passed", "failed"],
+          "additionalProperties": false,
+          "properties": {
+            "total": { "type": "integer", "minimum": 0 },
+            "passed": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 },
+            "failed_eval_ids": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "failed_checks": {
+          "type": "array",
+          "description": "Every failing check with its source — the risk evidence references for deep review.",
+          "items": {
+            "type": "object",
+            "required": ["eval_id", "artifact_type", "check_id", "message"],
+            "additionalProperties": false,
+            "properties": {
+              "eval_id": { "type": ["string", "null"] },
+              "artifact_type": { "type": ["string", "null"] },
+              "check_id": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "severity", "message", "evidence_ref"],
+        "additionalProperties": false,
+        "properties": {
+          "type": { "type": "string" },
+          "severity": { "enum": ["HIGH", "MEDIUM", "LOW"] },
+          "message": { "type": "string" },
+          "evidence_ref": {
+            "type": ["string", "null"],
+            "description": "Pointer to the exact trigger (eval/check/field) or null only for rules that read case-level state."
+          }
+        }
+      }
+    },
+    "review_action": {
+      "type": "object",
+      "required": ["required", "level", "reasons"],
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "boolean" },
+        "level": { "enum": ["AUTO_PASS", "SUMMARY_REVIEW", "DEEP_REVIEW"] },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Every trigger that fired, in evaluation order — the reviewer sees why this level."
+        }
+      }
+    },
+    "validation_status": { "enum": ["PASS", "FAIL"] },
+    "sampling": {
+      "type": "object",
+      "required": ["rate", "triggered", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "triggered": { "type": "boolean" },
+        "seed": { "type": "string" }
+      }
+    }
+  },
+  "definitions": {
+    "checkStatus": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"],
+      "description": "No UNKNOWN: a check that cannot be evaluated reports FAIL (eval-engine honesty rule §19)."
+    }
+  }
+}
