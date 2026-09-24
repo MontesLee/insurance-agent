@@ -27,3 +27,7 @@ client-intake-data/clients/*
 .env.local
 .pytest_cache/
 *.pyc
+
+# local browser-validation tooling (bridgic-browser uv project, not product code)
+web/pyproject.toml
+web/uv.lock
