@@ -1,0 +1,386 @@
+{
+ "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+ "executed_at": "2026-09-23T08:47:27Z",
+ "cases": [
+  {
+   "pilot_case_id": "C01",
+   "case_type": "child_protection",
+   "data_type": "SYNTHETIC",
+   "desc": "已婚二孩,儿童+家庭责任聚焦",
+   "created_at": "2026-09-23T08:47:13Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.44,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C02",
+   "case_type": "single_adult",
+   "data_type": "SYNTHETIC",
+   "desc": "单身成年人,基础保障",
+   "created_at": "2026-09-23T08:47:15Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.28,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C03",
+   "case_type": "married_no_child",
+   "data_type": "SYNTHETIC",
+   "desc": "已婚无子,储蓄+医疗",
+   "created_at": "2026-09-23T08:47:16Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.22,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C04",
+   "case_type": "dual_income",
+   "data_type": "SYNTHETIC",
+   "desc": "双收入家庭(高收入)",
+   "created_at": "2026-09-23T08:47:18Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.23,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C05",
+   "case_type": "mortgage_family",
+   "data_type": "SYNTHETIC",
+   "desc": "高额房贷家庭",
+   "created_at": "2026-09-23T08:47:19Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.39,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C06",
+   "case_type": "existing_insurance",
+   "data_type": "SYNTHETIC",
+   "desc": "已有较全保险(观察缺口收敛)",
+   "created_at": "2026-09-23T08:47:21Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.31,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C07",
+   "case_type": "underinsured",
+   "data_type": "SYNTHETIC",
+   "desc": "配置明显不足(仅意外险10万)",
+   "created_at": "2026-09-23T08:47:22Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.22,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C08",
+   "case_type": "incomplete_info",
+   "data_type": "SYNTHETIC",
+   "desc": "信息不完整:收入/预算/已有保险 UNKNOWN",
+   "created_at": "2026-09-23T08:47:22Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 1,
+   "result_status": "WAITING_FOR_USER",
+   "budget": {
+    "task_attempts_used": 1,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [],
+   "elapsed_s": 0.35,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C09",
+   "case_type": "evidence_sensitive_gap0",
+   "data_type": "SYNTHETIC",
+   "desc": "R4 缺口≈0(已有覆盖足额)——观察下游行为",
+   "created_at": "2026-09-23T08:47:24Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.25,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C10",
+   "case_type": "complex_family",
+   "data_type": "SYNTHETIC",
+   "desc": "三代同堂+3孩复杂责任",
+   "created_at": "2026-09-23T08:47:25Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.37,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C11",
+   "case_type": "knowledge_unavailable",
+   "data_type": "SYNTHETIC",
+   "desc": "Knowledge 不可用(kb-empty)——期望 fail closed",
+   "created_at": "2026-09-23T08:47:26Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": "empty",
+   "outcomes": [
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 1,
+   "result_status": "NEEDS_REVIEW",
+   "budget": {
+    "task_attempts_used": 1,
+    "repair_attempts_used": 2,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [],
+   "elapsed_s": 0.49,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  },
+  {
+   "pilot_case_id": "C12",
+   "case_type": "no_requirements",
+   "data_type": "SYNTHETIC",
+   "desc": "需求为空(keep [])——观察空需求行为",
+   "created_at": "2026-09-23T08:47:27Z",
+   "runtime_version": "phase26c-productionization-v1.0 (c7ed9c6)",
+   "kb": null,
+   "outcomes": [
+    "DEFERRED_WAITING",
+    "SUCCEEDED"
+   ],
+   "final_task_status": "SUCCEEDED",
+   "final_run_state": "SUCCEEDED",
+   "terminal_reason": "completed",
+   "attempt": 2,
+   "result_status": "COMPLETED",
+   "budget": {
+    "task_attempts_used": 2,
+    "repair_attempts_used": 0,
+    "llm_calls_used": 0
+   },
+   "mechanical_approvals": [
+    {
+     "step": 0,
+     "stage": "product-recommendation",
+     "actor": "pilot-operator",
+     "kind": "MECHANICAL"
+    }
+   ],
+   "elapsed_s": 1.27,
+   "review_status": "PENDING_HUMAN_REVIEW"
+  }
+ ]
+}

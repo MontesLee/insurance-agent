@@ -1,0 +1,34 @@
+{
+ "A": {
+  "case_status": "COMPLETED",
+  "rec_status": "INCOMPLETE_EVIDENCE",
+  "primary_exists": true,
+  "primary_cid": "C001",
+  "not_recommended": 7,
+  "blocking_uncertainties": [
+   {
+    "type": "insufficient_evidence",
+    "detail": "coverage ['critical_illness'] lacks knowledge backing"
+   },
+   {
+    "type": "insufficient_evidence",
+    "detail": "coverage ['critical_illness'] lacks knowledge backing"
+   },
+   {
+    "type": "insufficient_evidence",
+    "detail": "coverage ['critical_illness'] lacks knowledge backing"
+   }
+  ],
+  "human_review_required": true,
+  "expect": "primary exists (status may carry uncertainty downgrades by design, engine L642-660)",
+  "pass": true
+ },
+ "B": {
+  "rec_status": "INCOMPLETE_EVIDENCE",
+  "primary_exists": false,
+  "not_recommended": 4,
+  "insufficient_count": 4,
+  "expect": "primary BLOCKED + INCOMPLETE_EVIDENCE",
+  "pass": true
+ }
+}

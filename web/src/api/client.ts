@@ -10,6 +10,11 @@ import type {
   EventsResponse,
   Run,
 } from "../types/runtime";
+import type {
+  ApprovalDetailResponse,
+  ApprovalsResponse,
+  SupervisorState,
+} from "../types/approval";
 
 export class ApiError extends Error {
   constructor(
@@ -104,4 +109,33 @@ export const api = {
   /** SSE endpoint URL with the resume cursor (EventSource cannot set headers). */
   streamUrl: (runId: string, afterEventId?: string) =>
     `/api/runs/${runId}/stream${afterEventId ? `?after_event_id=${afterEventId}` : ""}`,
+
+  // ---- Review Queue (Phase 27.5-2) — read-only approval projection ---- #
+  /** Existing backend endpoint, project-scoped (no global list endpoint yet). */
+  approvals: (projectId: string) =>
+    request<ApprovalsResponse>(`/api/projects/${projectId}/approvals`),
+
+  getApproval: (approvalId: string) =>
+    request<ApprovalDetailResponse>(`/api/approvals/${approvalId}`),
+
+  /** Phase 10 supervisor state (existing endpoint, previously unconsumed). */
+  supervisor: (projectId: string) =>
+    request<{ project_id: string; supervisor: SupervisorState }>(
+      `/api/projects/${projectId}/supervisor`,
+    ),
+
+  // ---- Decision submission (Phase 27.5-4) — existing Phase 9 endpoints ---- #
+  /** POST /api/approvals/{id}/approve (REVIEWER role; body {actor, reason}). */
+  approveApproval: (approvalId: string, body: { actor: string; reason: string }) =>
+    request<Record<string, unknown>>(
+      `/api/approvals/${approvalId}/approve`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
+
+  /** POST /api/approvals/{id}/reject — reason is semantically required by the UI. */
+  rejectApproval: (approvalId: string, body: { actor: string; reason: string }) =>
+    request<Record<string, unknown>>(
+      `/api/approvals/${approvalId}/reject`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
 };
