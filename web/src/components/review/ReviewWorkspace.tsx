@@ -33,6 +33,7 @@ import type {
 } from "../../types/runtime";
 import { ApprovalStatusBadge } from "./ApprovalStatusBadge";
 import { DecisionPanel } from "./DecisionPanel";
+import { FeedbackPanel } from "./FeedbackPanel";
 
 const RUN_KEY = "webui:workspace-run";
 
@@ -450,6 +451,9 @@ export function ReviewWorkspace({
       {approval ? (
         <DecisionPanel approval={approval} onDecided={approvalQ.retry} />
       ) : null}
+
+      {/* G — Human Feedback (Phase 27.7; inert evidence, local MVP) */}
+      {approval ? <FeedbackPanel approval={approval} /> : null}
     </div>
   );
 }
