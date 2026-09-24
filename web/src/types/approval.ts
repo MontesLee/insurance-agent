@@ -31,6 +31,11 @@ export interface ApprovalsResponse {
 export interface ApprovalDetailResponse {
   project_id: string;
   approval: ApprovalRecord;
+  /** Phase 27.7.6-C: read-only projection of the approval context. */
+  review_context?: {
+    run_id?: string;
+    artifact_ids?: string[];
+  };
 }
 
 /**

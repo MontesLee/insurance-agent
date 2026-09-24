@@ -822,6 +822,62 @@ def test_api_approval_endpoints(c: Checks):
         cleanup(d)
 
 
+# ------------------------------------------------------------------------- #
+# API — Phase 27.7.6-C review_context projection (read-only)
+# ------------------------------------------------------------------------- #
+@section
+def test_api_approval_review_context(c: Checks):
+    d = fresh_dir()
+    old_root = os.environ.get("INSURANCE_AGENT_HARNESS_ROOT")
+    try:
+        h = LongRunningHarness(d)
+        p = h.create_project("ctx", task_graph={"tasks": [
+            {"task_id": "task_a", "task_type": "client_profile"}]})
+        mgr = h._approval_manager(p)
+        with_run = mgr.create_request(create_request(
+            project_id=p.project_id, request_type=APPROVAL_REPLAN,
+            reason="review context", graph_revision=2,
+            context={"run_id": "run_abc123",
+                     "artifact_ids": ["art_1", "art_2"]}))
+        without_run = mgr.create_request(create_request(
+            project_id=p.project_id, request_type=APPROVAL_REPLAN,
+            reason="no run", graph_revision=2,
+            context={"slot": "HR-R1"}))
+        mgr.wait(with_run["approval_id"])
+        mgr.wait(without_run["approval_id"])
+        os.environ["INSURANCE_AGENT_HARNESS_ROOT"] = d
+        from _common import make_client
+        client, m, bus = make_client()
+        r = client.get("/api/approvals/%s" % with_run["approval_id"])
+        body = r.json()
+        c.chk("RC: approval with run_id returns review_context",
+              r.status_code == 200
+              and body.get("review_context", {}).get("run_id") == "run_abc123"
+              and body.get("review_context", {}).get("artifact_ids")
+              == ["art_1", "art_2"])
+        r = client.get("/api/approvals/%s" % without_run["approval_id"])
+        c.chk("RC: approval without run_id returns empty review_context",
+              r.status_code == 200
+              and r.json().get("review_context") == {})
+        # read-only: the GET must not touch stored state
+        before = dict(with_run)
+        after = ApprovalStore(p._dir).get(with_run["approval_id"])
+        c.chk("RC: GET leaves approval state unchanged",
+              after["status"] == "WAITING_HUMAN"
+              and after["context"] == before["context"]
+              and after["decision"] is None
+              and after["resolved_at"] is None)
+        r = client.get("/api/approvals/%s" % with_run["approval_id"])
+        after2 = ApprovalStore(p._dir).get(with_run["approval_id"])
+        c.chk("RC: repeated GET still read-only", after2 == after)
+    finally:
+        if old_root is None:
+            os.environ.pop("INSURANCE_AGENT_HARNESS_ROOT", None)
+        else:
+            os.environ["INSURANCE_AGENT_HARNESS_ROOT"] = old_root
+        cleanup(d)
+
+
 def main():
     return run_sections(SECTIONS, "webui_test_approval_log.txt",
                         "RUNTIME APPROVAL GATEWAY")

@@ -15,12 +15,14 @@
  *      the knowledge-evidence artifact. Missing → "No evidence
  *      linked".
  *
- * Approval→run linkage does not exist in the backend (recorded
- * gap), so sections C–E are keyed by a persisted run-id selector.
+ * Phase 27.7.6-C: sections C-E auto-link from the approval's
+ * review_context.run_id (read-only backend projection of the
+ * approval context) — the reviewer never enters a run id. When
+ * the context has no run, C-E show "Run information unavailable".
  * Statuses render verbatim from the backend; durations are
  * presentation arithmetic over event timestamps.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../../api/client";
 import type {
   ApprovalRecord,
@@ -34,8 +36,7 @@ import type {
 import { ApprovalStatusBadge } from "./ApprovalStatusBadge";
 import { DecisionPanel } from "./DecisionPanel";
 import { FeedbackPanel } from "./FeedbackPanel";
-
-const RUN_KEY = "webui:workspace-run";
+import { ReviewCardDetail } from "./ReviewCardView";
 
 type Async<T> =
   | { kind: "loading" }
@@ -214,40 +215,42 @@ export function ReviewWorkspace({
     () => api.supervisor(projectId),
     [projectId],
   );
-  const [runDraft, setRunDraft] = useState(() => {
-    try {
-      return localStorage.getItem(RUN_KEY) ?? "";
-    } catch {
-      return "";
-    }
-  });
-  const [runLoaded, setRunLoaded] = useState<string | null>(
-    runDraft ? runDraft : null,
-  );
+
+  // Phase 27.7.6-C: auto-link run from the approval context —
+  // the reviewer never sees or types a run_id. When the approval
+  // loads, extract run_id from its context (or review_context)
+  // and activate sections C/D/E automatically.
+  const approval: ApprovalRecord | null =
+    approvalQ.state.kind === "ready" ? approvalQ.state.data.approval : null;
+  const reviewContext =
+    approvalQ.state.kind === "ready"
+      ? approvalQ.state.data.review_context
+      : undefined;
+  const contextRunId: string | null =
+    reviewContext?.run_id ??
+    ((approval?.context as Record<string, unknown> | null)?.run_id as
+      | string
+      | undefined) ??
+    null;
+
+  const [runLoaded, setRunLoaded] = useState<string | null>(null);
   useEffect(() => {
-    if (runLoaded) {
-      try {
-        localStorage.setItem(RUN_KEY, runLoaded);
-      } catch {
-        /* ignore */
-      }
-    }
-  }, [runLoaded]);
+    // Auto-activate when the approval carries a linked run
+    if (contextRunId) setRunLoaded(contextRunId);
+  }, [contextRunId]);
 
   const eventsQ = useAsync(
-    () => api.getEvents(runLoaded ?? ""),
+    () =>
+      runLoaded
+        ? api.getEvents(runLoaded)
+        : Promise.resolve<EventsResponse>({
+            run_id: "", count: 0, events: [],
+          }),
     [runLoaded],
   );
 
-  const approval: ApprovalRecord | null =
-    approvalQ.state.kind === "ready" ? approvalQ.state.data.approval : null;
   const supervisor: SupervisorState | null =
     supervisorQ.state.kind === "ready" ? supervisorQ.state.data.supervisor : null;
-
-  const loadRun = () => {
-    const id = runDraft.trim();
-    if (id) setRunLoaded(id);
-  };
 
   return (
     <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col gap-3 overflow-y-auto p-4">
@@ -358,36 +361,37 @@ export function ReviewWorkspace({
         />
       </Section>
 
-      {/* run selector gates C/D/E */}
-      <div className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white/60 p-3">
-        <span className="text-[12px] font-medium text-slate-500">
-          Run ID(用于执行时间线 / 产物 / 证据链):
-        </span>
-        <input
-          data-testid="workspace-run-input"
-          value={runDraft}
-          onChange={(e) => setRunDraft(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && loadRun()}
-          placeholder="run_xxx"
-          className="w-56 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[12px] text-slate-700 outline-none focus:border-slate-400"
-        />
-        <button
-          data-testid="workspace-run-load"
-          onClick={loadRun}
-          className="rounded-md bg-slate-800 px-3 py-1 text-[12px] font-medium text-white hover:bg-slate-700"
-        >
-          加载
-        </button>
-        <span className="text-[11px] text-slate-400">
-          approval→run 联动端点缺失(API GAP,已记录)
-        </span>
-      </div>
+      {/* A2 — Review Card (Phase 27.7.6 v2: risk-based review entry) */}
+      <Section
+        title="A2 · Review Card"
+        hint="风险卡 —— 该案例需要什么级别的审核?"
+      >
+        {!contextRunId ? (
+          <p className="py-3 text-center text-[12.5px] text-slate-400">
+            无 Review Card(该审批未携带运行上下文)
+          </p>
+        ) : (
+          <CardBlock runId={contextRunId} />
+        )}
+      </Section>
+
+      {/* Run info display (auto-linked; no manual input) */}
+      {contextRunId ? (
+        <p data-testid="run-linked" className="text-[11.5px] text-slate-400">
+          已自动关联运行:<span className="font-mono">{contextRunId}</span>
+          (来自审批上下文,审核者无需输入)
+        </p>
+      ) : (
+        <p data-testid="run-unavailable" className="text-[11.5px] text-slate-400">
+          Run information unavailable(该审批未携带运行上下文)
+        </p>
+      )}
 
       {/* C — Agent Execution Timeline */}
       <Section title="C · Agent 执行时间线" hint="Agent 做了什么?">
-        {!runLoaded ? (
-          <p className="py-3 text-center text-[12.5px] text-slate-400">
-            输入 Run ID 后展示执行时间线
+        {!contextRunId ? (
+          <p data-testid="timeline-no-run" className="py-3 text-center text-[12.5px] text-slate-400">
+            Run information unavailable
           </p>
         ) : (
           <AsyncBlock
@@ -417,33 +421,35 @@ export function ReviewWorkspace({
 
       {/* D — Generated Artifacts */}
       <Section title="D · 生成的产物" hint="产出了什么?">
-        {approval?.context &&
-        Array.isArray((approval.context as Record<string, unknown>).artifact_ids) &&
-        ((approval.context as Record<string, unknown>).artifact_ids as string[]).length > 0 ? (
-          <p className="mb-2 text-[11.5px] text-slate-500">
-            审批关联的交付物:
-            {(
-              (approval.context as Record<string, unknown>).artifact_ids as string[]
-            ).join(", ")}
-          </p>
-        ) : null}
-        {!runLoaded ? (
-          <p className="py-3 text-center text-[12.5px] text-slate-400">
-            输入 Run ID 后展示产物列表
+        {(() => {
+          const ctxArtifacts = (approval?.context as Record<string, unknown> | null)
+            ?.artifact_ids;
+          const artifactIds =
+            reviewContext?.artifact_ids ??
+            (Array.isArray(ctxArtifacts) ? (ctxArtifacts as string[]) : undefined);
+          return artifactIds && artifactIds.length > 0 ? (
+            <p data-testid="review-context-artifacts" className="mb-2 text-[11.5px] text-slate-500">
+              审批关联的交付物:{artifactIds.join(", ")}
+            </p>
+          ) : null;
+        })()}
+        {!contextRunId ? (
+          <p data-testid="artifacts-no-run" className="py-3 text-center text-[12.5px] text-slate-400">
+            Run information unavailable
           </p>
         ) : (
-          <ArtifactsSection runId={runLoaded} />
+          <ArtifactsSection runId={runLoaded ?? contextRunId} />
         )}
       </Section>
 
       {/* E — Evidence Chain */}
       <Section title="E · 证据链" hint="Agent 为什么这样认为?(推荐→需求→证据→来源)">
-        {!runLoaded ? (
-          <p className="py-3 text-center text-[12.5px] text-slate-400">
-            输入 Run ID 后追溯证据链
+        {!contextRunId ? (
+          <p data-testid="evidence-no-run" className="py-3 text-center text-[12.5px] text-slate-400">
+            Run information unavailable
           </p>
         ) : (
-          <EvidenceSection runId={runLoaded} />
+          <EvidenceSection runId={runLoaded ?? contextRunId} />
         )}
       </Section>
 
@@ -458,6 +464,40 @@ export function ReviewWorkspace({
   );
 }
 
+/** Phase 27.7.6 v2: the run's Review Card, fetched read-only and
+ *  rendered verbatim (level/validation/flags come from the backend
+ *  generator — this view never re-derives them). */
+function CardBlock({ runId }: { runId: string }) {
+  const q = useAsync(() => api.reviewCard(runId), [runId]);
+  return (
+    <AsyncBlock
+      state={q.state}
+      retry={q.retry}
+      empty={() => false}
+      render={(card) => <ReviewCardDetail card={card} />}
+    />
+  );
+}
+
+async function writeClipboard(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  // Fallback for non-secure contexts / jsdom.
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    if (!document.execCommand("copy")) throw new Error("execCommand failed");
+  } finally {
+    document.body.removeChild(ta);
+  }
+}
+
 function ArtifactsSection({ runId }: { runId: string }) {
   const q = useAsync(() => api.getArtifacts(runId), [runId]);
   const [openType, setOpenType] = useState<string | null>(null);
@@ -465,6 +505,29 @@ function ArtifactsSection({ runId }: { runId: string }) {
     () => api.getArtifact(runId, openType ?? ""),
     [openType],
   );
+  // Copy-to-clipboard feedback for one artifact at a time.
+  const [copyState, setCopyState] = useState<{
+    type: string; ok: boolean;
+  } | null>(null);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+    },
+    [],
+  );
+  const copyArtifact = async (a: ArtifactSummary) => {
+    try {
+      const d = await api.getArtifact(runId, a.artifact_type);
+      const payload = (d as { artifact?: unknown }).artifact ?? d;
+      await writeClipboard(JSON.stringify(payload, null, 2));
+      setCopyState({ type: a.artifact_type, ok: true });
+    } catch {
+      setCopyState({ type: a.artifact_type, ok: false });
+    }
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopyState(null), 2000);
+  };
   return (
     <AsyncBlock
       state={q.state}
@@ -474,11 +537,14 @@ function ArtifactsSection({ runId }: { runId: string }) {
         <div data-testid="workspace-artifacts">
           <ul className="flex flex-col gap-1.5">
             {d.artifacts.map((a: ArtifactSummary) => (
-              <li key={a.artifact_id}>
+              <li
+                key={a.artifact_id}
+                className="flex items-stretch gap-1.5"
+              >
                 <button
                   data-testid={`workspace-artifact-${a.artifact_type}`}
                   onClick={() => setOpenType(openType === a.artifact_type ? null : a.artifact_type)}
-                  className="w-full rounded-md border border-slate-200 px-3 py-1.5 text-left text-[12.5px] hover:bg-slate-50"
+                  className="min-w-0 flex-1 rounded-md border border-slate-200 px-3 py-1.5 text-left text-[12.5px] hover:bg-slate-50"
                 >
                   <span className="font-medium text-slate-700">{a.artifact_type}</span>
                   <span className="ml-2 font-mono text-[11px] text-slate-400">
@@ -487,6 +553,24 @@ function ArtifactsSection({ runId }: { runId: string }) {
                   <span className="float-right text-[11px] text-slate-400">
                     {a.producer_stage ?? DASH}
                   </span>
+                </button>
+                <button
+                  data-testid={`workspace-artifact-copy-${a.artifact_type}`}
+                  onClick={() => copyArtifact(a)}
+                  title="复制该产物的完整 JSON"
+                  className={
+                    copyState?.type === a.artifact_type
+                      ? copyState.ok
+                        ? "shrink-0 rounded-md border border-emerald-300 bg-emerald-50 px-2 text-[11.5px] font-medium text-emerald-700"
+                        : "shrink-0 rounded-md border border-red-300 bg-red-50 px-2 text-[11.5px] font-medium text-red-600"
+                      : "shrink-0 rounded-md border border-slate-200 bg-white px-2 text-[11.5px] font-medium text-slate-500 hover:bg-slate-50"
+                  }
+                >
+                  {copyState?.type === a.artifact_type
+                    ? copyState.ok
+                      ? "已复制"
+                      : "复制失败"
+                    : "复制 JSON"}
                 </button>
               </li>
             ))}

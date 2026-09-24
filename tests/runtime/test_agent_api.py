@@ -165,6 +165,66 @@ def test_full_agent_chain_via_api(c: Checks):
 
 
 @section
+def test_review_card_endpoint(c: Checks):
+    """Phase 27.7.6 v2: GET /api/runs/{id}/review-card — a READ-ONLY
+    projection of the evaluation layer's Review Card (generator runs
+    in memory; nothing is ever written into the run dir)."""
+    import glob as globmod
+    profile = {"family_profile": {"age": {"value": 35}},
+               "financial_profile": {"budget": {"value": "1万/年"}},
+               "existing_protection": {"existing_insurance": {"value": "无"}}}
+    script = [
+        ("agent_decide", {"action": "call_tool", "tool": "record_client_profile",
+                          "arguments": profile}),
+        ("agent_decide", {"action": "call_tool", "tool": "record_requirement_analysis",
+                          "arguments": {"requirements": [
+                              {"requirement_id": "R", "requirement_type": "medical",
+                               "summary": "住院医疗", "priority": "P1_HIGH"}]}}),
+        ("agent_decide", {"action": "call_tool", "tool": "record_risk_assessment",
+                          "arguments": {"risks": [
+                              {"risk_id": "R1", "risk_category": "R1_medical",
+                               "risk_name": "住院费用", "priority": "P1_HIGH"}]}}),
+        ("coverage_gap_analysis", {}), ("solution", {}),
+        ("product_candidate_provider", {}), ("recommendation", {}),
+        ("report_generation", {}),
+        ("agent_decide", {"action": "finish", "message": "分析完成，报告已生成。"}),
+    ]
+    client, mgr, _ = _client(script)
+    rid = client.post("/api/chats/chat_card/messages",
+                      json={"text": "35岁买保险，预算1万，担心住院。"}).json()["run_id"]
+    _wait(client, rid)
+
+    r = client.get("/api/runs/%s/review-card" % rid)
+    c.chk("finished run returns a card", r.status_code == 200, r.status_code)
+    b = r.json()
+    c.chk("card vocabulary is closed (level/status/dims)",
+          b["review_action"]["level"] in ("AUTO_PASS", "SUMMARY_REVIEW", "DEEP_REVIEW")
+          and b["validation_status"] in ("PASS", "FAIL")
+          and all(b["automatic_validation"][d] in ("PASS", "FAIL")
+                  for d in ("schema_check", "trace_check",
+                            "evidence_check", "logic_check")), b["review_action"])
+    dims_pass = all(b["automatic_validation"][d] == "PASS" for d in
+                    ("schema_check", "trace_check", "evidence_check", "logic_check"))
+    c.chk("validation_status consistent with the four dimensions",
+          (b["validation_status"] == "PASS") == dims_pass, b["validation_status"])
+    c.chk("required review never claims AUTO_PASS",
+          (not b["review_action"]["required"]) or b["review_action"]["level"] != "AUTO_PASS")
+    c.chk("card identifies its run", b["run_id"] == rid, b["run_id"])
+    r2 = client.get("/api/runs/%s/review-card" % rid)
+    c.chk("repeat GET is a stable read",
+          {k: v for k, v in r2.json().items() if k != "generated_at"}
+          == {k: v for k, v in b.items() if k != "generated_at"})
+    c.chk("endpoint writes NOTHING into the run dir (in-memory projection)",
+          not globmod.glob(os.path.join(mgr.run_root, rid, "**",
+                                        "human_review_card.json"), recursive=True))
+    c.chk("unknown run -> 404",
+          client.get("/api/runs/run_nope42/review-card").status_code == 404)
+    c.chk("path-traversal run id refused",
+          client.get("/api/runs/..%2F..%2Fetc%2Fpasswd/review-card").status_code == 404
+          and client.get("/api/runs/run..%2F./review-card").status_code == 404)
+
+
+@section
 def test_chat_busy_409(c: Checks):
     slow = [("agent_decide", {"action": "ask_user", "message": "请补充信息",
                               "required_fields": ["age"], "reason": "r"})]

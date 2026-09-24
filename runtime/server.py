@@ -89,6 +89,25 @@ def _load_bench():
 BENCH = _load_bench()
 
 
+# Phase 27.7.6 v2: the offline Review Card generator (evaluation layer,
+# hyphenated dir -> not importable as a package; same importlib idiom as
+# _load_bench). Loaded once; used ONLY as a read-only projection.
+_REVIEW_CARD_GEN = None
+
+
+def _review_card_generator():
+    global _REVIEW_CARD_GEN
+    if _REVIEW_CARD_GEN is None:
+        path = os.path.join(REPO_ROOT, "evaluation", "human-review",
+                            "review_card_generator.py")
+        spec = importlib.util.spec_from_file_location(
+            "webui_review_card_generator", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _REVIEW_CARD_GEN = mod
+    return _REVIEW_CARD_GEN
+
+
 # --------------------------------------------------------------------------- #
 # Run registry — metadata about ONE execution of a case (never a second CaseState)
 # --------------------------------------------------------------------------- #
@@ -884,6 +903,22 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="unknown artifact_type for this run")
         return detail
 
+    # ---- Phase 27.7.6 v2: Review Card projection (read-only) ------------- #
+    @app.get("/api/runs/{run_id}/review-card")
+    def get_review_card(run_id: str):
+        """Risk-based review card for a FINISHED run, generated on demand.
+
+        Read-only: computes the card in memory (the generator's
+        generate_card path — never its file-writing main) and returns
+        it. Keyed by the run DIRECTORY, not the in-memory registry, so
+        cards keep working after a backend restart. A run whose state
+        was never persisted gets the generator's fail-closed card.
+        """
+        run_dir = os.path.join(mgr.run_root, run_id)
+        if not _SAFE_RUN_ID(run_id) or not os.path.isdir(run_dir):
+            raise HTTPException(status_code=404, detail="unknown run_id")
+        return _review_card_generator().generate_card(run_dir)
+
     @app.get("/api/runs/{run_id}/stream")
     def stream_run(run_id: str, after_event_id: Optional[str] = None,
                    request: Request = None):
@@ -938,7 +973,18 @@ def create_app(manager: Optional[RunManager] = None) -> FastAPI:
         pid, appr = _find_approval(approval_id, _harness_root(mgr))
         if appr is None:
             return JSONResponse({"error": "approval not found"}, status_code=404)
-        return {"project_id": pid, "approval": appr}
+        # Phase 27.7.6-C: read-only projection of the approval's
+        # existing context — no state change, no computation.
+        ctx = appr.get("context") or {}
+        review_context = {}
+        run_id = ctx.get("run_id")
+        if run_id:
+            review_context["run_id"] = run_id
+        artifact_ids = ctx.get("artifact_ids")
+        if artifact_ids:
+            review_context["artifact_ids"] = artifact_ids
+        return {"project_id": pid, "approval": appr,
+                "review_context": review_context}
 
     @app.post("/api/approvals/{approval_id}/approve")
     def approve_approval(approval_id: str, req: ApprovalDecisionRequest,
@@ -1106,6 +1152,14 @@ def _start_agent_turn(mgr: RunManager, chat_id: str, req: ChatMessageRequest) ->
 def _require_run(mgr: RunManager, run_id: str) -> None:
     if mgr.get_run(run_id) is None:
         raise HTTPException(status_code=404, detail="unknown run_id")
+
+
+def _SAFE_RUN_ID(run_id: str) -> bool:
+    """Disk-path safety for endpoints that read the run DIRECTORY
+    (review-card): run ids are `run_<hex>`-shaped; refuse anything
+    with path separators or dots before touching the filesystem."""
+    import re
+    return bool(re.fullmatch(r"[A-Za-z0-9_-]{1,64}", run_id))
 
 
 app = create_app()

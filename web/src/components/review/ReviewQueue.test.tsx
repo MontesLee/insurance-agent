@@ -25,13 +25,61 @@ function rec(over: Partial<ApprovalRecord>): ApprovalRecord {
   };
 }
 
-function stubApprovals(approvals: ApprovalRecord[], status = 200) {
+function stubApprovals(
+  approvals: ApprovalRecord[],
+  status = 200,
+  cards: Record<string, unknown> = {},
+  failCards = false,
+) {
   return vi.fn(async (input: RequestInfo | URL) => {
-    if (String(input).includes("/api/projects/proj-1/approvals")) {
+    const url = String(input);
+    if (url.includes("/api/projects/proj-1/approvals")) {
       return Response.json({ project_id: "proj-1", approvals }, { status });
+    }
+    const rid = url.match(/\/api\/runs\/([^/]+)\/review-card$/)?.[1];
+    if (rid) {
+      if (failCards) return Response.json({ error: "boom" }, { status: 500 });
+      const card = cards[rid];
+      return card
+        ? Response.json(card)
+        : Response.json({ error: "unknown run" }, { status: 404 });
     }
     return Response.json({}, { status: 404 });
   });
+}
+
+/** Minimal backend-shaped Review Card (types/reviewCard.ts). */
+function card(over: Record<string, unknown> = {}) {
+  return {
+    schema_version: "1.0",
+    card_id: "HRC-00000001",
+    case_id: "case-x",
+    run_id: "run-1",
+    generated_at: "2026-09-24T12:00:00Z",
+    customer_summary: { age: "40", unresolved: [] },
+    agent_summary: {
+      case_status: "COMPLETED",
+      objective: [],
+      recommendation_status: "COMPLETE",
+      primary: { candidate_id: "C001", product_id: "P001", product_name: "医疗险A" },
+      recommendation: ["医疗险A"],
+      risk_highlights: [],
+      waiting_for_user: null,
+    },
+    automatic_validation: {
+      schema_check: "PASS",
+      trace_check: "PASS",
+      evidence_check: "PASS",
+      logic_check: "PASS",
+      eval_summary: { total: 9, passed: 9, failed: 0, failed_eval_ids: [] },
+      failed_checks: [],
+    },
+    risk_flags: [],
+    review_action: { required: false, level: "AUTO_PASS", reasons: ["all checks PASS"] },
+    validation_status: "PASS",
+    sampling: { rate: 0.1, triggered: false, seed: "case-x:run-1" },
+    ...over,
+  };
 }
 
 afterEach(() => vi.unstubAllGlobals());
@@ -105,5 +153,116 @@ describe("Review Queue — Phase 27.5-2", () => {
     render(<ReviewQueue onOpenApproval={() => {}} />);
     expect(await screen.findByTestId("approval-status-SOMETHING_NEW")).toBeInTheDocument();
     localStorage.removeItem("webui:review-project");
+  });
+});
+
+describe("Review Queue — Phase 27.7.6 v2 (risk-based review tasks)", () => {
+  const deepItem = rec({
+    approval_id: "apr_deep",
+    context: { run_id: "run-deep", client_name: "高风险案例" },
+  });
+  const sumItem = rec({
+    approval_id: "apr_sum",
+    context: { run_id: "run-sum" },
+    status: "APPROVED",
+    decision: "approve",
+  });
+  const noRunItem = rec({
+    approval_id: "apr_none",
+    context: { client_name: "无运行上下文" },
+  });
+  const withRuns = [deepItem, sumItem, noRunItem];
+  const CARDS = {
+    "run-deep": card({
+      run_id: "run-deep",
+      risk_flags: [
+        { type: "missing_evidence", severity: "HIGH", message: "证据链断裂", evidence_ref: "eval:E1:x" },
+      ],
+      review_action: { required: true, level: "DEEP_REVIEW", reasons: ["HIGH flag: missing_evidence"] },
+      validation_status: "FAIL",
+      automatic_validation: {
+        schema_check: "PASS", trace_check: "PASS", evidence_check: "FAIL", logic_check: "PASS",
+        eval_summary: { total: 6, passed: 5, failed: 1, failed_eval_ids: ["EVAL-006"] },
+        failed_checks: [],
+      },
+    }),
+    "run-sum": card({
+      run_id: "run-sum",
+      risk_flags: [
+        { type: "no_primary_recommendation", severity: "MEDIUM", message: "无主推荐", evidence_ref: "rec:status=NO_CANDIDATES" },
+      ],
+      review_action: { required: true, level: "SUMMARY_REVIEW", reasons: ["MEDIUM flag"] },
+      sampling: { rate: 0.1, triggered: true, seed: "x:run-sum" },
+    }),
+  };
+
+  async function openQueue() {
+    vi.stubGlobal("fetch", stubApprovals(withRuns, 200, CARDS));
+    localStorage.setItem("webui:review-project", "proj-1");
+    render(<ReviewQueue onOpenApproval={() => {}} />);
+    await screen.findByTestId("queue-list");
+    await screen.findByTestId("card-level-DEEP_REVIEW");
+  }
+
+  afterEach(() => localStorage.removeItem("webui:review-project"));
+
+  it("rows show card level badge, validation chips and top issue verbatim", async () => {
+    await openQueue();
+    expect(screen.getByTestId("card-level-DEEP_REVIEW")).toBeInTheDocument();
+    expect(screen.getByTestId("card-level-SUMMARY_REVIEW")).toBeInTheDocument();
+    expect(screen.getByTestId("card-issue-apr_deep").textContent).toContain("证据链断裂");
+    expect(screen.getByTestId("card-issue-apr_sum").textContent).toContain("随机抽审命中");
+    // approval without run context degrades honestly
+    expect(screen.getByText(/无 Review Card/)).toBeInTheDocument();
+  });
+
+  it("filter High Risk keeps only DEEP_REVIEW/HIGH items", async () => {
+    await openQueue();
+    fireEvent.click(screen.getByTestId("queue-filter-high"));
+    expect(screen.getByTestId("queue-item-apr_deep")).toBeInTheDocument();
+    expect(screen.queryByTestId("queue-item-apr_sum")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("queue-item-apr_none")).not.toBeInTheDocument();
+  });
+
+  it("filter Need Review uses backend status (ACTIVE approvals only)", async () => {
+    await openQueue();
+    fireEvent.click(screen.getByTestId("queue-filter-need"));
+    expect(screen.getByTestId("queue-item-apr_deep")).toBeInTheDocument();
+    expect(screen.queryByTestId("queue-item-apr_sum")).not.toBeInTheDocument(); // APPROVED
+  });
+
+  it("filter Random Audit keeps only sampling-triggered items", async () => {
+    await openQueue();
+    fireEvent.click(screen.getByTestId("queue-filter-audit"));
+    expect(screen.queryByTestId("queue-item-apr_deep")).not.toBeInTheDocument();
+    expect(screen.getByTestId("queue-item-apr_sum")).toBeInTheDocument();
+  });
+
+  it("filter with no matches shows the filtered-empty state", async () => {
+    // no HIGH/DEEP items in this dataset -> High Risk filter empties the list
+    vi.stubGlobal(
+      "fetch",
+      stubApprovals([sumItem, noRunItem], 200, CARDS),
+    );
+    localStorage.setItem("webui:review-project", "proj-1");
+    render(<ReviewQueue onOpenApproval={() => {}} />);
+    await screen.findByTestId("queue-list");
+    fireEvent.click(screen.getByTestId("queue-filter-high"));
+    expect(await screen.findByTestId("queue-filtered-empty")).toBeInTheDocument();
+    expect(screen.queryByTestId("queue-item-apr_sum")).not.toBeInTheDocument();
+  });
+
+  it("card fetch failure degrades to a hint, never blocks the list", async () => {
+    vi.stubGlobal(
+      "fetch",
+      stubApprovals(withRuns, 200, CARDS, /* failCards */ true),
+    );
+    localStorage.setItem("webui:review-project", "proj-1");
+    render(<ReviewQueue onOpenApproval={() => {}} />);
+    expect(
+      await screen.findByTestId("card-load-failed-apr_deep"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("queue-item-apr_sum")).toBeInTheDocument();
+    expect(screen.getByText(/无 Review Card/)).toBeInTheDocument();
   });
 });

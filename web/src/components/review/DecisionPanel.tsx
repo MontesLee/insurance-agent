@@ -23,10 +23,18 @@ const RESOLVED = new Set(["APPROVED", "REJECTED", "EXPIRED", "RESUMED"]);
 
 type Phase =
   | { kind: "input" }
-  | { kind: "confirm"; action: "approve" }
-  | { kind: "submitting"; action: "approve" | "reject" }
-  | { kind: "error"; action: "approve" | "reject"; message: string }
+  | { kind: "confirm"; action: "approve" | "request_fix" }
+  | { kind: "submitting"; action: "approve" | "reject" | "request_fix" }
+  | { kind: "error"; action: "approve" | "reject" | "request_fix"; message: string }
   | { kind: "done" };
+
+/**
+ * Phase 27.7.6 v2: request_fix ("退回修正") is a REJECT with a
+ * `REQUEST_FIX:` reason prefix — the V0.1 approval state machine has
+ * no NEED_FIX state (governance ADR-017: backend authority frozen),
+ * so the semantic lives in the auditable reason, not a new state.
+ */
+const REQUEST_FIX_PREFIX = "REQUEST_FIX: ";
 
 export function DecisionPanel({
   approval,
@@ -40,8 +48,8 @@ export function DecisionPanel({
 
   const alreadyDecided = RESOLVED.has(approval.status);
 
-  const submit = async (action: "approve" | "reject") => {
-    if (action === "reject" && comment.trim().length === 0) return;
+  const submit = async (action: "approve" | "reject" | "request_fix") => {
+    if (action !== "approve" && comment.trim().length === 0) return;
     setPhase({ kind: "submitting", action });
     try {
       // actor is overridden server-side by the authenticated user
@@ -55,7 +63,10 @@ export function DecisionPanel({
       } else {
         await api.rejectApproval(approval.approval_id, {
           actor: "human",
-          reason: comment.trim(),
+          reason:
+            action === "request_fix"
+              ? REQUEST_FIX_PREFIX + comment.trim()
+              : comment.trim(),
         });
       }
       setPhase({ kind: "done" });
@@ -118,7 +129,7 @@ export function DecisionPanel({
       ) : (
         <div className="mt-3">
           <label className="text-[12px] font-medium text-slate-500" htmlFor="decision-comment">
-            Comment(REJECT 必填;APPROVE 可留空)
+            Comment(REJECT / Request Fix 必填;APPROVE 可留空)
           </label>
           <textarea
             id="decision-comment"
@@ -133,16 +144,22 @@ export function DecisionPanel({
           {phase.kind === "confirm" ? (
             <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 p-2.5" data-testid="decision-confirm">
               <p className="text-[12.5px] font-medium text-amber-700">
-                确认批准?此操作将记录你的决定。
+                {phase.action === "approve"
+                  ? "确认批准?此操作将记录你的决定。"
+                  : "确认退回修正?将按 REJECT 记录(理由前缀 REQUEST_FIX:),修正意见完整保留在理由中。"}
               </p>
               <div className="mt-1.5 flex gap-2">
                 <button
                   data-testid="confirm-yes"
                   disabled={phase.kind !== "confirm"}
-                  onClick={() => void submit("approve")}
-                  className="rounded bg-emerald-600 px-3 py-1 text-[12px] font-medium text-white hover:bg-emerald-500"
+                  onClick={() => void submit(phase.action)}
+                  className={
+                    phase.action === "approve"
+                      ? "rounded bg-emerald-600 px-3 py-1 text-[12px] font-medium text-white hover:bg-emerald-500"
+                      : "rounded bg-amber-600 px-3 py-1 text-[12px] font-medium text-white hover:bg-amber-500"
+                  }
                 >
-                  确认批准
+                  {phase.action === "approve" ? "确认批准" : "确认退回修正"}
                 </button>
                 <button
                   data-testid="confirm-no"
@@ -183,6 +200,19 @@ export function DecisionPanel({
               className="rounded-md bg-emerald-600 px-4 py-1.5 text-[12.5px] font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
             >
               Approve
+            </button>
+            <button
+              data-testid="decision-request-fix"
+              disabled={phase.kind === "submitting" || comment.trim().length === 0}
+              onClick={() => setPhase({ kind: "confirm", action: "request_fix" })}
+              title={
+                comment.trim().length === 0
+                  ? "退回修正必须填写修正意见"
+                  : "按 REJECT 记录,理由前缀 REQUEST_FIX:"
+              }
+              className="rounded-md bg-amber-600 px-4 py-1.5 text-[12.5px] font-medium text-white hover:bg-amber-500 disabled:opacity-40"
+            >
+              Request Fix 退回修正
             </button>
             <button
               data-testid="decision-reject"

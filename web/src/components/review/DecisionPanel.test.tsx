@@ -125,6 +125,27 @@ describe("Decision Panel — Phase 27.5-4", () => {
     expect(screen.queryByTestId("decision-reject")).not.toBeInTheDocument();
   });
 
+  it("request_fix (27.7.6 v2): comment required, confirm-gated, recorded as REJECT with REQUEST_FIX prefix", async () => {
+    vi.stubGlobal("fetch", stubMutate());
+    render(<DecisionPanel approval={rec()} onDecided={() => {}} />);
+    const fix = screen.getByTestId("decision-request-fix") as HTMLButtonElement;
+    expect(fix.disabled).toBe(true); // 修正意见必填
+    fireEvent.change(screen.getByTestId("decision-comment"), {
+      target: { value: "推荐理由缺少家庭责任分析,请补充。" },
+    });
+    expect(fix.disabled).toBe(false);
+    fireEvent.click(fix);
+    // confirm gate BEFORE any API call, with the REJECT-recording caveat shown
+    const confirm = screen.getByTestId("decision-confirm");
+    expect(confirm.textContent).toContain("REJECT 记录");
+    expect(calls.length).toBe(0);
+    fireEvent.click(screen.getByTestId("confirm-yes"));
+    await screen.findByTestId("decision-success");
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toContain("/reject"); // existing endpoint, no state-machine change
+    expect(calls[0]).toContain("REQUEST_FIX: 推荐理由缺少家庭责任分析");
+  });
+
   it("unknown backend status renders verbatim — no mapping", () => {
     vi.stubGlobal("fetch", stubMutate());
     render(<DecisionPanel approval={rec({ status: "LEGAL_REVIEW_REQUIRED" })} onDecided={() => {}} />);

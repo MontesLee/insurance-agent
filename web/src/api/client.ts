@@ -15,6 +15,7 @@ import type {
   ApprovalsResponse,
   SupervisorState,
 } from "../types/approval";
+import type { ReviewCard } from "../types/reviewCard";
 
 export class ApiError extends Error {
   constructor(
@@ -105,6 +106,10 @@ export const api = {
 
   getArtifact: (runId: string, artifactType: string) =>
     request<ArtifactDetail>(`/api/runs/${runId}/artifacts/${artifactType}`),
+
+  /** Phase 27.7.6 v2: read-only Review Card projection (generated on demand). */
+  reviewCard: (runId: string) =>
+    request<ReviewCard>(`/api/runs/${runId}/review-card`),
 
   /** SSE endpoint URL with the resume cursor (EventSource cannot set headers). */
   streamUrl: (runId: string, afterEventId?: string) =>
