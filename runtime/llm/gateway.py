@@ -24,6 +24,17 @@ from .types import (
 _DEFAULT_TIMEOUT = 60.0
 _DEFAULT_MAX_RETRIES = 2
 
+# 28.K.7 (G-2): bounded exponential backoff between RATE-LIMIT retries
+# only (a 429 window lasts seconds; immediate retries all land inside
+# it). Other retryable errors (timeouts) keep the existing immediate
+# retry so the traced total-budget contract (timeout_s * (1 + retries))
+# is unchanged. Indirection `_sleep` lets tests observe/zero the waits.
+_RETRY_BACKOFF_S = (1.5, 4.0)
+
+
+def _sleep(seconds: float) -> None:  # pragma: no cover - thin wrapper
+    time.sleep(seconds)
+
 
 class CircuitBreaker:
     """Process-local circuit breaker (CLOSED → OPEN → HALF_OPEN).
@@ -116,26 +127,116 @@ class LLMGateway:
                 % self.provider.name, provider=self.provider.name)
         # 5. token budget preflight
         self._check_budget(request)
-        # 6. retry loop (bounded, transient-only)
+        # 6. retry loop (bounded, transient-only; 28.K.7 G-2: bounded
+        #    exponential backoff between retryable attempts; 28.K.11-F2:
+        #    per-attempt wall duration + the error OBJECT are threaded
+        #    into the observation layer — observability only, the
+        #    business outcome of every branch is byte-identical)
         last_error = None
         for attempt in range(1 + self.max_retries):
+            _t0 = time.perf_counter()
             try:
                 resp = self._do_generate(request, attempt)
                 self.circuit.record_success()
-                self._log(request, resp, attempt=attempt, status="OK")
+                self._log(request, resp, attempt=attempt, status="OK",
+                          duration_ms=round(
+                              (time.perf_counter() - _t0) * 1000.0, 1))
                 return resp
             except LLMError as e:
                 last_error = e
+                _dur = round((time.perf_counter() - _t0) * 1000.0, 1)
                 if not getattr(e, "retryable", False):
                     self.circuit.record_failure()
                     self._log(request, None, attempt=attempt,
-                              status="FAIL", error=type(e).__name__)
+                              status="FAIL", error=type(e).__name__,
+                              duration_ms=_dur, error_obj=e)
                     raise
                 self.circuit.record_failure()
                 self._log(request, None, attempt=attempt,
-                          status="RETRY", error=type(e).__name__)
+                          status="RETRY", error=type(e).__name__,
+                          duration_ms=_dur, error_obj=e)
+                if (isinstance(e, RateLimitError)
+                        and attempt < self.max_retries):
+                    _sleep(_RETRY_BACKOFF_S[min(
+                        attempt, len(_RETRY_BACKOFF_S) - 1)])
         self._log(request, None, attempt=self.max_retries,
-                  status="EXHAUSTED", error=type(last_error).__name__)
+                  status="EXHAUSTED", error=type(last_error).__name__,
+                  error_obj=last_error)
+        raise last_error
+
+    def generate_stream(self, request: LLMRequest, on_text) -> LLMResponse:
+        """28.K.26: STREAMING generation with the SAME governance as
+        generate() (policy/PII/rate-limit/circuit/budget + bounded retry
+        + RateLimit backoff + F2 llm.call records). The adapter forwards
+        only content-kind text through on_text under the same wall-clock
+        watchdog; the returned assembled response feeds the existing
+        final gates unchanged. No second gateway — one class, two entry
+        points sharing every policy."""
+        request.timeout_s = min(request.timeout_s or self.timeout_s,
+                                self.timeout_s)
+        self._check_policy(request)
+        self._check_pii(request)
+        if not self.rate_limiter.allow():
+            raise RateLimitError("LLM rate limit exceeded",
+                                provider=self.provider.name)
+        if not self.circuit.allow():
+            raise ProviderUnavailableError(
+                "LLM circuit breaker OPEN (provider %s failing)"
+                % self.provider.name, provider=self.provider.name)
+        self._check_budget(request)
+        last_error = None
+        for attempt in range(1 + self.max_retries):
+            _t0 = time.perf_counter()
+            try:
+                try:
+                    if hasattr(self.provider, "generate_stream"):
+                        resp = self.provider.generate_stream(request, on_text)
+                    else:
+                        # provider without streaming (e.g. a mock wired
+                        # directly): one-shot under the same governance,
+                        # delivered as a single on_text — behaviorally the
+                        # pre-K.26 contract, never a fake multi-chunk stream
+                        resp = self.provider.generate(request)
+                        if resp is not None and resp.content:
+                            on_text(resp.content)
+                except LLMError:
+                    raise
+                except Exception as e:  # noqa: BLE001 — normalize with
+                    # the SAME semantics as _do_generate's final catch:
+                    # 429 → retryable RateLimit; everything else →
+                    # NON-retryable LLMError (immediate fail-closed,
+                    # preserving the traced llm_unavailable contract)
+                    if " 429" in str(e):
+                        raise RateLimitError(
+                            "LLM 429 rate limited (normalized from "
+                            "provider stream)", provider=self.provider.name)
+                    raise LLMError("LLM stream failure: %s" % str(e)[:120],
+                                   provider=self.provider.name)
+                self.circuit.record_success()
+                self._log(request, resp, attempt=attempt, status="OK",
+                          duration_ms=round(
+                              (time.perf_counter() - _t0) * 1000.0, 1))
+                return resp
+            except LLMError as e:
+                last_error = e
+                _dur = round((time.perf_counter() - _t0) * 1000.0, 1)
+                if not getattr(e, "retryable", False):
+                    self.circuit.record_failure()
+                    self._log(request, None, attempt=attempt,
+                              status="FAIL", error=type(e).__name__,
+                              duration_ms=_dur, error_obj=e)
+                    raise
+                self.circuit.record_failure()
+                self._log(request, None, attempt=attempt,
+                          status="RETRY", error=type(e).__name__,
+                          duration_ms=_dur, error_obj=e)
+                if (isinstance(e, RateLimitError)
+                        and attempt < self.max_retries):
+                    _sleep(_RETRY_BACKOFF_S[min(
+                        attempt, len(_RETRY_BACKOFF_S) - 1)])
+        self._log(request, None, attempt=self.max_retries,
+                  status="EXHAUSTED", error=type(last_error).__name__,
+                  error_obj=last_error)
         raise last_error
 
     # ---- internal --------------------------------------------------------- #
@@ -186,6 +287,16 @@ class LLMGateway:
                 "LLM provider unreachable: %s" % str(e)[:80],
                 provider=self.provider.name)
         except Exception as e:  # noqa: BLE001 — normalize everything
+            # 28.K.7 (G-2): the raw provider adapter raises plain
+            # RuntimeError("LLM provider error 429: ...") for provider
+            # rate limits — normalize THOSE into the retryable
+            # RateLimitError so the bounded retry/backoff machinery
+            # applies. Everything else keeps the existing normalization
+            # (LLMError), preserving the traced llm_unavailable contract.
+            if " 429" in str(e):
+                raise RateLimitError(
+                    "LLM 429 rate limited (normalized from provider "
+                    "error)", provider=self.provider.name)
             if isinstance(e, (TimeoutError, ProviderUnavailableError)):
                 raise LLMError(
                     "LLM provider failure: %s" % str(e)[:80],
@@ -243,12 +354,17 @@ class LLMGateway:
                 % (request.max_tokens, request.max_total_tokens))
 
     def _log(self, request, response, *, attempt=1, status="OK",
-             error=""):
+             error="", duration_ms=None, error_obj=None):
         """Metadata-only logging: no raw prompts, no secrets.
         Phase 25: the single observability choke point — every terminal
         outcome and every retry passes here exactly once, so metrics
         and the structured log see the complete LLM story (observation
-        only; this method cannot change the business result)."""
+        only; this method cannot change the business result).
+        28.K.11-F2: `duration_ms` (per-attempt WALL time — failed
+        attempts have no response latency) and `error_obj` (the error
+        OBJECT, so obs.errors classification can name the class and
+        retryability instead of an opaque type string) close the
+        attribution gap traced in K.9/K.10."""
         self.call_log.append({
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                        time.gmtime()),
@@ -259,19 +375,29 @@ class LLMGateway:
             "attempt": attempt,
             "status": status,
             "error_type": error,
-            "latency_ms": response.latency_ms if response else None,
+            "duration_ms": (duration_ms if duration_ms is not None
+                            else (response.latency_ms
+                                  if response else None)),
             "usage": (response.usage.to_dict()
                       if response and response.usage else None),
             "cost_status": (response.cost.status if response
                             else UNKNOWN),
         })
         try:
-            self._observe(request, response, attempt, status, error)
+            self._observe(request, response, attempt, status, error,
+                          duration_ms=duration_ms, error_obj=error_obj)
         except Exception:  # noqa: BLE001 — observability must not break calls
             pass
 
-    def _observe(self, request, response, attempt, status, error):
-        """Phase 25 instrumentation (pure side-observation)."""
+    def _observe(self, request, response, attempt, status, error,
+                 duration_ms=None, error_obj=None):
+        """Phase 25 instrumentation (pure side-observation).
+        28.K.11-F2: the structured record now carries request/correlation
+        ids, the logical purpose, per-attempt wall duration for FAILED
+        attempts too, and the classified error block (error_class /
+        retryable / timeout) — enough to attribute the next transient
+        without guessing. Metadata only; the sink's denylist enforces
+        no-prompt/no-secret by construction."""
         import runtime.obs as obs
         m = obs.default_metrics()
         if status == "OK":
@@ -294,15 +420,21 @@ class LLMGateway:
             m.observe("llm_duration", response.latency_ms)
         usage = (response.usage.to_dict()
                  if response and response.usage else None)
-        m.record_tokens(self.provider.name,
-                        usage.get("total_tokens") if usage else None)
         obs.log(
             "llm.call", level=("INFO" if status == "OK" else "WARN"),
-            status=status, duration_ms=(response.latency_ms
-                                        if response else None),
+            status=status,
+            duration_ms=(duration_ms if duration_ms is not None
+                         else (response.latency_ms
+                               if response else None)),
             provider=self.provider.name, model=request.model,
             attempt=attempt, max_attempts=1 + self.max_retries,
             error_type=str(error) if error else None,
+            request_id=request.request_id,
+            correlation_id=request.correlation_id,
+            purpose=((request.metadata or {}).get("purpose")
+                     if hasattr(request, "metadata") else None),
+            timeout=(("Timeout" in str(error)) if error else None),
+            error=error_obj,  # object → obs.errors classification block
             tokens=(usage.get("total_tokens") if usage
                     else obs.UNKNOWN))
 
