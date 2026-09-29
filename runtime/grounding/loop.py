@@ -245,6 +245,7 @@ def generate_grounded(question: str, evidence: list, intent_result: dict,
     flushed so the streamed content converges to the full answer."""
     import re as _re
     from runtime.consumer_hygiene import sanitize_consumer_text
+    from runtime.grounding import claim_support as csupp
     _SENTENCE = _re.compile("[^。！？；\n]*[。！？；\n]+")
 
     def _make_stream_segmenter():
@@ -269,7 +270,7 @@ def generate_grounded(question: str, evidence: list, intent_result: dict,
                     break
                 seg = m.group(0)
                 state["buf"] = state["buf"][len(seg):]
-                if ggate.check(seg, evidence_map, rules)["ok"]:
+                if _full_gate(seg)["ok"]:
                     try:
                         emit("agent_stream_delta",
                              {"kind": "content",
@@ -281,6 +282,14 @@ def generate_grounded(question: str, evidence: list, intent_result: dict,
 
         return on_text, _flush
     evidence_map = {label: e["anchor"] for label, e in evidence}
+
+    # 28.K.28-II-IMPL: the production gate = citation closure AND claim
+    # support (deterministic; disabled -> identical to ggate alone).
+    def _full_gate(text):
+        v = ggate.check(text, evidence_map, rules)
+        if v["ok"]:
+            v = csupp.merge_verdict(v, csupp.check(text, evidence, rules))
+        return v
     gen_cfg = rules.get("generation") or {}
     prompt_version = gen_cfg.get("prompt_version", "qa-answer-v1")
     max_regen = int((rules.get("gate") or {}).get("max_regenerations", 1))
@@ -329,7 +338,7 @@ def generate_grounded(question: str, evidence: list, intent_result: dict,
                                     "request_id": request_id},
                                 product_ref=product_ref)
         answer = (resp.content or "").strip()
-        verdict = ggate.check(answer, evidence_map, rules)
+        verdict = _full_gate(answer)
         if verdict["ok"]:
             # 28.K.26: residual = held segments + trailing incomplete
             # sentence — emitted ONLY now that the FINAL gate passed

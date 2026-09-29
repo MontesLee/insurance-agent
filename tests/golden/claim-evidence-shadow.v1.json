@@ -1,0 +1,2241 @@
+{
+ "corpus": "claim-evidence-shadow",
+ "version": 1,
+ "frozen_at": "2026-09-29",
+ "as_of": "2026-09-29",
+ "claim_taxonomy": [
+  "C-FACT",
+  "C-USER",
+  "C-RECOMMENDATION",
+  "C-CALCULATION",
+  "C-DERIVED",
+  "C-UNCERTAIN"
+ ],
+ "support_states": [
+  "SUPPORTED",
+  "PARTIALLY_SUPPORTED",
+  "UNSUPPORTED",
+  "NOT_APPLICABLE",
+  "CONTRADICTED"
+ ],
+ "provenance": {
+  "pilot-corpus(real)": "knowledge/pilot/documents excerpts",
+  "catalog(real)": "config catalog P001 record",
+  "fixture(TEST-DATA)": "authored numeric product/policy facts (fixtures-KB precedent)"
+ },
+ "cases": [
+  {
+   "case_id": "P01",
+   "class": "P",
+   "claim_text": "短期团体健康保险产品可以对产品参数进行调整",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "verbatim real text"
+  },
+  {
+   "case_id": "P02",
+   "class": "P",
+   "claim_text": "产品参数包括保险金额、起付金额、给付比例、除外责任、责任等待期等事项",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "real text enumerated params"
+  },
+  {
+   "case_id": "P03",
+   "class": "P",
+   "claim_text": "产品参数可以根据投保团体的具体情况进行合理调整",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "real paraphrase within evidence scope"
+  },
+  {
+   "case_id": "P04",
+   "class": "P",
+   "claim_text": "短期健康保险的业务经营应当遵循相关监管规定",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "generic regulatory claim; evidence covers adjustment rules only — semantic partial"
+  },
+  {
+   "case_id": "P05",
+   "class": "P",
+   "claim_text": "demo-百万医疗险A（标准版）年保费为400元",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "real catalog fact"
+  },
+  {
+   "case_id": "P06",
+   "class": "P",
+   "claim_text": "该产品等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P07",
+   "class": "P",
+   "claim_text": "该产品免赔额为1万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：免赔额为1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P08",
+   "class": "P",
+   "claim_text": "该产品保额为100万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：保额为100万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P09",
+   "class": "P",
+   "claim_text": "该产品犹豫期为15天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：犹豫期为15天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P10",
+   "class": "P",
+   "claim_text": "该产品赔付比例为100%",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：赔付比例为100%。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P11",
+   "class": "P",
+   "claim_text": "该产品投保年龄为60岁",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：投保年龄为60岁。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P12",
+   "class": "P",
+   "claim_text": "该产品续保为20年",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：续保为20年。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P13",
+   "class": "P",
+   "claim_text": "该产品免赔额为0元",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：免赔额为0元。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P14",
+   "class": "P",
+   "claim_text": "该产品等待期为90天，免赔额为1万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本产品条款约定：等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "本产品条款约定：免赔额为1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "multi-evidence synthesis"
+  },
+  {
+   "case_id": "P15",
+   "class": "P",
+   "claim_text": "等待期90天且犹豫期15天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "条款：等待期90天；犹豫期15天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "single evidence both anchors"
+  },
+  {
+   "case_id": "P16",
+   "class": "P",
+   "claim_text": "P001的年保费为400元，且等待期由合同约定",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    },
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "catalog + KB"
+  },
+  {
+   "case_id": "P17",
+   "class": "P",
+   "claim_text": "P004的保额为100万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-重疾险A（定期至70岁）条款：保额100万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P004"
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "product-bound fixture fact"
+  },
+  {
+   "case_id": "U01",
+   "class": "P",
+   "claim_text": "我今年40岁",
+   "claim_type": "C-USER",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "user fact exemption (ADR-022-B ruling 3)"
+  },
+  {
+   "case_id": "U02",
+   "class": "P",
+   "claim_text": "孩子5岁",
+   "claim_type": "C-USER",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "user fact exemption (ADR-022-B ruling 3)"
+  },
+  {
+   "case_id": "U03",
+   "class": "P",
+   "claim_text": "房贷还有100万",
+   "claim_type": "C-USER",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "user fact exemption (ADR-022-B ruling 3)"
+  },
+  {
+   "case_id": "U04",
+   "class": "P",
+   "claim_text": "家庭年收入30万",
+   "claim_type": "C-USER",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "user fact exemption (ADR-022-B ruling 3)"
+  },
+  {
+   "case_id": "U05",
+   "class": "P",
+   "claim_text": "配偶35岁",
+   "claim_type": "C-USER",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "user fact exemption (ADR-022-B ruling 3)"
+  },
+  {
+   "case_id": "U06",
+   "class": "P",
+   "claim_text": "我们一家三口",
+   "claim_type": "C-USER",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "user fact exemption (ADR-022-B ruling 3)"
+  },
+  {
+   "case_id": "CA01",
+   "class": "P",
+   "claim_text": "收入替代保额=30万×5=150万",
+   "claim_type": "C-CALCULATION",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "deterministic calculation"
+  },
+  {
+   "case_id": "CA02",
+   "class": "P",
+   "claim_text": "预算按年收入的10%计算为3万",
+   "claim_type": "C-CALCULATION",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "deterministic calculation"
+  },
+  {
+   "case_id": "CA03",
+   "class": "P",
+   "claim_text": "扣除现有保额后缺口为100万-50万=50万",
+   "claim_type": "C-CALCULATION",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "deterministic calculation"
+  },
+  {
+   "case_id": "D01",
+   "class": "P",
+   "claim_text": "家庭收入主要来自一人，因此建议重点考虑收入中断风险",
+   "claim_type": "C-DERIVED",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "planning derived (OD-9)"
+  },
+  {
+   "case_id": "D02",
+   "class": "P",
+   "claim_text": "孩子尚幼，教育周期长，因此教育金需求优先级较高",
+   "claim_type": "C-DERIVED",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "planning derived (OD-9)"
+  },
+  {
+   "case_id": "D03",
+   "class": "P",
+   "claim_text": "基于您的收入结构，保障应先覆盖经济支柱",
+   "claim_type": "C-DERIVED",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "planning derived (OD-9)"
+  },
+  {
+   "case_id": "RE01",
+   "class": "P",
+   "claim_text": "建议优先补充医疗保障",
+   "claim_type": "C-RECOMMENDATION",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "recommendation body exempt (premises judged separately as C-FACT)"
+  },
+  {
+   "case_id": "RE02",
+   "class": "P",
+   "claim_text": "可以考虑配置定期寿险",
+   "claim_type": "C-RECOMMENDATION",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "recommendation body exempt (premises judged separately as C-FACT)"
+  },
+  {
+   "case_id": "RE03",
+   "class": "P",
+   "claim_text": "建议在预算内优先覆盖大额医疗风险",
+   "claim_type": "C-RECOMMENDATION",
+   "evidence": [],
+   "expected": "NOT_APPLICABLE",
+   "reason": "recommendation body exempt (premises judged separately as C-FACT)"
+  },
+  {
+   "case_id": "TP1",
+   "class": "P",
+   "claim_text": "该产品等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2019-01-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "effective-window valid"
+  },
+  {
+   "case_id": "TP2",
+   "class": "P",
+   "claim_text": "短期团体健康保险产品可以对产品参数进行调整",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2029-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "window valid"
+  },
+  {
+   "case_id": "N1-1",
+   "class": "N1",
+   "claim_text": "重疾险等待期为90天[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 citation-only: agri evidence"
+  },
+  {
+   "case_id": "N1-2",
+   "class": "N1",
+   "claim_text": "百万医疗险可以覆盖大病医疗费用[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 planning claim stuffed"
+  },
+  {
+   "case_id": "N1-3",
+   "class": "N1",
+   "claim_text": "定期寿险适合家庭经济支柱[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 wrong evidence topic"
+  },
+  {
+   "case_id": "N1-4",
+   "class": "N1",
+   "claim_text": "该产品免赔额为0元[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 citation on different fact"
+  },
+  {
+   "case_id": "N1-5",
+   "class": "N1",
+   "claim_text": "保险公司的偿付能力充足率为200%[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 fabricated number + citation"
+  },
+  {
+   "case_id": "N1-6",
+   "class": "N1",
+   "claim_text": "所有重疾险都保证续保[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 universal claim + citation"
+  },
+  {
+   "case_id": "N1-7",
+   "class": "N1",
+   "claim_text": "此产品保费为每年200元[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N1 citation but wrong number (real=400)"
+  },
+  {
+   "case_id": "N2-1",
+   "class": "N2",
+   "claim_text": "短期健康保险等待期由合同约定",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 same-domain no support"
+  },
+  {
+   "case_id": "N2-2",
+   "class": "N2",
+   "claim_text": "医疗险保费为每年300元",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 same topic wrong fact"
+  },
+  {
+   "case_id": "N2-3",
+   "class": "N2",
+   "claim_text": "健康保险产品不得强制搭销",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 regulatory neighbor absent"
+  },
+  {
+   "case_id": "N2-4",
+   "class": "N2",
+   "claim_text": "农业保险适用保险法相关规定",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 reversed direction"
+  },
+  {
+   "case_id": "N2-5",
+   "class": "N2",
+   "claim_text": "重疾险的疾病定义由银保监会统一规定",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 authority confusion"
+  },
+  {
+   "case_id": "N2-6",
+   "class": "N2",
+   "claim_text": "本产品支持全家投保",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 coverage claim no support"
+  },
+  {
+   "case_id": "N2-7",
+   "class": "N2",
+   "claim_text": "等待期出险也可以全额理赔",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 contradicting practice claim"
+  },
+  {
+   "case_id": "N2-8",
+   "class": "N2",
+   "claim_text": "团体健康保险必须一年一保",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N2 invented obligation"
+  },
+  {
+   "case_id": "N3-1",
+   "class": "N3",
+   "claim_text": "等待期为90天，并且所有重大疾病均覆盖",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 partial: coverage clause unsupported"
+  },
+  {
+   "case_id": "N3-2",
+   "class": "N3",
+   "claim_text": "免赔额为1万，且保证续保终身",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "免赔额为1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 partial: renewal unsupported"
+  },
+  {
+   "case_id": "N3-3",
+   "class": "N3",
+   "claim_text": "保额100万且含身故责任",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "保额为100万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 partial: death rider unsupported"
+  },
+  {
+   "case_id": "N3-4",
+   "class": "N3",
+   "claim_text": "犹豫期15天，退保无任何损失",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "犹豫期为15天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 partial: loss claim unsupported"
+  },
+  {
+   "case_id": "N3-5",
+   "class": "N3",
+   "claim_text": "等待期90天且投保年龄上限70岁",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天；投保年龄上限为60岁。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 partial: age contradicts (70 vs 60)"
+  },
+  {
+   "case_id": "N3-6",
+   "class": "N3",
+   "claim_text": "P001保费每年400元且无免赔额",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 premium supported deductible absent"
+  },
+  {
+   "case_id": "N3-7",
+   "class": "N3",
+   "claim_text": "赔付比例100%并覆盖进口药",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "赔付比例为100%。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 drug coverage unsupported"
+  },
+  {
+   "case_id": "N3-8",
+   "class": "N3",
+   "claim_text": "续保20年且费率不变",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "保证续保20年。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "N3 rate-lock unsupported"
+  },
+  {
+   "case_id": "N4-1",
+   "class": "N4",
+   "claim_text": "P004的等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N4 wrong product (P004 vs P001 evidence)"
+  },
+  {
+   "case_id": "N4-2",
+   "class": "N4",
+   "claim_text": "P001的等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P004"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N4 reversed"
+  },
+  {
+   "case_id": "N4-3",
+   "class": "N4",
+   "claim_text": "这款百万医疗险A等待期90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "P004条款：等待期90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P004"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N4 name vs id mismatch"
+  },
+  {
+   "case_id": "N4-4",
+   "class": "N4",
+   "claim_text": "P007定期寿险的免责条款仅含自杀",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "P001免责：既往症。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N4 product family confusion"
+  },
+  {
+   "case_id": "N4-5",
+   "class": "N4",
+   "claim_text": "P003中端医疗险保额100万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "保额100万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P006"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N4 wrong product"
+  },
+  {
+   "case_id": "N4-6",
+   "class": "N4",
+   "claim_text": "P005重疾险B的等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P006"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N4 sibling product"
+  },
+  {
+   "case_id": "N5-1",
+   "class": "N5",
+   "claim_text": "该产品等待期为90天（当前版本）",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为180天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2020-01-01",
+     "effective_to": "2023-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N5 old version expired evidence"
+  },
+  {
+   "case_id": "N5-2",
+   "class": "N5",
+   "claim_text": "本款保费为每年400元",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "年保费400元。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2021-01-01",
+     "effective_to": "2024-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N5 superseded version"
+  },
+  {
+   "case_id": "N5-3",
+   "class": "N5",
+   "claim_text": "P001免赔额为1万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "免赔额1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2024-01-01",
+     "effective_to": "2025-12-31",
+     "product_id": "P001"
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N5 prior term"
+  },
+  {
+   "case_id": "N5-4",
+   "class": "N5",
+   "claim_text": "现行产品等待期90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "0.9",
+     "effective_from": "2019-01-01",
+     "effective_to": "2025-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N5 v0.9 legacy"
+  },
+  {
+   "case_id": "N5-5",
+   "class": "N5",
+   "claim_text": "最新条款赔付比例100%",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "赔付比例100%。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2025-01-01",
+     "effective_to": "2026-06-30",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N5 window closed"
+  },
+  {
+   "case_id": "N6-1",
+   "class": "N6",
+   "claim_text": "该产品等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2027-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N6 future-effective evidence"
+  },
+  {
+   "case_id": "N6-2",
+   "class": "N6",
+   "claim_text": "本产品免赔额1万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "免赔额1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2020-01-01",
+     "effective_to": "2024-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N6 expired"
+  },
+  {
+   "case_id": "N6-3",
+   "class": "N6",
+   "claim_text": "犹豫期为15天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "犹豫期15天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2024-01-01",
+     "effective_to": "2026-01-01",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N6 window fully past"
+  },
+  {
+   "case_id": "N6-4",
+   "class": "N6",
+   "claim_text": "等待期90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": "2026-09-28",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N6 ended yesterday (as_of 2026-09-29)"
+  },
+  {
+   "case_id": "N6-5",
+   "class": "N6",
+   "claim_text": "等待期90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-09-30",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N6 starts tomorrow"
+  },
+  {
+   "case_id": "N6-6",
+   "class": "N6",
+   "claim_text": "参数调整规则适用于当前产品",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2025-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N6 real reg expired window"
+  },
+  {
+   "case_id": "N7-1",
+   "class": "N7",
+   "claim_text": "等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "等待期为180天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "CONTRADICTED",
+   "reason": "N7 conflicting evidence"
+  },
+  {
+   "case_id": "N7-2",
+   "class": "N7",
+   "claim_text": "P001的保费为400元",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    },
+    {
+     "content": "P001年保费500元。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "CONTRADICTED",
+   "reason": "N7 catalog vs KB conflict"
+  },
+  {
+   "case_id": "N7-3",
+   "class": "N7",
+   "claim_text": "免赔额为1万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "免赔额1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "免赔额2万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "CONTRADICTED",
+   "reason": "N7 plain conflict"
+  },
+  {
+   "case_id": "N7-4",
+   "class": "N7",
+   "claim_text": "续保年限为20年",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "保证续保20年。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "保证续保15年。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "CONTRADICTED",
+   "reason": "N7 renewal conflict"
+  },
+  {
+   "case_id": "N7-5",
+   "class": "N7",
+   "claim_text": "投保年龄上限为60岁",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "投保年龄上限60岁。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "投保年龄上限65岁。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "CONTRADICTED",
+   "reason": "N7 age conflict"
+  },
+  {
+   "case_id": "N7-6",
+   "class": "N7",
+   "claim_text": "犹豫期为15天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "犹豫期15天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "犹豫期20天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2020-01-01",
+     "effective_to": "2025-12-31",
+     "product_id": null
+    },
+    {
+     "content": "犹豫期15天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "N7 conflict among usable two [ERRATUM E1: conflicting 20天 item outside window — OD-6 filter correctly removes it]"
+  },
+  {
+   "case_id": "N8-1",
+   "class": "N8",
+   "claim_text": "重疾险确诊即赔",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "重疾险需满足合同约定的疾病定义后方可赔付。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N8 semantic neighbor: opposite meaning"
+  },
+  {
+   "case_id": "N8-2",
+   "class": "N8",
+   "claim_text": "医保可以报销所有医疗费用",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "医保按照规定的报销比例和范围支付医疗费用。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N8 universal vs scoped"
+  },
+  {
+   "case_id": "N8-3",
+   "class": "N8",
+   "claim_text": "百万医疗险可以带病投保",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "投保时需如实进行健康告知。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N8 opposite practice"
+  },
+  {
+   "case_id": "N8-4",
+   "class": "N8",
+   "claim_text": "等待期后所有的既往症都能赔",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期后发生的疾病可申请理赔。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N8 既往症 vs 疾病"
+  },
+  {
+   "case_id": "N8-5",
+   "class": "N8",
+   "claim_text": "消费型保险到期可以返还保费",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "消费型保险合同期满后不返还保费。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N8 direct contradiction no numbers"
+  },
+  {
+   "case_id": "N8-6",
+   "class": "N8",
+   "claim_text": "增额终身寿的保额会一直增长到200万",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "保额随时间按条款约定递增。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N8 invented ceiling number"
+  },
+  {
+   "case_id": "N9-1",
+   "class": "N9",
+   "claim_text": "您的家庭需要优先为经济支柱配置保障[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "NOT_APPLICABLE",
+   "reason": "N9 RV4 shape: planning claim + agri citation [ERRATUM E2: advice-shaped; stuffing carried by N9-2/3]"
+  },
+  {
+   "case_id": "N9-2",
+   "class": "N9",
+   "claim_text": "百万医疗险通常有1万免赔额[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N9 RV4 shape: product fact + agri citation"
+  },
+  {
+   "case_id": "N9-3",
+   "class": "N9",
+   "claim_text": "收入中断风险应通过定期寿险覆盖[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N9 RV4 shape"
+  },
+  {
+   "case_id": "N9-4",
+   "class": "N9",
+   "claim_text": "重疾险保额建议为年收入5倍[E1][E1][E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "NOT_APPLICABLE",
+   "reason": "N9 RV4 shape: repeated citation stuffing [ERRATUM E2: advice-shaped; stuffing carried by N9-2/3]"
+  },
+  {
+   "case_id": "N10-1",
+   "class": "N10",
+   "claim_text": "免赔额为0元[E1][E1][E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N10 stuffing: unrelated fact"
+  },
+  {
+   "case_id": "N10-2",
+   "class": "N10",
+   "claim_text": "该产品保证续保终身[E1][E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N10 stuffing"
+  },
+  {
+   "case_id": "N10-3",
+   "class": "N10",
+   "claim_text": "全家均可投保且无等待期[E1][E1][E1][E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N10 stuffing + contradiction"
+  },
+  {
+   "case_id": "N10-4",
+   "class": "N10",
+   "claim_text": "本公司为世界500强[E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N10 stuffing: company claim"
+  },
+  {
+   "case_id": "N10-5",
+   "class": "N10",
+   "claim_text": "购买本产品可享受保费折扣[E1][E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N10 stuffing: commercial claim"
+  },
+  {
+   "case_id": "N10-6",
+   "class": "N10",
+   "claim_text": "此产品比同类产品便宜一半[E1][E1][E1]",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "N10 stuffing: comparative claim"
+  },
+  {
+   "case_id": "RV4-A",
+   "class": "RV4A",
+   "claim_text": "(layer check executed by evaluator: agri must NOT qualify under C2 for the RV4 planning supplement query)",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "本条例对农业保险经营规则未作规定的，适用《中华人民共和国保险法》中保险经营规则及监督管理的有关规定。保险机构经营农业保险业务，应当符合国务院保险监督管理机构的规定。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2012-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "UNSUPPORTED",
+   "reason": "C2 layer seal: agri is retrieved-but-not-qualified for RV4 query"
+  },
+  {
+   "case_id": "RV4-B",
+   "class": "RV4B",
+   "claim_text": "该重疾险的等待期为90天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "PARTIALLY_SUPPORTED",
+   "reason": "QUALIFIED (health-reg passes C2 for 重疾/医疗-family query) but evidence only says parameters are contract-set: no 90天 — qualified ≠ supportive (Phase 2 core)"
+  },
+  {
+   "case_id": "S1",
+   "class": "S",
+   "claim_text": "该产品等待期为90天。免赔额为1万。建议优先配置医疗险。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "条款：等待期90天；免赔额1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-RECOMMENDATION",
+      "NOT_APPLICABLE"
+     ]
+    ]
+   },
+   "reason": "3-sentence answer S1 segmentation"
+  },
+  {
+   "case_id": "S2",
+   "class": "S",
+   "claim_text": "等待期为90天。所有疾病均可覆盖。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "S1 hold on second sentence"
+  },
+  {
+   "case_id": "S3",
+   "class": "S",
+   "claim_text": "P001年保费为400元。P004保额为100万。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "S1 hold second (wrong-evidence product)"
+  },
+  {
+   "case_id": "S4",
+   "class": "S",
+   "claim_text": "这款产品的等待期是90天。它的免赔额同样是1万。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "等待期为90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "ANAPHORA: sentence-local judgment cannot resolve 它 — S1 blind spot measurement"
+  },
+  {
+   "case_id": "S5",
+   "class": "S",
+   "claim_text": "我今年35岁。因此建议提高重疾保额。",
+   "claim_type": "MULTI",
+   "evidence": [],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-USER",
+      "NOT_APPLICABLE"
+     ],
+     [
+      "C-DERIVED",
+      "NOT_APPLICABLE"
+     ]
+    ]
+   },
+   "reason": "user+derived stream"
+  },
+  {
+   "case_id": "S6",
+   "class": "S",
+   "claim_text": "等待期为90天。但等待期为180天。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "等待期90天；等待期180天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "intra-answer contradiction surface"
+  },
+  {
+   "case_id": "S7",
+   "class": "S",
+   "claim_text": "免赔额为1万。该数字适用于所有计划。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "免赔额1万。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "anaphora number reference"
+  },
+  {
+   "case_id": "S8",
+   "class": "S",
+   "claim_text": "保费为每年400元。这是全行业最低价。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "supported fact + unsupported superlative"
+  },
+  {
+   "case_id": "S9",
+   "class": "S",
+   "claim_text": "该规定自2019年施行。当前版本等待期为90天。",
+   "claim_type": "MULTI",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-FACT",
+      "SUPPORTED"
+     ],
+     [
+      "C-FACT",
+      "UNSUPPORTED"
+     ]
+    ]
+   },
+   "reason": "real-reg sentence + unsupported numeric tail"
+  },
+  {
+   "case_id": "S10",
+   "class": "S",
+   "claim_text": "无法确认该产品是否在售。建议直接咨询保险公司。",
+   "claim_type": "MULTI",
+   "evidence": [],
+   "expected": {
+    "per_sentence": [
+     [
+      "C-UNCERTAIN",
+      "NOT_APPLICABLE"
+     ],
+     [
+      "C-RECOMMENDATION",
+      "NOT_APPLICABLE"
+     ]
+    ]
+   },
+   "reason": "uncertainty + recommendation stream"
+  },
+  {
+   "case_id": "P18",
+   "class": "P",
+   "claim_text": "该产品犹豫期为20天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "条款：犹豫期20天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "fixture numeric DIRECT"
+  },
+  {
+   "case_id": "P19",
+   "class": "P",
+   "claim_text": "P006重疾险C的等待期为180天",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "P006条款：等待期180天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P006"
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "product-bound exact fact"
+  },
+  {
+   "case_id": "P20",
+   "class": "P",
+   "claim_text": "本产品等待期为90天，且赔付比例为100%",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "等待期90天。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    },
+    {
+     "content": "赔付比例100%。",
+     "source_name": "fixture(TEST-DATA)",
+     "document_name": "fixture(TEST-DATA)",
+     "version": null,
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "multi-evidence both anchors"
+  },
+  {
+   "case_id": "P21",
+   "class": "P",
+   "claim_text": "P001的保费为每年400元，产品参数可按团体情况调整",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    },
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "catalog+KB dual-source"
+  },
+  {
+   "case_id": "P22",
+   "class": "P",
+   "claim_text": "责任等待期属于产品参数之一",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "第十八条 短期团体健康保险产品可以对产品参数进行调整。产品参数，是指保险产品条款中根据投保团体的具体情况进行合理调整的保险金额、起付金额、给付比例、除外责任、责任等待期等事项。",
+     "source_name": "pilot-corpus(real)",
+     "document_name": "pilot-corpus(real)",
+     "version": null,
+     "effective_from": "2019-12-01",
+     "effective_to": "2030-12-31",
+     "product_id": null
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "real enumeration DIRECT"
+  },
+  {
+   "case_id": "P23",
+   "class": "P",
+   "claim_text": "P001的年保费为400元",
+   "claim_type": "C-FACT",
+   "evidence": [
+    {
+     "content": "demo-百万医疗险A（标准版）年保费为400元（演示参考值）。",
+     "source_name": "catalog(real)",
+     "document_name": "catalog(real)",
+     "version": "1.0",
+     "effective_from": "2026-01-01",
+     "effective_to": null,
+     "product_id": "P001"
+    }
+   ],
+   "expected": "SUPPORTED",
+   "reason": "catalog exact rephrase"
+  }
+ ],
+ "errata": [
+  "E1 N7-6 -> SUPPORTED (window resolves)",
+  "E2 N9-1/N9-4 -> NOT_APPLICABLE (advice-shaped)"
+ ]
+}

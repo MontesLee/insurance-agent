@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://insurance-agent.local/schema/claim-evidence-support/v1.json",
+  "title": "Claim-Evidence Support Record (v1, additive)",
+  "description": "28.K.28-II-IMPL (Phase 2). One record per atomic claim judged by the deterministic support layer (runtime/grounding/claim_support.py), which sits strictly AFTER C2 evidence qualification and BESIDE the citation gate. Citation presence != claim support. INTERNAL-ONLY: these records live in grounding/support structures and audit evidence; Consumer surfaces never receive claim_id / evidence_refs / support_reason (28.K.28-II-IMPL §17). Support states are the shadow-frozen four + NOT_APPLICABLE for exempt claim types (C-USER / C-RECOMMENDATION / C-CALCULATION / C-DERIVED / C-UNCERTAIN).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_id",
+    "claim_text",
+    "claim_type",
+    "support_status",
+    "evidence_refs",
+    "support_type",
+    "support_reason"
+  ],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Stable id of the atomic claim within the turn's support evaluation (e.g. 'C1')."
+    },
+    "claim_text": {
+      "type": "string",
+      "description": "The atomic claim text (sentence-first + deterministic clause split — never semantic decomposition)."
+    },
+    "claim_type": {
+      "type": "string",
+      "enum": ["C-FACT", "C-USER", "C-RECOMMENDATION", "C-CALCULATION", "C-DERIVED", "C-UNCERTAIN"],
+      "description": "Shadow-frozen six-type taxonomy. Only C-FACT requires evidence support."
+    },
+    "support_status": {
+      "type": "string",
+      "enum": ["SUPPORTED", "PARTIAL", "UNSUPPORTED", "CONTRADICTED", "NOT_APPLICABLE"],
+      "description": "SUPPORTED = evidence explicitly supports the whole claim; PARTIAL = only part of the claim is supported (the composite '等待期90天且全病种覆盖' case); UNSUPPORTED = qualified evidence exists but does not support the claim; CONTRADICTED = evidence conflicts (detect + fail closed; no invented source precedence — OD-5); NOT_APPLICABLE = exempt claim type."
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "description": "Evidence labels of the C2-QUALIFIED items judged against (e.g. ['E1'])."
+    },
+    "support_type": {
+      "type": "string",
+      "enum": ["DIRECT", "PARTIAL", "CONTRADICTORY", "NONE", "EXEMPT"],
+      "description": "Strength dimension: DIRECT (number/entity anchored), PARTIAL, CONTRADICTORY, NONE, EXEMPT (claim type not subject to support)."
+    },
+    "support_reason": {
+      "type": "string",
+      "description": "Deterministic audit reason (anchor coverage counts, contradiction values, exemption class). Never shown to consumers."
+    }
+  }
+}

@@ -1,0 +1,161 @@
+# QA grounding rules — deterministic truth for the QA Agent grounding gate
+# (Phase 28.C-1 / ADR-022 APPROVED; owner rulings D1-D4/D6, 2026-09-25).
+#
+# Code (runtime/qa_agent/*) only CONSUMES this file — signals, thresholds
+# and refusal templates are never hardcoded (AGENTS.md §5 discipline).
+# The citation-closure gate runs as CODE BEFORE delivery; the LLM never
+# self-audits (design doc §5.2).
+version: 1
+
+citation:
+  # inline label shape produced/consumed by answers and the gate
+  pattern: '\[E([0-9]+)\]'
+  label_format: 'E%d'
+
+retrieval:
+  top_k: 8
+  domain_default: general
+  # 28.K.27-RV4-C2 (P1-B Phase 1): RetrievedEvidence -> QualifiedEvidence.
+  # A governance-allowed hit still needs MINIMUM topical relevance to the
+  # query before it may become [E#] evidence: >= this many DISTINCT
+  # query bigrams (CJK/alnum, normalized) must appear in the hit's
+  # content/source text. RV4-A case: the family-planning supplement
+  # query shares only {保险} with 《农业保险条例》 -> filtered ->
+  # existing insufficient_evidence refusal. 0 DISABLES the filter
+  # (= pre-C2 behaviour, the rollback knob). Deterministic, local,
+  # fail-closed; the exact value is OWNER-TUNABLE (RV4-B authorized
+  # the lexical-overlap design; 2 = minimal distinct terms).
+  qualification:
+    min_query_bigram_overlap: 2
+    # ultra-generic bigrams that appear in nearly EVERY insurance
+    # document (and in most user messages) — they carry no topical
+    # signal and are excluded from the overlap COUNT (audit-friendly,
+    # owner-tunable; keep minimal)
+    generic_bigrams: [保险, 个人, 公司, 业务, 我们, 可以, 以下, 相关]
+
+# 28.K.28-II-IMPL (Phase 2): Claim→Evidence Support — deterministic
+# production authority, strictly AFTER C2 qualification and BESIDE the
+# citation gate. Citation presence != claim support (RV4-A stuffing;
+# shadow-verified escape 88.2%->0%). Rollback: enabled=false or env
+# CLAIM_SUPPORT_ENABLED=0 (env wins) -> byte-identical legacy path.
+claim_support:
+  # shipped OFF (behavior-changing gate; slices-style staged rollout —
+  # Owner enables via env CLAIM_SUPPORT_ENABLED=1 or this flag)
+  enabled: false
+
+gate:
+  # one bounded regeneration after a gate failure, then refuse
+  max_regenerations: 1
+  max_answer_chars: 4000
+  sentence_separators: ['。', '！', '？', '!', '?', ';', '；', '\n']
+  # a sentence containing any of these is ASSERTING an insurance fact and
+  # must carry >=1 in-evidence citation (deterministic detection — the
+  # externalized fact-marker vocabulary)
+  fact_markers:
+    - 保险
+    - 险
+    - 保额
+    - 保费
+    - 等待期
+    - 犹豫期
+    - 免赔额
+    - 免赔
+    - 免责
+    - 赔付
+    - 赔偿
+    - 理赔
+    - 报销
+    - 条款
+    - 约定
+    - 投保
+    - 承保
+    - 保障
+    - 费率
+    - 期限
+    - 续保
+    - 健康告知
+    - 核保
+    - 现金价值
+    - 社保
+    - 医保
+    - 重疾
+    - 医疗
+    - 意外
+    - 年金
+    - 寿险
+    - 疾病
+    - 身故
+    - 全残
+    - 医院
+    - 赔付比例
+    - 保单
+    - 生效
+
+generation:
+  prompt_version: qa-answer-v3
+  max_tokens: 1024
+  # Phase 28.B5.1 timeout calibration (trace-verified): the legitimate
+  # slow-success ceiling observed live was ~50s (B5 scenario D); 30s
+  # would kill valid turns. 60s per attempt + 1 bounded retry bounds
+  # the worst generation wall at ~120s (was UNBOUNDED — the adapter
+  # ignored this value and httpx 60s is per-read, allowing slow-drip
+  # responses to exceed it; 174.6s = 2 x ~87s attempts in B5 scenario E).
+  # 28.K.10-F1 recalibration (owner-authorized 2026-09-27): provider
+  # latency re-measured at 23-56s (n=5 same-prompt variance ±25s; K.9.1
+  # window max 56.2s = 94% of the 60s budget) → intermittent watchdog
+  # exhaustion → llm_unavailable dead-ends (K.8 subset 3/8, K.9.1 1/3).
+  # 90s ≈ 1.6× headroom over the observed maximum; retry budgets
+  # unchanged (gateway_max_retries=1, max_regenerations=1) → worst
+  # bounded wall 90×2×2=360s, honest failure preserved. Quality gates
+  # (citation/evidence/grounding/fail-closed) untouched.
+  timeout_s: 90.0
+  gateway_max_retries: 1
+  # Externalized system prompt (28.B5.1: prompts live in rules, not
+  # code — AGENTS.md §5 discipline). Calibrated against the two live
+  # failure modes traced in phase-28b51-pre-audit.md: full-width
+  # parentheses （E1） instead of [E1], and fact sentences without an
+  # in-sentence citation (summary-style answers). The GATE is unchanged
+  # — this only makes the model more reliably produce gate-conformant
+  # output.
+  qa_system_prompt: |
+    You are the Insurance QA Agent. Answer the user's insurance knowledge question using ONLY the numbered evidence provided.
+
+    CITATION FORMAT (mandatory — output is machine-checked):
+    - Cite with HALF-WIDTH ASCII square brackets immediately after EVERY sentence that states an insurance fact, e.g. 等待期一般为90天[E1]。
+    - ONE fact per sentence; the citation [E#] must be in the SAME sentence as the fact it supports — never only at the end of a paragraph that covers several facts.
+    - Use ONLY the labels that appear in the evidence block ([E1], [E2], ...). Never invent labels, never renumber them.
+    - NEVER use （E1）, 【E1】, (E1), "E1" or any other variant — only [E1] with half-width square brackets.
+    - Do not join several facts into one long sentence with semicolons or commas; split them into separate sentences, each ending with its own citation.
+
+    VALID:   重大疾病保险常见等待期为90天[E1]。等待期内确诊一般仅退还保费[E1]。
+    INVALID: 重大疾病保险常见等待期为90天；确诊后仅退保费（E1）。  ← full-width parens + two facts, one citation
+    INVALID: 等待期一般为90天。此后确诊仅退保费[E1]。              ← citation not inside the first fact sentence
+    INVALID: - 产品目录中记录了免赔额与保费等信息。                 ← fact bullets without any [E#]
+
+    Content rules:
+    - Never state facts, numbers or terms that are not present in the evidence; do not use your own memory as an insurance-fact source.
+    - Never bridge with speculation wording such as 推测 / 大约 / 可能是 / 估计 — state only what the evidence says, with its citation. If the evidence gives a typical (常见) value, attribute it to the evidence exactly as 常见/一般为, with the citation.
+    - If the evidence does not fully answer the question, say exactly what is and is not covered by the evidence — refusing is correct, filling in is forbidden.
+    - Do NOT write closing advice or disclaimer sentences such as 以…为准 / 请以合同条款为准 / 建议咨询 / 请参考投保页面 — such sentences count as fact sentences and will fail the check. If the evidence does not cover something, state that limitation in the SAME sentence that cites what the evidence does say.
+    - Keep the whole answer within 6 sentences.
+    - Answer in Chinese. Be concise.
+
+# unified honest-refusal templates (fail-closed UX; ADR-022 four-failure
+# paths). These are CODE outputs and bypass the gate by construction.
+templates:
+  kb_unavailable: >-
+    知识服务当前不可用，暂时无法给出有依据的回答。为避免误导，我不会在缺少证据的情况下作答，请稍后再试。
+  insufficient_evidence: >-
+    知识库暂无可靠依据，暂时无法回答这个问题。您可以换个说法再问，或稍后再试。
+  llm_unavailable: >-
+    回答服务暂时不可用，无法生成有依据的回答。已检索到的证据已妥善记录，请稍后再试。
+  citation_gate_rejected: >-
+    本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。
+  conflicting_evidence: >-
+    检索到相互冲突的依据，为避免误导，双方依据如下（未做取舍）：
+  catalog_missing_fact: >-
+    目录暂无该数据，暂时无法回答这个产品事实问题。不会以推测补位。
+  internal_error: >-
+    回答过程中出现内部错误，本次不作答。问题已记录。
+  invalid_input: >-
+    这个问题暂时无法转入保险知识问答流程，请换个说法再试。
