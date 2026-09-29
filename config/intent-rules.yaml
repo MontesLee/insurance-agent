@@ -1,0 +1,228 @@
+# Intent rules — the deterministic truth source for intent classification.
+# Phase 28.A-1 / ADR-019 (APPROVED). A prompt is NEVER an intent source.
+#
+# This file is versioned (git) and auditable (every classification carries
+# rule ids in reason_codes). Code (runtime/intent/classifier.py) only
+# CONSUMES this file — it never hardcodes signals (AGENTS.md §5 discipline).
+#
+# Deterministic algorithm shape (fixed order — classifier.py docstring):
+#   1. SPECIFIC product reference (demonstrative or product-id pattern)
+#        -> product_qa (a specific-product question stays product QA even
+#           when phrased as "P001是什么产品")
+#   2. EVALUATIVE product reference ("怎么样/多少钱/值得吗"...) and NOT a
+#      definition question -> product_qa
+#   3. modify VERB hit -> modify_existing_plan
+#        (requires_active_case: without an active case the IntentResult is
+#         still modify_existing_plan but clarification_required=true —
+#         ADR-019 M1, also schema-enforced)
+#   4. plan ACTION signal (strong) -> insurance_plan
+#        (familial/financial context words alone NEVER fire plan — they only
+#         enrich reason codes; "给孩子买重疾险前应该先考虑什么" is guidance)
+#   5. definition markers / insurance concept words -> insurance_qa
+#   6. LLM candidate (optional, advisory only — never dispatches)
+#   7. else -> unknown_insurance_intent (fail-closed)
+#
+# Phase 28.A-2 additions: context signals (ADR-019 rule 7 / M1) and the
+# LLM candidate adapter knobs live in the `context` and `llm_candidate`
+# sections below. Rule 1 may inherit the insurance-domain anchor from
+# recent conversation context for ELLIPTICAL follow-ups (demonstratives /
+# product ids only — "那第二款怎么样"); evaluative-only phrasing NEVER
+# inherits (a mid-conversation "今天天气怎么样" must still degrade to
+# unknown). Switchable off for A/B of the pre-context behavior.
+version: 1
+
+vocabulary:
+  - insurance_qa
+  - product_qa
+  - insurance_plan
+  - modify_existing_plan
+  - unknown_insurance_intent
+
+markers:
+  # insurance-domain anchor: product branches only fire on insurance topics;
+  # out-of-domain messages ("今天天气怎么样") degrade to unknown
+  insurance_anchors:
+    - 险
+    - 保险
+    - 产品
+    - 保障
+    - 保额
+    - 保费
+    - 重疾
+    - 医疗
+    - 意外
+    - 年金
+    - 投保
+    - 理赔
+    - 条款
+    - 健康告知
+    - 健康
+  # references to ONE SPECIFIC product — override definition phrasing
+  product_specific:
+    - 这款
+    - 这个产品
+    - 这份产品
+    - 那款
+    - 那个产品
+    # 28.K.28-I-FIX Fix B-narrow (owner D1/D3): EXPLICIT ordinal/positional
+    # references only — in an enumeration context they point at products.
+    # The insurance-context anchor requirement (current message OR
+    # inherited) is unchanged = fail-closed without context. Bare
+    # 这个/那个/那这个/它 are deliberately NOT here (owner D3: never
+    # guess concept references).
+    - 第一款
+    - 第二款
+    - 前者
+    - 后者
+    - 第一份
+    - 第二份
+  product_id_pattern: 'P0\d{2}'
+  # evaluative/product-shopping phrasing — product QA unless a definition
+  # question ("等待期是什么" is a concept question, not a product lookup)
+  product_evaluative:
+    - 怎么样
+    - 好不好
+    - 值得买
+    - 值得吗
+    - 多少钱
+    - 贵不贵
+  # 28.K.28-I-FIX Fix A (owner D1): question-form protection — a
+  # planning-noun substring (规划/配置/保障/投保/预算 used as TOPIC or
+  # background) must never suppress question semantics. Fires ONLY as
+  # (a) a guard suppressing the plan rule when a question form is
+  # present and no exemption applies, and (b) a rule-5 qa signal ONLY
+  # when a plan signal is present in the SAME message AND the message
+  # itself carries an insurance anchor (fail-closed: out-of-domain
+  # questions never auto-route; vague anchored questions without plan
+  # nouns keep the governed-unknown path).
+  question_protection:
+    enabled: true
+    markers: [什么, 哪个, 哪些, 为什么, 怎么, 怎么回事, 是否]
+    # X不X A-not-A + cross-word modal questions (需要/应该 ... 吗)
+    patterns:
+      - '([一-龥]{1,3})不\1'
+      - '需要.{0,8}吗'
+      - '应该.{0,8}吗'
+    # planning REQUEST + question form stays plan (audit TRAP-01/02/03)
+    adjacency_exempt_pattern: '(怎么|如何)(规划|配置|配|买|投保|安排|设计|做)'
+    imperative_exempt_pattern: '(帮我|给我|请|麻烦).{0,8}(做|出|设计|配置|规划|安排|看|评估|分析|检查|梳理)'
+    # asking FOR advice is plan-family even in question form (PLAN-08)
+    advice_exempt_markers: [建议, 思路, 意见, 指南]
+  definition_markers:
+    - 是什么
+    - 什么是
+    - 什么叫
+    - 意思是
+    - 是啥
+    - 区别
+    - 有什么不同
+    - 有必要吗
+    - 需要吗
+    - 应该买吗
+
+intents:
+  modify_existing_plan:
+    requires_active_case: true
+    # ACTION VERBS are required to fire this intent
+    signals:
+      - 改成
+      - 改为
+      - 调整
+      - 换成
+      - 降低
+      - 提高
+      - 减少
+      - 增加
+      - 修改方案
+      - 改一下
+      - 方案改
+    # target nouns only enrich reason codes, never fire the intent
+    support_signals:
+      - 保额
+      - 保费
+      - 方案
+      - 重疾
+      - 医疗
+      - 意外
+  insurance_plan:
+    # ACTION signals are required to fire this intent
+    signals:
+      - 规划
+      - 配置
+      - 方案
+      - 买保险
+      - 怎么买
+      - 投保
+      - 预算
+      - 保障
+      # 28.K.28-I-FIX Fix A: colloquial planning actions (audit PLAN-09)
+      - 怎么配
+      - 怎么安排
+    # familial/financial context only enriches reason codes
+    support_signals:
+      - 家庭
+      - 孩子
+      - 娃
+      - 一家
+      - 夫妻
+      - 房贷
+      - 年收入
+  insurance_qa:
+    signals:
+      - 重疾险
+      - 医疗险
+      - 意外险
+      - 寿险
+      - 定期寿险
+      - 等待期
+      - 免赔额
+      - 免责
+      - 健康告知
+      - 社保
+      - 医保
+      - 现金价值
+      - 犹豫期
+      - 多少合适
+      - 该买多少
+      - 买多少合适
+
+context:
+  # ADR-019 rule 7: deterministic rules MAY reference conversation-context
+  # signals. v1.1 scope: anchor inheritance for demonstrative product
+  # references only (see header). active-case context is consumed at the
+  # modify branch (requires_active_case) — unchanged since 28.A-1.
+  anchor_inheritance: true
+  # 28.K.27-RV4-C1 (ADR-019 continuation addendum): when the previous
+  # turn in THIS conversation ended WAITING_USER from the planning
+  # agent, an answer-like message with NO new-intent signal continues
+  # the planning task. Question/definition/evaluative/plan-action
+  # phrasing always wins (topic switch); ack-only replies stay
+  # fail-closed (clarification_required).
+  plan_continuation:
+    enabled: true
+    reason_code: "plan:continuation"
+    ack_reason_code: "plan:continuation:ambiguous_ack"
+    ack_max_len: 6
+    # 28.K.28-I-FIX Fix C (owner D1): tiny negative guard — service/
+    # re-explain/recommend imperatives are NOT answers to planning
+    # clarification questions; they fall through to the normal rule
+    # chain (fail-closed) instead of continuing the plan. Verified
+    # ZERO overlap with the C1 positive corpus (42 cases).
+    negative_signals: [退款, 退保, 取消, 投诉, 再解释, 再讲一遍, 帮我推荐]
+
+llm_candidate:
+  # Advisory-only LLM proposals (ADR-019 rule 1: LLM may propose, the
+  # deterministic layer decides). Runtime enablement is env-gated
+  # (INSURANCE_AGENT_INTENT_LLM=1) — these knobs tune the adapter, never
+  # authority: the resolver + schema gate in classifier.py always decide.
+  timeout_seconds: 4.0
+  max_context_messages: 4
+
+thresholds:
+  # HD-1 initial value (owner decision pending shadow-data calibration).
+  # High-risk intents proposed ONLY by the LLM below this confidence must
+  # not auto-route: clarification_required=true instead.
+  high_risk_llm_min_confidence: 0.75
+  high_risk_intents:
+    - insurance_plan
+    - modify_existing_plan

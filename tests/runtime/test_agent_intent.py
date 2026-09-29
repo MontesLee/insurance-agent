@@ -236,6 +236,89 @@ def test_intent_flows_through_events_and_state(c: Checks):
           all(k not in blob.lower() for k in ("思考过程", "我猜测", "api_key")))
 
 
+
+# ------------------------------------------------------------------ #
+# 28.K.27-RV4-C1 · planning continuation (ADR-019 addendum)          #
+# ------------------------------------------------------------------ #
+RV4_T1 = ("我40岁，孩子5岁，有社保，重疾险200万，家庭年收入30万，有房贷，"
+          "每年愿意投入2万在保险，担心收入中断和大病医疗费用，"
+          "帮我看看家庭保障有没有明显缺口")
+RV4_T2 = ("200万重疾险是我的，我和配偶都有百万医疗险，孩子没有保险。"
+          "房贷还剩100万。配偶35岁，有100万重疾险，家庭主要收入是我一个人")
+
+
+@section
+def test_k27rv4c1_continuation_positive(c: Checks):
+    """P1-A fix: an answer to a pending planning clarification continues
+    the planning task — including when the answer is full of the very
+    product nouns that used to hijack it to QA (RV4-A real case)."""
+    from runtime.intent.classifier import classify
+    t1 = classify(RV4_T1)
+    c.chk("RV4 T1 stays a fresh plan request",
+          t1["intent_id"] == "insurance_plan"
+          and "rule:plan" in t1["reason_codes"][0])
+    t2 = classify(RV4_T2, pending_clarification=True)
+    c.chk("RV4 T2 = planning CONTINUATION (not qa)",
+          t2["intent_id"] == "insurance_plan")
+    c.chk("continuation reason recorded",
+          any(rc.startswith("plan:continuation") for rc in t2["reason_codes"]))
+    c.chk("context reason recorded",
+          "context:pending_clarification" in t2["reason_codes"])
+    c.chk("substantive answer is not clarification-gated",
+          t2["clarification_required"] is False)
+    t2_old = classify(RV4_T2)      # regression anchor: signal absent
+    c.chk("no pending signal -> OLD behaviour (qa) unchanged",
+          t2_old["intent_id"] == "insurance_qa")
+
+
+@section
+def test_k27rv4c1_continuation_matrix(c: Checks):
+    """Positive breadth + negative (topic switch must win) + ambiguous."""
+    from runtime.intent.classifier import classify
+    pos = [
+        "是我们两个人的，各100万，都是保到70岁的定期",
+        "我有百万医疗险，配偶有，孩子没有；房贷还剩80万，20年",
+        "主要是我在赚钱，妻子全职带孩子",
+    ]
+    for t in pos:
+        r = classify(t, pending_clarification=True)
+        c.chk("answer continues plan: %s" % t[:12],
+              r["intent_id"] == "insurance_plan"
+              and not r["clarification_required"])
+    neg = [
+        ("百万医疗险和重疾险有什么区别？", "insurance_qa"),
+        ("什么是等待期？", "insurance_qa"),
+        ("医疗险能买吗？", "insurance_qa"),
+        ("P001这款产品值得买吗？", "product_qa"),
+    ]
+    for t, expect in neg:
+        r = classify(t, pending_clarification=True)
+        c.chk("topic switch wins: %s" % t[:12],
+              r["intent_id"] == expect)
+    amb = ["好的", "是的", "嗯"]
+    for t in amb:
+        r = classify(t, pending_clarification=True)
+        c.chk("ack-only fails closed: %s" % t,
+              r["intent_id"] == "insurance_plan"
+              and r["clarification_required"] is True)
+
+
+@section
+def test_k27rv4c1_no_signal_no_change(c: Checks):
+    """Without pending_clarification every message classifies EXACTLY as
+    before — the flag is the only new input (regression anchor set)."""
+    from runtime.intent.classifier import classify
+    def _stable(d):
+        return {k: v for k, v in d.items() if k != "created_at"}
+
+    for t in (RV4_T1, RV4_T2, "什么是等待期？", "好的",
+              "帮我看看家庭保障有没有明显缺口"):
+        a = classify(t)
+        b = classify(t, pending_clarification=False)
+        c.chk("flag False == absent: %s" % t[:10],
+              _stable(a) == _stable(b))   # created_at is per-call
+
+
 def main():
     return run_sections(SECTIONS, "webui_test_agent_intent_log.txt", "RUNTIME AGENT INTENT")
 

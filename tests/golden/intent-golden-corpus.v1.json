@@ -1,0 +1,3393 @@
+{
+ "corpus": "intent-golden-corpus",
+ "version": 1,
+ "frozen_at": "2026-09-29",
+ "taxonomy": [
+  "insurance_qa",
+  "product_qa",
+  "insurance_plan",
+  "modify_existing_plan",
+  "unknown_insurance_intent"
+ ],
+ "derivation_rules": [
+  "D1 expected_intent derives from ADR-019/020 semantic definitions + agent-registry ownership, NEVER from actual rule output",
+  "D2 recommendation cases carry taxonomy_issue=true (no frozen recommendation intent; planning agent description owns product recommendation) — excluded from headline metrics, reported separately",
+  "D3 ack-only (<=6 chars) under pending -> plan + clarify (C1 addendum fail-closed); ack-only without pending -> unknown fail-closed",
+  "D4 mixed plan-action + QA sub-question in one message -> primary action wins (plan) per frozen rule-order design",
+  "D5 elliptical demonstrative product reference with insurance context -> product_qa (ADR-019 rule 7 anchor inheritance); without context -> unknown",
+  "D6 insurance-domain content with no rule signal -> unknown + domain:insurance_anchor (governed knowledge-QA seam, K.7)",
+  "D7 out-of-domain -> unknown without anchor (ungoverned clarify)"
+ ],
+ "expected_behavior_vocab": [
+  "auto_qa",
+  "auto_plan",
+  "clarify",
+  "governed_unknown",
+  "ungoverned_unknown"
+ ],
+ "cases": [
+  {
+   "case_id": "S1-QA-01",
+   "suite": "S1",
+   "conversation": [
+    "重疾险是什么？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "test:sec1",
+   "reason": "definition marker 是什么 + product noun"
+  },
+  {
+   "case_id": "S1-QA-02",
+   "suite": "S1",
+   "conversation": [
+    "什么是等待期？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept definition"
+  },
+  {
+   "case_id": "S1-QA-03",
+   "suite": "S1",
+   "conversation": [
+    "免赔额是什么意思"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept definition"
+  },
+  {
+   "case_id": "S1-QA-04",
+   "suite": "S1",
+   "conversation": [
+    "重疾险和医疗险有什么区别？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "difference question, canonical QA"
+  },
+  {
+   "case_id": "S1-QA-05",
+   "suite": "S1",
+   "conversation": [
+    "百万医疗险和重疾险有什么区别"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "easy",
+   "source": "real:run_24562be1",
+   "reason": "K.18 real user query verbatim"
+  },
+  {
+   "case_id": "S1-QA-06",
+   "suite": "S1",
+   "conversation": [
+    "健康告知是什么？做的时候要注意什么"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "definition + guidance follow-up"
+  },
+  {
+   "case_id": "S1-QA-07",
+   "suite": "S1",
+   "conversation": [
+    "保险的免责条款都包括哪些内容？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept coverage question"
+  },
+  {
+   "case_id": "S1-QA-08",
+   "suite": "S1",
+   "conversation": [
+    "犹豫期一般是多少天？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "policy concept"
+  },
+  {
+   "case_id": "S1-QA-09",
+   "suite": "S1",
+   "conversation": [
+    "现金价值是什么意思？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept definition"
+  },
+  {
+   "case_id": "S1-QA-10",
+   "suite": "S1",
+   "conversation": [
+    "社保和医保有什么不同？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept difference"
+  },
+  {
+   "case_id": "S1-QA-11",
+   "suite": "S1",
+   "conversation": [
+    "医保够用吗"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "synthetic:K5-S07",
+   "reason": "K.5 S07 real shape; necessity question"
+  },
+  {
+   "case_id": "S1-QA-12",
+   "suite": "S1",
+   "conversation": [
+    "定期寿险有必要买吗？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_recommendation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "necessity concept question (definition marker 有必要吗)"
+  },
+  {
+   "case_id": "S1-QA-13",
+   "suite": "S1",
+   "conversation": [
+    "重疾险的等待期是什么"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "live:C2-positive-control",
+   "reason": "today live positive control"
+  },
+  {
+   "case_id": "S1-QA-14",
+   "suite": "S1",
+   "conversation": [
+    "给孩子买重疾险前应该先考虑什么"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "real:run_50389328",
+   "reason": "rules-file documented guidance example; concept question not planning action"
+  },
+  {
+   "case_id": "S1-QA-15",
+   "suite": "S1",
+   "conversation": [
+    "百万医疗险一般保什么？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "general product-category question, not specific product"
+  },
+  {
+   "case_id": "S1-QA-16",
+   "suite": "S1",
+   "conversation": [
+    "我想了解一下重疾险和寿险到底该怎么选，家里刚生了二胎，预算也不多，麻烦讲得通俗一点"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "long-form colloquial concept question; no plan action verb (怎么选 is choosing guidance)"
+  },
+  {
+   "case_id": "S1-QA-17",
+   "suite": "S1",
+   "conversation": [
+    "意外险理赔流程是什么样的？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "process knowledge question"
+  },
+  {
+   "case_id": "S1-QA-18",
+   "suite": "S1",
+   "conversation": [
+    "什么叫增额终身寿？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "category definition"
+  },
+  {
+   "case_id": "S1-QA-19",
+   "suite": "S1",
+   "conversation": [
+    "我这种情况应该买多少重疾险？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_recommendation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "quantity-concept question (该买多少/多少合适 family); personal facts but no plan action verb"
+  },
+  {
+   "case_id": "S1-QA-20",
+   "suite": "S1",
+   "conversation": [
+    "重疾险买多少合适？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_recommendation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "frozen qa signal 买多少合适"
+  },
+  {
+   "case_id": "S1-PQ-01",
+   "suite": "S1",
+   "conversation": [
+    "P001是什么产品？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "easy",
+   "source": "test:sec6",
+   "reason": "product id reference"
+  },
+  {
+   "case_id": "S1-PQ-02",
+   "suite": "S1",
+   "conversation": [
+    "P001这款产品的等待期是多久？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "specific product parameter"
+  },
+  {
+   "case_id": "S1-PQ-03",
+   "suite": "S1",
+   "conversation": [
+    "demo-重疾险B（终身）值得买吗"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "catalog full-name reference (real catalog product)"
+  },
+  {
+   "case_id": "S1-PQ-04",
+   "suite": "S1",
+   "conversation": [
+    "demo-百万医疗险A的免赔额是多少"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "catalog base-name specific parameter"
+  },
+  {
+   "case_id": "S1-PQ-05",
+   "suite": "S1",
+   "conversation": [
+    "健康满分这款保险值得买吗"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "medium",
+   "source": "synthetic:K5-S05",
+   "reason": "K.5 S05 shape; demonstrative + evaluative with anchor (product need not exist in catalog)"
+  },
+  {
+   "case_id": "S1-PQ-06",
+   "suite": "S1",
+   "conversation": [
+    "这份产品和那款比哪个好？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "demonstrative product comparison, anchored by 产品"
+  },
+  {
+   "case_id": "S1-PQ-07",
+   "suite": "S1",
+   "conversation": [
+    "P006多次赔付的重疾险怎么样"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "product id + evaluative"
+  },
+  {
+   "case_id": "S1-PQ-08",
+   "suite": "S1",
+   "conversation": [
+    "这个产品多少钱一年"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_product_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "demonstrative 这个产品 + price, anchored"
+  },
+  {
+   "case_id": "S1-PLAN-01",
+   "suite": "S1",
+   "conversation": [
+    "帮我做一份家庭保险规划"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "canonical plan action"
+  },
+  {
+   "case_id": "S1-PLAN-02",
+   "suite": "S1",
+   "conversation": [
+    "我想给全家配置保险，预算2万"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "配置 action + budget"
+  },
+  {
+   "case_id": "S1-PLAN-03",
+   "suite": "S1",
+   "conversation": [
+    "我40岁，孩子5岁，有社保，重疾险200万，家庭年收入30万，有房贷，每年愿意投入2万在保险，担心收入中断和大病医疗费用，帮我看看家庭保障有没有明显缺口"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "real:RV4-T1",
+   "reason": "RV4 original T1 verbatim; gap-analysis request = planning intake"
+  },
+  {
+   "case_id": "S1-PLAN-04",
+   "suite": "S1",
+   "conversation": [
+    "一家三口怎么买保险比较合理？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "怎么买 action signal"
+  },
+  {
+   "case_id": "S1-PLAN-05",
+   "suite": "S1",
+   "conversation": [
+    "我老公35岁我32岁，家里主要靠他赚钱，想给他先把保障配齐，不知道从哪开始"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "colloquial; 保障 action signal (配齐保障 intent)"
+  },
+  {
+   "case_id": "S1-PLAN-06",
+   "suite": "S1",
+   "conversation": [
+    "预算有限，先给孩子买还是先给大人买？帮我出个方案"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "方案 action signal"
+  },
+  {
+   "case_id": "S1-PLAN-07",
+   "suite": "S1",
+   "conversation": [
+    "帮我看看我的家庭保障有没有缺口"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "coverage review = planning intake (same family as RV4 T1)"
+  },
+  {
+   "case_id": "S1-PLAN-08",
+   "suite": "S1",
+   "conversation": [
+    "我们夫妻俩想投保，有什么建议的思路吗？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "投保 action signal (frozen rule 4)"
+  },
+  {
+   "case_id": "S1-PLAN-09",
+   "suite": "S1",
+   "conversation": [
+    "家里老人60多了，想给他们配点保险，怎么配？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "synthetic:K5-S03-shape",
+   "reason": "K.5 S03/S04 family-planning shape; 怎么配 action"
+  },
+  {
+   "case_id": "S1-PLAN-10",
+   "suite": "S1",
+   "conversation": [
+    "宝宝刚出生，想给孩子规划一套保险，预算5000以内，帮我看看怎么安排"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "synthetic:K5-S01-shape",
+   "reason": "K.5 S01 child planning shape"
+  },
+  {
+   "case_id": "S1-MOD-01",
+   "suite": "S1",
+   "conversation": [
+    "把我的重疾险保额从50万提高到100万"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "modify action verb; no active case in production -> M1 clarify"
+  },
+  {
+   "case_id": "S1-MOD-02",
+   "suite": "S1",
+   "conversation": [
+    "方案改成以医疗为主"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "改成 action"
+  },
+  {
+   "case_id": "S1-MOD-03",
+   "suite": "S1",
+   "conversation": [
+    "保费太高了，帮我调整一下"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "调整 action"
+  },
+  {
+   "case_id": "S1-MOD-04",
+   "suite": "S1",
+   "conversation": [
+    "把定期寿险换成终身寿"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "换成 action"
+  },
+  {
+   "case_id": "S1-MOD-05",
+   "suite": "S1",
+   "conversation": [
+    "预算降低到1万"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "降低 action"
+  },
+  {
+   "case_id": "S1-MOD-06",
+   "suite": "S1",
+   "conversation": [
+    "我想减少一点保额，最近手头紧"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "减少 action"
+  },
+  {
+   "case_id": "S1-UNK-01",
+   "suite": "S1",
+   "conversation": [
+    "一家三口需要哪些保险？"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "real:run_a7d9ccb9",
+   "reason": "RV2 real user query; insurance anchor, no frozen rule signal -> governed unknown (K.7)"
+  },
+  {
+   "case_id": "S1-UNK-02",
+   "suite": "S1",
+   "conversation": [
+    "什么保险比较好？"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "synthetic:K5-S06",
+   "reason": "K.5 S06 vague intent shape; anchor 保险, no rule signal"
+  },
+  {
+   "case_id": "S1-UNK-03",
+   "suite": "S1",
+   "conversation": [
+    "我想给我爸买个保险，但是他有糖尿病"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "anchor 保险; no action/qa/evaluative signal (买了 not 买保险); health-complication context"
+  },
+  {
+   "case_id": "S1-UNK-04",
+   "suite": "S1",
+   "conversation": [
+    "你们刚才说的都可靠吗"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "synthetic:K5-S09",
+   "reason": "K.5 S09 challenge shape; no insurance anchor in message"
+  },
+  {
+   "case_id": "S1-UNK-05",
+   "suite": "S1",
+   "conversation": [
+    "今天天气怎么样"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "test:sec8",
+   "reason": "out-of-domain"
+  },
+  {
+   "case_id": "S1-UNK-06",
+   "suite": "S1",
+   "conversation": [
+    "帮我看看今天A股行情"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "out-of-domain"
+  },
+  {
+   "case_id": "S1-UNK-07",
+   "suite": "S1",
+   "conversation": [
+    "附近有什么好吃的推荐"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "out-of-domain"
+  },
+  {
+   "case_id": "S1-REC-01",
+   "suite": "S1",
+   "taxonomy_issue": true,
+   "conversation": [
+    "给我推荐一款重疾险"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_recommendation",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "recommendation; registry assigns product recommendation to planning agent; no frozen recommendation intent"
+  },
+  {
+   "case_id": "S1-REC-02",
+   "suite": "S1",
+   "taxonomy_issue": true,
+   "conversation": [
+    "有没有适合30岁女性的意外险推荐？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_recommendation",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "recommendation ask; taxonomy gap"
+  },
+  {
+   "case_id": "S1-REC-03",
+   "suite": "S1",
+   "taxonomy_issue": true,
+   "conversation": [
+    "帮我推荐一个性价比高的百万医疗险"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_recommendation",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "recommendation ask; taxonomy gap"
+  },
+  {
+   "case_id": "S1-REC-04",
+   "suite": "S1",
+   "taxonomy_issue": true,
+   "conversation": [
+    "这款重疾险值得买吗"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "qa_vs_recommendation",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "specific-product evaluation (product_qa exists for this); borderline recommendation wording"
+  },
+  {
+   "case_id": "S2-CONT-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "200万重疾险是我的，我和配偶都有百万医疗险，孩子没有保险。房贷还剩100万。配偶35岁，有100万重疾险，家庭主要收入是我一个人"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "real:RV4-T2",
+   "reason": "RV4 original T2 verbatim; answer to clarification continues planning (C1)"
+  },
+  {
+   "case_id": "S2-CONT-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我看看家庭保障有没有缺口",
+    "配偶35岁，收入和我差不多，有社保"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "pure answer content, no signals"
+  },
+  {
+   "case_id": "S2-CONT-03",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "房贷还有100万，还剩15年"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "financial fact answer"
+  },
+  {
+   "case_id": "S2-CONT-04",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "孩子5岁，身体挺好，没有住过院"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "child fact answer"
+  },
+  {
+   "case_id": "S2-CONT-05",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我和老公都有百万医疗，孩子没有"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §四.2 canonical continuation answer; bare product nouns are answer content not switch"
+  },
+  {
+   "case_id": "S2-CONT-06",
+   "suite": "S2",
+   "conversation": [
+    "帮全家做个保险方案",
+    "家庭年收入大概30万，我一个人的收入占大头"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "income fact answer"
+  },
+  {
+   "case_id": "S2-CONT-07",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "之前买过一份平安的百万医疗险，还在续保"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "existing-policy fact; contains 医疗险 noun but declarative answer"
+  },
+  {
+   "case_id": "S2-CONT-08",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "预算最多1万5，最好先把大人的配好"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "budget answer with mild directive; no action verb for new intent (配好 is answer detail)"
+  },
+  {
+   "case_id": "S2-CONT-09",
+   "suite": "S2",
+   "conversation": [
+    "给孩子规划保险",
+    "孩子刚上小学，学校有个学平险，别的都没有"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "school-policy fact answer"
+  },
+  {
+   "case_id": "S2-CONT-10",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我32，老婆30，都是体制内，公积金都有"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "demographics answer"
+  },
+  {
+   "case_id": "S2-ACK-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "好的"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "task §四.2 ack; C1 fail-closed ambiguous ack"
+  },
+  {
+   "case_id": "S2-ACK-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "是的"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack"
+  },
+  {
+   "case_id": "S2-ACK-03",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "可以"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack"
+  },
+  {
+   "case_id": "S2-ACK-04",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "继续"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack"
+  },
+  {
+   "case_id": "S2-ACK-05",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "就这样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack"
+  },
+  {
+   "case_id": "S2-ACK-06",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "嗯嗯"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack"
+  },
+  {
+   "case_id": "S2-SW-QA-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那百万医疗险和重疾险有什么区别？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §四.2; explicit question switch"
+  },
+  {
+   "case_id": "S2-SW-QA-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "重疾险到底是什么？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "definition switch"
+  },
+  {
+   "case_id": "S2-SW-QA-03",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "等待期一般是多久呢"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept question switch"
+  },
+  {
+   "case_id": "S2-SW-QA-04",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "对了，健康告知隐瞒病史会怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "new concept topic; qmark"
+  },
+  {
+   "case_id": "S2-SW-PQ-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我现在有P001，值得买吗？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §四.2; product-id evaluative switch"
+  },
+  {
+   "case_id": "S2-SW-PQ-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那这款重疾险怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "demonstrative evaluative switch"
+  },
+  {
+   "case_id": "S2-SW-MOD-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那我把预算从2万提高到3万"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §四.2; modify action beats continuation per frozen C1 semantics (switch list includes modify verbs); no active case -> clarify"
+  },
+  {
+   "case_id": "S2-SW-MOD-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "先不规划了，把之前的方案改成以孩子为主"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "explicit modify switch"
+  },
+  {
+   "case_id": "S2-SW-PLAN-01",
+   "suite": "S2",
+   "conversation": [
+    "重疾险和医疗险有什么区别？",
+    "那帮我给全家做个保险规划吧"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "QA then explicit plan action"
+  },
+  {
+   "case_id": "S2-SW-OOD-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "今天天气怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "out-of-domain switch; evaluative 怎么样 without anchor must not inherit"
+  },
+  {
+   "case_id": "S2-SW-OOD-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "最近股票行情怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "out-of-domain evaluative"
+  },
+  {
+   "case_id": "S2-NP-01",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划，把缺口都列出来",
+    "200万重疾险是我的，我和配偶都有百万医疗险，孩子没有保险。房贷还剩100万。配偶35岁，有100万重疾险，家庭主要收入是我一个人"
+   ],
+   "prev": "completed",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "real:RV4-T2+C1LIVE-variance",
+   "reason": "RV4 T2 after COMPLETED T1 (no pending): pre-C1 original behavior = qa via product nouns; semantically a NEW declarative statement with no plan action -> qa is the frozen outcome"
+  },
+  {
+   "case_id": "S2-NP-02",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "配偶35岁，收入和我差不多，有社保"
+   ],
+   "prev": "completed",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "answer-shaped message without pending and without any signal: anchor 社保 present, no rule hit -> governed unknown [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S2-NP-03",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "好的"
+   ],
+   "prev": "completed",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "ack without pending; no anchor -> fail-closed unknown"
+  },
+  {
+   "case_id": "S2-NP-04",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那百万医疗险和重疾险有什么区别？"
+   ],
+   "prev": "completed",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "question without pending: normal chain"
+  },
+  {
+   "case_id": "S2-NP-05",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "还有别的方案吗"
+   ],
+   "prev": "completed",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "plan-family follow-up on completed plan; 方案 action signal fires plan (follow-up planning)"
+  },
+  {
+   "case_id": "S2-QA-FU-01",
+   "suite": "S2",
+   "conversation": [
+    "重疾险和医疗险有什么区别？",
+    "那这个呢？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 pronoun trap; elliptical demonstrative with insurance context should inherit anchor (D5) and be product-referencing"
+  },
+  {
+   "case_id": "S2-QA-FU-02",
+   "suite": "S2",
+   "conversation": [
+    "重疾险和医疗险有什么区别？",
+    "这个需要买吗？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 pronoun; elliptical necessity question about referenced item; D5"
+  },
+  {
+   "case_id": "S2-QA-FU-03",
+   "suite": "S2",
+   "conversation": [
+    "P001和P002哪个好？",
+    "那第二款呢"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "28.A-2 documented anchor-inheritance example (那第二款怎么样 family)"
+  },
+  {
+   "case_id": "S2-QA-FU-04",
+   "suite": "S2",
+   "conversation": [
+    "重疾险的等待期是什么",
+    "那犹豫期呢？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "concept follow-up; 犹豫期 qa signal in message"
+  },
+  {
+   "case_id": "S2-QA-FU-05",
+   "suite": "S2",
+   "conversation": [
+    "P003的免赔额是多少",
+    "等待期又是多久"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "parameter follow-up carries its own qa signal"
+  },
+  {
+   "case_id": "S2-QA-FU-06",
+   "suite": "S2",
+   "conversation": [
+    "百万医疗险和重疾险有什么区别",
+    "那我老公呢？"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 pronoun; person-elliptical no product marker; anchor 医疗 from context only qualifies product branch; message anchor absent -> governed unknown per D5/D6 boundary [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S2-QA-FU-07",
+   "suite": "S2",
+   "conversation": [
+    "意外险都保什么？",
+    "那孩子怎么办？"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 pronoun; situational elliptical, no marker; governed unknown [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S2-QA-FU-08",
+   "suite": "S2",
+   "conversation": [
+    "我在看P004这款重疾险",
+    "那这个产品贵不贵"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "这个产品 demonstrative + evaluative"
+  },
+  {
+   "case_id": "S2-PQ-FU-01",
+   "suite": "S2",
+   "conversation": [
+    "P001的等待期是30天，正常吗？",
+    "那它的免赔额呢"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "elliptical parameter question; own signal 免赔额 present"
+  },
+  {
+   "case_id": "S2-PQ-FU-02",
+   "suite": "S2",
+   "conversation": [
+    "demo-重疾险B（终身）值得买吗",
+    "保费是多少"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "elliptical price question; own anchor+signal 保费 (qa family via plan-signal collision — hard case, expected qa per semantics) [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S2-PQ-FU-03",
+   "suite": "S2",
+   "conversation": [
+    "P006怎么样",
+    "和P005比呢"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "product-id elliptical comparison"
+  },
+  {
+   "case_id": "S2-PQ-FU-04",
+   "suite": "S2",
+   "conversation": [
+    "P001是什么产品",
+    "这款要多少钱"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "demonstrative 这款 + price"
+  },
+  {
+   "case_id": "S2-MOD-FU-01",
+   "suite": "S2",
+   "conversation": [
+    "把我的重疾险保额提高到100万",
+    "我的方案是去年在你这做的，case还在"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "user asserts existing case in words; production passes active_case_id=None (ADR-024) so M1 clarify remains correct-by-design"
+  },
+  {
+   "case_id": "S2-MOD-FU-02",
+   "suite": "S2",
+   "conversation": [
+    "保费太高了，帮我调整一下",
+    "改成月缴"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "modify action verb again; still no active case"
+  },
+  {
+   "case_id": "S2-MOD-FU-03",
+   "suite": "S2",
+   "conversation": [
+    "方案改成以医疗为主",
+    "不改了，保持原样"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "negation of modify; 保持原样 has no modify verb; falls through; 方案 plan signal in prior turn only; message itself no signal no anchor -> unknown ungoverned; DERIVATION UNCERTAIN -> difficulty hard [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S2-MOD-FU-04",
+   "suite": "S2",
+   "conversation": [
+    "把保额从50万提高到100万",
+    "好的，就按这个改"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "改 hit (改 singular substring) -> modify; clarify without case [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S3-CHAIN-01",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32，孩子3岁",
+    "年收入25万左右，房贷还剩60万"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "multi-turn clarification answers keep continuing"
+  },
+  {
+   "case_id": "S3-CHAIN-02",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32，孩子3岁",
+    "年收入25万左右，房贷还剩60万",
+    "大人都有公司补充医疗，孩子只有社保"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "4-turn continuation chain"
+  },
+  {
+   "case_id": "S3-CHAIN-03",
+   "suite": "S3",
+   "conversation": [
+    "给孩子规划一份保险",
+    "孩子6岁，有点过敏性鼻炎",
+    "预算一年8000，意外和医疗优先"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "3-turn planning detail chain"
+  },
+  {
+   "case_id": "S3-CHAIN-04",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我40岁，孩子5岁，有社保",
+    "重疾险200万，家庭年收入30万"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "RV4 T1 split into turns; facts keep continuing"
+  },
+  {
+   "case_id": "S3-CHAIN-05",
+   "suite": "S3",
+   "conversation": [
+    "全家保险怎么配",
+    "我们一家五口，爸妈同住",
+    "老人都有慢性病，长期吃药"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "elder-family continuation chain"
+  },
+  {
+   "case_id": "S3-CHAIN-06",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "预算2万",
+    "其中1万给孩子，剩下给大人"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "budget allocation answers"
+  },
+  {
+   "case_id": "S3-CHAIN-07",
+   "suite": "S3",
+   "conversation": [
+    "我想给全家买保险",
+    "先说下情况：我和爱人都是30岁",
+    "两个孩子，一个上小学一个上幼儿园",
+    "主要担心大人生大病收入断掉"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "4-turn intake chain"
+  },
+  {
+   "case_id": "S3-CHAIN-08",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "老公个体户没有社保",
+    "我体制内有社保，孩子随我"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "social-security facts"
+  },
+  {
+   "case_id": "S3-SWITCH-01",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "对了重疾险等待期一般多久？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "mid-chain concept switch"
+  },
+  {
+   "case_id": "S3-SWITCH-02",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "P002这款百万医疗险怎么样？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "mid-chain product switch"
+  },
+  {
+   "case_id": "S3-SWITCH-03",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "先回答我一个问题：社保和商保的区别是什么？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "explicit meta switch"
+  },
+  {
+   "case_id": "S3-SWITCH-04",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "算了，先不弄规划了，帮我看看P007"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "abandon-plan + product id"
+  },
+  {
+   "case_id": "S3-SWITCH-05",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "天气怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "out-of-domain mid-chain"
+  },
+  {
+   "case_id": "S3-SWITCH-06",
+   "suite": "S3",
+   "conversation": [
+    "重疾险是什么？",
+    "那医疗险呢？",
+    "帮我做个规划吧"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "QA chain ends in plan action"
+  },
+  {
+   "case_id": "S3-QACHAIN-01",
+   "suite": "S3",
+   "conversation": [
+    "重疾险是什么？",
+    "那等待期呢？",
+    "免赔额又是什么"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "pure concept chain"
+  },
+  {
+   "case_id": "S3-QACHAIN-02",
+   "suite": "S3",
+   "conversation": [
+    "P001是什么产品",
+    "它贵不贵",
+    "值不值得买"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "product chain evaluative [CORRECTION R2: evaluative-only phrasing NEVER inherits anchor per 28.A-2 documented design; elliptical 值不值得买 degrades to unknown BY DESIGN]"
+  },
+  {
+   "case_id": "S3-QACHAIN-03",
+   "suite": "S3",
+   "conversation": [
+    "健康告知重要吗",
+    "隐瞒会怎么样",
+    "那 waiting period 呢"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "mixed-language follow-up; anchor from context, message itself no signal -> governed unknown plausible; DERIVATION UNCERTAIN (expected unknown+governed per D6) — expected switched to unknown [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S3-QACHAIN-04",
+   "suite": "S3",
+   "conversation": [
+    "意外险包括什么",
+    "那交通意外呢",
+    "坐飞机算吗"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "elliptical yes/no; no marker no anchor in message; D6 [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S3-QACHAIN-05",
+   "suite": "S3",
+   "conversation": [
+    "百万医疗险是什么",
+    "和惠民保有什么区别",
+    "那惠民保值得买吗"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "值得买 evaluative + anchor 民保? message has 买吗? DERIVATION: 值得买 marker requires anchor in message (惠民保 contains 保) -> product_qa plausible; expected product_qa per D5-ish semantics of specific-product evaluation [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S3-QACHAIN-06",
+   "suite": "S3",
+   "conversation": [
+    "重疾险怎么理赔",
+    "需要什么材料",
+    "一般多久到账"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "claims process chain"
+  },
+  {
+   "case_id": "S3-IA-01",
+   "suite": "S3",
+   "conversation": [
+    "我想给爸妈买保险",
+    "他们一个65一个68",
+    "都有高血压",
+    "身体其他方面还行"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "elder intake chain; T1 has 买保险 action"
+  },
+  {
+   "case_id": "S3-IA-02",
+   "suite": "S3",
+   "conversation": [
+    "全家保障怎么规划",
+    "家里三口人",
+    "我收入20万，老婆15万",
+    "房子还剩80万贷款"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "finance intake chain"
+  },
+  {
+   "case_id": "S3-IA-03",
+   "suite": "S3",
+   "conversation": [
+    "帮我配一下保险",
+    "我29，未婚，互联网工作",
+    "经常加班，怕猝死",
+    "预算8千"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "single-person intake chain"
+  },
+  {
+   "case_id": "S3-IA-04",
+   "suite": "S3",
+   "conversation": [
+    "孩子保险怎么买",
+    "宝宝8个月",
+    "母乳喂养，很健康",
+    "预算3000"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "infant intake chain"
+  },
+  {
+   "case_id": "S3-IA-05",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我40岁，孩子5岁",
+    "有社保，重疾险200万",
+    "家庭年收入30万，有房贷"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "real:RV4-T1-split",
+   "reason": "RV4 T1 content split across turns"
+  },
+  {
+   "case_id": "S3-IA-06",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "每年愿意投入2万在保险",
+    "担心收入中断和大病医疗费用"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "real:RV4-T1-split",
+   "reason": "RV4 T1 tail split"
+  },
+  {
+   "case_id": "S4-ELL-01",
+   "suite": "S4",
+   "conversation": [
+    "重疾险和医疗险有什么区别？",
+    "那这个呢？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "ablation pair: with context D5 product reference; alone -> unknown"
+  },
+  {
+   "case_id": "S4-ELL-02",
+   "suite": "S4",
+   "conversation": [
+    "我在看P004",
+    "这个需要买吗？"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "with context the item is the product; alone the 需要吗 definition marker fires qa"
+  },
+  {
+   "case_id": "S4-ELL-03",
+   "suite": "S4",
+   "conversation": [
+    "重疾险和医疗险有什么区别？",
+    "那我老公呢？"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "person-elliptical: context does NOT make it product-specific (no demonstrative product marker); both modes unknown; anchor difference governed vs ungoverned is the observable [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S4-ELL-04",
+   "suite": "S4",
+   "conversation": [
+    "P002的等待期长吗",
+    "那P003呢"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "product_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "product-id elliptical works in both modes (id in message)"
+  },
+  {
+   "case_id": "S4-ELL-05",
+   "suite": "S4",
+   "conversation": [
+    "百万医疗险和重疾险有什么区别",
+    "第二款呢"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "28.A-2 documented inheritance case (那第二款怎么样 family)"
+  },
+  {
+   "case_id": "S4-ELL-06",
+   "suite": "S4",
+   "conversation": [
+    "P005和P006哪个好",
+    "后者呢"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "latter-elliptical; no marker, no anchor -> ungoverned unknown both modes (honest limitation)"
+  },
+  {
+   "case_id": "S4-ELL-07",
+   "suite": "S4",
+   "conversation": [
+    "重疾险的免责条款有哪些",
+    "这个呢"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "bare 这个 not in demonstrative list; ungoverned both modes; documents marker-list gap"
+  },
+  {
+   "case_id": "S4-ELL-08",
+   "suite": "S4",
+   "conversation": [
+    "意外险多少钱一年",
+    "那重疾险呢"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "insurance_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "category elliptical carries own signal"
+  },
+  {
+   "case_id": "S4-ELL-09",
+   "suite": "S4",
+   "conversation": [
+    "P001怎么样",
+    "买它还是买P002"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "product_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "product ids in message"
+  },
+  {
+   "case_id": "S4-ELL-10",
+   "suite": "S4",
+   "conversation": [
+    "健康告知是什么",
+    "那我需要做吗"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "需要做吗 not a marker (需要吗 is); alone -> no anchor -> ungoverned unknown; with context semantically QA follow-up — expected with-context qa per D5-family semantics (DERIVATION borderline: no rule supports; count as AMBIGUITY on mismatch) [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S4-PEND-01",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "200万重疾险是我的，我和配偶都有百万医疗险，孩子没有保险。房贷还剩100万。配偶35岁，有100万重疾险，家庭主要收入是我一个人"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "insurance_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "real:RV4-T2",
+   "reason": "THE RV4 ablation: alone (pre-C1 original) -> qa product-noun; with pending -> continuation"
+  },
+  {
+   "case_id": "S4-PEND-02",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "孩子5岁"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "short answer: pending -> continuation; alone no anchor no signal -> ungoverned unknown"
+  },
+  {
+   "case_id": "S4-PEND-03",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "房贷还剩100万"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §六 case; alone: 房贷 not anchor/signal -> ungoverned unknown"
+  },
+  {
+   "case_id": "S4-PEND-04",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "顺便说说百万医疗险和重疾险区别"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "insurance_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §六 case; 区别 marker switch in both modes"
+  },
+  {
+   "case_id": "S4-PEND-05",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我和老公都有百万医疗，孩子没有"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §七 continuation noun trap; alone -> qa (医疗 noun)… note message contains 百万医疗 not 医疗险; DERIVATION alone: no qa signal exact substring 医疗险? 百万医疗 lacks 险 suffix -> alone likely unknown+anchor(医疗) governed; expected_alone unknown_insurance_intent"
+  },
+  {
+   "case_id": "S4-PEND-06",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "有公司团体险，还用买吗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "expected_alone": "insurance_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "question phrasing; 买吗 not marker (应该买吗 is); alone: anchor 险 yes no signal -> governed unknown; expected with-context: qmark -> switch -> falls to chain -> no qa signal -> unknown governed. DERIVATION UNCERTAIN — expected unknown governed in both; overridden to unknown for honesty [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S4-PEND-07",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "预算大概一年两万吧"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "insurance_plan",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "预算 is a PLAN action signal in the message itself: alone ALSO fires plan (rule-order effect on answer-shaped content — key observable)"
+  },
+  {
+   "case_id": "S4-PEND-08",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "保障这块主要靠公司的，自己没买过"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "insurance_plan",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "保障 plan signal in message: continuation AND alone-plan collision (documented rule-collision observable)"
+  },
+  {
+   "case_id": "S4-CASE-01",
+   "suite": "S4",
+   "ablate_active_case": true,
+   "conversation": [
+    "把我的重疾险保额提高到100万"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "ABLATION-ONLY (non-production: server passes active_case_id=None): with case -> modify auto-route; production mode expects clarify (see S1-MOD-01)"
+  },
+  {
+   "case_id": "S4-CASE-02",
+   "suite": "S4",
+   "ablate_active_case": true,
+   "conversation": [
+    "方案改成以医疗为主"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ABLATION with case"
+  },
+  {
+   "case_id": "S4-CASE-03",
+   "suite": "S4",
+   "ablate_active_case": true,
+   "conversation": [
+    "预算从2万调整到3万"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ABLATION with case"
+  },
+  {
+   "case_id": "S4-CASE-04",
+   "suite": "S4",
+   "ablate_active_case": true,
+   "conversation": [
+    "帮我做家庭保障规划"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ABLATION control: plan unaffected by case presence"
+  },
+  {
+   "case_id": "S4-ANCH-01",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "今天天气怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "evaluative must NOT inherit anchor from context (28.A-2 rule)"
+  },
+  {
+   "case_id": "S4-ANCH-02",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那个产品多少钱"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "demonstrative inherits anchor from context; alone no anchor -> unknown"
+  },
+  {
+   "case_id": "S5-SW-01",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那重疾险是什么意思？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "definition switch"
+  },
+  {
+   "case_id": "S5-SW-02",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "这款保险怎么样？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "demonstrative evaluative switch"
+  },
+  {
+   "case_id": "S5-SW-03",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "先帮我推荐一款重疾险呗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "recommendation under pending; no plan verb, no modify verb, no qmark, no definition, no demonstrative — NOT a switch per frozen C1 list -> continuation expected; taxonomy_issue adjacent (recommendation wording); counted as continuation per frozen semantics"
+  },
+  {
+   "case_id": "S5-SW-04",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "意外险一般多少钱？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "qmark + qa signal switch"
+  },
+  {
+   "case_id": "S5-SW-05",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "换个思路，先给孩子配置"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "plan-action switch (配置) — still plan but via action not continuation; intent same, reason differs (observable for reason-code audit, counted correct either way at intent level)"
+  },
+  {
+   "case_id": "S5-SW-06",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "帮我看看P009"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "product-id switch"
+  },
+  {
+   "case_id": "S5-SW-07",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "等待期和犹豫期分别是什么"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "definition switch"
+  },
+  {
+   "case_id": "S5-SW-08",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "demo-年金险A怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "catalog-name switch"
+  },
+  {
+   "case_id": "S5-SW-09",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "不买了不买了，我想退款"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "surrender intent not in vocabulary; anchor 买/险? message has no anchor word… DERIVATION: no anchor -> ungoverned unknown expected [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S5-SW-10",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "你们这个规划收不收费？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "meta question about the service; qmark -> switch; anchor 规划 is plan signal! DERIVATION COLLISION: 规划 fires plan rule 4 before qmark logic… expected honestly = plan fires (frozen rule-order); semantic = meta/unknown. Marked expected per SEMANTIC unknown; high mismatch risk documented [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S5-SW-11",
+   "suite": "S5",
+   "conversation": [
+    "重疾险是什么？",
+    "那医疗险呢？",
+    "对了，帮我规划一下全家保险"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "3-turn with final switch to plan"
+  },
+  {
+   "case_id": "S5-SW-12",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "等等，P003的0免赔是什么意思"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "mid-chain product-parameter concept question [CORRECTION R1: product-id question IS product_qa per D-rules (consistency with S1-PQ-01)]"
+  },
+  {
+   "case_id": "S5-SW-13",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那这个方案能便宜点吗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "plan-signal 方案 in message fires plan (rule 4) despite qmark; qmark only matters in 4.5 which is skipped when rule 4 fires; expected plan per frozen semantics (方案 ask)"
+  },
+  {
+   "case_id": "S5-SW-14",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "医保断缴了还能用吗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "qa signal 医保 switch"
+  },
+  {
+   "case_id": "S5-SW-15",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我考虑一下，明天再说"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "deferral statement; no signals -> continuation per C1 (answer-like closing); borderline AMBIGUITY"
+  },
+  {
+   "case_id": "S5-SW-16",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "先告诉我重疾险该怎么选"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "guidance question; 该怎么选 — no marker (怎么买 signal differs); qmark -> switch; falls to rule 5? 重疾险 qa signal yes -> qa"
+  },
+  {
+   "case_id": "S5-SW-17",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "P012的收益怎么样"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "product-id evaluative switch"
+  },
+  {
+   "case_id": "S5-SW-18",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我不确定要不要给孩子买重疾险"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "hesitation statement contains 重疾险 (qa signal) BUT rule order: no product_specific/evaluative/modify/plan… rule 5 qa signal hits -> qa. Semantic: consultative statement = continuation-ish. DERIVATION: frozen rules give qa (signal substring); expected set to rules-derivable qa? NO — D1 semantic: it is an answer-like concern statement -> plan continuation. High-risk mismatch case (boundary AMBIGUITY). Expected=plan (continuation); likely actual=qa"
+  },
+  {
+   "case_id": "S5-SW-19",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "健康告知怎么填啊"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "concept + qmark switch"
+  },
+  {
+   "case_id": "S5-SW-20",
+   "suite": "S5",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那算了，我自己再想想，你把之前的方案再发我一份"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "方案 plan signal fires; semantic re-send request; expected plan (frozen)"
+  },
+  {
+   "case_id": "S6-ACK-01",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "好"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "min ack"
+  },
+  {
+   "case_id": "S6-ACK-02",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "行"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack"
+  },
+  {
+   "case_id": "S6-ACK-03",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "ok"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "latin ack (len 2 <= 6)"
+  },
+  {
+   "case_id": "S6-ACK-04",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "好的吧"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "3-char ack variant"
+  },
+  {
+   "case_id": "S6-ACK-05",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "嗯，都可以"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "5-char ack"
+  },
+  {
+   "case_id": "S6-ACK-06",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "先这样吧谢谢"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "6-char closing ack"
+  },
+  {
+   "case_id": "S6-ACK-07",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "好的，我确认这样可以"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "11-char confirm answer: > ack_max_len and no switch -> continuation auto"
+  },
+  {
+   "case_id": "S6-ACK-08",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "嗯嗯好的没问题"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "7-char ack: JUST over ack_max_len 6 -> continuation auto (boundary of the boundary)"
+  },
+  {
+   "case_id": "S6-ACK-09",
+   "suite": "S6",
+   "conversation": [
+    "好的"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ack with no context at all"
+  },
+  {
+   "case_id": "S6-ACK-10",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "bare qmark: qmark -> switch; no signals no anchor -> unknown ungoverned… DERIVATION: no anchor in message -> ungoverned unknown [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S6-MIX-01",
+   "suite": "S6",
+   "conversation": [
+    "帮我规划一下家庭保障，另外百万医疗和重疾险到底有什么区别？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 mixed-intent trap; primary action wins (D4 frozen rule-order design)"
+  },
+  {
+   "case_id": "S6-MIX-02",
+   "suite": "S6",
+   "conversation": [
+    "帮我做个方案，顺便问下等待期是什么"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "mixed; plan action primary"
+  },
+  {
+   "case_id": "S6-MIX-03",
+   "suite": "S6",
+   "conversation": [
+    "重疾险是什么？顺便帮我看看要不要加个医疗险"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "QA-primary mixed; rule order: product_specific no; evaluative no; modify no; plan signals? 投保/买保险/方案/规划/配置/怎么买/预算/保障 — none present (加个医疗险 no plan signal) -> rule5 qa via 重疾险 ✓ expected qa"
+  },
+  {
+   "case_id": "S6-MIX-04",
+   "suite": "S6",
+   "conversation": [
+    "先别规划了，直接告诉我重疾险买哪个"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "plan-negation + which-to-buy ask; frozen: 规划 plan signal present in message! fires plan despite negation. Semantic: product-pick question. Expected semantic qa; high mismatch risk (RULE_GAP negation)"
+  },
+  {
+   "case_id": "S6-BORDER-01",
+   "suite": "S6",
+   "conversation": [
+    "保险"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "single anchor word; no signal -> governed unknown"
+  },
+  {
+   "case_id": "S6-BORDER-02",
+   "suite": "S6",
+   "conversation": [
+    "我想问问保险的事"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "vague in-domain opener"
+  },
+  {
+   "case_id": "S6-BORDER-03",
+   "suite": "S6",
+   "conversation": [
+    "咨询一下"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "vague no anchor"
+  },
+  {
+   "case_id": "S6-BORDER-04",
+   "suite": "S6",
+   "conversation": [
+    "你们是保险公司吗"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "governed_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "meta question about service; anchor 保险/公司? 保险 anchor yes -> governed unknown"
+  },
+  {
+   "case_id": "S6-BORDER-05",
+   "suite": "S6",
+   "conversation": [
+    "帮我"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "bare help verb"
+  },
+  {
+   "case_id": "S6-BORDER-06",
+   "suite": "S6",
+   "conversation": [
+    "贵吗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "2-char: ack-len BUT contains qmark-ish 吗 -> switch -> no signals -> unknown ungoverned… DERIVATION CONFLICT: switch (吗) wins over ack; expected unknown ungoverned per D7 [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S6-BORDER-07",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我已经有一份保险了，还需要你们的规划吗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "meta-challenge; qmark switch; 需要吗 marker NOT exact (你们的规划吗)… signals: 规划 plan signal in message fires rule 4 first. DERIVATION: frozen rules -> plan. Semantic -> doubt/question. Expected semantic qa; high mismatch risk"
+  },
+  {
+   "case_id": "S6-BORDER-08",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "家里就我一个人赚钱，压力挺大的"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "emotional context statement = answer content -> continuation"
+  },
+  {
+   "case_id": "S6-BORDER-09",
+   "suite": "S6",
+   "conversation": [
+    "你们这个平台靠谱吗"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "synthetic:K5-S09",
+   "reason": "platform challenge; no insurance anchor"
+  },
+  {
+   "case_id": "S6-BORDER-10",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "无所谓，你看着办"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "delegation answer (7 chars, no switch) -> continuation"
+  },
+  {
+   "case_id": "S6-BORDER-11",
+   "suite": "S6",
+   "conversation": [
+    "救命"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "non-insurance urgent fragment"
+  },
+  {
+   "case_id": "S6-BORDER-12",
+   "suite": "S6",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "上次说的那个再解释一下"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "meta-reference to prior explanation; 那个 alone not demonstrative-product marker; no anchor -> ungoverned per D7… but semantic = explanation request (qa-ish). DERIVATION UNCERTAIN: expected ungoverned unknown by markers; semantic mismatch documented [PRE-FREEZE FIX: expected re-derived per exact marker/anchor semantics]"
+  },
+  {
+   "case_id": "S1-TRAP-01",
+   "suite": "S1",
+   "conversation": [
+    "我有重疾险200万，孩子没有医疗险，应该怎么配置？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 product noun trap; 配置 action signal with product facts = planning"
+  },
+  {
+   "case_id": "S1-TRAP-02",
+   "suite": "S1",
+   "conversation": [
+    "我家庭年收入30万，房贷100万，应该怎么规划？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §七 question-mark trap; 规划 action wins"
+  },
+  {
+   "case_id": "S1-TRAP-03",
+   "suite": "S1",
+   "conversation": [
+    "帮我看看我的保障是不是合理"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 recommendation verb trap; coverage review = planning intake (D4)"
+  },
+  {
+   "case_id": "S1-TRAP-04",
+   "suite": "S1",
+   "conversation": [
+    "家庭保障规划一般包括什么？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "task §七 planning noun trap; CONCEPT question about what planning includes, not a planning request; expected semantic qa"
+  },
+  {
+   "case_id": "S1-TRAP-05",
+   "suite": "S1",
+   "conversation": [
+    "保险配置的一般原则是什么？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "planning-noun concept question (配置 as topic not action)"
+  },
+  {
+   "case_id": "S1-TRAP-06",
+   "suite": "S1",
+   "conversation": [
+    "我的保障够不够？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "necessity question about own coverage; semantic qa/advice; 保障 substring will fire plan — key boundary observable"
+  },
+  {
+   "case_id": "S1-TRAP-07",
+   "suite": "S1",
+   "conversation": [
+    "一份保险规划要多少钱"
+   ],
+   "prev": "none",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "price question; evaluative 多少钱 + anchor; 规划 noun inside price question"
+  },
+  {
+   "case_id": "S1-TRAP-08",
+   "suite": "S1",
+   "conversation": [
+    "投保前需要注意什么？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "投保 is frozen PLAN action signal but semantic is pre-purchase guidance (qa); expected semantic qa; high mismatch risk"
+  },
+  {
+   "case_id": "S1-TRAP-09",
+   "suite": "S1",
+   "conversation": [
+    "我有200万重疾险，还需要医疗险吗？"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "plan_vs_qa",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "task §四.1; personal necessity question -> qa (需要吗 marker)"
+  },
+  {
+   "case_id": "S1-TRAP-10",
+   "suite": "S1",
+   "conversation": [
+    "根据我的情况帮我重新规划一下"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "none",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "task §四.1; plan action"
+  },
+  {
+   "case_id": "S2-CONT-11",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "夫妻俩都在私企，没有公积金"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "employment fact answer"
+  },
+  {
+   "case_id": "S2-ACK-07",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "好呀"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "clarify",
+   "boundary_class": "ambiguous",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "2-char ack"
+  },
+  {
+   "case_id": "S2-SW-QA-05",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "现金价值是什么"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "definition switch"
+  },
+  {
+   "case_id": "S2-NP-06",
+   "suite": "S2",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "谢谢，信息很全"
+   ],
+   "prev": "completed",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "ambiguous",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "closing thanks after completed run; no anchor no signal"
+  },
+  {
+   "case_id": "S2-QA-FU-09",
+   "suite": "S2",
+   "conversation": [
+    "定期寿险是什么",
+    "和意外险的区别大吗"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "own qa signal 意外险 present"
+  },
+  {
+   "case_id": "S3-CHAIN-09",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我30，老公32",
+    "一个孩子2岁",
+    "预算一年一万五"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "4-turn intake chain"
+  },
+  {
+   "case_id": "S3-SWITCH-07",
+   "suite": "S3",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "我35，媳妇32",
+    "你们和线下经纪人比有什么优势？"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "boundary_class": "continuation_vs_topic_switch",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "meta/platform question; qmark switch; no anchor no signal in message"
+  },
+  {
+   "case_id": "S3-QACHAIN-07",
+   "suite": "S3",
+   "conversation": [
+    "社保是什么",
+    "和商业保险区别在哪",
+    "那医保报销比例呢"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "own qa signal 医保"
+  },
+  {
+   "case_id": "S3-IA-07",
+   "suite": "S3",
+   "conversation": [
+    "全家保险方案怎么做",
+    "两大人一小孩",
+    "大人单位有补充医疗"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "plan_vs_continuation",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "supplement fact chain"
+  },
+  {
+   "case_id": "S4-ELL-11",
+   "suite": "S4",
+   "conversation": [
+    "P001是什么产品",
+    "那等待期呢"
+   ],
+   "prev": "none",
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "insurance_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "control: own signal in both modes"
+  },
+  {
+   "case_id": "S4-ELL-12",
+   "suite": "S4",
+   "conversation": [
+    "我在看P008和P009",
+    "第一个呢"
+   ],
+   "prev": "none",
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "ungoverned_unknown",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "ordinal elliptical not in marker list; documents gap both modes"
+  },
+  {
+   "case_id": "S4-PEND-09",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "两个老人都没有商业保险"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "medium",
+   "source": "authored",
+   "reason": "pending->continuation; alone anchor 保险 no signal -> governed unknown"
+  },
+  {
+   "case_id": "S4-PEND-10",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "重疾险保额50万，医疗险300万"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "expected_alone": "insurance_qa",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "KEY contrast: product nouns alone fire qa (rule 5); with pending -> continuation (RV4 mirror)"
+  },
+  {
+   "case_id": "S4-CASE-05",
+   "suite": "S4",
+   "ablate_active_case": true,
+   "conversation": [
+    "重疾险保额改成100万"
+   ],
+   "prev": "none",
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "auto_plan",
+   "boundary_class": "modify_vs_plan",
+   "difficulty": "easy",
+   "source": "authored",
+   "reason": "ABLATION with case"
+  },
+  {
+   "case_id": "S4-ANCH-03",
+   "suite": "S4",
+   "conversation": [
+    "帮我做家庭保障规划",
+    "那款产品多少钱"
+   ],
+   "prev": "waiting_plan",
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "expected_alone": "unknown_insurance_intent",
+   "boundary_class": "context_dependent",
+   "difficulty": "hard",
+   "source": "authored",
+   "reason": "demonstrative inherits anchor; alone ungoverned"
+  }
+ ],
+ "counts": {
+  "S1": 65,
+  "S2": 53,
+  "S3": 30,
+  "S4": 30,
+  "S5": 20,
+  "S6": 26
+ },
+ "post_first_run_corrections": [
+  "R1 S5-SW-12 expected qa->product_qa: consistency with own D-rules (S1-PQ-01 P001是什么产品 expects product_qa); product-id question is product-specific by definition",
+  "R2 S3-QACHAIN-02 expected product_qa->unknown: 28.A-2/intent-rules.yaml header documents evaluative-only phrasing NEVER inherits the anchor; expected must follow frozen design"
+ ]
+}
