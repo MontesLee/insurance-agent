@@ -1,0 +1,1149 @@
+{
+ "benchmark": "intent-arbitration",
+ "version": 1,
+ "frozen_at": "2026-09-30",
+ "gold_method": "per FROZEN taxonomy ADR-019 + FIX rulings D2/D3; GOLD_UNCERTAIN marks taxonomy tension (owner decision), excluded from accuracy denominators",
+ "cases": [
+  {
+   "case_id": "OBS1-01",
+   "message": "重疾险一般买多少保额？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "qa-noun signal 买多少保额? quantity-concept question → qa (per golden D-rules: quantity-concept = qa; personal facts absent)"
+  },
+  {
+   "case_id": "OBS1-02",
+   "message": "重疾保额通常建议多少？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "general advice-quantity, no personal facts → qa"
+  },
+  {
+   "case_id": "OBS1-03",
+   "message": "我35岁，家庭收入50万，重疾险买多少合适？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "personal facts + quantity question — golden S1-QA-19 analog: quantity-concept with personal facts stays qa (rule:qa:该买多少/买多少合适)"
+  },
+  {
+   "case_id": "OBS1-04",
+   "message": "按照我家的情况，重疾险应该配置多少？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "OWNER",
+   "boundary": "plan_qa",
+   "risk": "P1",
+   "rationale": "配置 is a PLAN action verb per FIX-A adjacency? — but sentence is a quantity question; taxonomy tension: FIX-A adjacency exempts 怎么+配置; here 按照我家的情况+应该配置多少 reads as personalized quantity question → qa by QA-19 analog, but 配置 substring fires plan deterministically — OWNER_DECISION_REQUIRED"
+  },
+  {
+   "case_id": "OBS1-05",
+   "message": "我已经有100万重疾险，还需要买吗？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "necessity question (需要吗 marker) with user fact → qa per golden"
+  },
+  {
+   "case_id": "OBS1-06",
+   "message": "重疾险保额怎么计算？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "how-to-calculate concept → qa (怎么计算 not a plan action phrasing per FIX-A: 计算 marker is CALC-type, question form)"
+  },
+  {
+   "case_id": "OBS1-07",
+   "message": "我的家庭收入50万，房贷80万，重疾险应该买多少？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "QA-19/20 family: personal facts + 该买多少 → qa"
+  },
+  {
+   "case_id": "OBS1-08",
+   "message": "重疾险保额一般怎么算？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "general calculation concept → qa"
+  },
+  {
+   "case_id": "OBS1-09",
+   "message": "我只想了解行业通常的重疾险保额。",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "explicitly informational (只想了解) → qa; no plan action verb"
+  },
+  {
+   "case_id": "OBS1-10",
+   "message": "根据我的家庭情况给我一个重疾险保额建议。",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "给我建议 + noun 保额; 建议 is not in plan signals; advisory-quantity → qa by QA-19 analog — but semantically leans recommendation; OWNER note"
+  },
+  {
+   "case_id": "E-01",
+   "message": "帮我全家买保险怎么安排",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "安排/配置 family plan action"
+  },
+  {
+   "case_id": "E-02",
+   "message": "全家保险配置建议",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P1",
+   "rationale": "配置 + 建议 noun-phrase without action-verb question — plan signal substring 配置 fires; semantically advisory"
+  },
+  {
+   "case_id": "E-03",
+   "message": "家庭保障怎么做",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "怎么做+保障 = plan adjacency"
+  },
+  {
+   "case_id": "E-04",
+   "message": "怎么给一家人买保险",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "怎么+买(保险) adjacency"
+  },
+  {
+   "case_id": "E-05",
+   "message": "重疾险是什么？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "pure definition"
+  },
+  {
+   "case_id": "E-06",
+   "message": "重疾险怎么买？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "怎么买 = plan action"
+  },
+  {
+   "case_id": "E-07",
+   "message": "医疗险和重疾险的区别",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "difference concept"
+  },
+  {
+   "case_id": "E-08",
+   "message": "医疗险和重疾险怎么搭配？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P1",
+   "rationale": "搭配 advisory — plan-ish; 搭配 not in signals → qa deterministically"
+  },
+  {
+   "case_id": "E-09",
+   "message": "帮我规划全家保障",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "canonical plan"
+  },
+  {
+   "case_id": "E-10",
+   "message": "帮我规划全家保障的思路对吗？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P1",
+   "rationale": "meta-question on the plan — question form + 规划 substring"
+  },
+  {
+   "case_id": "E-11",
+   "message": "房贷还有100万",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": [
+    "帮我做家庭保障规划"
+   ],
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "C1 continuation answer (pending)"
+  },
+  {
+   "case_id": "E-12",
+   "message": "那重疾险等待期多久？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": [
+    "帮我做家庭保障规划"
+   ],
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "question = topic switch under pending"
+  },
+  {
+   "case_id": "E-13",
+   "message": "继续",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": [
+    "帮我做家庭保障规划"
+   ],
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "ack-only fail-closed → plan+clarify"
+  },
+  {
+   "case_id": "E-14",
+   "message": "换个话题，医保断缴怎么办？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": [
+    "帮我做家庭保障规划"
+   ],
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "explicit switch + qa noun"
+  },
+  {
+   "case_id": "E-15",
+   "message": "房贷还有100万",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": [],
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "no pending, no signals, anchor 房贷? no → ungoverned unknown (D7)"
+  },
+  {
+   "case_id": "E-16",
+   "message": "配偶35岁有社保",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": [],
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "same shape: no pending → unknown (governed? 社保 anchor → governed unknown)"
+  },
+  {
+   "case_id": "E-17",
+   "message": "对了，P001这款产品怎么样",
+   "recent_context": [
+    "帮我做家庭保障规划",
+    "我35岁"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "topic_switch",
+   "risk": "P2",
+   "rationale": "product-id switch under pending"
+  },
+  {
+   "case_id": "E-18",
+   "message": "顺便问下意外险多少钱一年",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "topic_switch",
+   "risk": "P2",
+   "rationale": "多少钱 evaluative + 意外险 anchor → pq? 多少钱 in product_evaluative + anchor → product_qa per rules; gold: price question about category → qa; GOLD tension"
+  },
+  {
+   "case_id": "E-19",
+   "message": "先不规划了，说说定期寿险是什么",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "topic_switch",
+   "risk": "P2",
+   "rationale": "explicit abort + definition"
+  },
+  {
+   "case_id": "E-20",
+   "message": "好的",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "ack → clarify (fail-closed)"
+  },
+  {
+   "case_id": "E-21",
+   "message": "好的，就这样定了吧",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "confirm-length ack > 6 chars → continuation auto"
+  },
+  {
+   "case_id": "E-22",
+   "message": "嗯",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "no context ack → unknown"
+  },
+  {
+   "case_id": "E-23",
+   "message": "P004的保额是多少",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "pq_plan",
+   "risk": "P2",
+   "rationale": "product-id fact"
+  },
+  {
+   "case_id": "E-24",
+   "message": "我该买P004吗？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "pq_plan",
+   "risk": "P1",
+   "rationale": "product-specific necessity — product_qa by specific-ref; evaluative 需要吗? tension"
+  },
+  {
+   "case_id": "E-25",
+   "message": "帮我对比P001和P002然后推荐一个",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "pq_plan",
+   "risk": "P1",
+   "rationale": "recommendation request on specific products — REC taxonomy debt (D2 keep fail-closed/mapped); deterministic → product_qa (id)"
+  },
+  {
+   "case_id": "E-26",
+   "message": "股票怎么投资",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "ins_nonins",
+   "risk": "P2",
+   "rationale": "out-of-domain"
+  },
+  {
+   "case_id": "E-27",
+   "message": "保险和基金哪个好？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "ins_nonins",
+   "risk": "P1",
+   "rationale": "mixed-domain comparison — 保险 anchor present; semantically finance comparison"
+  },
+  {
+   "case_id": "E-28",
+   "message": "帮我看看天气",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "ins_nonins",
+   "risk": "P2",
+   "rationale": "out-of-domain"
+  },
+  {
+   "case_id": "E-29",
+   "message": "",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "ins_nonins",
+   "risk": "P2",
+   "rationale": "empty → fail-closed"
+  },
+  {
+   "case_id": "E-30",
+   "message": "？？？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "ins_nonins",
+   "risk": "P2",
+   "rationale": "pure punctuation"
+  },
+  {
+   "case_id": "E-31",
+   "message": "我有重疾险和医疗险，怎么配置合理？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "product nouns + 配置 action → plan"
+  },
+  {
+   "case_id": "E-32",
+   "message": "重疾险医疗险意外险都有什么用？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "multi-noun purpose question → qa"
+  },
+  {
+   "case_id": "E-33",
+   "message": "我30岁收入20万想买50万保额的保险怎么规划",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "numbers + 规划 → plan"
+  },
+  {
+   "case_id": "E-34",
+   "message": "30万和50万区别是什么",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "plan_qa",
+   "risk": "P1",
+   "rationale": "bare numbers no insurance noun — no anchor → ungoverned unknown deterministic; semantically ambiguous"
+  },
+  {
+   "case_id": "E-35",
+   "message": "孩子5岁",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": [
+    "帮我做家庭保障规划"
+   ],
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto_plan",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "answer-shaped continuation"
+  },
+  {
+   "case_id": "E-36",
+   "message": "孩子5岁了，可以单独买少儿险吗？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": [
+    "帮我做家庭保障规划"
+   ],
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto_qa",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "question under pending = switch"
+  },
+  {
+   "case_id": "E-37",
+   "message": "家里就我一个人挣钱",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "general",
+   "risk": "P2",
+   "rationale": "implicit worry, no signal → governed unknown (家庭 anchor? 我一个人挣钱 — no anchor word → ungoverned)"
+  },
+  {
+   "case_id": "E-38",
+   "message": "怕生大病没钱治",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "GOLD_UNCERTAIN",
+   "expected_behavior": "auto_qa",
+   "boundary": "general",
+   "risk": "P1",
+   "rationale": "implicit insurance need — no noun anchor; semantically insurance"
+  },
+  {
+   "case_id": "G-S1-QA-04",
+   "message": "重疾险和医疗险有什么区别？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-QA-05",
+   "message": "百万医疗险和重疾险有什么区别",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-QA-11",
+   "message": "医保够用吗",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-QA-14",
+   "message": "给孩子买重疾险前应该先考虑什么",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-QA-16",
+   "message": "我想了解一下重疾险和寿险到底该怎么选，家里刚生了二胎，预算也不多，麻烦讲得通俗一点",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-PLAN-03",
+   "message": "我40岁，孩子5岁，有社保，重疾险200万，家庭年收入30万，有房贷，每年愿意投入2万在保险，担心收入中断和大病医疗费用，帮我看看家庭保障有没有明显缺口",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-PLAN-04",
+   "message": "一家三口怎么买保险比较合理？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-PLAN-05",
+   "message": "我老公35岁我32岁，家里主要靠他赚钱，想给他先把保障配齐，不知道从哪开始",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-PLAN-06",
+   "message": "预算有限，先给孩子买还是先给大人买？帮我出个方案",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-PLAN-07",
+   "message": "帮我看看我的家庭保障有没有缺口",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-PLAN-08",
+   "message": "我们夫妻俩想投保，有什么建议的思路吗？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-UNK-01",
+   "message": "一家三口需要哪些保险？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-UNK-02",
+   "message": "什么保险比较好？",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-UNK-03",
+   "message": "我想给我爸买个保险，但是他有糖尿病",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S1-UNK-04",
+   "message": "你们刚才说的都可靠吗",
+   "recent_context": [],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-ACK-01",
+   "message": "好的",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-ACK-02",
+   "message": "是的",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-ACK-03",
+   "message": "可以",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-ACK-04",
+   "message": "继续",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-ACK-05",
+   "message": "就这样",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-ACK-06",
+   "message": "嗯嗯",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-QA-01",
+   "message": "那百万医疗险和重疾险有什么区别？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-QA-02",
+   "message": "重疾险到底是什么？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-QA-03",
+   "message": "等待期一般是多久呢",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-QA-04",
+   "message": "对了，健康告知隐瞒病史会怎么样",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-PQ-01",
+   "message": "我现在有P001，值得买吗？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-PQ-02",
+   "message": "那这款重疾险怎么样",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-MOD-01",
+   "message": "那我把预算从2万提高到3万",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-MOD-02",
+   "message": "先不规划了，把之前的方案改成以孩子为主",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "modify_existing_plan",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-PLAN-01",
+   "message": "那帮我给全家做个保险规划吧",
+   "recent_context": [
+    "重疾险和医疗险有什么区别？"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-OOD-01",
+   "message": "今天天气怎么样",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-SW-OOD-02",
+   "message": "最近股票行情怎么样",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": true,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-NP-01",
+   "message": "200万重疾险是我的，我和配偶都有百万医疗险，孩子没有保险。房贷还剩100万。配偶35岁，有100万重疾险，家庭主要收入是我一个人",
+   "recent_context": [
+    "帮我做家庭保障规划，把缺口都列出来"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-NP-02",
+   "message": "配偶35岁，收入和我差不多，有社保",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-NP-03",
+   "message": "好的",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "unknown_insurance_intent",
+   "expected_behavior": "clarify",
+   "boundary": "clarify_proceed",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-NP-04",
+   "message": "那百万医疗险和重疾险有什么区别？",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_qa",
+   "expected_behavior": "auto",
+   "boundary": "plan_qa",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-NP-05",
+   "message": "还有别的方案吗",
+   "recent_context": [
+    "帮我做家庭保障规划"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "insurance_plan",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-QA-FU-01",
+   "message": "那这个呢？",
+   "recent_context": [
+    "重疾险和医疗险有什么区别？"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-QA-FU-02",
+   "message": "这个需要买吗？",
+   "recent_context": [
+    "重疾险和医疗险有什么区别？"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  },
+  {
+   "case_id": "G-S2-QA-FU-03",
+   "message": "那第二款呢",
+   "recent_context": [
+    "P001和P002哪个好？"
+   ],
+   "active_case_context": null,
+   "pending": false,
+   "expected_intent": "product_qa",
+   "expected_behavior": "auto",
+   "boundary": "cont_new",
+   "risk": "P2",
+   "rationale": "golden v1 frozen expectation"
+  }
+ ]
+}

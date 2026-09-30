@@ -185,6 +185,16 @@ intents:
       - 多少合适
       - 该买多少
       - 买多少合适
+      # Pre-UAT OBS-1 fix (owner task 2026-09-30): narrow
+      # advice-QUANTITY question forms. "重疾保额通常建议多少" carried
+      # an insurance anchor but no noun-suffix signal and no quantity
+      # signal -> unknown fallback. Two-signal minimal fix; NOT the
+      # bare high-frequency words (建议/配置/多少/购买/合适 are
+      # forbidden as standalone signals — planning contamination).
+      # Priority is safe by rule order: plan action signals (rule 4)
+      # fire BEFORE qa (rule 5), so a planning message keeps plan.
+      - 建议多少
+      - 多少保额
 
 context:
   # ADR-019 rule 7: deterministic rules MAY reference conversation-context
