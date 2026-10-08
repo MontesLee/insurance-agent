@@ -1,0 +1,183 @@
+{
+ "ran_at": "2026-10-05T02:32:28",
+ "kb": "44af9ff2-ecef-445e-87c6-cb1458cd4d44",
+ "active": 29,
+ "total": 29,
+ "chunks": 791,
+ "results": [
+  {
+   "document_id": "L1-01",
+   "state": "ACTIVE",
+   "chunks": 53,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-02",
+   "state": "ACTIVE",
+   "chunks": 16,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-03",
+   "state": "ACTIVE",
+   "chunks": 20,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-04",
+   "state": "ACTIVE",
+   "chunks": 34,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-05",
+   "state": "ACTIVE",
+   "chunks": 10,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-06",
+   "state": "ACTIVE",
+   "chunks": 68,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-07",
+   "state": "ACTIVE",
+   "chunks": 88,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-08",
+   "state": "ACTIVE",
+   "chunks": 34,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-09",
+   "state": "ACTIVE",
+   "chunks": 23,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-10",
+   "state": "ACTIVE",
+   "chunks": 27,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-11",
+   "state": "ACTIVE",
+   "chunks": 11,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-12",
+   "state": "ACTIVE",
+   "chunks": 13,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-13",
+   "state": "ACTIVE",
+   "chunks": 9,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-14",
+   "state": "ACTIVE",
+   "chunks": 19,
+   "detail": ""
+  },
+  {
+   "document_id": "L1-15",
+   "state": "ACTIVE",
+   "chunks": 8,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-16",
+   "state": "ACTIVE",
+   "chunks": 27,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-17",
+   "state": "ACTIVE",
+   "chunks": 13,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-18",
+   "state": "ACTIVE",
+   "chunks": 30,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-19",
+   "state": "ACTIVE",
+   "chunks": 20,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-20",
+   "state": "ACTIVE",
+   "chunks": 30,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-21",
+   "state": "ACTIVE",
+   "chunks": 32,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-22",
+   "state": "ACTIVE",
+   "chunks": 76,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-23",
+   "state": "ACTIVE",
+   "chunks": 13,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-24",
+   "state": "ACTIVE",
+   "chunks": 14,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L1-25",
+   "state": "ACTIVE",
+   "chunks": 13,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L2-01",
+   "state": "ACTIVE",
+   "chunks": 35,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L2-02",
+   "state": "ACTIVE",
+   "chunks": 44,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L2-03",
+   "state": "ACTIVE",
+   "chunks": 3,
+   "detail": "(re-verified)"
+  },
+  {
+   "document_id": "L2-05",
+   "state": "ACTIVE",
+   "chunks": 8,
+   "detail": "(re-verified)"
+  }
+ ]
+}

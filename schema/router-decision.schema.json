@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://insurance-agent.local/schema/router-decision/v1.json",
+  "title": "RouterDecision Contract (v1)",
+  "description": "Phase 28.A-0 / ADR-020 (APPROVED). The ONLY output of the deterministic Router: validated IntentResult -> declared Agent. The Router does lookup / validate / dispatch and NOTHING else — no insurance business logic, no workflow knowledge, no knowledge retrieval, no product recommendation. An LLM may NEVER produce a RouterDecision: decision_source has no LLM value (structural exclusion) and any LLM-produced document claiming to be a routing decision is by contract invalid. agent_id MUST reference an Agent declared in the Agent Registry (checked against the registry document by contract tests and, at implementation time, by the router's registry-only import boundary + CI tests).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "intent_id",
+    "agent_id",
+    "decision_source",
+    "validation_result"
+  ],
+  "properties": {
+    "intent_id": {
+      "type": "string",
+      "enum": [
+        "insurance_qa",
+        "product_qa",
+        "insurance_plan",
+        "modify_existing_plan",
+        "unknown_insurance_intent"
+      ],
+      "description": "Echo of the consumed IntentResult.intent_id (same v1 vocabulary). The Router consumes ONLY schema-validated IntentResults."
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$",
+      "description": "Target agent, MUST exist in the Agent Registry (single source of truth, ADR-021). fail-closed: unknown intent or missing agent routes to the conversation agent's clarification path (decision_source=fallback), never a business agent by default."
+    },
+    "decision_source": {
+      "type": "string",
+      "enum": ["registry_lookup", "fallback", "blocked"],
+      "description": "registry_lookup = table hit intent->declared agent; fallback = clarification path (unknown intent / low-confidence high-risk / unclassifiable); blocked = routing refused by a gate (e.g. data policy). Deliberately NO 'llm' value: the Router is deterministic, LLM never decides routing (ADR-020 forbidden list)."
+    },
+    "validation_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valid"],
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "description": "Whether the consumed IntentResult passed schema validation. false must pair with decision_source=fallback or blocked."
+        },
+        "errors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Validation error reasons (verbatim), for audit."
+        },
+        "intent_result_created_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Traceability back to the IntentResult decision timestamp."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "decision_source": { "enum": ["registry_lookup"] } },
+        "required": ["decision_source"]
+      },
+      "then": {
+        "properties": {
+          "validation_result": {
+            "properties": { "valid": { "const": true } },
+            "required": ["valid"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "validation_result": { "properties": { "valid": { "const": false } } }
+        },
+        "required": ["validation_result"]
+      },
+      "then": {
+        "properties": {
+          "decision_source": { "enum": ["fallback", "blocked"] }
+        }
+      }
+    }
+  ]
+}

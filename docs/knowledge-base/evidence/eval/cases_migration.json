@@ -1,0 +1,21 @@
+[
+  {"case_id": "RB-L1-001", "query": "保险公司注册资本的最低限额是多少", "intent_mode": "auto", "category": "法律/NUMERIC"},
+  {"case_id": "RB-L1-017", "query": "保险公司设立分支机构需要经过什么程序", "intent_mode": "auto", "category": "监管"},
+  {"case_id": "RB-L1-007", "query": "长期健康保险产品的犹豫期不得少于多少天", "intent_mode": "auto", "category": "健康险/等待期"},
+  {"case_id": "RB-L2-001", "query": "2020版重疾规范规定必须包含哪三种轻度疾病", "intent_mode": "auto", "category": "重疾定义"},
+  {"case_id": "RB-L1-009", "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料", "intent_mode": "auto", "category": "人身保险"},
+  {"case_id": "RB-L1-027", "query": "人身保险公司的保险条款和保险费率需要审批还是备案", "intent_mode": "auto", "category": "产品合同/REGULATORY"},
+  {"case_id": "RB-L1-019", "query": "保险保障基金由谁缴纳、按什么缴纳", "intent_mode": "auto", "category": "金额/PAYMENT"},
+  {"case_id": "RB-L1-023", "query": "银行保险机构收到消费投诉后多久作出处理决定", "intent_mode": "auto", "category": "时限/DATE_TIME"},
+  {"case_id": "PROBE-CHILD-CI", "query": "儿童重疾险一般保障哪些重大疾病", "intent_mode": "auto", "category": "儿童重疾"},
+  {"case_id": "RB-N-001", "query": "如何办理机动车驾驶证换证手续", "intent_mode": "auto", "category": "NEGATIVE"},
+  {"case_id": "RB-N-002", "query": "社会保险里的养老保险退休后怎么办理领取手续", "intent_mode": "auto", "category": "NEGATIVE"},
+  {"case_id": "RB-N-003", "query": "医院门诊挂号预约有哪些方式", "intent_mode": "auto", "category": "NEGATIVE"},
+  {"case_id": "RB-N-004", "query": "机动车年检流程是怎样的", "intent_mode": "auto", "category": "NEGATIVE"},
+  {"case_id": "RB-N-006", "query": "未成年人办理身份证需要什么材料", "intent_mode": "auto", "category": "NEGATIVE"},
+  {"case_id": "GEN-01", "query": "保险公司倒闭了，我的人寿保险单还有效吗", "intent_mode": "auto", "category": "GENERAL"},
+  {"case_id": "GEN-02", "query": "什么是保险销售行为可回溯", "intent_mode": "auto", "category": "GENERAL"},
+  {"case_id": "GEN-03", "query": "重大疾病保险一般保障哪些疾病", "intent_mode": "auto", "category": "GENERAL"},
+  {"case_id": "GEN-04", "query": "通过互联网买保险需要注意什么", "intent_mode": "auto", "category": "GENERAL"},
+  {"case_id": "GEN-05", "query": "意外伤害保险的保险期间有什么规定", "intent_mode": "auto", "category": "GENERAL"}
+]

@@ -1,0 +1,208 @@
+{
+ "kb_id": "e38edd35-3d75-441e-9a76-d7ab1466d590",
+ "results": {
+  "L1-01.md": {
+   "file": "L1-01.md",
+   "knowledge_id": "920ea746-b7b9-4e33-af15-ea5f2c956f16",
+   "parse_status": "completed",
+   "chunk_count": 53,
+   "verified": true
+  },
+  "L1-02.md": {
+   "file": "L1-02.md",
+   "knowledge_id": "adca3b1d-da2d-4256-80f4-c2825539f14a",
+   "parse_status": "completed",
+   "chunk_count": 16,
+   "verified": true
+  },
+  "L1-03.md": {
+   "file": "L1-03.md",
+   "knowledge_id": "14dd5ef2-dcc2-482e-b607-3f12cda5893c",
+   "parse_status": "completed",
+   "chunk_count": 20,
+   "verified": true
+  },
+  "L1-04.md": {
+   "file": "L1-04.md",
+   "knowledge_id": "09db9971-51e3-44d0-b877-300ee80def3f",
+   "parse_status": "completed",
+   "chunk_count": 34,
+   "verified": true
+  },
+  "L1-05.md": {
+   "file": "L1-05.md",
+   "knowledge_id": "14de3129-b303-4c9a-8989-b6dde632efe0",
+   "parse_status": "completed",
+   "chunk_count": 10,
+   "verified": true
+  },
+  "L1-06.md": {
+   "file": "L1-06.md",
+   "knowledge_id": "46da925b-a327-4421-9c50-7a417173cc4c",
+   "parse_status": "completed",
+   "chunk_count": 68,
+   "verified": true
+  },
+  "L1-07.md": {
+   "file": "L1-07.md",
+   "knowledge_id": "ca10e3a9-8580-4655-ac7a-09d92f777d22",
+   "parse_status": "completed",
+   "chunk_count": 88,
+   "verified": true
+  },
+  "L1-08.md": {
+   "file": "L1-08.md",
+   "knowledge_id": "23cce969-eae8-45ea-b90b-231fe6f70556",
+   "parse_status": "completed",
+   "chunk_count": 34,
+   "verified": true
+  },
+  "L1-09.md": {
+   "file": "L1-09.md",
+   "knowledge_id": "5d1485e4-dfe4-4d6e-8796-27049af3ca05",
+   "parse_status": "completed",
+   "chunk_count": 23,
+   "verified": true
+  },
+  "L1-10.md": {
+   "file": "L1-10.md",
+   "knowledge_id": "7080d025-8aa8-4a7b-99fa-003ca4364a07",
+   "parse_status": "completed",
+   "chunk_count": 27,
+   "verified": true
+  },
+  "L1-11.md": {
+   "file": "L1-11.md",
+   "knowledge_id": "100c0211-a227-436c-b94d-bb58a1f8363f",
+   "parse_status": "completed",
+   "chunk_count": 11,
+   "verified": true
+  },
+  "L1-12.md": {
+   "file": "L1-12.md",
+   "knowledge_id": "27ab88c8-5c0d-4ad7-8314-caded09db8b8",
+   "parse_status": "completed",
+   "chunk_count": 13,
+   "verified": true
+  },
+  "L1-13.md": {
+   "file": "L1-13.md",
+   "knowledge_id": "e719623e-6333-4478-a46c-56ebc15402ec",
+   "parse_status": "completed",
+   "chunk_count": 9,
+   "verified": true
+  },
+  "L1-14.md": {
+   "file": "L1-14.md",
+   "knowledge_id": "416ebbce-ef13-4b08-967d-c016bf5db46d",
+   "parse_status": "completed",
+   "chunk_count": 19,
+   "verified": true
+  },
+  "L1-15.md": {
+   "file": "L1-15.md",
+   "knowledge_id": "934df1e4-f558-41ae-901e-74fb731d2eb8",
+   "parse_status": "completed",
+   "chunk_count": 8,
+   "verified": true
+  },
+  "L1-16.md": {
+   "file": "L1-16.md",
+   "knowledge_id": "dc5b524f-9671-4ffb-947e-cc9175b3eb8a",
+   "parse_status": "completed",
+   "chunk_count": 27,
+   "verified": true
+  },
+  "L1-17.md": {
+   "file": "L1-17.md",
+   "knowledge_id": "dcc7dd69-38c1-416e-8339-d3e4b61e5b9a",
+   "parse_status": "completed",
+   "chunk_count": 13,
+   "verified": true
+  },
+  "L1-18.md": {
+   "file": "L1-18.md",
+   "knowledge_id": "066dccc4-f367-4540-93e7-a251a8edd686",
+   "parse_status": "completed",
+   "chunk_count": 30,
+   "verified": true
+  },
+  "L1-19.md": {
+   "file": "L1-19.md",
+   "knowledge_id": "c874f5e1-65df-4adf-aeaf-80910773afe3",
+   "parse_status": "completed",
+   "chunk_count": 20,
+   "verified": true
+  },
+  "L1-20.md": {
+   "file": "L1-20.md",
+   "knowledge_id": "48195dad-bb48-40d5-9cec-4a565156be21",
+   "parse_status": "completed",
+   "chunk_count": 30,
+   "verified": true
+  },
+  "L1-21.md": {
+   "file": "L1-21.md",
+   "knowledge_id": "6e56c17e-d4fb-4653-9cb4-fc3674e15e09",
+   "parse_status": "completed",
+   "chunk_count": 32,
+   "verified": true
+  },
+  "L1-22.md": {
+   "file": "L1-22.md",
+   "knowledge_id": "65c9f776-e966-4506-ba6c-a41900f52a8a",
+   "parse_status": "completed",
+   "chunk_count": 76,
+   "verified": true
+  },
+  "L1-23.md": {
+   "file": "L1-23.md",
+   "knowledge_id": "5925c78b-ba3c-41bd-98dc-65c2cb82ab6f",
+   "parse_status": "completed",
+   "chunk_count": 13,
+   "verified": true
+  },
+  "L1-24.md": {
+   "file": "L1-24.md",
+   "knowledge_id": "42c14893-3fe8-477b-8e1c-2f0556887bd0",
+   "parse_status": "completed",
+   "chunk_count": 14,
+   "verified": true
+  },
+  "L1-25.md": {
+   "file": "L1-25.md",
+   "knowledge_id": "a7fb3284-6b6c-4add-8015-03132251288f",
+   "parse_status": "completed",
+   "chunk_count": 13,
+   "verified": true
+  },
+  "L2-03.md": {
+   "file": "L2-03.md",
+   "knowledge_id": "bdb71d10-5030-41cd-98c7-70d7e0651cca",
+   "parse_status": "completed",
+   "chunk_count": 3,
+   "verified": true
+  },
+  "L2-05.md": {
+   "file": "L2-05.md",
+   "knowledge_id": "76ff3f4b-51cb-483f-9fae-4b15a8533dc0",
+   "parse_status": "completed",
+   "chunk_count": 8,
+   "verified": true
+  },
+  "L2-01.pdf": {
+   "file": "L2-01.pdf",
+   "knowledge_id": "1872d84e-482f-4d2c-a1ee-e39dc43ec85f",
+   "parse_status": "completed",
+   "chunk_count": 35,
+   "verified": true
+  },
+  "L2-02.pdf": {
+   "file": "L2-02.pdf",
+   "knowledge_id": "76b31cf1-9c43-4c7a-ab00-6cdbedbac357",
+   "parse_status": "completed",
+   "chunk_count": 44,
+   "verified": true
+  }
+ }
+}

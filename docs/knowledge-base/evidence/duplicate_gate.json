@@ -1,0 +1,23 @@
+{
+ "gate": "DUPLICATE_GATE",
+ "checked_at": "2026-10-04",
+ "kb_v1_internal_duplicates": 0,
+ "note": "KB-V1 内 30 Document ID 互斥；跨库重叠与 insurance-pilot-2 如下（不同 dataset，切换 KB 时 Owner 裁决去留）",
+ "cross_kb_overlap_with_insurance_pilot_2": [
+  {
+   "pilot_doc": "pilot_reg_health_ins_2019",
+   "v1_doc": "L1-04",
+   "regulation": "健康保险管理办法(2019年第3号)"
+  },
+  {
+   "pilot_doc": "pilot_reg_disclosure_2022",
+   "v1_doc": "L1-05",
+   "regulation": "人身保险产品信息披露管理办法(2022年第8号)"
+  },
+  {
+   "pilot_doc": "pilot_reg_internet_ins_2020",
+   "v1_doc": "L1-06",
+   "regulation": "互联网保险业务监管办法(2020年第13号)"
+  }
+ ]
+}

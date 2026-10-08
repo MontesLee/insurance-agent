@@ -34,11 +34,6 @@ export function WelcomeScreen({ onPick }: { onPick: (text: string) => void }) {
           </li>
         ))}
       </ul>
-      <p className="mt-6 rounded-lg bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-700">
-        Portfolio Demo Mode：当前系统以结构化 Client State 为上游输入边界（自然语言直达
-        intake 尚未接入主执行路径）。你的问题会映射到对应的演示 case，由真实 Agent
-        Runtime 完整执行——需求 → 风险 → 缺口 → 方案 → 推荐 → 报告，全过程可观察。
-      </p>
     </div>
   );
 }

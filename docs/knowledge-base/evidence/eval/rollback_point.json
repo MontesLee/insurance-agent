@@ -1,0 +1,31 @@
+{
+ "recorded_at": "2026-10-05T01:32:00.512770",
+ "note": "KB_MIGRATION_ROLLBACK_POINT (§4)",
+ "CURRENT_RUNTIME_KB": "insurance-pilot-2 (54d7b757-f6e0-4c29-8de0-e40e92d8464a, 17 docs, embedding=builtin-embedding-local/nomic-embed-text:latest)",
+ "CURRENT_EMBEDDING_MODEL": "nomic-embed-text:latest (768d, ollama weknora-ollama:11434, models row builtin-embedding-local tenant 10000)",
+ "CURRENT_DATASET_ID": "WeKnora KB 54d7b757-f6e0-4c29-8de0-e40e92d8464a",
+ "CURRENT_REGISTRY_ENTRY": "agent_runtime PG (127.0.0.1:5433): 17 ACTIVE versions (10 laws A/GLOBAL + 7 domain B/GLOBAL) + 6 SUPERSEDED",
+ "CURRENT_CONFIG_HASH": {
+  "tmp/hd2.env": "8b97172cdc0a8848"
+ },
+ "CURRENT_WEKNORA_CONFIG": {
+  "insurance-kb-v1": {
+   "id": "44af9ff2-ecef-445e-87c6-cb1458cd4d44",
+   "embedding": "builtin-embedding-local(nomic)",
+   "docs": 29,
+   "chunks": 791,
+   "embeddings": 791
+  },
+  "insurance-pilot-2": {
+   "id": "54d7b757-f6e0-4c29-8de0-e40e92d8464a",
+   "embedding": "builtin-embedding-local(nomic)",
+   "docs": 17
+  },
+  "ollama": [
+   "bge-m3:latest 1.2GB",
+   "nomic-embed-text:latest 274MB"
+  ]
+ },
+ "CURRENT_INDEX_STATUS": "kb-v1: 791/791 embedded (nomic 768d); pilot-2: unchanged production",
+ "ROLLBACK_VIABILITY": "pilot-2 KB + nomic model + registry untouched throughout; runtime env (tmp/hd2.env) single-line KB id revert + restart restores production; NO re-download/re-embed needed (nomic embeddings remain in place on pilot-2)"
+}

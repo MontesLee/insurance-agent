@@ -1,0 +1,162 @@
+{
+  "version": 2,
+  "note": "M3 E1 planning baseline (Phase 28.B6): fingerprints of the LEGACY path under frozen prompts (PLANNING_PROMPT_FREEZE). The M3 candidate must reproduce these exactly (B4 comparator/normalizer unchanged). RE-CAPTURED 2026-09-27 (Phase 28.K.7, owner D-K6-2 lever-2): the SOLUTION_VALIDATION query-template calibration (purpose suffix cleared) changed the retrieved knowledge-evidence content on the legacy path for multi-product plans; prompts.py unchanged (freeze sha tripwire still enforced). Affected: GC-PL-G01, GC-PL-G03, GC-PL-G04, GC-PL-G05.",
+  "baseline": {
+    "GC-PL-G01": {
+      "run_status": "completed",
+      "event_chain_hash": "aa89a1df43e19c48ede5b33c33f0d91c102c1b4e8b61bebcb86aa71fc5bf2f30",
+      "artifact_hashes": [
+        "c2d92f354f338a191b3586c858bc39fd279998af14403a1396fb9cb08ee0404a",
+        "ff0dae472bf4396501f7288a68419a594dacc8d0168979e02e72b0294919b954",
+        "c39c319383f1cc27fe695106962af4f5933902f42dded6aab6ccc0e4eb48696b",
+        "74776f9699c326b0e687016072f9e386ce5a8a5610b4c477480f2fa244506587",
+        "c26e1361c3d03791b1f269cd19d12bd222511d40f27cd488ecc3a543dd775a50",
+        "d32b8525ba1a56fc6844afcac979262c4092c5f8cf33886ee15d918b59a8c5a3",
+        "32b741f1a73f9f804f0958b383a02025a08a003dddeb1f91913d68cd8f8a0863",
+        "3ffc3bddab496650a9dfadeb2e2ba38e7efcfb77abb6c15cc74bcc384ce32dc4",
+        "c3bfe47589a7276389a51568a185154f5f5de9ce83910c2286255418e16294dd"
+      ],
+      "eval_verdicts": [
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)"
+      ],
+      "risk_signals": [],
+      "artifact_count": 9
+    },
+    "GC-PL-G02": {
+      "run_status": "waiting",
+      "event_chain_hash": "91f8729a58e338707f00f868b8b8dfddce3519d1a0a679bedcbe06d4bec35845",
+      "artifact_hashes": [],
+      "eval_verdicts": [],
+      "risk_signals": [],
+      "artifact_count": 0
+    },
+    "GC-PL-G03": {
+      "run_status": "completed",
+      "event_chain_hash": "aa89a1df43e19c48ede5b33c33f0d91c102c1b4e8b61bebcb86aa71fc5bf2f30",
+      "artifact_hashes": [
+        "c2d92f354f338a191b3586c858bc39fd279998af14403a1396fb9cb08ee0404a",
+        "ff0dae472bf4396501f7288a68419a594dacc8d0168979e02e72b0294919b954",
+        "c39c319383f1cc27fe695106962af4f5933902f42dded6aab6ccc0e4eb48696b",
+        "74776f9699c326b0e687016072f9e386ce5a8a5610b4c477480f2fa244506587",
+        "c26e1361c3d03791b1f269cd19d12bd222511d40f27cd488ecc3a543dd775a50",
+        "d32b8525ba1a56fc6844afcac979262c4092c5f8cf33886ee15d918b59a8c5a3",
+        "32b741f1a73f9f804f0958b383a02025a08a003dddeb1f91913d68cd8f8a0863",
+        "3ffc3bddab496650a9dfadeb2e2ba38e7efcfb77abb6c15cc74bcc384ce32dc4",
+        "c3bfe47589a7276389a51568a185154f5f5de9ce83910c2286255418e16294dd"
+      ],
+      "eval_verdicts": [
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)"
+      ],
+      "risk_signals": [],
+      "artifact_count": 9
+    },
+    "GC-PL-G04": {
+      "run_status": "completed",
+      "event_chain_hash": "8393f504c023749309616030c80eca3c2386a7f59322fe1317c32642440904eb",
+      "artifact_hashes": [
+        "c2d92f354f338a191b3586c858bc39fd279998af14403a1396fb9cb08ee0404a",
+        "ff0dae472bf4396501f7288a68419a594dacc8d0168979e02e72b0294919b954",
+        "c39c319383f1cc27fe695106962af4f5933902f42dded6aab6ccc0e4eb48696b",
+        "74776f9699c326b0e687016072f9e386ce5a8a5610b4c477480f2fa244506587",
+        "c26e1361c3d03791b1f269cd19d12bd222511d40f27cd488ecc3a543dd775a50",
+        "d32b8525ba1a56fc6844afcac979262c4092c5f8cf33886ee15d918b59a8c5a3",
+        "32b741f1a73f9f804f0958b383a02025a08a003dddeb1f91913d68cd8f8a0863",
+        "3ffc3bddab496650a9dfadeb2e2ba38e7efcfb77abb6c15cc74bcc384ce32dc4",
+        "c3bfe47589a7276389a51568a185154f5f5de9ce83910c2286255418e16294dd"
+      ],
+      "eval_verdicts": [
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)"
+      ],
+      "risk_signals": [],
+      "artifact_count": 9
+    },
+    "GC-PL-G05": {
+      "run_status": "completed",
+      "event_chain_hash": "0be9067791a29d1d3b83da6e84638af75e89dcafaa8efb0b1c230ab0fd830e69",
+      "artifact_hashes": [
+        "c2d92f354f338a191b3586c858bc39fd279998af14403a1396fb9cb08ee0404a",
+        "ff0dae472bf4396501f7288a68419a594dacc8d0168979e02e72b0294919b954",
+        "c39c319383f1cc27fe695106962af4f5933902f42dded6aab6ccc0e4eb48696b",
+        "74776f9699c326b0e687016072f9e386ce5a8a5610b4c477480f2fa244506587",
+        "c26e1361c3d03791b1f269cd19d12bd222511d40f27cd488ecc3a543dd775a50",
+        "d32b8525ba1a56fc6844afcac979262c4092c5f8cf33886ee15d918b59a8c5a3",
+        "32b741f1a73f9f804f0958b383a02025a08a003dddeb1f91913d68cd8f8a0863",
+        "3ffc3bddab496650a9dfadeb2e2ba38e7efcfb77abb6c15cc74bcc384ce32dc4",
+        "c3bfe47589a7276389a51568a185154f5f5de9ce83910c2286255418e16294dd"
+      ],
+      "eval_verdicts": [
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_passed', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)",
+        "('eval_started', None, None)"
+      ],
+      "risk_signals": [],
+      "artifact_count": 9
+    }
+  }
+}

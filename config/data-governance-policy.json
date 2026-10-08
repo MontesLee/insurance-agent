@@ -1,0 +1,58 @@
+{
+  "$comment": [
+    "Data governance policy (Phase 28.I / B-04 / Owner decisions D-GOV-1..6).",
+    "RETENTION VALUES ARE DEPLOYMENT CONFIGURATION, NOT LEGAL RULINGS: the",
+    "owner decision mandates purpose-based, minimum-necessary, configurable",
+    "retention per data class — every value here is overridable via",
+    "INSURANCE_AGENT_RETENTION_POLICY (path to an alternative file) and no",
+    "business code reads these numbers directly (they resolve through",
+    "runtime/governance.py). Days are measured from the object's",
+    "last_activity/created timestamp.",
+    "Data classes:",
+    "  D1 business_content  — Conversation/Message/Run/AnswerContext/Artifact",
+    "  D2 operational_trace — runtime events, execution diagnostics",
+    "  D3 evaluation_data   — eval cases/outputs/golden comparisons",
+    "  D4 security_audit    — access/audit records (independently governed)",
+    "  D5 system_metadata   — config/health/non-user operational metadata",
+    "deletion: hard (physical delete incl. cascade) | none (policy keeps).",
+    "legal_hold exceptions are managed at runtime (holds registry), not here."
+  ],
+  "version": 1,
+  "classes": {
+    "business_content": {
+      "retention_days": 180,
+      "deletion": "hard",
+      "cascade": ["operational_trace", "evaluation_data_of_object"],
+      "description": "Consumer business lifecycle: deletable on consumer request at any time; auto-eligible after retention_days of inactivity; artifacts follow their parent run (D-GOV-4)."
+    },
+    "operational_trace": {
+      "retention_days": 30,
+      "deletion": "hard",
+      "cascade": [],
+      "description": "Shorter than business content where feasible (D-GOV-1); carries user content in message/answer payloads, therefore deleted WITH or BEFORE its parent (D-GOV-5: no indefinite raw user content)."
+    },
+    "evaluation_data": {
+      "retention_days": 90,
+      "deletion": "hard",
+      "cascade": [],
+      "description": "Minimum necessary, purpose-bound. Production conversations NEVER auto-enter eval/golden datasets (explicit selection only); on-demand operator review projections inherit the reviewed object's lifecycle."
+    },
+    "security_audit": {
+      "retention_days": 365,
+      "deletion": "none",
+      "cascade": [],
+      "description": "Independently governed (D-GOV-1). Audit records store actor/object/action metadata ONLY — never message bodies or artifact content (GOV-7); deletion of business data never cascades into audit records."
+    },
+    "system_metadata": {
+      "retention_days": 0,
+      "deletion": "none",
+      "cascade": [],
+      "description": "Operational lifecycle (metrics/health/config); contains no user business content; out of deletion scope."
+    }
+  },
+  "tombstone": {
+    "enabled": true,
+    "fields": ["object_class", "object_id", "deleted_at", "reason", "actor"],
+    "$comment": "Tombstones never contain user business content and cannot restore data."
+  }
+}

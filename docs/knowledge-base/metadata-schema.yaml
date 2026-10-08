@@ -1,0 +1,37 @@
+# KB v1.0 metadata schema — every runtime document must express these
+# fields (carried by the agent governance registry; WeKnora jsonb
+# metadata is a projection target, not the source of truth).
+schema: kb-metadata/v1.0
+fields:
+  document_id:      {type: string, required: true,  note: fixed registry ID (L#-##)}
+  document_title:   {type: string, required: true}
+  knowledge_layer:  {type: enum, required: true, values: [L1, L2, L3, L4, L5, L6]}
+  knowledge_type:   {type: enum, required: true, values: [LAW, REGULATION, INSURANCE_BASICS, PRODUCT_TYPE, UNDERWRITING, CLAIM, PLANNING_METHODOLOGY, PRODUCT, FAQ]}
+  authority_level:  {type: enum, required: true, values: [AUTHORITATIVE, DOMAIN_REFERENCE, METHODOLOGY, ILLUSTRATIVE]}
+  risk_level:       {type: enum, required: true, values: [R0, R1, R2, R3, R4]}
+  source_type:      {type: string, required: true}
+  source_organization: {type: string, required: true}
+  source_url:       {type: string, required: false, note: required when source_type is official}
+  version:          {type: string, required: true}
+  effective_date:   {type: date, required: false, note: required for LAW/REGULATION}
+  expiry_date:      {type: date, required: false}
+  jurisdiction:     {type: string, required: true, default: CN}
+  language:         {type: string, required: true, default: zh-CN}
+  product_specific: {type: bool, required: true}
+  company_specific: {type: bool, required: true}
+  product_company:  {type: string, required: false}
+  product_code:     {type: string, required: false}
+  parent_document:  {type: string, required: false}
+  supersedes:       {type: string, required: false}
+  superseded_by:    {type: string, required: false}
+  runtime_enabled:  {type: bool, required: true, default: false}
+rules:
+  knowledge_layer: "v1.0 30-doc set uses L1-L5 only; L6 reserved for future product docs — do NOT create L6 to fill counts"
+  authority_level:
+    L1: AUTHORITATIVE (official original text only; LLM rewrites must be DOMAIN_REFERENCE with source_document)
+    L2: DOMAIN_REFERENCE
+    L3: DOMAIN_REFERENCE
+    L4: AUTHORITATIVE or DOMAIN_REFERENCE per source
+    L5: METHODOLOGY (must never masquerade as law/regulation)
+  risk_level_default: {L1: R3, L2: R1, L3: R2, L4: R3, L5: R4}
+  risk_level_override: "allowed with documented reason in registry"

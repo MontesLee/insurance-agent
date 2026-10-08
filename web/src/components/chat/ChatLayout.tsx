@@ -1,13 +1,18 @@
 /**
- * ChatLayout — the User-Mode main screen: chat history | conversation | agent
- * inspector. One runtime, one event stream: sending a message maps to a demo
- * case (Portfolio Demo Mode), calls the EXISTING POST /api/runs, and every
- * pixel of progress comes from the SSE RuntimeEvents of that single run.
+ * ChatLayout — the CONSUMER chat screen (Phase 28.E-1): chat history |
+ * conversation | composer. One runtime, one event stream: the agent path
+ * posts the user's text to the EXISTING chat API and every pixel of
+ * progress comes from the SSE RuntimeEvents of that single run.
+ *
+ * Consumer-space composition: no runtime inspector, no Agent/Demo mode
+ * toggle, no developer entry (those live behind internal routes now —
+ * see app/route.ts + shell/). Demo-case execution remains available in
+ * the developer console only.
  */
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { api, ApiError } from "../../api/client";
 import type { ConflictInfo } from "../../types/chat";
-import { useRunMeta, useRunStream } from "../../hooks/useRunStream";
+import { useRunStream } from "../../hooks/useRunStream";
 import {
   chatsReducer,
   loadChats,
@@ -17,33 +22,16 @@ import {
 import { ChatSidebar } from "./ChatSidebar";
 import { Conversation } from "./Conversation";
 import { Composer } from "./Composer";
-import { AgentInspectorPanel } from "../inspector/AgentInspectorPanel";
+import { consumerFallbackText, consumerFinalizeArtifact, consumerTerminalView } from "../../state/consumerView";
+import { markSubmit } from "../../perf/chatPerf";
 
-const REPORT_STAGE = "report-generation";
-
-export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () => void }) {
+export function ChatLayout() {
   const [chats, dispatch] = useReducer(chatsReducer, undefined, () => {
     const loaded = loadChats();
     return loaded.length > 0 ? loaded : [makeChat()];
   });
   const [activeId, setActiveId] = useState(() => null as string | null);
-  const [chatMode, setChatMode] = useState<"agent" | "demo">(() => {
-    try {
-      return localStorage.getItem("webui:chatMode") === "demo" ? "demo" : "agent";
-    } catch {
-      return "agent";
-    }
-  });
-  const [agentCfg, setAgentCfg] = useState<{ configured: boolean; provider: string | null } | null>(null);
   const [agentUnavailable, setAgentUnavailable] = useState<string | null>(null);
-  useEffect(() => {
-    try {
-      localStorage.setItem("webui:chatMode", chatMode);
-    } catch { /* ignore */ }
-  }, [chatMode]);
-  useEffect(() => {
-    api.agentConfig().then(setAgentCfg).catch(() => setAgentCfg({ configured: false, provider: null }));
-  }, []);
   const active = useMemo(
     () => chats.find((c) => c.id === activeId) ?? chats[0] ?? null,
     [chats, activeId],
@@ -55,23 +43,45 @@ export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () =>
 
   const runId = active?.runId ?? null;
   const { state, error: streamError, streaming, viewStopped, stop, resume } = useRunStream(runId);
-  const { meta, error: metaError } = useRunMeta(runId);
 
   const [draft, setDraft] = useState("");
   const [caseId, setCaseId] = useState(active?.caseId ?? "bm-complete-001");
   const [conflict, setConflict] = useState<ConflictInfo | null>(null);
   const [sending, setSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [inspectorOpen, setInspectorOpen] = useState(false);
 
   // finalize the transcript once the run reaches its terminal state (idempotent)
   useEffect(() => {
     if (!active || !state?.terminalEvent) return;
     if (state.runId !== active.runId) return;
-    const artifactType =
-      state.status === "completed"
-        ? (state.stageOrder.find((s) => s.id === REPORT_STAGE)?.produces ?? "insurance-report")
-        : null;
+    // 28.E-2: Completion ≠ Artifact — the card requires a REAL report
+    // artifact in this run (artifact_created for the report stage), never
+    // a terminal status alone. QA turns have none → no report card.
+    const artifact = consumerFinalizeArtifact(state);
+    // 28.E-5: deterministic terminal presentation — the final wording is
+    // the agent's own text when safe, else a conservative fallback; the
+    // internal result_status classifies answer vs honest refusal.
+    const status = state.status === "completed" || state.status === "needs_review"
+      || state.status === "waiting" || state.status === "failed"
+      ? state.status
+      : "failed";
+    const resultStatus = (state.terminalEvent?.data?.["result_status"] as string | undefined) ?? null;
+    // 28.K.20 (T5): if the run FAILED mid-stream, any safely-streamed
+    // content is retained and paired with the failure copy — never raw
+    // errors. run_failed does not clear the stream buffer, so the partial
+    // content survives to this point by construction. (needs_review keeps
+    // its K.1 fixed copy — that contract deliberately maps system
+    // templates away; not altered here.)
+    const PARTIAL_FAILURE_SUFFIX = "这次回答没有完整生成，请稍后重试。";
+    const partialStream = state.stream?.kind === "content"
+      ? (state.stream.text || "").trim() : "";
+    const finalizeWith = (replyText: string | null | undefined) => {
+      let text = replyText;
+      if (!text && status === "failed" && partialStream) {
+        text = partialStream + "\n\n" + PARTIAL_FAILURE_SUFFIX;
+      }
+      return consumerTerminalView(status, resultStatus, text, artifact !== null);
+    };
     if (active.serverChatId) {
       // Agent Mode: the final wording comes from the agent itself (server chat)
       let alive = true;
@@ -80,22 +90,20 @@ export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () =>
         const reply = [...chat.messages].reverse().find(
           (m) => m.role === "assistant" && m.run_id === active.runId,
         );
+        const terminal = finalizeWith(reply?.content);
         dispatch({
           type: "finalizeAgent",
           chatId: active.id,
           runId: state.runId,
-          status: state.status === "completed" || state.status === "needs_review"
-            || state.status === "waiting" || state.status === "failed"
-            ? state.status
-            : "failed",
-          text: reply?.content ?? "（本轮无回复）",
-          artifactType,
-          artifactTitle: "客户保险需求分析报告",
+          status,
+          text: terminal.message,
+          artifactType: artifact?.artifactType ?? null,
+          artifactTitle: artifact?.title ?? "",
         });
       }).catch(() => {
         if (alive) {
           dispatch({ type: "finalizeAgent", chatId: active.id, runId: state.runId,
-            status: "failed", text: "无法读取 Agent 回复。", artifactType: null,
+            status: "failed", text: consumerFallbackText("error"), artifactType: null,
             artifactTitle: "" });
         }
       });
@@ -105,47 +113,41 @@ export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () =>
       type: "finalize",
       chatId: active.id,
       runId: state.runId,
-      status: state.status === "completed" || state.status === "needs_review"
-        || state.status === "waiting" || state.status === "failed"
-        ? state.status
-        : "failed",
-      artifactType,
-      artifactTitle: "客户保险需求分析报告",
+      status,
+      artifactType: artifact?.artifactType ?? null,
+      artifactTitle: artifact?.title ?? "",
     });
   }, [active, state?.terminalEvent, state?.runId, state?.status, state?.stageOrder]);
 
   const send = async (text: string, cid: string) => {
     if (!active) return;
+    markSubmit(); // 28.K.28 perf mark (passive, T0)
     setConflict(null);
     setAgentUnavailable(null);
     dispatch({ type: "send", chatId: active.id, text, caseId: cid });
     setSending(true);
     try {
-      if (chatMode === "agent") {
-        let serverChat = active.serverChatId ?? null;
-        if (!serverChat) {
-          serverChat = (await api.createChat()).chat_id;
-          dispatch({ type: "setServerChat", chatId: active.id, serverChatId: serverChat, mode: "agent" });
-        }
-        const r = await api.postChatMessage(serverChat, text);
-        dispatch({ type: "bindRun", chatId: active.id, runId: r.run_id });
-      } else {
-        const created = await api.createRun(cid);
-        dispatch({ type: "bindRun", chatId: active.id, runId: created.run_id });
+      let serverChat = active.serverChatId ?? null;
+      if (!serverChat) {
+        serverChat = (await api.createChat()).chat_id;
+        dispatch({ type: "setServerChat", chatId: active.id, serverChatId: serverChat, mode: "agent" });
       }
+      const r = await api.postChatMessage(serverChat, text);
+      dispatch({ type: "bindRun", chatId: active.id, runId: r.run_id });
     } catch (err) {
       const cf = err instanceof ApiError ? err.conflict : null;
       if (cf) {
         const owner = chats.find((c) => c.runId === cf.run_id) ?? null;
         setConflict({ caseId: cf.case_id, runId: cf.run_id, ownerChatId: owner?.id ?? null });
       } else if (err instanceof ApiError && err.status === 503) {
-        // LLM provider not configured — fail CLOSED, never a silent demo fallback
-        const detail = (err.body as { detail?: { message?: string } })?.detail?.message;
-        setAgentUnavailable(detail ?? "LLM provider 未配置。请配置后端环境变量，或切换到演示模式。");
+        // LLM provider not configured — fail CLOSED, never a silent
+        // fallback. Consumer copy ONLY (28.E-7 Journey F): the backend
+        // detail names env vars/provider internals and must not render.
+        setAgentUnavailable("智能服务暂时不可用，请稍后再试。");
       } else if (err instanceof ApiError && err.status === 409) {
         dispatch({ type: "appendError", chatId: active.id, text: "这个对话已有一轮正在进行的分析，请等它结束后再发送。" });
       } else {
-        dispatch({ type: "appendError", chatId: active.id, text: "无法启动分析（后端不可达）。请确认 `python -m runtime.server` 正在运行。" });
+        dispatch({ type: "appendError", chatId: active.id, text: "暂时无法连接服务，请稍后再试。" });
       }
     } finally {
       setSending(false);
@@ -209,62 +211,21 @@ export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () =>
               Agent 运行中
             </span>
           ) : null}
-          <div className="ml-auto flex items-center gap-1.5">
-            <div className="flex overflow-hidden rounded-lg border border-slate-200" data-testid="mode-toggle">
-              <button
-                type="button"
-                onClick={() => setChatMode("agent")}
-                className={`px-2.5 py-1 text-[11.5px] font-medium ${chatMode === "agent" ? "bg-slate-800 text-white" : "text-slate-600 hover:bg-slate-50"}`}
-                data-testid="mode-agent"
-              >
-                Agent{agentCfg && !agentCfg.configured ? " ·未配置" : ""}
-              </button>
-              <button
-                type="button"
-                onClick={() => setChatMode("demo")}
-                className={`px-2.5 py-1 text-[11.5px] font-medium ${chatMode === "demo" ? "bg-slate-800 text-white" : "text-slate-600 hover:bg-slate-50"}`}
-                data-testid="mode-demo"
-              >
-                演示 Demo
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setInspectorOpen((v) => !v)}
-              className="rounded-lg border border-slate-200 px-2.5 py-1 text-[11.5px] font-medium text-slate-600 hover:bg-slate-50 xl:hidden"
-              data-testid="toggle-inspector"
-            >
-              Agent {streaming ? "●" : "○"}
-            </button>
-            <button
-              type="button"
-              onClick={onOpenDeveloperMode}
-              className="rounded-lg border border-slate-200 px-2.5 py-1 text-[11.5px] font-medium text-slate-600 hover:bg-slate-50"
-            >
-              ⚙ Developer Mode
-            </button>
-          </div>
+          <div className="ml-auto" />
         </div>
 
         {active ? (
           <>
-            {agentUnavailable && chatMode === "agent" ? (
+            {agentUnavailable ? (
               <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-[12px] text-amber-800" data-testid="agent-unavailable">
-                <p className="font-semibold">Agent Mode 不可用：{agentUnavailable}</p>
-                <button
-                  type="button"
-                  onClick={() => setChatMode("demo")}
-                  className="mt-1 rounded border border-amber-300 bg-white px-2 py-0.5 text-[11px] font-medium hover:bg-amber-100"
-                >
-                  切换到演示模式
-                </button>
+                <p className="font-semibold">暂时无法回答：{agentUnavailable}</p>
               </div>
             ) : null}
             <Conversation
               chat={active}
               streamState={state?.runId === active.runId ? state : null}
               streaming={streaming}
-              streamError={streamError ?? (metaError && runId ? "无法读取 Run 元数据。" : null)}
+              streamError={streamError}
               conflict={conflict}
               onOpenConflictOwner={(id) => { setActiveId(id); setConflict(null); }}
               onPickPrompt={(text) => setDraft(text)}
@@ -280,7 +241,7 @@ export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () =>
               setDraft={setDraft}
               caseId={caseId}
               setCaseId={setCaseId}
-              mode={chatMode}
+              mode="agent"
             />
           </>
         ) : (
@@ -291,30 +252,6 @@ export function ChatLayout({ onOpenDeveloperMode }: { onOpenDeveloperMode: () =>
           </div>
         )}
       </div>
-
-      {/* right inspector (drawer below xl) */}
-      <div className="hidden w-[22rem] shrink-0 overflow-hidden xl:flex">
-        {state ? (
-          <AgentInspectorPanel meta={meta} state={state} streaming={streaming} error={streamError ?? metaError} />
-        ) : (
-          <aside className="flex w-full items-center justify-center border-l border-slate-200 bg-slate-50/70 px-6 text-center">
-            <p className="text-[12px] text-slate-400">
-              发送一个问题后，这里会实时显示 Agent 的运行状态、Pipeline、质量校验与事件轨迹。
-            </p>
-          </aside>
-        )}
-      </div>
-      {inspectorOpen ? (
-        <div className="fixed inset-0 z-40 bg-slate-900/20 xl:hidden" onClick={(e) => e.target === e.currentTarget && setInspectorOpen(false)}>
-          <div className="ml-auto h-full w-[22rem] overflow-hidden border-l border-slate-200 bg-slate-50 shadow-xl">
-            {state ? (
-              <AgentInspectorPanel meta={meta} state={state} streaming={streaming} error={streamError ?? metaError} />
-            ) : (
-              <p className="p-6 text-[12px] text-slate-400">尚无运行中的 Agent。</p>
-            )}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

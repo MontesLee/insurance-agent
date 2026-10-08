@@ -42,6 +42,18 @@ claim_support:
   # shipped OFF (behavior-changing gate; slices-style staged rollout —
   # Owner enables via env CLAIM_SUPPORT_ENABLED=1 or this flag)
   enabled: false
+  # FIX-3 (OD-FIX3-1/2 approved 2026-10-02) — staged default-OFF levers,
+  # independent rollback (env EXEMPTION_V2_ENABLED / PREMISE_SCAN_ENABLED
+  # wins over these flags, same pattern as enabled() above).
+  exemption_v2:
+    # B: guarded guidance / evidence-absence exemption (whitelist only)
+    enabled: false
+    # patterns optional — defaults are the K.29-C replay-frozen regexes
+    # (code-side); override only via corpus-revision-gated change.
+  premise_scan:
+    # D: numeric premises inside C-RECOMMENDATION/C-UNCERTAIN clauses
+    # are re-judged under full C-FACT rules (fail closed)
+    enabled: false
 
 gate:
   # one bounded regeneration after a gate failure, then refuse

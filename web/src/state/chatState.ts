@@ -8,7 +8,19 @@
  */
 import type { ChatSession, ChatStore, Message } from "../types/chat";
 
-const STORAGE_KEY = "webui:chats:v1";
+/**
+ * 28.G: conversations are stored PER SUBJECT — a different identity never
+ * sees another subject's local transcripts (logout / identity switch shows
+ * nothing of the previous user). The scope is set from the SERVER-resolved
+ * subject (whoami), never from a client-supplied user id.
+ */
+let storageScope = "local";
+export function chatStorageKey(scope: string = storageScope): string {
+  return `webui:chats:v2:${scope}`;
+}
+export function setChatStorageScope(scope: string): void {
+  storageScope = scope || "local";
+}
 
 export const DEMO_CASES: { id: string; label: string; desc: string }[] = [
   { id: "bm-complete-001", label: "家庭基础分析", desc: "基准客户：35岁/已婚/1孩/房贷" },
@@ -64,22 +76,28 @@ export function seedChats(): ChatSession[] {
   ];
 }
 
+/**
+ * Load persisted conversations (28.F-1 / B-03 remediation): a NEW user
+ * gets an EMPTY list — never fabricated history. `seedChats` remains
+ * exported as a demo capability but is NOT part of the consumer path
+ * (Consumer /chat must not fall back to demo data).
+ */
 export function loadChats(): ChatSession[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return seedChats();
+    const raw = localStorage.getItem(chatStorageKey());
+    if (!raw) return [];
     const store = JSON.parse(raw) as ChatStore;
-    if (store?.version !== 1 || !Array.isArray(store.chats)) return seedChats();
+    if (store?.version !== 1 || !Array.isArray(store.chats)) return [];
     return store.chats;
   } catch {
-    return seedChats();
+    return [];
   }
 }
 
 export function saveChats(chats: ChatSession[]): void {
   try {
     const store: ChatStore = { version: 1, chats };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    localStorage.setItem(chatStorageKey(), JSON.stringify(store));
   } catch {
     /* storage unavailable — chat history degrades to in-memory */
   }
@@ -87,7 +105,7 @@ export function saveChats(chats: ChatSession[]): void {
 
 export function clearStoredChats(): void {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(chatStorageKey());
   } catch {
     /* ignore */
   }

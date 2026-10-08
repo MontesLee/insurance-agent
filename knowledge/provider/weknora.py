@@ -41,6 +41,7 @@ response never becomes evidence.
 """
 from __future__ import annotations
 
+import os
 from typing import Any, Callable, Optional
 
 from .base import (KnowledgeFilters, KnowledgeHit, KnowledgeSearchResult,
@@ -194,17 +195,31 @@ def _load_live_rules():
 class WeKnoraLiveTransport:
     """Real HTTP transport for the pure-search endpoint. Fail-closed at
     the HTTP boundary: connection/timeout -> ProviderUnavailable;
-    HTTP 4xx/5xx, non-JSON, or success!=true -> ProviderResponseInvalid."""
+    HTTP 4xx/5xx, non-JSON, or success!=true -> ProviderResponseInvalid.
+
+    HD-2 (28.H): the retrieval METHOD is a deployment property, set via
+    INSURANCE_AGENT_WEKNORA_SEARCH_METHOD and passed through verbatim
+    (e.g. "vector_search" for deployments whose hybrid/keyword path has
+    no CJK tokenizer). Empty/unset keeps the backend's default (the
+    historically verified behaviour) — no semantic change either way:
+    the agent's own deterministic scoring governs downstream.
+    """
+
+    SEARCH_METHOD_ENV = "INSURANCE_AGENT_WEKNORA_SEARCH_METHOD"
 
     def __init__(self, base_url, api_key, timeout=15.0):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
+        self.search_method = os.environ.get(
+            self.SEARCH_METHOD_ENV, "").strip()
 
     def __call__(self, payload: dict) -> dict:
-        body = _json.dumps({"query": payload.get("query", ""),
-                            "knowledge_base_id": payload.get("kb_id", "")},
-                           ensure_ascii=False).encode("utf-8")
+        req_body = {"query": payload.get("query", ""),
+                    "knowledge_base_id": payload.get("kb_id", "")}
+        if self.search_method:
+            req_body["search_method"] = self.search_method
+        body = _json.dumps(req_body, ensure_ascii=False).encode("utf-8")
         req = _urlreq.Request(
             self.base_url + LIVE_SEARCH_PATH, data=body,
             headers={"Content-Type": "application/json",

@@ -54,12 +54,19 @@ class AgentState:
         if state is not None:
             arts = state.get("artifacts") or {}
             if arts:
-                lines.append("stored artifacts: " + ", ".join(sorted(arts.keys())))
+                # 28.K.25-S1 source hygiene: artifact TYPES only — the
+                # model needs to know what exists, not internal registry ids
+                lines.append("stored artifacts: " + ", ".join(
+                    sorted({str(a.get("artifact_type", a) if isinstance(a, dict)
+                                else a).replace(" ", "-") for a in arts.values()})
+                    if all(isinstance(a, dict) for a in arts.values())
+                    else sorted(arts.keys())))
             evals = state.get("evaluations") or []
             if evals:
-                bad = [e["eval_id"] for e in evals if e.get("status") == "FAIL"]
-                lines.append("evals: %d (%s)" % (len(evals),
-                                                 "all PASS" if not bad else "FAIL: " + ",".join(bad[-3:])))
+                bad_n = sum(1 for e in evals if e.get("status") == "FAIL")
+                # 28.K.25-S1: counts only — eval ids stay internal
+                lines.append("evals: %d (%s)" % (
+                    len(evals), "all PASS" if not bad_n else "%d FAIL" % bad_n))
             st = state.get("status")
             if st:
                 lines.append("case status: %s" % st)

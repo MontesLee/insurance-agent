@@ -1,5 +1,6 @@
 import type { Message as Msg } from "../../types/chat";
 import { Markdown } from "../Markdown";
+import { sanitizeConsumerText } from "../../state/contentHygiene";
 
 /** One chat message. Activity and artifact kinds have their own cards. */
 export function MessageView({ message }: { message: Msg }) {
@@ -16,7 +17,7 @@ export function MessageView({ message }: { message: Msg }) {
     return (
       <div className="flex justify-start" data-testid="msg-assistant">
         <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
-          <Markdown text={message.text} />
+          <Markdown text={sanitizeConsumerText(message.text)} />
         </div>
       </div>
     );

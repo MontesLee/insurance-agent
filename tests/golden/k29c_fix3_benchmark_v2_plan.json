@@ -1,0 +1,121 @@
+{
+  "corpus": "k29c-fix3-benchmark-v2",
+  "version": "0.2-plan-only",
+  "frozen_at": null,
+  "status": "PLAN/SCHEMA ONLY — generation of real samples is a separately authorized phase. Existing goldens (claim-evidence-shadow.v1.json, k29c_claim_taxonomy.json) are NOT modified; this file supersedes the family layout of k29c_fix3_taxonomy.v2.json (v0.1) per the Owner's Phase-0 family list (F2=contradiction, F6=evidence-conflict added).",
+  "invariants": {
+    "INV-1_high_risk_zero_escape": "numbers, product/contract facts, regulatory assertions, payout promises, recommendation-embedded numeric premises are rejected at the DETERMINISTIC layer by every candidate",
+    "INV-2_fail_closed": "any error/timeout/undecidable => KEEP_BASELINE (no upgrade)"
+  },
+  "case_schema": {
+    "case_id": "string '<family>-<nn>' unique",
+    "family": "F1|F2|F3|F4|F5|F6",
+    "claim_text": "string as the model would emit it ([E#] allowed; judge input strips them)",
+    "claim_type_hint": "expected deterministic typing (locks Option D premise-scan behavior)",
+    "evidence": [
+      {
+        "content": "string",
+        "source_name": "string",
+        "document_name": "string|null",
+        "version": "string|null",
+        "effective_from": "ISO-date|null",
+        "effective_to": "ISO-date|null",
+        "product_id": "string|null (REQUIRED non-null when product binding is the tested property)"
+      }
+    ],
+    "numeric_premise_expected": "bool — claim embeds a numeric premise that MUST be support-checked regardless of type (F-1 acceptance lock)",
+    "high_risk_flags": ["number", "product", "regulatory", "payout_promise", "negation", "scope_broadener"],
+    "expected_gate": "ACCEPT | REJECT — composite-gate outcome REQUIRED under any approved candidate",
+    "expected_judge": "ENTAILED | NOT_ENTAILED | CONTRADICTED | EXEMPT — ground truth for the semantic-judge shadow (Option C validation)",
+    "reason": "one-line rationale",
+    "source": "golden-derived:<id> | benchmark-derived:<run/case> | adversarial-authored | hand-authored-positive"
+  },
+  "families": {
+    "F1_paraphrase": {
+      "purpose": "measure the BENEFIT surface: evidence-entailed semantic rewrites that the current lexical ceiling rejects (E-class = 61% of observed failures)",
+      "risk_level": "low (no numbers/products/regulatory content by construction)",
+      "definition_rules": [
+        "synonym substitution, clause reordering, mechanism summarization of the evidence content",
+        "FORBIDDEN in this family: any numeric anchor, product id/name, regulatory citation, payout promise, scope broadener (所有/一律/全部/任何), negation of an evidence assertion"
+      ],
+      "expected_behavior": "C1 rejects (the gap being measured); candidates B+D keep rejecting (out of scope for them); C-shadow should output ALLOW_UPGRADE (ENTAILED)",
+      "pass_criteria": [
+        "candidate safety: the SAME candidate accepts F1 >= 40% while keeping F2/F4/F5/F6 at 100% reject",
+        "no F1 case may carry a high_risk_flag (construction invariant)"
+      ],
+      "min_quota": 20,
+      "generation_rules": "derive from claim-evidence-shadow.v1 P-cases by controlled rewrite (one transformation each: synonym|reorder|summarize) + benchmark-derived E-class claims from A-fixed claim_rows (labeled) + hand-authored positives"
+    },
+    "F2_contradiction": {
+      "purpose": "the family that killed threshold relaxation: claim asserts what evidence denies (or vice versa) with high lexical overlap",
+      "risk_level": "critical (semantic inversion — payout/coverage inversions are user-harmful)",
+      "definition_rules": [
+        "evidence contains an explicit negation (不/无/不得/不属于/不予以) or opposite-value assertion; claim asserts the affirmative (or inverse)",
+        "include quantifier-scope inversions (所有/全部 vs evidence partial) and modal inversions (可以 vs 不得)",
+        "at least 5 cases must be payout/coverage-related (返还/赔付/续保/报销)"
+      ],
+      "expected_behavior": "REJECT by every candidate, always; semantic judge must output CONTRADICTED",
+      "pass_criteria": ["100% reject = HARD GATE for every candidate (any escape disqualifies)", "judge contradiction-detection rate reported separately (shadow quality metric, not a gate for B/D)"],
+      "min_quota": 10,
+      "generation_rules": "golden-derived from N8 family + adversarial-authored inversions over pilot-corpus sentences + benchmark-derived where observed"
+    },
+    "F3_recommendation": {
+      "purpose": "pure general/procedural guidance that SHOULD pass the exemption whitelist (Option B acceptance surface)",
+      "risk_level": "low",
+      "definition_rules": [
+        "procedural advice (通读条款/如实告知/先预算后保额/咨询保险公司), general methodology, honest evidence-absence prose (证据未提及X)",
+        "FORBIDDEN: any numeric anchor, NUM_RE hit, product reference in an AFFIRMATIVE fact assertion, regulatory assertion"
+      ],
+      "expected_behavior": "ACCEPT under B's guarded exemption (and unchanged future C); judge = EXEMPT",
+      "pass_criteria": ["B accepts >= 90% of F3", "no F3 case accepted while carrying numeric_premise_expected=true (those belong to F4)"],
+      "min_quota": 10,
+      "generation_rules": "benchmark-derived B-class claims from taxonomy (31 observed) + varied phrasings (wording must not matter) + evidence-absence prose variants"
+    },
+    "F4_recommendation_number": {
+      "purpose": "F-1 latent gap: recommendation-embedded numeric premises must NOT bypass support via type exemption",
+      "risk_level": "high (specific insurance quantities delivered on guidance phrasing)",
+      "definition_rules": [
+        "guidance shell (建议/一般建议/推荐) + numeric premise (amounts, multiples, days, percentages, age)",
+        "MUST include: >=3 trap cases (evidence states a DIFFERENT number), >=2 sourced-premise positives (premise verbatim in evidence — acceptable ONLY under Option D premise-pass), >=2 range forms (3-5倍) that bare-anchor regexes may miss"
+      ],
+      "expected_behavior": "REJECT unless the numeric premise is independently SUPPORTED (Option D semantics); judge = NOT_ENTAILED for unsourced, ENTAILED for the sourced subset",
+      "pass_criteria": ["100% reject on unsourced/trap subset = HARD GATE", "Option D acceptance measured on the sourced subset (report, not gate)", "current C1 behavior on this family recorded as the F-1 exposure baseline (expected: passes today — that is the gap being closed)"],
+      "min_quota": 10,
+      "generation_rules": "adversarial-authored from K.29-C probes (P-C3-01/02) generalized + benchmark-derived R1-05/R2-10 answer patterns"
+    },
+    "F5_regulatory_product": {
+      "purpose": "high-risk insurance facts: regulatory content and product specifics — the zero-escape core",
+      "risk_level": "critical",
+      "definition_rules": [
+        "regulatory: 保险法/管理办法/令第/施行日期/文号/监管要求 (include metadata-only dates: effective_from present, date absent from content)",
+        "product: P0xx/demo-/该产品 exclusion lists, deductibles, waiting periods, age limits — product_id REQUIRED in evidence",
+        "payout/continuity promises: 保证续保/返还/承诺赔付",
+        "MUST include a small verbatim-sourced ACCEPT subset (<=5) to prove no over-blocking"
+      ],
+      "expected_behavior": "REJECT unless verbatim-supported (ACCEPT subset); judge = NOT_ENTAILED for paraphrased/unsourced, ENTAILED for verbatim subset",
+      "pass_criteria": ["100% reject on the REJECT subset = HARD GATE", "product-identity binding exercised (N4-3-type cases with product_id set and a wrong-product claim must reject)"],
+      "min_quota": 15,
+      "generation_rules": "golden-derived N4/N5/N6/N10/N1 anchors + adversarial-authored product/regulatory mixes + one metadata-date case pinning Option C's metadata semantics"
+    },
+    "F6_evidence_conflict": {
+      "purpose": "close the NOT_COVERED blind spot from K.29-B (pilot KB had no conflict pairs): evidence items DISAGREE with each other; the claim sides with one",
+      "risk_level": "high (system must not silently pick a side — ADR-022 both-sides rule)",
+      "definition_rules": [
+        ">=2 evidence items with conflicting values for the SAME labelled anchor (等待期 90 vs 180; 免赔额 0元 vs 1万) or conflicting qualitative assertions",
+        "claim asserts one side (or a third value); variants: same-version conflict, cross-version conflict (v1 vs v2 both in window), in-window vs expired-window pair",
+        "documents the EXPECTED deterministic behavior: numeric-anchor CONTRADICTED path (existing) + qualitative-conflict behavior (currently NOT detected — record as designed-gap note for Owner)"
+      ],
+      "expected_behavior": "REJECT (deterministic contradiction path for anchor conflicts); judge = CONTRADICTED; qualitative-conflict cases record current behavior honestly",
+      "pass_criteria": ["100% reject on anchor-conflict subset = HARD GATE (existing behavior must not regress)", "qualitative-conflict subset: report current outcome + desired outcome as a design note (any change is a separate authorized fix)"],
+      "min_quota": 8,
+      "generation_rules": "hand-authored conflict pairs over pilot-corpus facts + same-document cross-chunk conflicts where derivable; each case tags conflict_type: anchor-value | version | window | qualitative"
+    }
+  },
+  "construction_rules": {
+    "source_mix_target": "golden-derived ~30% | benchmark-derived ~40% | adversarial/hand-authored ~30%",
+    "provenance": "every case carries source; no existing golden file is edited (new corpus only)",
+    "freeze_procedure": "first full evaluation run -> audited corrections logged -> freeze (frozen_at set, version 1.0) -> regression lock in test suite; second reviewer = OWNER DECISION #3",
+    "acceptance_simulator": "extends tools/k29c_calibration_study.py replay pattern; hard-gate families evaluated first (any escape stops the candidate)"
+  },
+  "total_min_quota": 73
+}

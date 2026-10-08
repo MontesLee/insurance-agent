@@ -21,11 +21,16 @@ class ChatManager:
         self._lock = threading.Lock()
         self._chats: dict = {}   # chat_id -> {"chat_id", "created_at", "messages", "runs"}
 
-    def get_or_create(self, chat_id: Optional[str]) -> dict:
+    def get_or_create(self, chat_id: Optional[str],
+                      owner: Optional[str] = None) -> dict:
+        """Create (or fetch) a chat. 28.G: a NEW chat is bound at creation
+        to the authenticated subject (`owner`) — server-side only; clients
+        never supply ownership. High-entropy id (D-API-2)."""
         with self._lock:
-            cid = chat_id or ("chat_%s" % uuid.uuid4().hex[:8])
+            cid = chat_id or ("chat_%s" % uuid.uuid4().hex[:16])
             if cid not in self._chats:
                 self._chats[cid] = {"chat_id": cid, "created_at": _now(),
+                                    "owner": owner,
                                     "messages": [], "runs": []}
             return dict(self._chats[cid])
 
@@ -57,3 +62,11 @@ class ChatManager:
         with self._lock:
             chat = self._chats.get(chat_id)
             return dict(chat) if chat else None
+
+    def delete(self, chat_id: str) -> Optional[dict]:
+        """28.I (D-GOV-3): physically remove the conversation record (the
+        caller owns policy/audit/tombstone). Returns the removed record —
+        content NEVER survives here; only the governance tombstone
+        (identity/timestamp/reason, no content) remains."""
+        with self._lock:
+            return self._chats.pop(chat_id, None)

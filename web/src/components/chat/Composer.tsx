@@ -117,7 +117,7 @@ export function Composer({
               </label>
             </>
           ) : (
-            <span className="text-blue-500/80">Agent Mode · 真实 LLM 理解与决策</span>
+            <span className="text-blue-500/80">由 AI 保险顾问为你分析</span>
           )}
         </div>
       </div>

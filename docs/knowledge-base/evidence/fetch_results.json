@@ -1,0 +1,428 @@
+{
+ "L1-02": {
+  "url": "https://www.gov.cn/gongbao/2025/issue_12246/202508/content_7038009.html",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 53353,
+  "sha256": "474df1e72d4950d74e21b3f7dfb1916c20b817c2abf9a422bccf30da2c36f5d4",
+  "page_title": "国家金融监督管理总局令（2025年第7号）　　金融机构产品适当性管理办法__2025年第24号国务院公报_中国政府网",
+  "text_chars": 7052,
+  "marker_checks": {
+   "金融机构产品适当性管理办法": true,
+   "2025年第7号": true,
+   "2026年2月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-03": {
+  "url": "https://www.gov.cn/gongbao/2023/issue_10826/202311/content_6915815.html",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 57202,
+  "sha256": "a079675ef50c773b8259c171dfd0e9ad592a10612a95fa11f98f4dc3a902966c",
+  "page_title": "国家金融监督管理总局令（2023年第2号）　　保险销售行为管理办法__2023年第32号国务院公报_中国政府网",
+  "text_chars": 9172,
+  "marker_checks": {
+   "保险销售行为管理办法": true,
+   "2023年第2号": true,
+   "2024年3月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-04": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2019-12/04/content_5458542.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 92102,
+  "sha256": "fe892a22066d7a0b7e8518d7a965c5550873ffb8d7d9df0020fde94b9006230a",
+  "page_title": "健康保险管理办法_国务院部门文件_中国政府网",
+  "text_chars": 15082,
+  "marker_checks": {
+   "健康保险管理办法": true,
+   "2019年第3号": true,
+   "2019年12月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-05": {
+  "url": "http://www.gov.cn/gongbao/content/2023/content_5739545.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 45583,
+  "sha256": "d682fd673be968851550e3d1ddb2bbc675eb0074abb8bff5e5047d99dfab510f",
+  "page_title": "中国银行保险监督管理委员会令（2022年第8号）　　人身保险产品信息披露管理办法__2023年第3号国务院公报_中国政府网",
+  "text_chars": 4707,
+  "marker_checks": {
+   "人身保险产品信息披露管理办法": true,
+   "2022年第8号": true,
+   "2023年6月30日": true
+  },
+  "markers_ok": true
+ },
+ "L1-06": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2020-12/14/content_5569402.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 135615,
+  "sha256": "80143bf408a017c52253830694ace9e7d0a7c42dfba6030ad069bdedef6370c8",
+  "page_title": "互联网保险业务监管办法_国务院部门文件_中国政府网",
+  "text_chars": 28929,
+  "marker_checks": {
+   "互联网保险业务监管办法": true,
+   "2020年第13号": true,
+   "2021年2月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-07": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2020-11/24/content_5563685.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 182502,
+  "sha256": "2213ba3175a937faab2073cdf149b42485c4f809b2c25d36d1cae4641deb4cbd",
+  "page_title": "保险代理人监管规定_国务院部门文件_中国政府网",
+  "text_chars": 37753,
+  "marker_checks": {
+   "保险代理人监管规定": true,
+   "2020年第11号": true,
+   "2021年1月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-08": {
+  "url": "http://www.gov.cn/gongbao/content/2018/content_5288836.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 100842,
+  "sha256": "526a26588ca9af8a4067993ed553649b47aeb0b8049051ae9bf2904447c77d5c",
+  "page_title": "中国保险监督管理委员会令（2018年第3号）　　保险经纪人监管规定__2018年第13号国务院公报_中国政府网",
+  "text_chars": 14867,
+  "marker_checks": {
+   "保险经纪人监管规定": true,
+   "2018年第3号": true,
+   "2018年5月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-09": {
+  "url": "http://www.gov.cn/gongbao/content/2010/content_1585443.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 53009,
+  "sha256": "3789b6663f8ec79cb7de676bd9f9fcc74f5824c8ee0fe7f3d897ea478b46f4cf",
+  "page_title": "中国保险监督管理委员会令（2009年第1号）　　保险公司管理规定__2010年第11号国务院公报_中国政府网",
+  "text_chars": 10231,
+  "marker_checks": {
+   "保险公司管理规定": true,
+   "2009年第1号": true
+  },
+  "markers_ok": true
+ },
+ "L1-10": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2022-11/14/content_5726811.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 71406,
+  "sha256": "f8b3b7653d3066260da8e66d5f4092f9f33cf0bc720364471eb91580bccf2db6",
+  "page_title": "保险保障基金管理办法_国务院部门文件_中国政府网",
+  "text_chars": 11695,
+  "marker_checks": {
+   "保险保障基金管理办法": true,
+   "2022年第7号": true,
+   "2022年12月12日": true
+  },
+  "markers_ok": true
+ },
+ "L1-11": {
+  "url": "http://www.gov.cn/gongbao/content/2021/content_5598125.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 48441,
+  "sha256": "ca2333c87cd1a4b7e11cee55d3ba4483636d202349b856b0edb3ccb9b969e2ad",
+  "page_title": "中国银行保险监督管理委员会令（2021年第1号）　　保险公司偿付能力管理规定__2021年第10号国务院公报_中国政府网",
+  "text_chars": 4972,
+  "marker_checks": {
+   "保险公司偿付能力管理规定": true,
+   "2021年第1号": true,
+   "2021年3月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-12": {
+  "url": "http://www.gov.cn/gongbao/content/2020/content_5512564.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 51149,
+  "sha256": "7d055f7e5020a30d709a8dd9631a6a398b169a5300ef8006385a51210f77039c",
+  "page_title": "中国银行保险监督管理委员会令（2020年第3号）　　银行业保险业消费投诉处理管理办法__2020年第14号国务院公报_中国政府网",
+  "text_chars": 5915,
+  "marker_checks": {
+   "银行业保险业消费投诉处理管理办法": true,
+   "2020年第3号": true,
+   "2020年3月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-13": {
+  "url": "http://www.gov.cn/gongbao/content/2010/content_1702219.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 31897,
+  "sha256": "8a9d5e631b25d83559f293c8005c5bf67815e07e74aaf506f22efb509d780ea2",
+  "page_title": "中国保险监督管理委员会令（2010年第4号）　　人身保险业务基本服务规定__2010年第26号国务院公报_中国政府网",
+  "text_chars": 3849,
+  "marker_checks": {
+   "人身保险业务基本服务规定": true,
+   "2010年第4号": true
+  },
+  "markers_ok": true
+ },
+ "L1-14": {
+  "url": "http://www.gov.cn/gongbao/content/2012/content_2163594.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 46715,
+  "sha256": "887ba7601afa33cca15a432f85320b6dc7676553f0bc823f26de62c700f54380",
+  "page_title": "中国保险监督管理委员会令（2011年第3号）　　人身保险公司保险条款和保险费率管理办法__2012年第17号国务院公报_中国政府网",
+  "text_chars": 8329,
+  "marker_checks": {
+   "人身保险公司保险条款和保险费率管理办法": true,
+   "2011年第3号": true
+  },
+  "markers_ok": true
+ },
+ "L1-15": {
+  "url": "http://www.gov.cn/gongbao/content/2017/content_5248245.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 35505,
+  "sha256": "77a1ba601e69af3e1c80a0c5c5880b5cfd5b13347afa0aca95f19b9343608468",
+  "page_title": "保监会关于印发《保险销售行为可回溯管理暂行办法》的通知　　保险销售行为可回溯管理暂行办法__2017年第35号国务院公报_中国政府网",
+  "text_chars": 3520,
+  "marker_checks": {
+   "保险销售行为可回溯管理暂行办法": true,
+   "54号": true
+  },
+  "markers_ok": true
+ },
+ "L1-16": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2021-10/15/content_5642766.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 71634,
+  "sha256": "ad3255744e3121c96914f432e4636bf9103e07deb2d3460d3b0a603820ebf543",
+  "page_title": "中国银保监会办公厅关于印发意外伤害保险业务监管办法的通知_国务院部门文件_中国政府网",
+  "text_chars": 11626,
+  "marker_checks": {
+   "意外伤害保险业务监管办法": true,
+   "106号": true,
+   "2022年1月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-17": {
+  "url": "http://www.gov.cn/gongbao/content/2018/content_5312244.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 53514,
+  "sha256": "a601a8bda63ac33b4fefdab43fe0bd4edbdf8b40504c35749f797b425d102087",
+  "page_title": "中国银行保险监督管理委员会令（2018年第2号）　　保险公司信息披露管理办法__2018年第22号国务院公报_中国政府网",
+  "text_chars": 5800,
+  "marker_checks": {
+   "保险公司信息披露管理办法": true,
+   "2018年第2号": true
+  },
+  "markers_ok": true
+ },
+ "L1-18": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2021-09/14/content_5637138.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 82360,
+  "sha256": "71fe9254648aa9a85030a0d2a16c701cf141f82a2dfdbae9b951ff476c9fbf2b",
+  "page_title": "中国银保监会关于印发保险公司分支机构市场准入管理办法的通知_国务院部门文件_中国政府网",
+  "text_chars": 13511,
+  "marker_checks": {
+   "保险公司分支机构市场准入管理办法": true,
+   "37号": true
+  },
+  "markers_ok": true
+ },
+ "L1-19": {
+  "url": "http://www.gov.cn/gongbao/content/2021/content_5633451.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 72737,
+  "sha256": "e5e6a46ddb24382ce67d4363c198aaf85c10bf13929cf81b54617ad4a172096d",
+  "page_title": "中国银行保险监督管理委员会令（2021年第6号）　　保险公司董事、监事和高级管理人员任职资格管理规定__2021年第24号国务院公报_中国政府网",
+  "text_chars": 8901,
+  "marker_checks": {
+   "任职资格管理规定": true,
+   "2021年第6号": true
+  },
+  "markers_ok": true
+ },
+ "L1-20": {
+  "url": "http://www.gov.cn/gongbao/content/2018/content_5294432.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 98323,
+  "sha256": "c732afc2b344253f6a9c5261adefac736b651bb2876adf2b9a7b41c743c75352",
+  "page_title": "中国保险监督管理委员会令（2018年第5号）　　保险公司股权管理办法__2018年第15号国务院公报_中国政府网",
+  "text_chars": 13166,
+  "marker_checks": {
+   "保险公司股权管理办法": true,
+   "2018年第5号": true
+  },
+  "markers_ok": true
+ },
+ "L1-21": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2022-01/15/content_5668356.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 133190,
+  "sha256": "fbfce95ecdc611f980ffa837a523cfa415888073266f01fbc3c992e67d28932b",
+  "page_title": "银行保险机构关联交易管理办法_国务院部门文件_中国政府网",
+  "text_chars": 26279,
+  "marker_checks": {
+   "银行保险机构关联交易管理办法": true,
+   "2022年第1号": false
+  },
+  "markers_ok": false
+ },
+ "L1-21A": {
+  "url": "https://www.gov.cn/gongbao/2025/issue_12146/202507/content_7030979.html",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 183843,
+  "sha256": "acb2cbcdd1eb821314325948ab472a818949cbfd6a74ef819e66ec5ec9039dfc",
+  "page_title": "国家金融监督管理总局令（2025年第4号）　　金融监管总局关于修改部分规章的决定　　信托公司管理办法　　信托公司股权管理暂行办法　　银行保险机构关联交易管理办法__2025年第19号国务院公报_中国政",
+  "text_chars": 33632,
+  "marker_checks": {
+   "修改部分规章的决定": true,
+   "2025年第4号": true
+  },
+  "markers_ok": true
+ },
+ "L1-22": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2021-11/06/content_5649398.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 167336,
+  "sha256": "5e36d1bd368deee98437ccd4292a89f85bc8e5372203db103ccab8fab1814e55",
+  "page_title": "保险中介行政许可及备案实施办法_国务院部门文件_中国政府网",
+  "text_chars": 32871,
+  "marker_checks": {
+   "保险中介行政许可及备案实施办法": true,
+   "2021年第12号": true,
+   "2022年2月1日": true
+  },
+  "markers_ok": true
+ },
+ "L1-23": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/2020-09/10/content_5542206.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 45211,
+  "sha256": "95ac20e1bd403d0086b72831745a52c468d988ffb86c66899f0f78321d9e3264",
+  "page_title": "中国银保监会办公厅关于规范保险公司健康管理服务的通知_国务院部门文件_中国政府网",
+  "text_chars": 5828,
+  "marker_checks": {
+   "健康管理服务": true,
+   "83号": true
+  },
+  "markers_ok": true
+ },
+ "L1-24": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/202504/content_7019852.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 39701,
+  "sha256": "920457928bc6d224075e399d0df6d4c54f58cade653a4829f1bc1c2bcd0b515c",
+  "page_title": "国家金融监督管理总局关于推动深化人身保险行业个人营销体制改革的通知_国务院部门文件_中国政府网",
+  "text_chars": 5785,
+  "marker_checks": {
+   "个人营销体制改革": true,
+   "13号": true
+  },
+  "markers_ok": true
+ },
+ "L1-25": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/202409/content_6973835.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 43143,
+  "sha256": "866754b215598abfb84d27cc7229921fcf6dcbaeeec406b7b1b1dba6417a670e",
+  "page_title": "国务院关于加强监管防范风险推动保险业高质量发展的若干意见_国务院文件_中国政府网",
+  "text_chars": 5529,
+  "marker_checks": {
+   "保险业高质量发展的若干意见": true,
+   "21号": true
+  },
+  "markers_ok": true
+ },
+ "L2-05": {
+  "url": "https://www.gov.cn/zhengce/zhengceku/202510/content_7046318.htm",
+  "http_status": 200,
+  "ctype": "text/html",
+  "bytes": 33475,
+  "sha256": "368976f950d7dc30a9e5bcf3ab8a0ce26c44a3920d749088171dbcce892fec19",
+  "page_title": "国家金融监督管理总局关于做好《中国人身保险业经验生命表（2025）》发布使用有关事项的通知_国务院部门文件_中国政府网",
+  "text_chars": 3769,
+  "marker_checks": {
+   "经验生命表": true,
+   "21号": true
+  },
+  "markers_ok": true
+ },
+ "L2-03": {
+  "url": "https://www.nfra.gov.cn/cn/static/data/DocInfo/SelectByDocId/data_docId=940130.json",
+  "official_page": "NFRA docId: 940130",
+  "http_status": 200,
+  "nfra_doc_id": "940130",
+  "nfra_doc_title": "中国银保监会办公厅关于使用重大疾病保险的疾病定义有关事项的通知",
+  "publish_date": "2020-11-06 11:38:24.0",
+  "text_chars": 763,
+  "sha256": "92bb034eb7cb0e39a3452abfbb914f100907fc967cc41064dabd438d13ed6a17"
+ },
+ "L1-01": {
+  "url": "https://www.nfra.gov.cn/cn/static/data/DocInfo/SelectByDocId/data_docId=879931.json",
+  "official_page": "NFRA docId: 879931",
+  "http_status": 200,
+  "nfra_doc_id": "879931",
+  "nfra_doc_title": "中华人民共和国保险法",
+  "publish_date": "2019-12-29 12:16:00",
+  "text_chars": 22211,
+  "sha256": "e4d5cd944d1046e35c6edbaeffb3e06483f82e4e2a55c56cb9ac7b3d4ba4f21b"
+ },
+ "L1-14-2015": {
+  "url": "https://www.nfra.gov.cn/cn/static/data/DocInfo/SelectByDocId/data_docId=1025609.json",
+  "official_page": "NFRA docId: 1025609",
+  "http_status": 200,
+  "nfra_doc_id": "1025609",
+  "nfra_doc_title": "人身保险公司保险条款和保险费率管理办法",
+  "publish_date": "2015-12-03 09:11:00",
+  "text_chars": 7463,
+  "sha256": "12c5736d78aae4bbce440ef56a763be5c68850f5b4cd61128a5a4e828d2c0247"
+ },
+ "L1-14-alt": {
+  "url": "https://www.nfra.gov.cn/cn/static/data/DocInfo/SelectByDocId/data_docId=372901.json",
+  "official_page": "NFRA docId: 372901",
+  "http_status": 200,
+  "nfra_doc_id": "372901",
+  "nfra_doc_title": "人身保险公司保险条款和保险费率管理办法（2015年修订）",
+  "publish_date": "2015-12-03 16:32:28",
+  "text_chars": 7708,
+  "sha256": "1c5ed075ed15ad31605fc100a32a8cd82eced99924d8425765faaa03307d1a7a"
+ },
+ "L1-09-nfra": {
+  "url": "https://www.nfra.gov.cn/cn/static/data/DocInfo/SelectByDocId/data_docId=372897.json",
+  "official_page": "NFRA docId: 372897",
+  "http_status": 200,
+  "nfra_doc_id": "372897",
+  "nfra_doc_title": "保险公司管理规定",
+  "publish_date": "2015-12-03 16:20:00",
+  "text_chars": 9742,
+  "sha256": "98ef88a04bb370cab5b0d1a01d9f1a84f01ad769b9f43b63598c880914b6e4d3"
+ }
+}

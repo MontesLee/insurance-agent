@@ -33,6 +33,60 @@ export interface EvalUiEntry {
 export interface StreamUiState {
   text: string;
   kind: "reasoning" | "content";
+  /** 28.K.29-A: "answer" = the final-answer stream (message position).
+   * Step-boundary events do NOT clear an answer stream — the transcript
+   * finalize owns its end (spec §11 no-duplication contract). */
+  channel?: "answer";
+}
+
+/** 28.K.28: one contiguous run of same-kind stream text inside a step bucket. */
+export interface StepSegment {
+  kind: "reasoning" | "content";
+  text: string;
+}
+
+export interface StepOutputBucket {
+  key: string;
+  segments: StepSegment[];
+}
+
+/** Characters retained per bucket (tail-capped; the oldest text drops first). */
+export const MAX_BUCKET_CHARS = 4000;
+
+/** Joined display text of a bucket — every segment, in arrival order. */
+export function bucketText(b: StepOutputBucket): string {
+  return b.segments.map((s) => s.text).join("");
+}
+
+/**
+ * Append stream text to a bucket, merging into the trailing segment when the
+ * kind matches (so an R,C,R,C stream stays 3 segments, not 4), then tail-cap
+ * the total at MAX_BUCKET_CHARS by dropping from the FRONT.
+ */
+export function appendSegment(
+  b: StepOutputBucket,
+  kind: StepSegment["kind"],
+  text: string,
+): StepOutputBucket {
+  const last = b.segments[b.segments.length - 1];
+  let segs: StepSegment[] =
+    last && last.kind === kind
+      ? [...b.segments.slice(0, -1), { kind, text: last.text + text }]
+      : [...b.segments, { kind, text }];
+
+  let total = segs.reduce((n, s) => n + s.text.length, 0);
+  while (total > MAX_BUCKET_CHARS && segs.length > 0) {
+    const head = segs[0]!;
+    const over = total - MAX_BUCKET_CHARS;
+    if (head.text.length <= over) {
+      segs = segs.slice(1);
+      total -= head.text.length;
+    } else {
+      segs = [{ kind: head.kind, text: head.text.slice(over) }, ...segs.slice(1)];
+      total = MAX_BUCKET_CHARS;
+    }
+  }
+  return { key: b.key, segments: segs };
 }
 
 export interface RunUiState {
@@ -47,6 +101,36 @@ export interface RunUiState {
   connected: boolean;
   /** live-only LLM output (transient deltas; rebuilt never — not in history) */
   stream: StreamUiState | null;
+  /**
+   * 28.K.17 (K.16 Option A): epoch-ms timestamp of the LAST
+   * agent_stream_delta ARRIVAL — pure UI liveness metadata. The delta's
+   * CONTENT is never stored here (reasoning stays only in the stream
+   * buffer; content renders exactly as before). Used solely to derive
+   * the consumer-safe "generation is actively streaming" state.
+   */
+  lastDeltaAt: number | null;
+  /**
+   * Step-scoped streaming outputs (agent-loop transparency). Each
+   * agent_step_started opens a bucket; deltas while a bucket is open
+   * append to THAT bucket, tagged by kind. Buckets are live-only
+   * (transient deltas — rebuilt never, not in history/replay).
+   * QA-slice turns (no agent_step events) keep the single global
+   * `stream` message bubble — both paths coexist without duplication.
+   *
+   * 28.K.28 SUPERSEDES E-2: `reasoning` deltas NOW enter the bucket as
+   * `kind:"reasoning"` segments (Owner decision — an always-thinking
+   * model otherwise leaves the box permanently empty). They stay
+   * distinguishable from `kind:"content"` segments so the UI can
+   * de-emphasize them, and they STILL never enter the answer bubble
+   * (`stream`) — the final assistant answer must not carry CoT.
+   * Render-time sanitization applies to reasoning segments too.
+   */
+  stepOutputs: StepOutputBucket[];
+  currentStepKey: string | null;
+  /** true once ANY agent_step_started arrived (agent-loop turn) —
+      distinguishes QA-slice turns (auto-open composing bucket on first
+      content delta) from agent-loop boundary gaps (orphan → bubble only) */
+  sawAgentStep: boolean;
   /** the tool the agent is currently executing (null between tools) */
   currentTool: string | null;
 }
@@ -78,6 +162,10 @@ export function initRunState(runId: string, stageOrder: StageInfo[]): RunUiState
     terminalEvent: null,
     connected: false,
     stream: null,
+    lastDeltaAt: null,
+    stepOutputs: [],
+    currentStepKey: null,
+    sawAgentStep: false,
     currentTool: null,
   };
 }
@@ -118,13 +206,19 @@ function statusFromTerminal(e: RuntimeEvent): RunStatus {
  * The explicit transition table. `void` entries = timeline-only events (they are
  * recorded, but must NOT move pipeline/eval state).
  */
-const TRANSITIONS: Record<EventType, (s: RunUiState, e: RuntimeEvent) => void> = {
+// Phase 28.B prep: the EventType union now carries the FULL dual-end
+// vocabulary (schema/event-vocabulary.json + reserved). The table stays
+// PARTIAL by design — unknown/unhandled types are stored in the timeline
+// without a transition (see the `event` case); the lookup is already
+// undefined-safe.
+const TRANSITIONS: Partial<Record<EventType, (s: RunUiState, e: RuntimeEvent) => void>> = {
   run_started: (s, e) => {
     s.status = "running";
     s.currentStage = null;
     void e;
   },
   run_completed: (s, e) => {
+    s.currentStepKey = null; // freeze step output buckets at terminal
     s.status = statusFromTerminal(e);
     s.currentStage = null;
     s.currentTool = null;
@@ -136,6 +230,7 @@ const TRANSITIONS: Record<EventType, (s: RunUiState, e: RuntimeEvent) => void> =
     }
   },
   run_failed: (s, e) => {
+    s.currentStepKey = null;
     s.status = "failed";
     s.currentStage = null;
     s.currentTool = null;
@@ -143,14 +238,88 @@ const TRANSITIONS: Record<EventType, (s: RunUiState, e: RuntimeEvent) => void> =
   },
   // agent-loop events: timeline-only for pipeline/eval state (§22 — they enrich
   // the stream, they never move stage state; the LLM cannot fake progress)
-  agent_step_started: (s) => { s.stream = null; },
-  agent_decision: (s) => { s.stream = null; },
+  agent_step_started: (s, e) => {
+    // 28.K.29-A: an ANSWER stream (message position) survives step
+    // boundaries — only step-scoped streams reset per step
+    if (s.stream?.channel !== "answer") s.stream = null;
+    // Step-scoped streaming: open a new output bucket for this step.
+    // Buckets accumulate content deltas until the next step/decision —
+    // giving each LLM call its own Codex-style output area.
+    const key = "step-" + (e.data?.["step"] ?? s.stepOutputs.length + 1);
+    s.currentStepKey = key;
+    s.sawAgentStep = true;
+    if (!s.stepOutputs.some((b) => b.key === key)) {
+      s.stepOutputs = [...s.stepOutputs, { key, segments: [] }];
+    }
+  },
+  agent_decision: (s) => {
+    // 28.K.29-A: keep the answer stream — the decision that ENDS the
+    // turn (finish/ask_user) is exactly what produced it; the transcript
+    // finalize replaces it (no duplication, no flicker gap)
+    if (s.stream?.channel !== "answer") s.stream = null;
+    // close attribution — deltas after a decision belong to the next step
+    s.currentStepKey = null;
+  },
   agent_step_error: () => {},
   // live streaming text: append to the transient buffer; NEVER into events[]
   agent_stream_delta: (s, e) => {
-    const kind = e.data["kind"] === "reasoning" ? "reasoning" : "content";
-    const prev = s.stream && s.stream.kind === kind ? s.stream.text : "";
-    s.stream = { kind, text: (prev + String(e.data["text"] ?? "")).slice(-4000) };
+    // 28.K.29-A: answer-channel deltas (agent_decide finish/ask_user
+    // `message` — the FINAL user answer streaming as real provider
+    // tool-arg fragments) route to the message-position bubble ONLY,
+    // never into a step bucket (spec §11: step box = working process,
+    // bubble = final answer — the transcript finalize converges here).
+    if (e.data["channel"] === "answer") {
+      s.lastDeltaAt = Date.now();
+      if (e.data["reset"]) {
+        s.stream = null;          // retry attempt: discard partial answer
+        return;
+      }
+      const atext = String(e.data["text"] ?? "");
+      if (atext.length === 0) return;
+      const aprev = s.stream?.kind === "content" ? s.stream.text : "";
+      s.stream = { kind: "content", channel: "answer",
+                   text: (aprev + atext).slice(-MAX_BUCKET_CHARS) };
+      return;
+    }
+    // 28.K.17: arrival timestamp drives the consumer live-activity row.
+    // 28.K.28 SUPERSEDES 28.K.20/E-2: reasoning deltas NOW enter the step
+    // bucket as `kind:"reasoning"` segments (Owner decision — glm-5.3 always
+    // thinks, so a content-only buffer stays empty for the whole reasoning
+    // phase and the box shows nothing). They remain a SEPARATE segment kind
+    // so the UI can de-emphasize them, and they still never reach the answer
+    // bubble below. Same-kind neighbours merge, so a mixed R,C,R,C stream is
+    // 3 segments, not 4.
+    s.lastDeltaAt = Date.now();
+    const kind: StepSegment["kind"] =
+      e.data["kind"] === "reasoning" ? "reasoning" : "content";
+    const text = String(e.data["text"] ?? "");
+    if (text.length === 0) return;
+    if (s.currentStepKey === null && !s.sawAgentStep) {
+      // QA-slice turn (NO agent_step events at all): auto-open an
+      // implicit composing bucket on the FIRST delta of ANY kind so the
+      // per-step output box appears for QA questions too. Agent-loop
+      // boundary gaps (sawAgentStep=true, key briefly null) go to the
+      // global bubble only — the next agent_step_started opens a
+      // proper named bucket.
+      const key = "qa-composing";
+      s.currentStepKey = key;
+      if (!s.stepOutputs.some((b) => b.key === key)) {
+        s.stepOutputs = [...s.stepOutputs, { key, segments: [] }];
+      }
+    }
+    if (s.currentStepKey !== null) {
+      const target = s.currentStepKey;
+      s.stepOutputs = s.stepOutputs.map((b) =>
+        b.key === target ? appendSegment(b, kind, text) : b);
+      if (s.sawAgentStep) return; // agent-loop: bucket ONLY (no bubble dup)
+    }
+    // 28.K.28: the answer bubble stays CONTENT-ONLY — CoT must never pollute
+    // the final assistant answer, even now that it is displayable in the box.
+    if (kind === "reasoning") return;
+    // QA-slice: the global bubble also receives the text (K.20/K.26
+    // message-position answer stream — coexists with the step box)
+    const prev = s.stream?.text ?? "";
+    s.stream = { kind: "content", text: (prev + text).slice(-MAX_BUCKET_CHARS) };
   },
   stage_started: (s, e) => {
     s.stream = null;

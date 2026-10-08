@@ -61,6 +61,14 @@ EVENT_TYPES = frozenset({
     "approval_requested", "approval_waiting", "approval_approved",
     "approval_rejected", "approval_expired", "approval_resumed",
     "approval_failed",
+    # intent layer (Phase 28.A-1, ADR-019): classification telemetry —
+    # shadow mode first (data.shadow=true); carries intent/confidence/
+    # confidence_source/reason_codes only, never message content
+    "intent_classified",
+    # QA agent slice (Phase 28.C-1, ADR-022): grounding telemetry —
+    # metadata only (grounding_status/failure_reason/evidence_refs/
+    # retrieval/generation summary); the answer text never enters events
+    "qa_answered",
 })
 
 # events after which a run's stream is closed

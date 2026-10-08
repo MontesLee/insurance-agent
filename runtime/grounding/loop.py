@@ -18,6 +18,8 @@ intent other than as opaque echo fields.
 """
 from __future__ import annotations
 
+import os
+
 from typing import Optional
 
 from runtime.llm.types import LLMError, LLMRequest
@@ -25,6 +27,15 @@ from runtime.grounding import context as gctx
 from runtime.grounding import gate as ggate
 
 _gateway_cache = {"provider": None, "gateway": None}
+
+# FIX-3 (OD-FIX3-3 preparation): S1' shadow OBSERVATION SEAM — default
+# None = zero behavior. A future, separately-authorized S1' harness may
+# attach an observer to record gate inputs/outputs (shadow only: it can
+# never alter the verdict, the answer, or any consumer-facing output;
+# errors inside the observer are swallowed by construction). This seam
+# grants NO authority and changes NOTHING while shadow_observer is None
+# (locked by test).
+shadow_observer = None
 
 
 class _GatewayProviderAdapter:
@@ -52,6 +63,14 @@ class _GatewayProviderAdapter:
         msgs = [{"role": m.get("role", "user"),
                  "content": m.get("content", "")}
                 for m in (request.messages or [])]
+        # K.29-B-FIX Phase 1: forward request.system_prompt as the
+        # leading system message — same translation as runtime/llm/
+        # glm.py::GLMProvider (this adapter's own docstring names it
+        # as the pattern). The previous translation dropped it, so the
+        # QA slice's qa_system_prompt never reached the provider.
+        if request.system_prompt:
+            msgs.insert(0, {"role": "system",
+                            "content": request.system_prompt})
         box: dict = {}
 
         def _call():
@@ -105,6 +124,11 @@ class _GatewayProviderAdapter:
         msgs = [{"role": m.get("role", "user"),
                  "content": m.get("content", "")}
                 for m in (request.messages or [])]
+        # K.29-B-FIX Phase 1: identical system_prompt forwarding as
+        # generate() above (streaming and non-streaming must agree).
+        if request.system_prompt:
+            msgs.insert(0, {"role": "system",
+                            "content": request.system_prompt})
         box: dict = {}
 
         def _call():
@@ -339,6 +363,15 @@ def generate_grounded(question: str, evidence: list, intent_result: dict,
                                 product_ref=product_ref)
         answer = (resp.content or "").strip()
         verdict = _full_gate(answer)
+        if shadow_observer is not None:      # FIX-3 S1' seam (no-op)
+            try:
+                shadow_observer("qa_final_gate", {
+                    "question": query, "answer": answer,
+                    "ok": verdict.get("ok"),
+                    "violations": (verdict.get("violations") or [])[:10],
+                    "evidence": evidence})
+            except Exception:  # noqa: BLE001 — observation must never
+                pass           # affect the gated answer
         if verdict["ok"]:
             # 28.K.26: residual = held segments + trailing incomplete
             # sentence — emitted ONLY now that the FINAL gate passed
@@ -357,6 +390,42 @@ def generate_grounded(question: str, evidence: list, intent_result: dict,
                         else "partial_grounding"),
                 product_ref=product_ref)
         last_violations = verdict["violations"]
+
+    # FIX-3 Phase 14 (OD-FIX3-77, default OFF): verified-subset answer
+    # assembly. When the whole answer failed the final gate, sentences
+    # that INDIVIDUALLY pass the SAME full gate (citation + claim
+    # support — including any in-process authority chain wired into
+    # csupp.check) are assembled as the delivered answer. The joined
+    # subset is RE-GATED as a whole before delivery (assembly must not
+    # create new claims); empty subset or re-gate failure falls through
+    # to the normal refusal below. No gate is bypassed or relaxed; OFF
+    # (default) keeps this code path unreachable.
+    if str(os.environ.get("AUTHORITY_VERIFIED_SUBSET_DELIVERY", "0")
+           ).strip().lower() in ("1", "true", "yes", "on"):
+        _sents = [s for s in ggate.split_sentences(answer, rules)
+                  if s.strip()]
+        _keep = [s for s in _sents if _full_gate(s)["ok"]]
+        _subset = "\n".join(
+            s if s.endswith(("。", "！", "？", "!", "?", "；", ";"))
+            else s + "。" for s in _keep).strip()
+        _sv = _full_gate(_subset) if _subset else {"ok": False}
+        if _subset and _sv["ok"]:
+            # NOTE: generation provenance stays SCHEMA-STANDARD (the
+            # AnswerContext schema is closed); the subset provenance
+            # (source=AUTHORITY_VERIFIED_SUBSET, kept/omitted counts)
+            # is recorded by the ops-layer trace, not this record.
+            usage = getattr(resp, "usage", None)
+            return gctx.grounded(
+                _subset, _sv.get("cited") or [], evidence_map,
+                intent_result, retrieval,
+                {"provider": getattr(gateway.provider, "name", ""),
+                 "model": "", "prompt_version": prompt_version,
+                 "gateway": True, "attempts": attempts,
+                 "request_id": request_id,
+                 "usage": (usage.to_dict() if usage else None)},
+                status=("grounded" if governed_status == "success"
+                        else "partial_grounding"),
+                product_ref=product_ref)
 
     return gctx.refused("citation_gate_rejected", intent_result, retrieval,
                         generation={

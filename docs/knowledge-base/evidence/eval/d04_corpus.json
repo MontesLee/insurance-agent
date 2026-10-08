@@ -1,0 +1,880 @@
+[
+ {
+  "case_id": "RB-L1-001",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "保险公司注册资本的最低限额是多少",
+  "category": "HIGH",
+  "retrieved_docs": [
+   "L1-01",
+   "L1-07",
+   "L1-09",
+   "L1-08",
+   "L1-01",
+   "L1-09"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection on generated claims",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 9,
+   "exp_doc_rank": 7,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": 1,
+  "draft_head": "设立保险公司的注册资本最低限额为人民币二亿元[E1]。保险公司的注册资本必须为实缴货币资本[E1]。国务院保险监督管理机构可以根据保险公司的业务范围、经营规模调整该最低限额，但不得低于人民币二亿元[E1]。另外，保险公司以2亿元最低资本金额设立的，在其住所地以外的每一省、自治区、直辖市首次申请设立分公司，应当增加不少于"
+ },
+ {
+  "case_id": "RB-L1-017",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "保险公司设立分支机构需要经过什么程序",
+  "category": "MEDIUM",
+  "retrieved_docs": [
+   "L1-18",
+   "L1-01",
+   "L1-09",
+   "L1-09",
+   "L1-09",
+   "L1-09"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "draft asserts the fact; lexical support rejects (paraphrase ceiling)",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 10,
+   "exp_doc_rank": 1,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": 3,
+  "draft_head": "保险公司在境内设立分支机构，应当经保险监督管理机构批准[E2]。分支机构设立分为筹建、开业两个阶段[E1]。筹建阶段，申请人应提交筹建申请书等材料，由保险公司或其上级管理机构向银保监会或其派出机构提出申请，监管机构自受理之日起三十日内审查，对符合规定的发出筹建通知书[E1]。申请人应自收到筹建通知书起六个月内完成筹建，"
+ },
+ {
+  "case_id": "RB-L1-007",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "长期健康保险产品的犹豫期不得少于多少天",
+  "category": "HIGH",
+  "retrieved_docs": [
+   "L1-04",
+   "L1-13",
+   "L1-04",
+   "L2-03",
+   "L1-07",
+   "L1-05"
+  ],
+  "qualified_n": 10,
+  "final": "ANSWER",
+  "reason": "ANSWERED",
+  "viol_kinds": [],
+  "r_class": "-",
+  "root": "answered (not a D-04 case)",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 10,
+   "exp_doc_rank": 1,
+   "final": "ANSWER"
+  },
+  "bge_exp_doc_rank": 1,
+  "draft_head": "根据《健康保险管理办法》，长期健康保险产品的犹豫期不得少于15天[E1]。长期健康保险产品应当设置合同犹豫期，并在保险条款中列明投保人在犹豫期内的权利[E1]。"
+ },
+ {
+  "case_id": "RB-L2-001",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "2020版重疾规范规定必须包含哪三种轻度疾病",
+  "category": "HIGH",
+  "retrieved_docs": [
+   "L2-03",
+   "L2-01",
+   "L2-01",
+   "L2-02",
+   "L2-01",
+   "L1-04"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection on generated claims",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 5,
+   "exp_doc_rank": 2,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": 2,
+  "draft_head": "根据《重大疾病保险的疾病定义使用规范（2020年修订版）》，重大疾病保险产品若还保障保险金额低于六种重度疾病的其他疾病，则还应当包括规范内的三种轻度疾病[E3]。这三种轻度疾病为恶性肿瘤——轻度、较轻急性心肌梗死和轻度脑中风后遗症[E3]。规范对这三种轻度疾病均列有具体的疾病定义[E4]。同时，所包含的每种轻度疾病累计"
+ },
+ {
+  "case_id": "RB-L1-009",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料",
+  "category": "MEDIUM",
+  "retrieved_docs": [
+   "L1-05",
+   "L1-03",
+   "L1-06",
+   "L1-17",
+   "L1-15",
+   "L1-04"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "draft asserts the fact; lexical support rejects (paraphrase ceiling)",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 9,
+   "exp_doc_rank": 3,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": 1,
+  "draft_head": "根据《人身保险产品信息披露管理办法》，保险公司应当根据保险产品审批或备案材料报送内容披露保险产品信息[E1]。应披露的材料包括保险产品目录、保险产品条款以及保险产品费率表[E1]。一年期以上的人身保险产品现金价值全表和一年期以上的人身保险产品说明书亦在应披露之列[E1]。银保监会规定的其他应当披露的产品材料信息也属于披"
+ },
+ {
+  "case_id": "RB-L1-027",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "人身保险公司的保险条款和保险费率需要审批还是备案",
+  "category": "HIGH",
+  "retrieved_docs": [
+   "L1-14",
+   "L1-14",
+   "L1-14",
+   "L1-01",
+   "L1-16",
+   "L1-02"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "draft asserts the fact; lexical support rejects (paraphrase ceiling)",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 9,
+   "exp_doc_rank": 2,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": 1,
+  "draft_head": "人身保险公司的保险条款和保险费率由保险公司总公司报送中国保监会审批或者备案[E1]。关系社会公众利益的保险险种、依法实行强制保险的险种、中国保监会规定的新开发人寿保险险种以及中国保监会规定的其他险种，应当在使用前报送中国保监会审批[E1]。前述规定以外的其他险种，应当报送中国保监会备案[E1]。《保险法》也规定，关系社"
+ },
+ {
+  "case_id": "RB-L1-019",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "保险保障基金由谁缴纳、按什么缴纳",
+  "category": "MEDIUM",
+  "retrieved_docs": [
+   "L1-10",
+   "L1-01",
+   "L1-01",
+   "L1-07",
+   "L1-05",
+   "L1-14"
+  ],
+  "qualified_n": 2,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "draft asserts the fact; lexical support rejects (paraphrase ceiling)",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 5,
+   "exp_doc_rank": 1,
+   "final": "ANSWER"
+  },
+  "bge_exp_doc_rank": 1,
+  "draft_head": "根据《保险保障基金管理办法》，保险保障基金由境内保险公司依法缴纳[E1]。其中，财产保险保障基金由财产保险公司缴纳形成[E1]。人身保险保障基金由人身保险公司缴纳形成[E1]。缴费费率由基准费率和风险差别费率构成[E1]。保险公司应当及时、足额将保险保障基金缴纳到保险保障基金公司的专门账户[E1]。此外，境外直接保险业"
+ },
+ {
+  "case_id": "RB-L1-023",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "银行保险机构收到消费投诉后多久作出处理决定",
+  "category": "HIGH",
+  "retrieved_docs": [
+   "L1-12",
+   "L1-14",
+   "L1-13",
+   "L1-22",
+   "L1-21",
+   "L1-01"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "draft asserts the fact; lexical support rejects (paraphrase ceiling)",
+  "minimal_answer_test": {
+   "citation_ok": true,
+   "support_ok": true,
+   "support_violations": []
+  },
+  "nomic": {
+   "qualified_n": 8,
+   "exp_doc_rank": 1,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": 1,
+  "draft_head": "根据《银行业保险业消费投诉处理管理办法》，对于事实清楚、争议情况简单的消费投诉，银行保险机构应当自收到消费投诉之日起15日内作出处理决定并告知投诉人[E1]。情况复杂的，可以延长至30日[E1]。情况特别复杂或者有其他特殊原因的，经其上级机构或者总行、总公司高级管理人员审批并告知投诉人，可以再延长30日[E1]。消费投"
+ },
+ {
+  "case_id": "PROBE-CHILD-CI",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "儿童重疾险一般保障哪些重大疾病",
+  "category": "GENERAL",
+  "retrieved_docs": [
+   "L2-02",
+   "L2-01",
+   "L2-01",
+   "L2-01",
+   "L1-14",
+   "L2-03"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 5,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "证据显示，《重大疾病保险的疾病定义使用规范（2020年修订版）》的疾病定义主要参考国内外成年人重大疾病保险发展状况并结合现代医学进展制定[E1]。该规范适用于保险期间主要为成年人（十八周岁及以上）阶段的重大疾病保险[E1]，因此证据未覆盖儿童重疾险专属保障哪些重大疾病这一问题。就规范本身规定而言，此类产品的疾病范围应当"
+ },
+ {
+  "case_id": "RB-N-001",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "如何办理机动车驾驶证换证手续",
+  "category": "NEGATIVE",
+  "retrieved_docs": [
+   "L1-18",
+   "L2-01",
+   "L1-07",
+   "L1-08",
+   "L1-09",
+   "L1-08"
+  ],
+  "qualified_n": 7,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R7",
+  "root": "negative query — correct refusal",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 3,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "现有证据仅涵盖保险公司分支机构的设立、改建、变更营业场所及撤销等监管规定[E1]，以及保险专业代理机构与保险经纪机构的相关监管规定[E3]。证据中不包含机动车驾驶证换证手续的办理流程、所需材料或办理机关等内容，故无法依据现有证据回答该问题[E1]。"
+ },
+ {
+  "case_id": "RB-N-002",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "社会保险里的养老保险退休后怎么办理领取手续",
+  "category": "NEGATIVE",
+  "retrieved_docs": [
+   "L1-01",
+   "L1-01",
+   "L1-01",
+   "L1-01",
+   "L1-14",
+   "L1-10"
+  ],
+  "qualified_n": 4,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R7",
+  "root": "negative query — correct refusal",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 6,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "现有证据未包含社会保险基本养老保险退休后办理领取手续的流程、条件或所需材料，无法据此回答该问题[E1]。证据中与养老相关的内容仅涉及商业养老年金保险的定义[E2]。养老年金保险是指以养老保障为目的的年金保险[E2]。此类保险约定给付被保险人生存保险金的年龄不得小于国家规定的退休年龄[E2]。相邻两次给付的时间间隔不得超"
+ },
+ {
+  "case_id": "RB-N-003",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "医院门诊挂号预约有哪些方式",
+  "category": "NEGATIVE",
+  "retrieved_docs": [
+   "L2-01",
+   "L2-02",
+   "L1-12",
+   "L1-13",
+   "L1-03",
+   "L1-18"
+  ],
+  "qualified_n": 1,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R7",
+  "root": "negative query — correct refusal",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 0,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "现有证据为保险条款中的责任免除事项与术语释义部分[E1]。该证据仅包含专科医生资格条件、组织病理学检查及ICD-10等术语定义[E1]。证据中未包含医院门诊挂号预约方式的相关内容[E1]。因此无法依据现有证据回答该问题[E1]。"
+ },
+ {
+  "case_id": "RB-N-004",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "机动车年检流程是怎样的",
+  "category": "NEGATIVE",
+  "retrieved_docs": [
+   "L2-01",
+   "L1-05",
+   "L1-13",
+   "L1-16",
+   "L1-17",
+   "L1-13"
+  ],
+  "qualified_n": 1,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R7",
+  "root": "negative query — correct refusal",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 0,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "所提供的证据[E1]内容为保险条款内容，包括被保险人感染艾滋病病毒或患艾滋病、战争、军事冲突、核爆炸、核辐射或核污染、遗传性疾病等责任免除事项[E1]。[E1]中还包括专科医生、组织病理学检查、ICD-10与ICD-O-3等术语释义[E1]。上述证据中不包含任何关于机动车年检流程的内容[E1]。因此无法依据该证据回答机"
+ },
+ {
+  "case_id": "RB-N-006",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "未成年人办理身份证需要什么材料",
+  "category": "NEGATIVE",
+  "retrieved_docs": [
+   "L1-22",
+   "L1-20",
+   "L1-18",
+   "L1-09",
+   "L1-09",
+   "L1-18"
+  ],
+  "qualified_n": 5,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R7",
+  "root": "negative query — correct refusal",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 3,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "现有证据均为保险监管类规定，仅涵盖保险机构高级管理人员任职资格申请材料、保险公司及其分支机构筹建与开业材料等内容[E1]。证据中未包含未成年人办理身份证所需材料的相关规定[E1]。因此该问题超出本证据的覆盖范围，无法据现有证据作答[E1]。"
+ },
+ {
+  "case_id": "GEN-01",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "保险公司倒闭了，我的人寿保险单还有效吗",
+  "category": "GENERAL",
+  "retrieved_docs": [
+   "L1-10",
+   "L1-01",
+   "L1-01",
+   "L1-18",
+   "L1-15",
+   "L1-01"
+  ],
+  "qualified_n": 6,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "fact_sentence"
+  ],
+  "r_class": "R3",
+  "root": "citation presence failure only",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 7,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "根据证据，经营有人寿保险业务的保险公司被依法撤销或被依法宣告破产的，其持有的人寿保险合同及责任准备金必须转让给其他经营有人寿保险业务的保险公司[E2]。不能同其他保险公司达成转让协议的，由国务院保险监督管理机构指定经营有人寿保险业务的保险公司接受转让[E2]。转让或指定接受转让时，应当维护被保险人、受益人的合法权益[E"
+ },
+ {
+  "case_id": "GEN-02",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "什么是保险销售行为可回溯",
+  "category": "GENERAL",
+  "retrieved_docs": [
+   "L1-15",
+   "L1-03",
+   "L1-06",
+   "L1-03",
+   "L1-16",
+   "L1-03"
+  ],
+  "qualified_n": 9,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 8,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "保险销售行为可回溯，是指保险公司、保险中介机构通过录音录像等技术手段采集视听资料、电子数据，记录和保存保险销售过程关键环节，实现销售行为可回放、重要信息可查询、问题责任可确认[E1]。保险公司、保险中介机构销售投保人为自然人的保险产品时，必须实施可回溯管理，团体保险产品除外[E1]。开展电话销售业务的，应将电话通话过程"
+ },
+ {
+  "case_id": "GEN-03",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "重大疾病保险一般保障哪些疾病",
+  "category": "GENERAL",
+  "retrieved_docs": [
+   "L2-02",
+   "L2-01",
+   "L1-14",
+   "L2-01",
+   "L2-03",
+   "L1-04"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 6,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "根据《重大疾病保险的疾病定义使用规范（2020年修订版）》，重大疾病保险中的“疾病”是指保险合同约定的疾病、疾病状态或手术[E1]。保险期间主要为成年人（十八周岁及以上）阶段的重疾险产品，其保障的疾病范围应当包括六种重度疾病，即恶性肿瘤——重度、较重急性心肌梗死、严重脑中风后遗症、重大器官移植术或造血干细胞移植术、冠状"
+ },
+ {
+  "case_id": "GEN-04",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "通过互联网买保险需要注意什么",
+  "category": "GENERAL",
+  "retrieved_docs": [
+   "L1-03",
+   "L1-06",
+   "L1-06",
+   "L1-06",
+   "L1-06",
+   "L1-06"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "fact_sentence"
+  ],
+  "r_class": "R3",
+  "root": "citation presence failure only",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 6,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "通过互联网购买保险应注意以下几点。互联网保险业务应由依法设立的保险机构开展，其他机构和个人不得开展[E2]。保险机构应在其官方网站披露营业执照、经营许可证、自营网络平台网址以及偿付能力充足率等监管评价信息[E3]。投保页面须属于保险机构的自营网络平台[E8]。营销宣传页面应明确标识产品为保险产品，并标明保险产品全称、承"
+ },
+ {
+  "case_id": "GEN-05",
+  "population": "PRODUCTION-LIKE",
+  "source": "qa_slice_bgem3(kb-v1)",
+  "query": "意外伤害保险的保险期间有什么规定",
+  "category": "GENERAL",
+  "retrieved_docs": [
+   "L1-16",
+   "L1-16",
+   "L1-04",
+   "L1-16",
+   "L1-16",
+   "L1-14"
+  ],
+  "qualified_n": 10,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection",
+  "minimal_answer_test": null,
+  "nomic": {
+   "qualified_n": 10,
+   "exp_doc_rank": null,
+   "final": "REFUSAL"
+  },
+  "bge_exp_doc_rank": null,
+  "draft_head": "监管规定区分保险期限一年及以下与保险期限一年以上的意外险分别作出要求[E1]。以激活注册方式销售的意外险，产品保险期限应不少于7天，且保险责任开始时间应在激活注册之后[E4]。保险期限一年及以下的意外险保单最低现金价值按未满期净保费方法确定，保险期限一年以上的则按《普通型人身保险精算规定》相关要求计算[E1]。保险期限"
+ },
+ {
+  "case_id": "N08",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "互联网保险业务可以通过什么平台经营",
+  "category": "normal",
+  "retrieved_docs": [
+   "L1-03",
+   "L1-06"
+  ],
+  "qualified_n": 2,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "N09",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "偿付能力达标公司需要满足哪些条件",
+  "category": "normal",
+  "retrieved_docs": [
+   "L1-01",
+   "L1-11",
+   "L1-18"
+  ],
+  "qualified_n": 3,
+  "final": "REFUSAL",
+  "reason": "llm_unavailable",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R8",
+  "root": "provider transient",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "回答服务暂时不可用，无法生成有依据的回答。已检索到的证据已妥善记录，请稍后再试。"
+ },
+ {
+  "case_id": "H05",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "中国人身保险业经验生命表2025从什么时候开始使用",
+  "category": "high_risk",
+  "retrieved_docs": [
+   "L2-05"
+  ],
+  "qualified_n": 1,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "P02",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "保险销售可回溯资料应当保存多长时间",
+  "category": "product_numeric",
+  "retrieved_docs": [
+   "L1-03",
+   "L1-06",
+   "L1-15"
+  ],
+  "qualified_n": 4,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "P03",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "银行保险机构董事近亲属与机构发生的关联交易要经过什么程序",
+  "category": "product_numeric",
+  "retrieved_docs": [
+   "L1-21"
+  ],
+  "qualified_n": 3,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "P04",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "重疾新规下恶性肿瘤轻度疾病有哪些",
+  "category": "product_numeric",
+  "retrieved_docs": [
+   "L2-02"
+  ],
+  "qualified_n": 1,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "P05",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "不符合2020版定义的重疾产品最迟可以销售到什么时候",
+  "category": "product_numeric",
+  "retrieved_docs": [
+   "L1-06",
+   "L1-12",
+   "L1-16",
+   "L2-01",
+   "L2-03"
+  ],
+  "qualified_n": 3,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "R01",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "我30岁月收入8000元，应该重点买什么保险",
+  "category": "r4_personal",
+  "retrieved_docs": [],
+  "qualified_n": 0,
+  "final": "REFUSAL",
+  "reason": "insufficient_evidence",
+  "viol_kinds": [],
+  "r_class": "R1",
+  "root": "governed path: allowed=0 qual=0",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": ""
+ },
+ {
+  "case_id": "R02",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "孩子刚出生，预算每年3000元，怎么配置重疾险",
+  "category": "r4_personal",
+  "retrieved_docs": [],
+  "qualified_n": 0,
+  "final": "REFUSAL",
+  "reason": "insufficient_evidence",
+  "viol_kinds": [],
+  "r_class": "R1",
+  "root": "governed path: allowed=0 qual=0",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": ""
+ },
+ {
+  "case_id": "R03",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "我有100万房贷，需要多少定期寿险保额",
+  "category": "r4_personal",
+  "retrieved_docs": [
+   "L1-07",
+   "L1-08",
+   "L1-14"
+  ],
+  "qualified_n": 1,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ },
+ {
+  "case_id": "R04",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "父母50岁了买重疾险要注意什么",
+  "category": "r4_personal",
+  "retrieved_docs": [],
+  "qualified_n": 0,
+  "final": "REFUSAL",
+  "reason": "insufficient_evidence",
+  "viol_kinds": [],
+  "r_class": "R1",
+  "root": "governed path: allowed=0 qual=0",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": ""
+ },
+ {
+  "case_id": "R05",
+  "population": "PRODUCTION-LIKE",
+  "source": "prod_shadow(kb-v1,governed)",
+  "query": "网上买的保险和线下买的保险理赔一样吗",
+  "category": "r4_personal",
+  "retrieved_docs": [
+   "L1-04"
+  ],
+  "qualified_n": 1,
+  "final": "REFUSAL",
+  "reason": "citation_gate_rejected",
+  "viol_kinds": [
+   "claim_support"
+  ],
+  "r_class": "R4",
+  "root": "claim-support rejection (no draft kept)",
+  "minimal_answer_test": null,
+  "nomic": null,
+  "bge_exp_doc_rank": null,
+  "draft_head": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。"
+ }
+]

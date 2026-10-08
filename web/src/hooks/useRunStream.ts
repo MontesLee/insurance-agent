@@ -17,6 +17,8 @@ import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { api, ApiError } from "../api/client";
 import type { Run, RuntimeEvent, RunStatus } from "../types/runtime";
 import { isTerminal, runReducer, type RunUiState } from "../state/runReducer";
+import { markFirstContentDelta, markFirstEvent, markTerminal,
+         reportTurn } from "../perf/chatPerf";
 
 const cursorKey = (runId: string) => `webui:lastEventId:${runId}`;
 
@@ -118,6 +120,11 @@ export function useRunStream(runId: string | null): UseRunStream {
       // 3) live tail — only when the run has not finished and the view is open
       if (terminalRef.current || closed || stoppedRef.current) return;
 
+      // EventSource cannot set the Authorization header (browser API
+      // limitation), so the key rides as a ?key= query parameter
+      // (server checks it as an auth fallback — see _identity_dep).
+      // EventSource handles SSE streaming natively (no proxy buffering
+      // issues that fetch+ReadableStream can hit through dev proxies).
       const cursor = loadCursor(runId!);
       const es = new EventSource(api.streamUrl(runId!, cursor ?? undefined));
       esRef.current = es;
@@ -126,9 +133,16 @@ export function useRunStream(runId: string | null): UseRunStream {
         const event = JSON.parse(ev.data) as RuntimeEvent;
         if (event.run_id !== runId) return; // defensive: never mix runs
         if (event.event_id && event.event_id <= (loadCursor(runId!) ?? "")) return; // dedupe durable ids
+        markFirstEvent(); // 28.K.28 perf mark (passive)
+        if (event.event_type === "agent_stream_delta"
+            && (event.data as { kind?: string } | null)?.kind === "content") {
+          markFirstContentDelta();
+        }
         dispatch({ type: "event", event });
         if (event.event_id) saveCursor(runId!, event.event_id);
         if (isTerminal(event)) {
+          markTerminal();
+          reportTurn(runId);
           terminalRef.current = true;
           esRef.current?.close();
           esRef.current = null;
@@ -163,12 +177,16 @@ export function useRunStream(runId: string | null): UseRunStream {
 
 const LIVE = new Set(["queued", "running"]);
 
+/**
+ * Consumer-facing stream error copy (28.E-3): no "Run"/"runtime"/HTTP
+ * internals — the developer console keeps its own wording via useRunMeta.
+ */
 function humanError(e: unknown): string {
   if (e instanceof ApiError) {
-    if (e.status === 404) return "Run 不存在（可能属于已重启的上一个后端会话）。";
-    return `Runtime server error ${e.status}`;
+    if (e.status === 404) return "这轮分析的进度已不可用（服务已重启）。";
+    return "暂时无法连接服务，请稍后再试。";
   }
-  return "无法连接 runtime server。";
+  return "暂时无法连接服务，请稍后再试。";
 }
 
 /**

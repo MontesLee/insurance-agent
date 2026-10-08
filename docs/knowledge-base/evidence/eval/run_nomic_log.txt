@@ -1,0 +1,16 @@
+saved -> D:\Workspace\insurance-agent\docs\knowledge-base\evidence\eval\eval_nomic.json
+{
+ "Recall@1": 0.26,
+ "Recall@5": 0.58,
+ "Recall@10": 0.68,
+ "MRR": 0.3983227533917003,
+ "QualifiedEvidence": "33/50",
+ "QualificationRate": 0.66,
+ "ClaimSupport": "8/18",
+ "ClaimModuleOnly": "8/18",
+ "NegativePass": "6/7",
+ "NegativeFPR": 0.14285714285714285
+}
+self-retrieval identical@1 (expect 1.0, degenerate): 0.94
+self-retrieval prefix64@1/5/10: [0.82, 1.0, 1.0]
+failure matrix: {'DATA_MISSING': 0, 'CHUNKING': 0, 'EMBEDDING': 0, 'RANKING': 27, 'QUALIFICATION': 0, 'NEGATIVE_NOISE': 1, 'UNKNOWN': 0}

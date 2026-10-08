@@ -67,14 +67,36 @@ _FACT_ANCHOR_RE = re.compile(
 _PRODUCT_NOUN_RE = re.compile(r"险|保险|重疾|医疗|寿险|年金|意外")
 _NUM_ANCHOR_RE = re.compile(
     r"(等待期|犹豫期|免赔额|保额|保费|赔付比例|报销比例|投保年龄|续保)"
-    r"[^\d]{0,8}(\d+(?:\.\d+)?)\s*(天|日|万|万元|元|%|岁|周岁)?")
-_BARE_NUM_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(天|日|万|万元|元|%|岁|周岁)")
+    r"[^\d]{0,8}(\d+(?:\.\d+)?)\s*(天|日|万|万元|元|%|岁|周岁|月|年|次|折|倍)?")
+_BARE_NUM_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*(天|日|万|万元|元|%|岁|周岁|月|年|次|折|倍)")
+# FIX-3 baseline debt (OD-FIX3-2): explicit RANGE tokens — a claim range
+# is only supported by range CONTAINMENT, never by shared edge values
+# ("5-10倍" is not supported by evidence "3-5倍" even though 5 matches).
+_RANGE_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*[-–~]\s*(\d+(?:\.\d+)?)\s*"
+    r"(天|日|万|万元|元|%|岁|周岁|月|年|次|折|倍)")
+# FIX-3 baseline debt (OD-FIX3-2C): product NAME candidates — a claim
+# naming a specific 险-type product cannot be supported by evidence
+# bound to a DIFFERENT product (F5-08/N4-3 family; uses the existing
+# identity contract — no catalog redesign). The regex matches the
+# SUFFIX only; prefix variants are built from the preceding chars.
+_PRODUCT_NAME_RE = re.compile(
+    r"(?:重疾险|医疗险|寿险|意外险|年金险|护理险|防癌险|团险)")
+_LABEL_RANGE_RE_FMT = (
+    r"(%s)[^\d]{0,8}(\d+(?:\.\d+)?)\s*[-–~]\s*(\d+(?:\.\d+)?)")
 _CLAUSE_SPLIT_RE = re.compile(r"[，,、；;]|而且|并且|同时|另外|此外")
 _EV_ANCHOR_RE = re.compile(
     r"(等待期|犹豫期|免赔额|保额|保费|赔付比例|报销比例|投保年龄|续保)"
     r"[^\d]{0,8}(\d+(?:\.\d+)?)")
 _CITATION_RE = re.compile(r"\[E\d+\]")
 _UNIT_NORM = {"日": "天", "万元": "万", "天/年": "天"}
+# FIX-3 baseline debt (OD-FIX3-2D): FULL-DATE tokens are matched as a
+# unit — the FIX2 digit-boundary regex would otherwise reject "2019年"
+# inside "2019年12月1日" (year followed by month digits). A claim date
+# is supported only by the SAME full date; any swapped component
+# (2025年12月1日 vs 2019年…) stays unsupported.
+_FULL_DATE_RE = re.compile(r"(\d{4})年(\d{1,2})月(\d{1,2})日")
 _STOP_BIGRAMS = {"的了", "和与", "及或", "在对", "由为", "是有", "一般",
                  "通常", "可能", "需要", "应该", "可以", "投保", "产品",
                  "保险", "条款", "规定", "事项", "适用", "关于", "有关",
@@ -92,6 +114,79 @@ def enabled(rules: Optional[dict] = None) -> bool:
         from runtime.grounding import gate as ggate
         rules = ggate.load_rules()
     return bool(((rules.get("claim_support") or {}).get("enabled", True)))
+
+
+def _flag_on(env_name: str, rules: Optional[dict], key: str) -> bool:
+    """FIX-3 staged flag (OD-FIX3-1; same pattern as enabled()): env
+    wins over rules; rules default OFF. Independent per-lever rollback."""
+    env = str(os.environ.get(env_name, "")).strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    if rules is None or "claim_support" not in (rules or {}):
+        from runtime.grounding import gate as ggate
+        rules = ggate.load_rules()
+    cs = (rules or {}).get("claim_support") or {}
+    return bool(((cs.get(key) or {}).get("enabled", False)))
+
+
+# FIX-3 B (OD-FIX3-1): guarded guidance exemption patterns — code
+# defaults are the K.29-C replay-frozen regexes (zero new escape on the
+# frozen attack surface); rules may override via exemption_v2.patterns.
+_EXEMPT_META_DEFAULT = (
+    r"证据|资料|未提及|未载明|未给出|未提供|没有.{0,6}(记载|明确)|"
+    r"无法.{0,8}(给出|基于)|未记载|未规定|未单独|未专门|未覆盖|未说明|仅有标题")
+_EXEMPT_GUIDE_DEFAULT = (
+    r"建议|应该|可以考虑|先.{1,8}再|一般建议|通常建议|优先|"
+    r"需要.{0,6}(考虑|注意)|通读|如实|咨询|查阅|阅读")
+_EXEMPT_HIGH_RISK_DEFAULT = (
+    r"P0\d{2}|demo-|这款|该产品|某产品|保险法|管理办法|监管|银保监|"
+    r"令第|施行|保证.{0,6}(续保|赔付|返还)|承诺")
+
+
+def _exemption_patterns(rules: dict) -> dict:
+    p = (((rules.get("claim_support") or {}).get("exemption_v2") or {})
+         .get("patterns") or {})
+    return {
+        "meta": re.compile(p.get("meta", _EXEMPT_META_DEFAULT)),
+        "guidance": re.compile(p.get("guidance", _EXEMPT_GUIDE_DEFAULT)),
+        "high_risk": re.compile(
+            p.get("high_risk", _EXEMPT_HIGH_RISK_DEFAULT)),
+    }
+
+
+def _guarded_guidance(text: str, anchors: list, patterns: dict) -> bool:
+    """FIX-3 B whitelist: evidence-absence prose is exempt only with NO
+    numeric anchor and NO bare number; general guidance additionally
+    requires no high-risk token. Anything numeric/product/regulatory/
+    payout stays on the full C-FACT path (INV-1; probe-hardened against
+    '建议…因为等待期只有90天' / '建议保额3-5倍' wrappers)."""
+    if patterns["meta"].search(text):
+        return not anchors and not _BARE_NUM_RE.search(text)
+    if patterns["guidance"].search(text):
+        return (not anchors and not _BARE_NUM_RE.search(text)
+                and not patterns["high_risk"].search(text))
+    return False
+
+
+_TYPICAL_VALUE_RE = re.compile(r"通常|一般|常见|普遍|行业")
+
+
+def _premise_scan_applies(claim_text: str, claim_type: str,
+                          anchors: list) -> bool:
+    """FIX-3 D scope: C-RECOMMENDATION / C-UNCERTAIN clauses carrying a
+    numeric premise, plus C-CALCULATION clauses that assert a TYPICAL
+    value ('保额通常为10倍') rather than compute from user inputs —
+    the latter stay exempt (computation on user numbers is out of
+    scope by design; OD-FIX3-2B unit/multiplier debt closed for the
+    typical-value shape)."""
+    if claim_type in (C_RECOMMENDATION, C_UNCERTAIN):
+        return bool(anchors) or bool(_BARE_NUM_RE.search(
+            _CITATION_RE.sub("", claim_text)))
+    if claim_type == C_CALCULATION:
+        return _TYPICAL_VALUE_RE.search(claim_text) is not None
+    return False
 
 
 def classify_claim(text: str) -> str:
@@ -221,7 +316,31 @@ def _product_ok(claim: str, item: dict) -> bool:
         return not item.get("product_id") or item["product_id"] in pid_ids
     cp = _claim_product(claim)
     if cp is None:
-        return True
+        # FIX-3 baseline debt (OD-FIX3-2C): catalog-unresolvable product
+        # NAME candidates against a product-BOUND evidence item. For
+        # each 险-type suffix occurrence, progressive prefix variants
+        # (suffix alone up to 6 preceding chars) are tried — a single
+        # greedy regex would capture sentence words ('因为重疾险'). A
+        # claim naming a specific product cannot be supported by an
+        # item that mentions NONE of the variants; generic anaphora
+        # (该产品/这款) carries no suffix and stays unconstrained.
+        if not item.get("product_id"):
+            return True
+        had_suffix = bool(_PRODUCT_NAME_RE.search(claim))
+        if not had_suffix:
+            return True
+        identity = " ".join([
+            str(item.get("product_id") or ""),
+            str(item.get("document_name") or ""),
+            str(item.get("source_name") or ""),
+            item.get("content") or ""])
+        for m in _PRODUCT_NAME_RE.finditer(claim):
+            start, end = m.start(), m.end()
+            for k in range(0, 7):          # progressive prefix variants
+                cand = claim[max(0, start - k):end]
+                if len(cand) >= 3 and cand in identity:
+                    return True
+        return False
     product = cp.get("product") or cp
     doc = str(item.get("document_id") or "")
     if doc:
@@ -240,15 +359,62 @@ def _product_ok(claim: str, item: dict) -> bool:
 
 
 def _value_found(value: str, unit: str, text: str) -> bool:
-    if not unit:
-        return value in text
-    if value + unit in text:
-        return True
-    return unit == "万" and (value + "万元" in text)
+    """K.28-II-FIX2 (P2-3): BOUNDARY-AWARE numeric matching — a short
+    numeric token must never match inside a longer one ("0元" ⊄
+    "10000元"; "1000" ⊄ "10000"). The char before the value must not
+    be a digit, and the char after the full token (value+unit, with
+    the FIX1-era 万/万元 variant kept) must not be a digit. Exact
+    matches keep working ("90天" in "等待期为90天。")."""
+    variants = [unit] if unit else [""]
+    if unit == "万":
+        variants.append("万元")
+    for v in variants:
+        pat = r"(?<!\d)" + re.escape(value) + (re.escape(v) if v else "")               + r"(?!\d)"
+        if re.search(pat, text):
+            return True
+    return False
 
 
 def _norm_unit(u: str) -> str:
     return _UNIT_NORM.get(u, u)
+
+
+def _range_supported(a: str, b: str, unit: str, items: list) -> bool:
+    """FIX-3 range containment: claim range [a,b] is supported only by
+    an evidence range [x,y] with the SAME normalized unit such that
+    a >= x and b <= y. Shared edge values never suffice."""
+    ua, ub = float(a), float(b)
+    for it in items:
+        for m in _RANGE_RE.finditer(it.get("content") or ""):
+            x, y, u = float(m.group(1)), float(m.group(2)), m.group(3)
+            if _norm_unit(u) == _norm_unit(unit) and x <= ua and ub <= y:
+                return True
+    return False
+
+
+def _value_in_ev_range(value: str, unit: str, items: list) -> bool:
+    """FIX-3 range relation (converse direction): a single claim value
+    is supported by an evidence RANGE of the same unit that contains
+    it ('4倍' inside '3-5倍') — completing the range-boundary relation
+    without over-blocking legitimate in-range statements."""
+    v = float(value)
+    for it in items:
+        for m in _RANGE_RE.finditer(it.get("content") or ""):
+            x, y, u = float(m.group(1)), float(m.group(2)), m.group(3)
+            if _norm_unit(u) == _norm_unit(unit) and x <= v <= y:
+                return True
+    return False
+
+
+def _anchor_in_claim_range(value: str, unit: str, claim_text: str) -> bool:
+    """True when this anchor value is an EDGE of a range stated in the
+    claim itself — such anchors are judged by containment, not by
+    value-presence (the FIX-3 range bypass closure)."""
+    for m in _RANGE_RE.finditer(claim_text):
+        if _norm_unit(m.group(3)) == _norm_unit(unit) and value in (
+                m.group(1), m.group(2)):
+            return True
+    return False
 
 
 def judge_claim(claim_text: str, claim_type: str, anchors: list,
@@ -292,16 +458,50 @@ def judge_claim(claim_text: str, claim_type: str, anchors: list,
                         label, sorted(vals)), "violations": [
                         "claim_support:contradicted:%s" % label]}
         if len(vals) == 1 and value not in vals:
-            return {"support_status": CONTRADICTED,
-                    "support_type": "CONTRADICTORY",
-                    "support_reason": "claim %s=%s vs evidence %s=%s" % (
-                        label, value, label, sorted(vals)[0]),
-                    "violations": [
-                        "claim_support:contradicted:%s" % label]}
+            # FIX-3A: a labelled evidence RANGE containing the claim
+            # value is not a conflict ("保额…3-5倍" vs claim 保额=4)
+            lab_range = re.compile(
+                _LABEL_RANGE_RE_FMT % re.escape(label))
+            in_range = any(
+                float(x) <= float(value) <= float(y)
+                for it in usable
+                for _m in lab_range.finditer(it.get("content") or "")
+                for x, y in [(_m.group(2), _m.group(3))])
+            if not in_range:
+                return {"support_status": CONTRADICTED,
+                        "support_type": "CONTRADICTORY",
+                        "support_reason": "claim %s=%s vs evidence %s=%s" % (
+                            label, value, label, sorted(vals)[0]),
+                        "violations": [
+                            "claim_support:contradicted:%s" % label]}
     if anchors:
-        covered = [any(_value_found(v, _norm_unit(u), it.get("content")
-                                   or "") for it in usable)
-                   for _l, v, u in anchors]
+        claim_dates = _FULL_DATE_RE.findall(claim_text)
+        claim_date_strs = [m.group(0) for m in
+                           _FULL_DATE_RE.finditer(claim_text)]
+        covered = []
+        for _l, v, u in anchors:
+            # FIX-3D: date components are covered only by the SAME
+            # full date string in the evidence
+            if u in ("年", "月", "日") and any(
+                    v in d for d in claim_dates):
+                covered.append(any(
+                    ds in (it.get("content") or "")
+                    for it in usable for ds in claim_date_strs))
+                continue
+            rng = None
+            for m in _RANGE_RE.finditer(claim_text):
+                if v in (m.group(1), m.group(2)):
+                    rng = m
+                    break
+            if rng is not None:
+                # FIX-3A: range-edge anchor -> containment judgment
+                covered.append(_range_supported(
+                    rng.group(1), rng.group(2), rng.group(3), usable))
+                continue
+            covered.append(any(
+                _value_found(v, _norm_unit(u), it.get("content") or "")
+                for it in usable)
+                or _value_in_ev_range(v, u, usable))
         if all(covered):
             st, ty = SUPPORTED, "DIRECT"
         elif any(covered):
@@ -338,23 +538,52 @@ def judge_claim(claim_text: str, claim_type: str, anchors: list,
 def check(text: str, evidence: list, rules: Optional[dict] = None) -> dict:
     """GATE-shaped verdict for the loop: every C-FACT claim must be
     SUPPORTED; PARTIAL/UNSUPPORTED/CONTRADICTED fail (regenerate via
-    the existing loop, then refuse — B+C policy). Disabled → ok."""
+    the existing loop, then refuse — B+C policy). Disabled → ok.
+
+    FIX-3 (OD-FIX3-1, staged default-OFF, independent rollback):
+      exemption_v2 (B) — guarded guidance/evidence-absence clauses are
+        exempt from the support requirement (whitelist only; hard
+        safety classes terminal by construction of the guards);
+      premise_scan (D) — C-RECOMMENDATION/C-UNCERTAIN clauses carrying
+        a numeric premise are re-judged under full C-FACT rules (the
+        premise must be SUPPORTED; the whole clause fails closed).
+    Both OFF → behavior byte-identical to the pre-FIX-3 rule (locked
+    by test)."""
     if not enabled(rules):
         return {"ok": True, "violations": [], "claims": []}
     if rules is None or "gate" not in (rules or {}):
         from runtime.grounding import gate as ggate
         rules = ggate.load_rules()
+    exemption_on = _flag_on("EXEMPTION_V2_ENABLED", rules, "exemption_v2")
+    premise_on = _flag_on("PREMISE_SCAN_ENABLED", rules, "premise_scan")
+    patterns = _exemption_patterns(rules)
     items = _items_from_evidence(evidence)
     rows, violations = [], []
     for c in split_claims(text, rules):
-        j = judge_claim(c["claim_text"], c["claim_type"], c["anchors"],
-                        items)
+        ctype = c["claim_type"]
+        # ---- FIX-3 D: numeric-premise scan (before the type exemption
+        # can apply — the premise cannot be bypassed by phrasing)
+        if (premise_on and _premise_scan_applies(
+                c["claim_text"], ctype, c["anchors"])):
+            j = judge_claim(c["claim_text"], C_FACT, c["anchors"], items)
+            rows.append({"claim_text": c["claim_text"],
+                         "claim_type": ctype,
+                         "support_status": j["support_status"],
+                         "support_type": j["support_type"] + "+PREMISE",
+                         "support_reason": j["support_reason"]})
+            violations.extend(j["violations"])
+            continue
+        j = judge_claim(c["claim_text"], ctype, c["anchors"], items)
+        exempt = (exemption_on and ctype == C_FACT and _guarded_guidance(
+            _CITATION_RE.sub("", c["claim_text"]), c["anchors"], patterns))
         rows.append({"claim_text": c["claim_text"],
-                     "claim_type": c["claim_type"],
+                     "claim_type": ctype,
                      "support_status": j["support_status"],
                      "support_type": j["support_type"],
-                     "support_reason": j["support_reason"]})
-        violations.extend(j["violations"])
+                     "support_reason": j["support_reason"],
+                     **({"exempt": "guidance-v2"} if exempt else {})})
+        if not exempt:
+            violations.extend(j["violations"])
     return {"ok": not violations, "violations": violations[:10],
             "claims": rows}
 

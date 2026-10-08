@@ -12,7 +12,7 @@
   },
 
   "purpose_query_suffix": {
-    "SOLUTION_VALIDATION": "适用性 策略验证",
+    "SOLUTION_VALIDATION": "",
     "PRODUCT_VALIDATION": "产品责任 对比",
     "POLICY_FACT": "条款 约定",
     "MEDICAL_FACT": "医学 定义",
@@ -42,6 +42,7 @@
 
   "notes": {
     "specificity": "Query specificity comes from (domain, purpose), not from caller free-text. This keeps retrieval deterministic and prevents query injection.",
+    "k7_calibration": "28.K.7 (S-2): SOLUTION_VALIDATION suffix cleared ('适用性 策略验证' -> ''). Live evidence: the suffix pushed the deterministic template past the governed corpus's match threshold — multi-product plans (solution_type=None -> general domain) retrieved 0 evidence with the suffix and 2 without; the single-domain templates (medical/critical_illness/life) retrieve with OR without it. Determinism/anti-injection unchanged: queries remain template-generated per (domain, purpose). accident/savings domain corpus gaps are NOT covered by this calibration (fail-closed remains correct there; corpus expansion is an owner decision).",
     "traceability": "The requesting artifact is recorded in related_artifact_ids (gap_id / solution_id), never by stuffing its text into the query."
   }
 }

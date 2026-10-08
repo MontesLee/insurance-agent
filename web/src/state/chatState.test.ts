@@ -7,6 +7,7 @@ import {
   makeChat,
   mapPromptToCase,
   saveChats,
+  seedChats,
 } from "./chatState";
 
 beforeEach(() => {
@@ -99,10 +100,21 @@ describe("chats reducer", () => {
 });
 
 describe("local persistence (V0.1, backend-shaped envelope)", () => {
-  it("seeds demo conversations on first load", () => {
-    const seeded = loadChats();
-    expect(seeded.length).toBeGreaterThanOrEqual(3);
-    expect(seeded[0]!.title.length).toBeGreaterThan(0);
+  it("B-03: a NEW consumer gets an EMPTY list — never fabricated history", () => {
+    localStorage.removeItem("webui:chats:v1");
+    expect(loadChats()).toEqual([]);
+  });
+  it("B-03: corrupted storage also yields an EMPTY list (no demo fallback)", () => {
+    localStorage.setItem("webui:chats:v1", "{not json");
+    expect(loadChats()).toEqual([]);
+  });
+  it("seedChats remains exported as a demo capability, outside the consumer path", () => {
+    // Developer/demo surfaces may still build demo transcripts from this
+    // helper; the CONSUMER loader (loadChats) must never call it.
+    const demo = seedChats();
+    expect(demo.length).toBeGreaterThanOrEqual(3);
+    const src = loadChats.toString();
+    expect(src.includes("seedChats")).toBe(false);
   });
   it("round-trips through the versioned envelope", () => {
     const c = makeChat();
@@ -111,9 +123,5 @@ describe("local persistence (V0.1, backend-shaped envelope)", () => {
     const loaded = loadChats();
     expect(loaded).toHaveLength(1);
     expect(loaded[0]!.messages[0]).toMatchObject({ kind: "user", text: "round trip" });
-  });
-  it("falls back to seeds on corrupted storage", () => {
-    localStorage.setItem("webui:chats:v1", "{not json");
-    expect(loadChats().length).toBeGreaterThanOrEqual(3);
   });
 });

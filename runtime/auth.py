@@ -11,7 +11,9 @@ Design:
   `INSURANCE_AGENT_API_KEYS` (comma-separated `key:role:user` entries) or
   a keys file `INSURANCE_AGENT_API_KEYS_FILE` (one `key:role:user` per
   line). Roles: `OWNER` (everything), `REVIEWER` (read + approve/reject),
-  `OPERATOR` (read + run/control). Requests authenticate with
+  `OPERATOR` (read + run/control), `CONSUMER` (28.G: an authenticated
+  CONSUMER subject — access ONLY to objects it owns; ownership lives on
+  the objects, NEVER on this role). Requests authenticate with
   `Authorization: Bearer <key>`.
 * Authorization — endpoint classes declare a minimum role; the
   authenticated identity (never the request body) becomes the actor.
@@ -29,8 +31,10 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-ROLES = ("OWNER", "REVIEWER", "OPERATOR")
-_ROLE_RANK = {"OPERATOR": 1, "REVIEWER": 2, "OWNER": 3}
+ROLES = ("OWNER", "REVIEWER", "OPERATOR", "CONSUMER")
+# rank order preserved (REVIEWER ⊇ OPERATOR ⊇ …); CONSUMER sits below
+# every internal role — it passes no internal gate (28.G G-B02-10)
+_ROLE_RANK = {"CONSUMER": 1, "OPERATOR": 2, "REVIEWER": 3, "OWNER": 4}
 
 
 class Identity:

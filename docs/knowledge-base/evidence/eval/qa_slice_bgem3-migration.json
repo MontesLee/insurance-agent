@@ -1,0 +1,2119 @@
+{
+ "ran_at": "2026-10-05T02:27:04",
+ "kb": "insurance-kb-v1",
+ "kb_id": "44af9ff2-ecef-445e-87c6-cb1458cd4d44",
+ "arm": "bgem3-migration",
+ "model": "glm-5.3-flash",
+ "cases": [
+  {
+   "case_id": "RB-L1-001",
+   "query": "保险公司注册资本的最低限额是多少",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-01",
+     "rank": 1,
+     "score": 0.01639
+    },
+    {
+     "doc": "L1-07",
+     "rank": 2,
+     "score": 0.01587
+    },
+    {
+     "doc": "L1-09",
+     "rank": 3,
+     "score": 0.01558
+    },
+    {
+     "doc": "L1-08",
+     "rank": 4,
+     "score": 0.01555
+    },
+    {
+     "doc": "L1-01",
+     "rank": 5,
+     "score": 0.01513
+    },
+    {
+     "doc": "L1-09",
+     "rank": 6,
+     "score": 0.01426
+    },
+    {
+     "doc": "L1-22",
+     "rank": 7,
+     "score": 0.0142
+    },
+    {
+     "doc": "L1-11",
+     "rank": 8,
+     "score": 0.01297
+    },
+    {
+     "doc": "L1-20",
+     "rank": 9,
+     "score": 0.01286
+    },
+    {
+     "doc": "L1-16",
+     "rank": 10,
+     "score": 0.01202
+    }
+   ],
+   "retrieval_ms": 951,
+   "qualified": [
+    "L1-01",
+    "L1-07",
+    "L1-08",
+    "L1-09",
+    "L1-11",
+    "L1-16",
+    "L1-20",
+    "L1-22"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 28.0
+   },
+   "raw_answer": "设立保险公司的注册资本最低限额为人民币二亿元[E1]。保险公司的注册资本必须为实缴货币资本[E1]。国务院保险监督管理机构可以根据保险公司的业务范围、经营规模调整该最低限额，但不得低于人民币二亿元[E1]。另外，保险公司以2亿元最低资本金额设立的，在其住所地以外的每一省、自治区、直辖市首次申请设立分公司，应当增加不少于人民币2千万元的注册资本[E6]。保险公司注册资本达到人民币5亿元且偿付能力充足的，设立分公司不需要增加注册资本[E6]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-L1-017",
+   "query": "保险公司设立分支机构需要经过什么程序",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-18",
+     "rank": 1,
+     "score": 0.01621
+    },
+    {
+     "doc": "L1-01",
+     "rank": 2,
+     "score": 0.01553
+    },
+    {
+     "doc": "L1-09",
+     "rank": 3,
+     "score": 0.01521
+    },
+    {
+     "doc": "L1-09",
+     "rank": 4,
+     "score": 0.01438
+    },
+    {
+     "doc": "L1-09",
+     "rank": 5,
+     "score": 0.01225
+    },
+    {
+     "doc": "L1-09",
+     "rank": 6,
+     "score": 0.01219
+    },
+    {
+     "doc": "L1-07",
+     "rank": 7,
+     "score": 0.01178
+    },
+    {
+     "doc": "L1-08",
+     "rank": 8,
+     "score": 0.01163
+    },
+    {
+     "doc": "L1-09",
+     "rank": 9,
+     "score": 0.01148
+    },
+    {
+     "doc": "L1-22",
+     "rank": 10,
+     "score": 0.00882
+    }
+   ],
+   "retrieval_ms": 517,
+   "qualified": [
+    "L1-01",
+    "L1-07",
+    "L1-08",
+    "L1-09",
+    "L1-18",
+    "L1-22"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 89.2
+   },
+   "raw_answer": "保险公司在境内设立分支机构，应当经保险监督管理机构批准[E2]。分支机构设立分为筹建、开业两个阶段[E1]。筹建阶段，申请人应提交筹建申请书等材料，由保险公司或其上级管理机构向银保监会或其派出机构提出申请，监管机构自受理之日起三十日内审查，对符合规定的发出筹建通知书[E1]。申请人应自收到筹建通知书起六个月内完成筹建，筹建期间不得从事任何保险经营活动[E1]。筹建完成后，申请人向拟设地银保监会派出机构提交开业验收报告，派出机构自收到完整报告之日起三十日内作出批准或不予批准的决定，批准开业的颁发保险许可证[E1]。经批准设立的分支机构，应向市场监督管理部门办理登记注册手续，领取营业执照后方可营业[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-L1-007",
+   "query": "长期健康保险产品的犹豫期不得少于多少天",
+   "intent": {
+    "intent_id": "insurance_qa",
+    "confidence": 1.0,
+    "clarify": false,
+    "reasons": [
+     "rule:qa:犹豫期"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-04",
+     "rank": 1,
+     "score": 0.01631
+    },
+    {
+     "doc": "L1-13",
+     "rank": 2,
+     "score": 0.01443
+    },
+    {
+     "doc": "L1-04",
+     "rank": 3,
+     "score": 0.01409
+    },
+    {
+     "doc": "L2-03",
+     "rank": 4,
+     "score": 0.01169
+    },
+    {
+     "doc": "L1-07",
+     "rank": 5,
+     "score": 0.01065
+    },
+    {
+     "doc": "L1-05",
+     "rank": 6,
+     "score": 0.01048
+    },
+    {
+     "doc": "L1-02",
+     "rank": 7,
+     "score": 0.01011
+    },
+    {
+     "doc": "L1-06",
+     "rank": 8,
+     "score": 0.00989
+    },
+    {
+     "doc": "L2-02",
+     "rank": 9,
+     "score": 0.00969
+    },
+    {
+     "doc": "L2-01",
+     "rank": 10,
+     "score": 0.00951
+    }
+   ],
+   "retrieval_ms": 693,
+   "qualified": [
+    "L1-02",
+    "L1-04",
+    "L1-05",
+    "L1-06",
+    "L1-07",
+    "L1-13",
+    "L2-01",
+    "L2-02",
+    "L2-03"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 1,
+    "elapsed_s": 8.6
+   },
+   "raw_answer": "根据《健康保险管理办法》，长期健康保险产品的犹豫期不得少于15天[E1]。长期健康保险产品应当设置合同犹豫期，并在保险条款中列明投保人在犹豫期内的权利[E1]。",
+   "raw_viol_kinds": [],
+   "raw_violations": [],
+   "cited": [
+    "E1"
+   ],
+   "claims": [
+    {
+     "claim": "根据《健康保险管理办法》",
+     "claim_type": "C-FACT",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "长期健康保险产品的犹豫期不得少于15天[E1]",
+     "claim_type": "C-FACT",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "长期健康保险产品应当设置合同犹豫期",
+     "claim_type": "C-FACT",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "并在保险条款中列明投保人在犹豫期内的权利[E1]",
+     "claim_type": "C-FACT",
+     "support": "SUPPORTED"
+    }
+   ],
+   "final_answer": "根据《健康保险管理办法》，长期健康保险产品的犹豫期不得少于15天[E1]。长期健康保险产品应当设置合同犹豫期，并在保险条款中列明投保人在犹豫期内的权利[E1]。",
+   "final_decision": "ANSWER",
+   "failure_reason": null
+  },
+  {
+   "case_id": "RB-L2-001",
+   "query": "2020版重疾规范规定必须包含哪三种轻度疾病",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L2-03",
+     "rank": 1,
+     "score": 0.01605
+    },
+    {
+     "doc": "L2-01",
+     "rank": 2,
+     "score": 0.01589
+    },
+    {
+     "doc": "L2-01",
+     "rank": 3,
+     "score": 0.01578
+    },
+    {
+     "doc": "L2-02",
+     "rank": 4,
+     "score": 0.01534
+    },
+    {
+     "doc": "L2-01",
+     "rank": 5,
+     "score": 0.01306
+    },
+    {
+     "doc": "L1-04",
+     "rank": 6,
+     "score": 0.01189
+    },
+    {
+     "doc": "L2-02",
+     "rank": 7,
+     "score": 0.01173
+    },
+    {
+     "doc": "L1-04",
+     "rank": 8,
+     "score": 0.01151
+    },
+    {
+     "doc": "L1-04",
+     "rank": 9,
+     "score": 0.01142
+    },
+    {
+     "doc": "L1-14",
+     "rank": 10,
+     "score": 0.0106
+    }
+   ],
+   "retrieval_ms": 667,
+   "qualified": [
+    "L1-04",
+    "L1-14",
+    "L2-01",
+    "L2-02",
+    "L2-03"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 38.5
+   },
+   "raw_answer": "根据《重大疾病保险的疾病定义使用规范（2020年修订版）》，重大疾病保险产品若还保障保险金额低于六种重度疾病的其他疾病，则还应当包括规范内的三种轻度疾病[E3]。这三种轻度疾病为恶性肿瘤——轻度、较轻急性心肌梗死和轻度脑中风后遗症[E3]。规范对这三种轻度疾病均列有具体的疾病定义[E4]。同时，所包含的每种轻度疾病累计保险金额分别不应高于相应重度疾病累计保险金额的30%[E3]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-L1-009",
+   "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-05",
+     "rank": 1,
+     "score": 0.01609
+    },
+    {
+     "doc": "L1-03",
+     "rank": 2,
+     "score": 0.01415
+    },
+    {
+     "doc": "L1-06",
+     "rank": 3,
+     "score": 0.0132
+    },
+    {
+     "doc": "L1-17",
+     "rank": 4,
+     "score": 0.0126
+    },
+    {
+     "doc": "L1-15",
+     "rank": 5,
+     "score": 0.01255
+    },
+    {
+     "doc": "L1-04",
+     "rank": 6,
+     "score": 0.01235
+    },
+    {
+     "doc": "L1-13",
+     "rank": 7,
+     "score": 0.01222
+    },
+    {
+     "doc": "L1-02",
+     "rank": 8,
+     "score": 0.01192
+    },
+    {
+     "doc": "L1-14",
+     "rank": 9,
+     "score": 0.0113
+    },
+    {
+     "doc": "L1-06",
+     "rank": 10,
+     "score": 0.01104
+    }
+   ],
+   "retrieval_ms": 554,
+   "qualified": [
+    "L1-02",
+    "L1-03",
+    "L1-04",
+    "L1-05",
+    "L1-06",
+    "L1-13",
+    "L1-14",
+    "L1-15",
+    "L1-17"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 38.3
+   },
+   "raw_answer": "根据《人身保险产品信息披露管理办法》，保险公司应当根据保险产品审批或备案材料报送内容披露保险产品信息[E1]。应披露的材料包括保险产品目录、保险产品条款以及保险产品费率表[E1]。一年期以上的人身保险产品现金价值全表和一年期以上的人身保险产品说明书亦在应披露之列[E1]。银保监会规定的其他应当披露的产品材料信息也属于披露范围[E1]。保险公司销售一年期以上的人身保险产品，应当在销售过程中以纸质或电子形式向投保人提供产品说明书[E1]。订立保险合同采用格式条款的，保险公司向投保人提供的投保单应当附格式条款及条款查询方式[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-L1-027",
+   "query": "人身保险公司的保险条款和保险费率需要审批还是备案",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-14",
+     "rank": 1,
+     "score": 0.01639
+    },
+    {
+     "doc": "L1-14",
+     "rank": 2,
+     "score": 0.01508
+    },
+    {
+     "doc": "L1-14",
+     "rank": 3,
+     "score": 0.01499
+    },
+    {
+     "doc": "L1-01",
+     "rank": 4,
+     "score": 0.01376
+    },
+    {
+     "doc": "L1-16",
+     "rank": 5,
+     "score": 0.01375
+    },
+    {
+     "doc": "L1-02",
+     "rank": 6,
+     "score": 0.01195
+    },
+    {
+     "doc": "L1-16",
+     "rank": 7,
+     "score": 0.01158
+    },
+    {
+     "doc": "L1-13",
+     "rank": 8,
+     "score": 0.01129
+    },
+    {
+     "doc": "L1-04",
+     "rank": 9,
+     "score": 0.01115
+    },
+    {
+     "doc": "L1-04",
+     "rank": 10,
+     "score": 0.0111
+    }
+   ],
+   "retrieval_ms": 645,
+   "qualified": [
+    "L1-01",
+    "L1-02",
+    "L1-04",
+    "L1-13",
+    "L1-14",
+    "L1-16"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 70.0
+   },
+   "raw_answer": "人身保险公司的保险条款和保险费率由保险公司总公司报送中国保监会审批或者备案[E1]。关系社会公众利益的保险险种、依法实行强制保险的险种、中国保监会规定的新开发人寿保险险种以及中国保监会规定的其他险种，应当在使用前报送中国保监会审批[E1]。前述规定以外的其他险种，应当报送中国保监会备案[E1]。《保险法》也规定，关系社会公众利益的保险险种、依法实行强制保险的险种和新开发的人寿保险险种的保险条款和保险费率，应当报国务院保险监督管理机构批准[E4]。其他保险险种的保险条款和保险费率，应当报保险监督管理机构备案[E4]。报送备案的，不得迟于使用后10日[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-L1-019",
+   "query": "保险保障基金由谁缴纳、按什么缴纳",
+   "intent": {
+    "intent_id": "insurance_qa",
+    "confidence": 1.0,
+    "clarify": false,
+    "reasons": [
+     "rule:qa:question_form"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-10",
+     "rank": 1,
+     "score": 0.01609
+    },
+    {
+     "doc": "L1-01",
+     "rank": 2,
+     "score": 0.01286
+    },
+    {
+     "doc": "L1-01",
+     "rank": 3,
+     "score": 0.00997
+    },
+    {
+     "doc": "L1-07",
+     "rank": 4,
+     "score": 0.00943
+    },
+    {
+     "doc": "L1-05",
+     "rank": 5,
+     "score": 0.00941
+    },
+    {
+     "doc": "L1-14",
+     "rank": 6,
+     "score": 0.00937
+    },
+    {
+     "doc": "L1-01",
+     "rank": 7,
+     "score": 0.00871
+    },
+    {
+     "doc": "L1-16",
+     "rank": 8,
+     "score": 0.00865
+    },
+    {
+     "doc": "L1-04",
+     "rank": 9,
+     "score": 0.0085
+    },
+    {
+     "doc": "L1-08",
+     "rank": 10,
+     "score": 0.0082
+    }
+   ],
+   "retrieval_ms": 624,
+   "qualified": [
+    "L1-01",
+    "L1-10"
+   ],
+   "qualified_n": 2,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 25.3
+   },
+   "raw_answer": "根据《保险保障基金管理办法》，保险保障基金由境内保险公司依法缴纳[E1]。其中，财产保险保障基金由财产保险公司缴纳形成[E1]。人身保险保障基金由人身保险公司缴纳形成[E1]。缴费费率由基准费率和风险差别费率构成[E1]。保险公司应当及时、足额将保险保障基金缴纳到保险保障基金公司的专门账户[E1]。此外，境外直接保险业务、再保险分入业务等不属于救助范围的业务不缴纳保险保障基金[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-L1-023",
+   "query": "银行保险机构收到消费投诉后多久作出处理决定",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-12",
+     "rank": 1,
+     "score": 0.01639
+    },
+    {
+     "doc": "L1-14",
+     "rank": 2,
+     "score": 0.01339
+    },
+    {
+     "doc": "L1-13",
+     "rank": 3,
+     "score": 0.01182
+    },
+    {
+     "doc": "L1-22",
+     "rank": 4,
+     "score": 0.01117
+    },
+    {
+     "doc": "L1-21",
+     "rank": 5,
+     "score": 0.01064
+    },
+    {
+     "doc": "L1-01",
+     "rank": 6,
+     "score": 0.0104
+    },
+    {
+     "doc": "L1-22",
+     "rank": 7,
+     "score": 0.01033
+    },
+    {
+     "doc": "L1-18",
+     "rank": 8,
+     "score": 0.01013
+    },
+    {
+     "doc": "L1-21",
+     "rank": 9,
+     "score": 0.01008
+    },
+    {
+     "doc": "L1-09",
+     "rank": 10,
+     "score": 0.0099
+    }
+   ],
+   "retrieval_ms": 638,
+   "qualified": [
+    "L1-01",
+    "L1-09",
+    "L1-12",
+    "L1-13",
+    "L1-14",
+    "L1-18",
+    "L1-21",
+    "L1-22"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 28.6
+   },
+   "raw_answer": "根据《银行业保险业消费投诉处理管理办法》，对于事实清楚、争议情况简单的消费投诉，银行保险机构应当自收到消费投诉之日起15日内作出处理决定并告知投诉人[E1]。情况复杂的，可以延长至30日[E1]。情况特别复杂或者有其他特殊原因的，经其上级机构或者总行、总公司高级管理人员审批并告知投诉人，可以再延长30日[E1]。消费投诉处理过程中需外部机构进行鉴定、检测、评估等工作的，相关期间可以不计入消费投诉处理期限，但应当及时告知投诉人[E1]。本办法中除“7个工作日”以外的“日”均为自然日[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:unsupported",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "PROBE-CHILD-CI",
+   "query": "儿童重疾险一般保障哪些重大疾病",
+   "intent": {
+    "intent_id": "insurance_qa",
+    "confidence": 1.0,
+    "clarify": false,
+    "reasons": [
+     "rule:qa:重疾险"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L2-02",
+     "rank": 1,
+     "score": 0.01639
+    },
+    {
+     "doc": "L2-01",
+     "rank": 2,
+     "score": 0.01559
+    },
+    {
+     "doc": "L2-01",
+     "rank": 3,
+     "score": 0.01362
+    },
+    {
+     "doc": "L2-01",
+     "rank": 4,
+     "score": 0.01308
+    },
+    {
+     "doc": "L1-14",
+     "rank": 5,
+     "score": 0.01284
+    },
+    {
+     "doc": "L2-03",
+     "rank": 6,
+     "score": 0.01178
+    },
+    {
+     "doc": "L2-02",
+     "rank": 7,
+     "score": 0.01132
+    },
+    {
+     "doc": "L1-04",
+     "rank": 8,
+     "score": 0.01102
+    },
+    {
+     "doc": "L1-04",
+     "rank": 9,
+     "score": 0.01089
+    },
+    {
+     "doc": "L1-04",
+     "rank": 10,
+     "score": 0.01052
+    }
+   ],
+   "retrieval_ms": 661,
+   "qualified": [
+    "L1-04",
+    "L1-14",
+    "L2-01",
+    "L2-02",
+    "L2-03"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 71.6
+   },
+   "raw_answer": "证据显示，《重大疾病保险的疾病定义使用规范（2020年修订版）》的疾病定义主要参考国内外成年人重大疾病保险发展状况并结合现代医学进展制定[E1]。该规范适用于保险期间主要为成年人（十八周岁及以上）阶段的重大疾病保险[E1]，因此证据未覆盖儿童重疾险专属保障哪些重大疾病这一问题。就规范本身规定而言，此类产品的疾病范围应当包括恶性肿瘤——重度、较重急性心肌梗死、严重脑中风后遗症、重大器官移植术或造血干细胞移植术、冠状动脉搭桥术（或称冠状动脉旁路移植术）、严重慢性肾衰竭[E1]。若产品还保障保险金额低于上述六种重度疾病的其他疾病，则还应当包括恶性肿瘤——轻度、较轻急性心肌梗死、轻度脑中风后遗症[E1]。规范疾病范围内其他可供保险公司选择使用的疾病还包括多个肢体缺失、急性重症肝炎或亚急性重症肝炎、双耳失聪、双目失明、瘫痪、心脏瓣膜手术、严重Ⅲ度烧伤、重型再生障碍性贫血、主动脉手术等[E2]。各保险公司还可以根据市场需求增加规范疾病范围以外的其他疾病，并合理制定相关定义[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-N-001",
+   "query": "如何办理机动车驾驶证换证手续",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match"
+    ],
+    "qa_route": false
+   },
+   "retrieved": [
+    {
+     "doc": "L1-18",
+     "rank": 1,
+     "score": 0.0157
+    },
+    {
+     "doc": "L2-01",
+     "rank": 2,
+     "score": 0.01452
+    },
+    {
+     "doc": "L1-07",
+     "rank": 3,
+     "score": 0.01385
+    },
+    {
+     "doc": "L1-08",
+     "rank": 4,
+     "score": 0.01337
+    },
+    {
+     "doc": "L1-09",
+     "rank": 5,
+     "score": 0.01303
+    },
+    {
+     "doc": "L1-08",
+     "rank": 6,
+     "score": 0.01153
+    },
+    {
+     "doc": "L1-20",
+     "rank": 7,
+     "score": 0.01124
+    },
+    {
+     "doc": "L1-20",
+     "rank": 8,
+     "score": 0.01101
+    },
+    {
+     "doc": "L1-07",
+     "rank": 9,
+     "score": 0.01082
+    },
+    {
+     "doc": "L1-07",
+     "rank": 10,
+     "score": 0.01029
+    }
+   ],
+   "retrieval_ms": 673,
+   "qualified": [
+    "L1-07",
+    "L1-08",
+    "L1-09",
+    "L1-18",
+    "L1-20",
+    "L2-01"
+   ],
+   "qualified_n": 7,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 41.7
+   },
+   "raw_answer": "现有证据仅涵盖保险公司分支机构的设立、改建、变更营业场所及撤销等监管规定[E1]，以及保险专业代理机构与保险经纪机构的相关监管规定[E3]。证据中不包含机动车驾驶证换证手续的办理流程、所需材料或办理机关等内容，故无法依据现有证据回答该问题[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-N-002",
+   "query": "社会保险里的养老保险退休后怎么办理领取手续",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-01",
+     "rank": 1,
+     "score": 0.01363
+    },
+    {
+     "doc": "L1-01",
+     "rank": 2,
+     "score": 0.01348
+    },
+    {
+     "doc": "L1-01",
+     "rank": 3,
+     "score": 0.01325
+    },
+    {
+     "doc": "L1-01",
+     "rank": 4,
+     "score": 0.01219
+    },
+    {
+     "doc": "L1-14",
+     "rank": 5,
+     "score": 0.01206
+    },
+    {
+     "doc": "L1-10",
+     "rank": 6,
+     "score": 0.01186
+    },
+    {
+     "doc": "L1-25",
+     "rank": 7,
+     "score": 0.01176
+    },
+    {
+     "doc": "L1-22",
+     "rank": 8,
+     "score": 0.01137
+    },
+    {
+     "doc": "L1-20",
+     "rank": 9,
+     "score": 0.01123
+    },
+    {
+     "doc": "L1-18",
+     "rank": 10,
+     "score": 0.01114
+    }
+   ],
+   "retrieval_ms": 798,
+   "qualified": [
+    "L1-01",
+    "L1-14",
+    "L1-18",
+    "L1-25"
+   ],
+   "qualified_n": 4,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 66.8
+   },
+   "raw_answer": "现有证据未包含社会保险基本养老保险退休后办理领取手续的流程、条件或所需材料，无法据此回答该问题[E1]。证据中与养老相关的内容仅涉及商业养老年金保险的定义[E2]。养老年金保险是指以养老保障为目的的年金保险[E2]。此类保险约定给付被保险人生存保险金的年龄不得小于国家规定的退休年龄[E2]。相邻两次给付的时间间隔不得超过一年[E2]。证据中亦未记载社保养老金的申领机构、办理程序或所需材料等信息[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:unsupported",
+    "claim_support:unsupported",
+    "claim_support:unsupported",
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-N-003",
+   "query": "医院门诊挂号预约有哪些方式",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match"
+    ],
+    "qa_route": false
+   },
+   "retrieved": [
+    {
+     "doc": "L2-01",
+     "rank": 1,
+     "score": 0.01561
+    },
+    {
+     "doc": "L2-02",
+     "rank": 2,
+     "score": 0.01413
+    },
+    {
+     "doc": "L1-12",
+     "rank": 3,
+     "score": 0.01368
+    },
+    {
+     "doc": "L1-13",
+     "rank": 4,
+     "score": 0.0126
+    },
+    {
+     "doc": "L1-03",
+     "rank": 5,
+     "score": 0.01213
+    },
+    {
+     "doc": "L1-18",
+     "rank": 6,
+     "score": 0.01162
+    },
+    {
+     "doc": "L1-04",
+     "rank": 7,
+     "score": 0.01148
+    },
+    {
+     "doc": "L1-12",
+     "rank": 8,
+     "score": 0.01116
+    },
+    {
+     "doc": "L1-04",
+     "rank": 9,
+     "score": 0.01093
+    },
+    {
+     "doc": "L2-01",
+     "rank": 10,
+     "score": 0.01045
+    }
+   ],
+   "retrieval_ms": 704,
+   "qualified": [
+    "L2-01"
+   ],
+   "qualified_n": 1,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 30.7
+   },
+   "raw_answer": "现有证据为保险条款中的责任免除事项与术语释义部分[E1]。该证据仅包含专科医生资格条件、组织病理学检查及ICD-10等术语定义[E1]。证据中未包含医院门诊挂号预约方式的相关内容[E1]。因此无法依据现有证据回答该问题[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-N-004",
+   "query": "机动车年检流程是怎样的",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match"
+    ],
+    "qa_route": false
+   },
+   "retrieved": [
+    {
+     "doc": "L2-01",
+     "rank": 1,
+     "score": 0.01639
+    },
+    {
+     "doc": "L1-05",
+     "rank": 2,
+     "score": 0.01218
+    },
+    {
+     "doc": "L1-13",
+     "rank": 3,
+     "score": 0.01162
+    },
+    {
+     "doc": "L1-16",
+     "rank": 4,
+     "score": 0.01143
+    },
+    {
+     "doc": "L1-17",
+     "rank": 5,
+     "score": 0.01129
+    },
+    {
+     "doc": "L1-13",
+     "rank": 6,
+     "score": 0.01111
+    },
+    {
+     "doc": "L1-15",
+     "rank": 7,
+     "score": 0.01094
+    },
+    {
+     "doc": "L1-20",
+     "rank": 8,
+     "score": 0.01014
+    },
+    {
+     "doc": "L2-05",
+     "rank": 9,
+     "score": 0.00991
+    },
+    {
+     "doc": "L1-17",
+     "rank": 10,
+     "score": 0.00986
+    }
+   ],
+   "retrieval_ms": 703,
+   "qualified": [
+    "L2-01"
+   ],
+   "qualified_n": 1,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 27.2
+   },
+   "raw_answer": "所提供的证据[E1]内容为保险条款内容，包括被保险人感染艾滋病病毒或患艾滋病、战争、军事冲突、核爆炸、核辐射或核污染、遗传性疾病等责任免除事项[E1]。[E1]中还包括专科医生、组织病理学检查、ICD-10与ICD-O-3等术语释义[E1]。上述证据中不包含任何关于机动车年检流程的内容[E1]。因此无法依据该证据回答机动车年检流程的问题。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "RB-N-006",
+   "query": "未成年人办理身份证需要什么材料",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match"
+    ],
+    "qa_route": false
+   },
+   "retrieved": [
+    {
+     "doc": "L1-22",
+     "rank": 1,
+     "score": 0.01498
+    },
+    {
+     "doc": "L1-20",
+     "rank": 2,
+     "score": 0.01368
+    },
+    {
+     "doc": "L1-18",
+     "rank": 3,
+     "score": 0.0129
+    },
+    {
+     "doc": "L1-09",
+     "rank": 4,
+     "score": 0.01286
+    },
+    {
+     "doc": "L1-09",
+     "rank": 5,
+     "score": 0.0125
+    },
+    {
+     "doc": "L1-18",
+     "rank": 6,
+     "score": 0.01243
+    },
+    {
+     "doc": "L1-22",
+     "rank": 7,
+     "score": 0.01203
+    },
+    {
+     "doc": "L1-14",
+     "rank": 8,
+     "score": 0.01119
+    },
+    {
+     "doc": "L1-22",
+     "rank": 9,
+     "score": 0.01118
+    },
+    {
+     "doc": "L1-14",
+     "rank": 10,
+     "score": 0.01105
+    }
+   ],
+   "retrieval_ms": 579,
+   "qualified": [
+    "L1-09",
+    "L1-14",
+    "L1-18",
+    "L1-22"
+   ],
+   "qualified_n": 5,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 41.8
+   },
+   "raw_answer": "现有证据均为保险监管类规定，仅涵盖保险机构高级管理人员任职资格申请材料、保险公司及其分支机构筹建与开业材料等内容[E1]。证据中未包含未成年人办理身份证所需材料的相关规定[E1]。因此该问题超出本证据的覆盖范围，无法据现有证据作答[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:unsupported",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:unsupported",
+    "claim_support:unsupported",
+    "claim_support:unsupported"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "GEN-01",
+   "query": "保险公司倒闭了，我的人寿保险单还有效吗",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-10",
+     "rank": 1,
+     "score": 0.01577
+    },
+    {
+     "doc": "L1-01",
+     "rank": 2,
+     "score": 0.01518
+    },
+    {
+     "doc": "L1-01",
+     "rank": 3,
+     "score": 0.01308
+    },
+    {
+     "doc": "L1-18",
+     "rank": 4,
+     "score": 0.01172
+    },
+    {
+     "doc": "L1-15",
+     "rank": 5,
+     "score": 0.01108
+    },
+    {
+     "doc": "L1-01",
+     "rank": 6,
+     "score": 0.01071
+    },
+    {
+     "doc": "L1-13",
+     "rank": 7,
+     "score": 0.01059
+    },
+    {
+     "doc": "L2-05",
+     "rank": 8,
+     "score": 0.01029
+    },
+    {
+     "doc": "L1-10",
+     "rank": 9,
+     "score": 0.01015
+    },
+    {
+     "doc": "L1-03",
+     "rank": 10,
+     "score": 0.01
+    }
+   ],
+   "retrieval_ms": 680,
+   "qualified": [
+    "L1-01",
+    "L1-03",
+    "L1-10",
+    "L1-13"
+   ],
+   "qualified_n": 6,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 39.4
+   },
+   "raw_answer": "根据证据，经营有人寿保险业务的保险公司被依法撤销或被依法宣告破产的，其持有的人寿保险合同及责任准备金必须转让给其他经营有人寿保险业务的保险公司[E2]。不能同其他保险公司达成转让协议的，由国务院保险监督管理机构指定经营有人寿保险业务的保险公司接受转让[E2]。转让或指定接受转让时，应当维护被保险人、受益人的合法权益[E2]。因此，您的保单利益可通过合同转让得以延续，而非直接失效。若受让公司的清算资产不足以偿付人寿保险合同保单利益，保险保障基金可向保单受让公司提供救助[E1]。其中个人保单持有人的救助金额以转让后保单利益不超过转让前保单利益的90%为限，机构保单持有人以不超过80%为限[E1]。",
+   "raw_viol_kinds": [
+    "fact_sentence"
+   ],
+   "raw_violations": [
+    "fact_sentence:no_citation:3"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "GEN-02",
+   "query": "什么是保险销售行为可回溯",
+   "intent": {
+    "intent_id": "insurance_qa",
+    "confidence": 1.0,
+    "clarify": false,
+    "reasons": [
+     "rule:qa:什么是"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-15",
+     "rank": 1,
+     "score": 0.01639
+    },
+    {
+     "doc": "L1-03",
+     "rank": 2,
+     "score": 0.01546
+    },
+    {
+     "doc": "L1-06",
+     "rank": 3,
+     "score": 0.014
+    },
+    {
+     "doc": "L1-03",
+     "rank": 4,
+     "score": 0.014
+    },
+    {
+     "doc": "L1-16",
+     "rank": 5,
+     "score": 0.01381
+    },
+    {
+     "doc": "L1-03",
+     "rank": 6,
+     "score": 0.0118
+    },
+    {
+     "doc": "L1-03",
+     "rank": 7,
+     "score": 0.0118
+    },
+    {
+     "doc": "L1-04",
+     "rank": 8,
+     "score": 0.01151
+    },
+    {
+     "doc": "L1-06",
+     "rank": 9,
+     "score": 0.01128
+    },
+    {
+     "doc": "L1-06",
+     "rank": 10,
+     "score": 0.01123
+    }
+   ],
+   "retrieval_ms": 545,
+   "qualified": [
+    "L1-03",
+    "L1-04",
+    "L1-06",
+    "L1-15",
+    "L1-16"
+   ],
+   "qualified_n": 9,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 36.4
+   },
+   "raw_answer": "保险销售行为可回溯，是指保险公司、保险中介机构通过录音录像等技术手段采集视听资料、电子数据，记录和保存保险销售过程关键环节，实现销售行为可回放、重要信息可查询、问题责任可确认[E1]。保险公司、保险中介机构销售投保人为自然人的保险产品时，必须实施可回溯管理，团体保险产品除外[E1]。开展电话销售业务的，应将电话通话过程全程录音并备份存档[E1]。除电话销售和互联网保险业务外，符合规定情形的（如通过保险兼业代理机构销售保险期间超过1年的人身保险产品），应在取得投保人同意后对销售过程关键环节以现场同步录音录像方式记录[E1]。根据不同销售方式，还可采取录像、销售页面管理和操作轨迹记录等方法实施可回溯管理，并对产生的视听资料及电子资料做好备份存档[E2]。视听资料保管期限自保险合同终止之日起计算，保险期间超过1年的不得少于10年[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "GEN-03",
+   "query": "重大疾病保险一般保障哪些疾病",
+   "intent": {
+    "intent_id": "insurance_qa",
+    "confidence": 1.0,
+    "clarify": false,
+    "reasons": [
+     "rule:qa:question_form"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L2-02",
+     "rank": 1,
+     "score": 0.01631
+    },
+    {
+     "doc": "L2-01",
+     "rank": 2,
+     "score": 0.01517
+    },
+    {
+     "doc": "L1-14",
+     "rank": 3,
+     "score": 0.01447
+    },
+    {
+     "doc": "L2-01",
+     "rank": 4,
+     "score": 0.01312
+    },
+    {
+     "doc": "L2-03",
+     "rank": 5,
+     "score": 0.01282
+    },
+    {
+     "doc": "L1-04",
+     "rank": 6,
+     "score": 0.01258
+    },
+    {
+     "doc": "L1-04",
+     "rank": 7,
+     "score": 0.012
+    },
+    {
+     "doc": "L2-01",
+     "rank": 8,
+     "score": 0.01188
+    },
+    {
+     "doc": "L1-04",
+     "rank": 9,
+     "score": 0.01127
+    },
+    {
+     "doc": "L2-02",
+     "rank": 10,
+     "score": 0.01013
+    }
+   ],
+   "retrieval_ms": 537,
+   "qualified": [
+    "L1-04",
+    "L1-14",
+    "L2-01",
+    "L2-02",
+    "L2-03"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 73.6
+   },
+   "raw_answer": "根据《重大疾病保险的疾病定义使用规范（2020年修订版）》，重大疾病保险中的“疾病”是指保险合同约定的疾病、疾病状态或手术[E1]。保险期间主要为成年人（十八周岁及以上）阶段的重疾险产品，其保障的疾病范围应当包括六种重度疾病，即恶性肿瘤——重度、较重急性心肌梗死、严重脑中风后遗症、重大器官移植术或造血干细胞移植术、冠状动脉搭桥术（或称冠状动脉旁路移植术）和严重慢性肾衰竭[E1]。如果产品还保障保险金额低于上述六种重度疾病的其他疾病，则还应当包括恶性肿瘤——轻度、较轻急性心肌梗死和轻度脑中风后遗症[E1]。规范疾病范围内还包括多个肢体缺失、急性重症肝炎或亚急性重症肝炎、严重非恶性颅内肿瘤、严重慢性肝衰竭、严重脑炎后遗症或严重脑膜炎后遗症、深度昏迷、双耳失聪、双目失明、瘫痪和心脏瓣膜手术等[E2]。此外还包括严重阿尔茨海默病、严重脑损伤、严重原发性帕金森病、严重Ⅲ度烧伤、严重特发性肺动脉高压、严重运动神经元病、语言能力丧失、重型再生障碍性贫血、主动脉手术、严重慢性呼吸衰竭、严重克罗恩病和严重溃疡性结肠炎[E2]。除规范规定的疾病外，保险公司还可以根据市场需求在产品中增加规范疾病范围以外的其他疾病，并合理制定相关定义[E1]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "GEN-04",
+   "query": "通过互联网买保险需要注意什么",
+   "intent": {
+    "intent_id": "insurance_qa",
+    "confidence": 1.0,
+    "clarify": false,
+    "reasons": [
+     "rule:qa:question_form"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-03",
+     "rank": 1,
+     "score": 0.01463
+    },
+    {
+     "doc": "L1-06",
+     "rank": 2,
+     "score": 0.01389
+    },
+    {
+     "doc": "L1-06",
+     "rank": 3,
+     "score": 0.01369
+    },
+    {
+     "doc": "L1-06",
+     "rank": 4,
+     "score": 0.01345
+    },
+    {
+     "doc": "L1-06",
+     "rank": 5,
+     "score": 0.01345
+    },
+    {
+     "doc": "L1-06",
+     "rank": 6,
+     "score": 0.01295
+    },
+    {
+     "doc": "L1-06",
+     "rank": 7,
+     "score": 0.01284
+    },
+    {
+     "doc": "L1-06",
+     "rank": 8,
+     "score": 0.01198
+    },
+    {
+     "doc": "L1-06",
+     "rank": 9,
+     "score": 0.01134
+    },
+    {
+     "doc": "L1-06",
+     "rank": 10,
+     "score": 0.01121
+    }
+   ],
+   "retrieval_ms": 586,
+   "qualified": [
+    "L1-03",
+    "L1-06"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 134.8
+   },
+   "raw_answer": "通过互联网购买保险应注意以下几点。互联网保险业务应由依法设立的保险机构开展，其他机构和个人不得开展[E2]。保险机构应在其官方网站披露营业执照、经营许可证、自营网络平台网址以及偿付能力充足率等监管评价信息[E3]。投保页面须属于保险机构的自营网络平台[E8]。营销宣传页面应明确标识产品为保险产品，并标明保险产品全称、承保保险公司全称及提供销售或经纪服务的保险中介机构全称[E8]。投保文书材料应由投保人本人以签字、盖章或其他法律法规认可的方式确认，销售人员不得代替确认[E1]。保险费应由投保人本人账户支付，销售人员不得代缴保险费，也不得代领退保金和保险金[E1]。",
+   "raw_viol_kinds": [
+    "fact_sentence"
+   ],
+   "raw_violations": [
+    "fact_sentence:no_citation:0"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  },
+  {
+   "case_id": "GEN-05",
+   "query": "意外伤害保险的保险期间有什么规定",
+   "intent": {
+    "intent_id": "unknown_insurance_intent",
+    "confidence": 0.0,
+    "clarify": true,
+    "reasons": [
+     "fallback:no_signal_match",
+     "domain:insurance_anchor"
+    ],
+    "qa_route": true
+   },
+   "retrieved": [
+    {
+     "doc": "L1-16",
+     "rank": 1,
+     "score": 0.01609
+    },
+    {
+     "doc": "L1-16",
+     "rank": 2,
+     "score": 0.01495
+    },
+    {
+     "doc": "L1-04",
+     "rank": 3,
+     "score": 0.01484
+    },
+    {
+     "doc": "L1-16",
+     "rank": 4,
+     "score": 0.01452
+    },
+    {
+     "doc": "L1-16",
+     "rank": 5,
+     "score": 0.01309
+    },
+    {
+     "doc": "L1-14",
+     "rank": 6,
+     "score": 0.01261
+    },
+    {
+     "doc": "L1-01",
+     "rank": 7,
+     "score": 0.01221
+    },
+    {
+     "doc": "L1-16",
+     "rank": 8,
+     "score": 0.01108
+    },
+    {
+     "doc": "L1-10",
+     "rank": 9,
+     "score": 0.0108
+    },
+    {
+     "doc": "L2-02",
+     "rank": 10,
+     "score": 0.01078
+    }
+   ],
+   "retrieval_ms": 599,
+   "qualified": [
+    "L1-01",
+    "L1-04",
+    "L1-10",
+    "L1-14",
+    "L1-16",
+    "L2-02"
+   ],
+   "qualified_n": 10,
+   "generation": {
+    "attempts": 2,
+    "elapsed_s": 83.2
+   },
+   "raw_answer": "监管规定区分保险期限一年及以下与保险期限一年以上的意外险分别作出要求[E1]。以激活注册方式销售的意外险，产品保险期限应不少于7天，且保险责任开始时间应在激活注册之后[E4]。保险期限一年及以下的意外险保单最低现金价值按未满期净保费方法确定，保险期限一年以上的则按《普通型人身保险精算规定》相关要求计算[E1]。保险期限一年以上的意外险厘定保险费时，应按审慎原则确定预定利率[E1]。对保险期限为24小时以内（含24小时）的航空意外险，其责任准备金不得低于“过去滚动12个月航空意外险自留毛保费×2/365”计算的数值[E1]。证据未规定意外险保险期间的上限，但对保险期限一年及以下的意外险，禁止在距保单到期日前间隔60天以上预收下一保单年度保费[E8]。",
+   "raw_viol_kinds": [
+    "claim_support"
+   ],
+   "raw_violations": [
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial",
+    "claim_support:partial"
+   ],
+   "cited": [],
+   "claims": [
+    {
+     "claim": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据）",
+     "claim_type": "C-UNCERTAIN",
+     "support": "SUPPORTED"
+    },
+    {
+     "claim": "为避免误导",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    },
+    {
+     "claim": "本次不作答",
+     "claim_type": "C-FACT",
+     "support": "REJECTED"
+    }
+   ],
+   "final_answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "final_decision": "REFUSAL",
+   "failure_reason": "citation_gate_rejected"
+  }
+ ]
+}

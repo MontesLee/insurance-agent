@@ -1,0 +1,16 @@
+saved -> D:\Workspace\insurance-agent\docs\knowledge-base\evidence\eval\eval_bge-m3.json
+{
+ "Recall@1": 0.82,
+ "Recall@5": 1.0,
+ "Recall@10": 1.0,
+ "MRR": 0.8906666666666667,
+ "QualifiedEvidence": "50/50",
+ "QualificationRate": 1.0,
+ "ClaimSupport": "28/28",
+ "ClaimModuleOnly": "27/28",
+ "NegativePass": "3/7",
+ "NegativeFPR": 0.5714285714285714
+}
+self-retrieval identical@1 (expect 1.0, degenerate): 0.94
+self-retrieval prefix64@1/5/10: [0.8, 0.98, 1.0]
+failure matrix: {'DATA_MISSING': 0, 'CHUNKING': 0, 'EMBEDDING': 0, 'RANKING': 0, 'QUALIFICATION': 0, 'NEGATIVE_NOISE': 4, 'UNKNOWN': 0}

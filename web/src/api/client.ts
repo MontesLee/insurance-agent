@@ -39,11 +39,24 @@ export class ApiError extends Error {
   }
 }
 
+export const CONSUMER_KEY_STORAGE = "webui:consumer-key";
+
+/** 28.G: the stored consumer credential — used ONLY as an
+ *  authentication secret sent to the server; it is never an ownership
+ *  source (ownership is decided server-side from the resolved subject). */
+export function authHeaders(): Record<string, string> {
+  let key = "";
+  try {
+    key = localStorage.getItem(CONSUMER_KEY_STORAGE) ?? "";
+  } catch { /* storage unavailable */ }
+  return key ? { Authorization: `Bearer ${key}` } : {};
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let resp: Response;
   try {
     resp = await fetch(path, {
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       ...init,
     });
   } catch (cause) {
@@ -52,6 +65,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const text = await resp.text();
   const body: unknown = text ? safeJson(text) : null;
   if (!resp.ok) {
+    if (resp.status === 401) {
+      // let the shell surface the identity gate (28.G); callers still
+      // receive the ApiError
+      window.dispatchEvent(new CustomEvent("webui:unauthorized"));
+    }
     throw new ApiError(resp.status, body);
   }
   return body as T;
@@ -111,9 +129,25 @@ export const api = {
   reviewCard: (runId: string) =>
     request<ReviewCard>(`/api/runs/${runId}/review-card`),
 
-  /** SSE endpoint URL with the resume cursor (EventSource cannot set headers). */
-  streamUrl: (runId: string, afterEventId?: string) =>
-    `/api/runs/${runId}/stream${afterEventId ? `?after_event_id=${afterEventId}` : ""}`,
+  /** SSE endpoint URL with the resume cursor. EventSource cannot set the
+   * Authorization header (browser API limitation), so the key rides as a
+   * ?key= query parameter — the server checks it as an auth fallback. */
+  streamUrl: (runId: string, afterEventId?: string) => {
+    let key = "";
+    try { key = localStorage.getItem(CONSUMER_KEY_STORAGE) ?? ""; } catch { /* */ }
+    const params = new URLSearchParams();
+    if (afterEventId) params.set("after_event_id", afterEventId);
+    if (key) params.set("key", key);
+    const qs = params.toString();
+    return `/api/runs/${runId}/stream${qs ? `?${qs}` : ""}`;
+  },
+  // ---- 28.G consumer identity + opaque artifact references ----
+  whoami: () => request<{ subject: string | null; role: string | null; mode: string }>(
+    "/api/consumer/whoami"),
+  issueArtifactRef: (runId: string, artifactType: string) =>
+    request<{ ref: string }>(`/api/runs/${runId}/artifact-refs/${artifactType}`),
+  artifactByRef: (ref: string) =>
+    request<ArtifactDetail>(`/api/consumer/artifacts/${ref}`),
 
   // ---- Review Queue (Phase 27.5-2) — read-only approval projection ---- #
   /** Existing backend endpoint, project-scoped (no global list endpoint yet). */

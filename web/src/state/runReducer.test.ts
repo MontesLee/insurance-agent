@@ -160,20 +160,21 @@ describe("replay equals live (refresh safety)", () => {
 });
 
 describe("agent streaming deltas (transient, DeepSeek-style live output)", () => {
-  it("accumulates same-kind deltas in the stream buffer, never in events[]", () => {
+  it("reasoning deltas NEVER enter the displayable buffer (28.K.20 strengthened E-2)", () => {
     const s = apply([
       ev({ event_type: "run_started" }),
       ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "用户要给孩子" } }),
       ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "买保险…" } }),
     ]);
-    expect(s.stream).toEqual({ kind: "reasoning", text: "用户要给孩子买保险…" });
+    expect(s.stream).toBeNull();
     expect(s.events.map((e) => e.event_type)).toEqual(["run_started"]);
   });
 
-  it("kind switch restarts the buffer; next phase clears it", () => {
+  it("content accumulates across interleaved reasoning (28.K.20 T3); next phase clears it", () => {
     const s = apply([
       ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "思考…" } }),
       ev({ event_type: "agent_stream_delta", data: { kind: "content", text: "结论A" } }),
+      ev({ event_type: "agent_stream_delta", data: { kind: "reasoning", text: "再思考…" } }),
       ev({ event_type: "agent_stream_delta", data: { kind: "content", text: "结论B" } }),
     ]);
     expect(s.stream).toEqual({ kind: "content", text: "结论A结论B" });
@@ -227,5 +228,58 @@ describe("tool_started marks the pipeline step RUNNING (live step indicator)", (
     const s = apply([ev({ event_type: "tool_started", skill: "knowledge_search" })]);
     expect(s.currentTool).toBe("knowledge_search");
     expect(s.stages["risk-analysis"]!.status).toBe("pending");
+  });
+});
+
+describe("28.K.17 — delta arrival metadata (lastDeltaAt)", () => {
+  it("starts null; a delta stamps epoch-ms arrival; content buffer unchanged", () => {
+    let s = initRunState("run_d1", []);
+    expect(s.lastDeltaAt).toBeNull();
+    s = runReducer(s, { type: "events", events: [
+      { event_id: "e1", run_id: "run_d1", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "reasoning", text: "内部思考" } },
+    ] })!;
+    expect(typeof s.lastDeltaAt).toBe("number");
+    // 28.K.20: reasoning deltas never touch the displayable buffer
+    expect(s.stream).toBeNull();
+    expect(s.events).toHaveLength(0); // still never in the durable timeline
+  });
+
+  it("28.K.20: content accumulates across interleaved reasoning; reasoning never renders", () => {
+    let s = initRunState("run_d3", []);
+    s = runReducer(s, { type: "events", events: [
+      { event_id: "e1", run_id: "run_d3", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "reasoning", text: "思考A" } },
+      { event_id: "e2", run_id: "run_d3", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "content", text: "C1" } },
+      { event_id: "e3", run_id: "run_d3", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "reasoning", text: "思考B" } },
+      { event_id: "e4", run_id: "run_d3", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "content", text: "C2" } },
+    ] })!;
+    expect(s.stream?.text).toBe("C1C2");
+    expect(s.stream?.kind).toBe("content");
+  });
+
+  it("a second delta refreshes the timestamp; terminal does not clear it (UI gates on live)", () => {
+    let s = initRunState("run_d2", []);
+    s = runReducer(s, { type: "events", events: [
+      { event_id: "e1", run_id: "run_d2", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "content", text: "A" } },
+    ] })!;
+    const first = s.lastDeltaAt;
+    s = runReducer(s, { type: "events", events: [
+      { event_id: "e2", run_id: "run_d2", timestamp: "t", event_type: "agent_stream_delta",
+        stage: null, skill: null, status: null, case_id: null, artifact_id: null, eval_id: null,
+        repair_attempt: null, message: null, data: { kind: "content", text: "B" } },
+    ] })!;
+    expect(s.lastDeltaAt! >= first!).toBe(true);
+    expect(s.stream?.text.endsWith("AB")).toBe(true);
   });
 });

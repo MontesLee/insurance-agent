@@ -20,28 +20,68 @@ export interface RuntimeEvent {
 }
 
 export type EventType =
-  | "run_started"
-  | "run_completed"
-  | "run_failed"
-  | "agent_step_started"
+  // Phase 28.B prep — the union is the FULL dual-end contract: it equals
+  // schema/event-vocabulary.json "vocabulary" (== runtime/events.py
+  // EVENT_TYPES, asserted by tests/contract/test_event_vocabulary.py)
+  // plus "reserved" (contract-first: grounding phases are embedded in
+  // qa_answered today; standalone emission lands under a runtime-
+  // authorized phase). Sync is asserted by web/src/types/runtime.test.ts.
+  | "agent_assigned"
+  | "agent_completed"
   | "agent_decision"
+  | "agent_failed"
+  | "agent_message_acknowledged"
+  | "agent_message_failed"
+  | "agent_message_received"
+  | "agent_message_sent"
+  | "agent_output_validated"
+  | "agent_started"
   | "agent_step_error"
+  | "agent_step_started"
   | "agent_stream_delta"
-  | "stage_started"
-  | "stage_completed"
-  | "stage_failed"
-  | "eval_started"
-  | "eval_passed"
-  | "eval_failed"
-  | "repair_started"
-  | "repair_completed"
-  | "repair_exhausted"
+  | "agent_tool_call"
+  | "agent_tool_completed"
+  | "agent_validation_failed"
+  | "approval_approved"
+  | "approval_expired"
+  | "approval_failed"
+  | "approval_rejected"
+  | "approval_requested"
+  | "approval_resumed"
+  | "approval_waiting"
   | "artifact_created"
   | "checkpoint_created"
   | "checkpoint_resumed"
-  | "tool_started"
+  | "eval_failed"
+  | "eval_passed"
+  | "eval_started"
+  | "graph_validation_failed"
+  | "graph_validation_passed"
+  | "graph_validation_started"
+  | "handoff_rejected"
+  | "handoff_validated"
+  | "intent_classified"
+  | "planner_completed"
+  | "planner_failed"
+  | "planner_started"
+  | "qa_answered"
+  | "repair_completed"
+  | "repair_exhausted"
+  | "repair_started"
+  | "run_completed"
+  | "run_failed"
+  | "run_started"
+  | "stage_completed"
+  | "stage_failed"
+  | "stage_started"
+  | "task_activated"
   | "tool_completed"
-  | "tool_failed";
+  | "tool_failed"
+  | "tool_started"
+  // contract-reserved (no backend emission yet)
+  | "grounding_started"
+  | "grounding_completed"
+;
 
 export const RUN_TERMINAL_EVENT_TYPES: ReadonlySet<EventType> = new Set([
   "run_completed",

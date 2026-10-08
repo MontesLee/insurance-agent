@@ -1,0 +1,762 @@
+{
+ "ran_at": "2026-10-05T02:45:43",
+ "kb": "insurance-kb-v1",
+ "kb_id": "44af9ff2-ecef-445e-87c6-cb1458cd4d44",
+ "retrieval": "governed KnowledgeService + PG registry + live WeKnora provider (JWT transport variant)",
+ "model": "glm-5.3-flash",
+ "cases": [
+  {
+   "case_id": "N01",
+   "category": "normal",
+   "query": "保险公司倒闭了，我的人寿保险单还有效吗",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 3,
+    "denied": 0,
+    "docs": [
+     "L1-01",
+     "L1-10"
+    ],
+    "latency_ms": 876
+   },
+   "qualified_n": 3,
+   "generation_s": 38.0,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "fact_sentence"
+   ],
+   "total_s": 38.9
+  },
+  {
+   "case_id": "N02",
+   "category": "normal",
+   "query": "什么是保险销售行为可回溯",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "success",
+    "allowed": 2,
+    "denied": 0,
+    "docs": [
+     "L1-03",
+     "L1-15"
+    ],
+    "latency_ms": 528
+   },
+   "qualified_n": 2,
+   "generation_s": 58.9,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 59.5
+  },
+  {
+   "case_id": "N03",
+   "category": "normal",
+   "query": "重大疾病保险一般保障哪些疾病",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "success",
+    "allowed": 3,
+    "denied": 0,
+    "docs": [
+     "L2-01",
+     "L2-02",
+     "L2-03"
+    ],
+    "latency_ms": 545
+   },
+   "qualified_n": 3,
+   "generation_s": 67.9,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 68.4
+  },
+  {
+   "case_id": "N04",
+   "category": "normal",
+   "query": "通过互联网买保险需要注意什么",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "success",
+    "allowed": 5,
+    "denied": 0,
+    "docs": [
+     "L1-03",
+     "L1-06"
+    ],
+    "latency_ms": 592
+   },
+   "qualified_n": 5,
+   "generation_s": 121.2,
+   "final": "REFUSAL",
+   "reason": "llm_unavailable",
+   "answer": "回答服务暂时不可用，无法生成有依据的回答。已检索到的证据已妥善记录，请稍后再试。",
+   "raw_gate_ok": null,
+   "viol_kinds": [],
+   "total_s": 121.8
+  },
+  {
+   "case_id": "N05",
+   "category": "normal",
+   "query": "意外伤害保险的保险期间有什么规定",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 4,
+    "denied": 0,
+    "docs": [
+     "L1-04",
+     "L1-10",
+     "L1-14",
+     "L1-16"
+    ],
+    "latency_ms": 544
+   },
+   "qualified_n": 4,
+   "generation_s": 84.6,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 85.1
+  },
+  {
+   "case_id": "N06",
+   "category": "normal",
+   "query": "银行保险机构收到消费投诉后多久作出处理决定",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 3,
+    "denied": 0,
+    "docs": [
+     "L1-12",
+     "L1-21"
+    ],
+    "latency_ms": 688
+   },
+   "qualified_n": 3,
+   "generation_s": 26.2,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 26.9
+  },
+  {
+   "case_id": "N07",
+   "category": "normal",
+   "query": "保险公司设立分支机构需要经过什么程序",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 4,
+    "denied": 0,
+    "docs": [
+     "L1-01",
+     "L1-07",
+     "L1-08",
+     "L1-09"
+    ],
+    "latency_ms": 480
+   },
+   "qualified_n": 4,
+   "generation_s": 51.8,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 52.3
+  },
+  {
+   "case_id": "N08",
+   "category": "normal",
+   "query": "互联网保险业务可以通过什么平台经营",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 2,
+    "denied": 0,
+    "docs": [
+     "L1-03",
+     "L1-06"
+    ],
+    "latency_ms": 791
+   },
+   "qualified_n": 2,
+   "generation_s": 54.8,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 55.6
+  },
+  {
+   "case_id": "N09",
+   "category": "normal",
+   "query": "偿付能力达标公司需要满足哪些条件",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 3,
+    "denied": 0,
+    "docs": [
+     "L1-01",
+     "L1-11",
+     "L1-18"
+    ],
+    "latency_ms": 682
+   },
+   "qualified_n": 3,
+   "generation_s": 166.2,
+   "final": "REFUSAL",
+   "reason": "llm_unavailable",
+   "answer": "回答服务暂时不可用，无法生成有依据的回答。已检索到的证据已妥善记录，请稍后再试。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 166.8
+  },
+  {
+   "case_id": "N10",
+   "category": "normal",
+   "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 2,
+    "denied": 0,
+    "docs": [
+     "L1-04",
+     "L1-15"
+    ],
+    "latency_ms": 714
+   },
+   "qualified_n": 2,
+   "generation_s": 49.1,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 49.8
+  },
+  {
+   "case_id": "H01",
+   "category": "high_risk",
+   "query": "保险公司注册资本的最低限额是多少",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 5,
+    "denied": 0,
+    "docs": [
+     "L1-01",
+     "L1-09",
+     "L1-20"
+    ],
+    "latency_ms": 597
+   },
+   "qualified_n": 5,
+   "generation_s": 32.8,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 33.4
+  },
+  {
+   "case_id": "H02",
+   "category": "high_risk",
+   "query": "长期健康保险产品的犹豫期不得少于多少天",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "success",
+    "allowed": 4,
+    "denied": 0,
+    "docs": [
+     "L1-04",
+     "L1-06",
+     "L1-07"
+    ],
+    "latency_ms": 638
+   },
+   "qualified_n": 4,
+   "generation_s": 43.4,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "fact_sentence"
+   ],
+   "total_s": 44.1
+  },
+  {
+   "case_id": "H03",
+   "category": "high_risk",
+   "query": "人身保险公司的保险条款和保险费率需要审批还是备案",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 6,
+    "denied": 2,
+    "docs": [
+     "L1-01",
+     "L1-04",
+     "L1-14",
+     "L1-16"
+    ],
+    "latency_ms": 615
+   },
+   "qualified_n": 6,
+   "generation_s": 26.8,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 27.4
+  },
+  {
+   "case_id": "H04",
+   "category": "high_risk",
+   "query": "2020版重疾规范规定必须包含哪三种轻度疾病",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 2,
+    "denied": 0,
+    "docs": [
+     "L2-01",
+     "L2-03"
+    ],
+    "latency_ms": 577
+   },
+   "qualified_n": 1,
+   "generation_s": 46.9,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 47.5
+  },
+  {
+   "case_id": "H05",
+   "category": "high_risk",
+   "query": "中国人身保险业经验生命表2025从什么时候开始使用",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L2-05"
+    ],
+    "latency_ms": 667
+   },
+   "qualified_n": 1,
+   "generation_s": 20.2,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 20.9
+  },
+  {
+   "case_id": "G01",
+   "category": "negative",
+   "query": "如何办理机动车驾驶证换证手续",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L2-01"
+    ],
+    "latency_ms": 555
+   },
+   "qualified_n": 1,
+   "generation_s": 27.6,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 28.2
+  },
+  {
+   "case_id": "G02",
+   "category": "negative",
+   "query": "社会保险里的养老保险退休后怎么办理领取手续",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L1-25"
+    ],
+    "latency_ms": 1115
+   },
+   "qualified_n": 1,
+   "generation_s": 50.7,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 51.8
+  },
+  {
+   "case_id": "G03",
+   "category": "negative",
+   "query": "医院门诊挂号预约有哪些方式",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "insufficient_evidence",
+    "allowed": 0,
+    "denied": 0,
+    "docs": [],
+    "latency_ms": 736
+   },
+   "qualified_n": 0,
+   "final": "REFUSAL",
+   "reason": "insufficient_evidence",
+   "answer": "",
+   "total_s": 0.7
+  },
+  {
+   "case_id": "G04",
+   "category": "negative",
+   "query": "机动车年检流程是怎样的",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L2-01"
+    ],
+    "latency_ms": 606
+   },
+   "qualified_n": 1,
+   "generation_s": 19.8,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 20.4
+  },
+  {
+   "case_id": "G05",
+   "category": "negative",
+   "query": "未成年人办理身份证需要什么材料",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L1-22"
+    ],
+    "latency_ms": 617
+   },
+   "qualified_n": 1,
+   "generation_s": 42.5,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 43.1
+  },
+  {
+   "case_id": "P01",
+   "category": "product_numeric",
+   "query": "保险保障基金由谁缴纳、按什么缴纳",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "success",
+    "allowed": 2,
+    "denied": 0,
+    "docs": [
+     "L1-01",
+     "L1-10"
+    ],
+    "latency_ms": 528
+   },
+   "qualified_n": 2,
+   "generation_s": 33.3,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 33.9
+  },
+  {
+   "case_id": "P02",
+   "category": "product_numeric",
+   "query": "保险销售可回溯资料应当保存多长时间",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 4,
+    "denied": 0,
+    "docs": [
+     "L1-03",
+     "L1-06",
+     "L1-15"
+    ],
+    "latency_ms": 691
+   },
+   "qualified_n": 4,
+   "generation_s": 36.6,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 37.3
+  },
+  {
+   "case_id": "P03",
+   "category": "product_numeric",
+   "query": "银行保险机构董事近亲属与机构发生的关联交易要经过什么程序",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 3,
+    "denied": 0,
+    "docs": [
+     "L1-21"
+    ],
+    "latency_ms": 713
+   },
+   "qualified_n": 3,
+   "generation_s": 74.4,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 75.1
+  },
+  {
+   "case_id": "P04",
+   "category": "product_numeric",
+   "query": "重疾新规下恶性肿瘤轻度疾病有哪些",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L2-02"
+    ],
+    "latency_ms": 732
+   },
+   "qualified_n": 1,
+   "generation_s": 29.6,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 30.3
+  },
+  {
+   "case_id": "P05",
+   "category": "product_numeric",
+   "query": "不符合2020版定义的重疾产品最迟可以销售到什么时候",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 5,
+    "denied": 0,
+    "docs": [
+     "L1-06",
+     "L1-12",
+     "L1-16",
+     "L2-01",
+     "L2-03"
+    ],
+    "latency_ms": 629
+   },
+   "qualified_n": 3,
+   "generation_s": 59.3,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 59.9
+  },
+  {
+   "case_id": "R01",
+   "category": "r4_personal",
+   "query": "我30岁月收入8000元，应该重点买什么保险",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "insufficient_evidence",
+    "allowed": 0,
+    "denied": 0,
+    "docs": [],
+    "latency_ms": 614
+   },
+   "qualified_n": 0,
+   "final": "REFUSAL",
+   "reason": "insufficient_evidence",
+   "answer": "",
+   "total_s": 0.6
+  },
+  {
+   "case_id": "R02",
+   "category": "r4_personal",
+   "query": "孩子刚出生，预算每年3000元，怎么配置重疾险",
+   "intent": "insurance_plan",
+   "retrieval": {
+    "status": "insufficient_evidence",
+    "allowed": 0,
+    "denied": 0,
+    "docs": [],
+    "latency_ms": 641
+   },
+   "qualified_n": 0,
+   "final": "REFUSAL",
+   "reason": "insufficient_evidence",
+   "answer": "",
+   "total_s": 0.6
+  },
+  {
+   "case_id": "R03",
+   "category": "r4_personal",
+   "query": "我有100万房贷，需要多少定期寿险保额",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "success",
+    "allowed": 3,
+    "denied": 0,
+    "docs": [
+     "L1-07",
+     "L1-08",
+     "L1-14"
+    ],
+    "latency_ms": 637
+   },
+   "qualified_n": 1,
+   "generation_s": 39.7,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 40.4
+  },
+  {
+   "case_id": "R04",
+   "category": "r4_personal",
+   "query": "父母50岁了买重疾险要注意什么",
+   "intent": "insurance_qa",
+   "retrieval": {
+    "status": "insufficient_evidence",
+    "allowed": 0,
+    "denied": 0,
+    "docs": [],
+    "latency_ms": 633
+   },
+   "qualified_n": 0,
+   "final": "REFUSAL",
+   "reason": "insufficient_evidence",
+   "answer": "",
+   "total_s": 0.6
+  },
+  {
+   "case_id": "R05",
+   "category": "r4_personal",
+   "query": "网上买的保险和线下买的保险理赔一样吗",
+   "intent": "unknown_insurance_intent",
+   "retrieval": {
+    "status": "success",
+    "allowed": 1,
+    "denied": 0,
+    "docs": [
+     "L1-04"
+    ],
+    "latency_ms": 580
+   },
+   "qualified_n": 1,
+   "generation_s": 75.7,
+   "final": "REFUSAL",
+   "reason": "citation_gate_rejected",
+   "answer": "本次生成的回答未能通过引用校验（无法确认每条保险结论都有依据），为避免误导，本次不作答。",
+   "raw_gate_ok": false,
+   "viol_kinds": [
+    "claim_support"
+   ],
+   "total_s": 76.2
+  }
+ ]
+}

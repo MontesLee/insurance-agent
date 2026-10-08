@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://insurance-agent.local/schema/agent-registry/v1.json",
+  "title": "Agent Registry Entry Contract (v1)",
+  "description": "Phase 28.A-0 / ADR-021 (APPROVED). Declares ONE agent entry in the single-source-of-truth Agent Registry. v1 scope: DECLARATION ONLY — no execution fields. This is the approved v1 subset of the ADR-021 field set: execution-phase fields (workflow, tools, skills, knowledge_dependencies, communication_policy, internal flag) arrive in a later versioned revision of this contract together with the 28.A-1+ implementation, never silently. Registry form: v1 = configuration based (code-resident declarations with fail-closed startup validation); runtime dynamic registry is FORBIDDEN (ADR-021 ruling). The Router consumes ONLY agent ids declared here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "description",
+    "supported_intents",
+    "input_contract",
+    "output_contract",
+    "capabilities",
+    "risk_level"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$",
+      "description": "Stable agent identifier (e.g. insurance-qa-agent). Referenced by RouterDecision.agent_id; must not collide across the registry."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable agent name."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What this agent is responsible for (business responsibility, not implementation detail)."
+    },
+    "supported_intents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "insurance_qa",
+          "product_qa",
+          "insurance_plan",
+          "modify_existing_plan",
+          "unknown_insurance_intent"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Intents this agent may serve — a SUBSET of the v1 IntentResult vocabulary (ADR-019). At startup the registry validator fail-closes if any entry references an intent outside the vocabulary."
+    },
+    "input_contract": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference (path or URI) to the agent's input contract document/schema."
+    },
+    "output_contract": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference (path or URI) to the agent's output contract document/schema (e.g. artifact contract or answer contract)."
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Machine-readable capability tags (e.g. knowledge-grounded-qa, planning-workflow). Used for governance/audit surfacing, not for routing logic (routing is intent-based only)."
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Risk classification of this agent's actions. High-risk agents (e.g. planning, plan modification) are subject to the ADR-019 confidence floor and ADR-024 review linkage."
+    }
+  }
+}

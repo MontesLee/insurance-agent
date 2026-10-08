@@ -58,6 +58,20 @@ class EventBus:
         self._done: dict = {}          # run_id -> terminal event dict (or True)
         self._publish_count = 0        # stats only
 
+    def purge(self, run_id: str) -> None:
+        """Physically drop a run's event history + terminal marker
+        (28.I D-GOV-5: business deletion cascades into trace; a deleted
+        run's events — which embed user content — must not survive).
+        Subscribers are closed; closed-browser semantics already apply."""
+        with self._lock:
+            self._history.pop(run_id, None)
+            self._done.pop(run_id, None)
+            for sub in self._subs.pop(run_id, []):
+                try:
+                    getattr(sub, "close", lambda: None)()
+                except Exception:  # noqa: BLE001 — never block a purge
+                    pass
+
     # ------------------------------------------------------------------ #
     # publish side (called from the run's worker thread)
     # ------------------------------------------------------------------ #

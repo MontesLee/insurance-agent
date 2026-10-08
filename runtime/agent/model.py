@@ -103,18 +103,28 @@ _DEFAULT_BASE_URLS = {
 # --------------------------------------------------------------------------- #
 class OpenAICompatProvider:
     def __init__(self, name: str, model: str, api_key: str, base_url: str = "",
-                 timeout: float = 60.0):
+                 timeout: float = 60.0, reasoning_effort: str = ""):
         self.name = name
         self.model = model
         self._api_key = api_key
         self._base_url = (base_url or "https://api.openai.com/v1").rstrip("/")
         self._timeout = timeout
+        # 28.K.27: reasoning budget for always-thinking models (GLM's
+        # `reasoning_effort`: low|high|max). "" omits the parameter entirely,
+        # i.e. the provider's own default — see runtime/agent/config.py.
+        self._reasoning_effort = (reasoning_effort or "").strip()
 
-    def generate(self, messages: list, tools: list) -> LLMResponse:
-        payload: dict = {
+    def _payload_base(self, messages: list) -> dict:
+        out: dict = {
             "model": self.model,
             "messages": [self._encode(m) for m in messages],
         }
+        if self._reasoning_effort:
+            out["reasoning_effort"] = self._reasoning_effort
+        return out
+
+    def generate(self, messages: list, tools: list) -> LLMResponse:
+        payload: dict = self._payload_base(messages)
         if tools:
             payload["tools"] = [t.as_openai() if isinstance(t, ToolSpec) else t
                                 for t in tools]
@@ -158,12 +168,9 @@ class OpenAICompatProvider:
 
         GLM's OpenAI-compatible endpoint streams `reasoning_content` (thinking)
         and `content` deltas plus fragmented tool_calls — all handled here."""
-        payload: dict = {
-            "model": self.model,
-            "messages": [self._encode(m) for m in messages],
-            "stream": True,
-            "stream_options": {"include_usage": True},
-        }
+        payload: dict = self._payload_base(messages)
+        payload["stream"] = True
+        payload["stream_options"] = {"include_usage": True}
         if tools:
             payload["tools"] = [t.as_openai() if isinstance(t, ToolSpec) else t
                                 for t in tools]
@@ -211,6 +218,15 @@ class OpenAICompatProvider:
                     slot["id"] += tc.get("id") or ""
                     slot["name"] += fn.get("name") or ""
                     slot["args"] += fn.get("arguments") or ""
+                    # 28.K.29-A: forward the tool-call argument fragment as
+                    # a RAW provider delta (kind=tool_args). This is the
+                    # real streaming byte stream, NOT user-facing content —
+                    # consumers decide policy (the agent loop routes ONLY
+                    # agent_decide's user-facing message onward; every
+                    # other tool's args stay internal).
+                    yield {"type": "delta", "kind": "tool_args",
+                           "tool": slot["name"],
+                           "text": fn.get("arguments") or ""}
 
         parsed_calls = []
         for idx in sorted(calls):

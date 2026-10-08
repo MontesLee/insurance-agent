@@ -1,0 +1,422 @@
+{
+ "ran_at": "2026-10-05T11:26:31",
+ "cases": [
+  {
+   "case_id": "RB-L1-001",
+   "query": "保险公司注册资本的最低限额是多少",
+   "p0": {
+    "refused": true,
+    "partial_rows": 4,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 3,
+    "upgraded": 1,
+    "blocked": [
+     {
+      "s": "另外，保险公司以2亿元最低资本金额设立的，在其住所地以外的每一省、自治区、直辖市首次申请设立分公司，应当增加不少于人民币",
+      "why": "hard-class"
+     },
+     {
+      "s": "保险公司注册资本达到人民币5亿元且偿付能力充足的，设立分公司不需要增加注册资本[E6]",
+      "why": "hard-class"
+     }
+    ],
+    "delivered": true
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "RB-L1-017",
+   "query": "保险公司设立分支机构需要经过什么程序",
+   "p0": {
+    "refused": true,
+    "partial_rows": 10,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 4,
+    "upgraded": 1,
+    "blocked": [
+     {
+      "s": "筹建阶段，申请人应提交筹建申请书等材料，由保险公司或其上级管理机构向银保监会或其派出机构提出申请，监管机构自受理之日起三",
+      "why": "hard-class"
+     },
+     {
+      "s": "申请人应自收到筹建通知书起六个月内完成筹建，筹建期间不得从事任何保险经营活动[E1]",
+      "why": "hard-class"
+     },
+     {
+      "s": "筹建完成后，申请人向拟设地银保监会派出机构提交开业验收报告，派出机构自收到完整报告之日起三十日内作出批准或不予批准的决定",
+      "why": "hard-class"
+     }
+    ],
+    "delivered": true
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "RB-L2-001",
+   "query": "2020版重疾规范规定必须包含哪三种轻度疾病",
+   "p0": {
+    "refused": true,
+    "partial_rows": 5,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 3,
+    "upgraded": 0,
+    "blocked": [
+     {
+      "s": "根据《重大疾病保险的疾病定义使用规范（2020年修订版）》，重大疾病保险产品若还保障保险金额低于六种重度疾病的其他疾病，",
+      "why": "hard-class"
+     },
+     {
+      "s": "这三种轻度疾病为恶性肿瘤——轻度、较轻急性心肌梗死和轻度脑中风后遗症[E3]",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "规范对这三种轻度疾病均列有具体的疾病定义[E4]",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "RB-L1-009",
+   "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料",
+   "p0": {
+    "refused": true,
+    "partial_rows": 6,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 5,
+    "upgraded": 0,
+    "blocked": [
+     {
+      "s": "根据《人身保险产品信息披露管理办法》，保险公司应当根据保险产品审批或备案材料报送内容披露保险产品信息[E1]",
+      "why": "hard-class"
+     },
+     {
+      "s": "应披露的材料包括保险产品目录、保险产品条款以及保险产品费率表[E1]",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "一年期以上的人身保险产品现金价值全表和一年期以上的人身保险产品说明书亦在应披露之列[E1]",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "银保监会规定的其他应当披露的产品材料信息也属于披露范围[E1]",
+      "why": "hard-class"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "RB-L1-027",
+   "query": "人身保险公司的保险条款和保险费率需要审批还是备案",
+   "p0": {
+    "refused": true,
+    "partial_rows": 3,
+    "unsupported_rows": 1
+   },
+   "ca": {
+    "failing_sentences": 4,
+    "upgraded": 2,
+    "blocked": [
+     {
+      "s": "《保险法》也规定，关系社会公众利益的保险险种、依法实行强制保险的险种和新开发的人寿保险险种的保险条款和保险费率，应当报国",
+      "why": "hard-class"
+     },
+     {
+      "s": "报送备案的，不得迟于使用后10日[E1]",
+      "why": "hard-class"
+     }
+    ],
+    "delivered": true
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "RB-L1-019",
+   "query": "保险保障基金由谁缴纳、按什么缴纳",
+   "p0": {
+    "refused": true,
+    "partial_rows": 3,
+    "unsupported_rows": 1
+   },
+   "ca": {
+    "failing_sentences": 4,
+    "upgraded": 1,
+    "blocked": [
+     {
+      "s": "根据《保险保障基金管理办法》，保险保障基金由境内保险公司依法缴纳[E1]",
+      "why": "hard-class"
+     },
+     {
+      "s": "缴费费率由基准费率和风险差别费率构成[E1]",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "此外，境外直接保险业务、再保险分入业务等不属于救助范围的业务不缴纳保险保障基金[E1]",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "RB-L1-023",
+   "query": "银行保险机构收到消费投诉后多久作出处理决定",
+   "p0": {
+    "refused": true,
+    "partial_rows": 1,
+    "unsupported_rows": 3
+   },
+   "ca": {
+    "failing_sentences": 3,
+    "upgraded": 0,
+    "blocked": [
+     {
+      "s": "根据《银行业保险业消费投诉处理管理办法》，对于事实清楚、争议情况简单的消费投诉，银行保险机构应当自收到消费投诉之日起15",
+      "why": "hard-class"
+     },
+     {
+      "s": "情况复杂的，可以延长至30日[E1]",
+      "why": "hard-class"
+     },
+     {
+      "s": "情况特别复杂或者有其他特殊原因的，经其上级机构或者总行、总公司高级管理人员审批并告知投诉人，可以再延长30日[E1]",
+      "why": "hard-class"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "PROBE-CHILD-CI",
+   "query": "儿童重疾险一般保障哪些重大疾病",
+   "p0": {
+    "refused": true,
+    "partial_rows": 6,
+    "unsupported_rows": 2
+   },
+   "ca": {
+    "failing_sentences": 5,
+    "upgraded": 2,
+    "blocked": [
+     {
+      "s": "该规范适用于保险期间主要为成年人（十八周岁及以上）阶段的重大疾病保险[E1]，因此证据未覆盖儿童重疾险专属保障哪些重大疾",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "规范疾病范围内其他可供保险公司选择使用的疾病还包括多个肢体缺失、急性重症肝炎或亚急性重症肝炎、双耳失聪、双目失明、瘫痪、",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "各保险公司还可以根据市场需求增加规范疾病范围以外的其他疾病，并合理制定相关定义[E1]",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "GEN-01",
+   "query": "保险公司倒闭了，我的人寿保险单还有效吗",
+   "p0": {
+    "refused": true,
+    "partial_rows": 0,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 4,
+    "upgraded": 0,
+    "blocked": [
+     {
+      "s": "根据证据，经营有人寿保险业务的保险公司被依法撤销或被依法宣告破产的，其持有的人寿保险合同及责任准备金必须转让给其他经营有",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "转让或指定接受转让时，应当维护被保险人、受益人的合法权益[E2]",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "因此，您的保单利益可通过合同转让得以延续，而非直接失效",
+      "why": "hard-class"
+     },
+     {
+      "s": "若受让公司的清算资产不足以偿付人寿保险合同保单利益，保险保障基金可向保单受让公司提供救助[E1]",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "GEN-02",
+   "query": "什么是保险销售行为可回溯",
+   "p0": {
+    "refused": true,
+    "partial_rows": 5,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 2,
+    "upgraded": 0,
+    "blocked": [
+     {
+      "s": "除电话销售和互联网保险业务外，符合规定情形的（如通过保险兼业代理机构销售保险期间超过1年的人身保险产品），应在取得投保人",
+      "why": "hard-class"
+     },
+     {
+      "s": "根据不同销售方式，还可采取录像、销售页面管理和操作轨迹记录等方法实施可回溯管理，并对产生的视听资料及电子资料做好备份存档",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "GEN-03",
+   "query": "重大疾病保险一般保障哪些疾病",
+   "p0": {
+    "refused": true,
+    "partial_rows": 12,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 5,
+    "upgraded": 2,
+    "blocked": [
+     {
+      "s": "规范疾病范围内还包括多个肢体缺失、急性重症肝炎或亚急性重症肝炎、严重非恶性颅内肿瘤、严重慢性肝衰竭、严重脑炎后遗症或严重",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "此外还包括严重阿尔茨海默病、严重脑损伤、严重原发性帕金森病、严重Ⅲ度烧伤、严重特发性肺动脉高压、严重运动神经元病、语言能",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "除规范规定的疾病外，保险公司还可以根据市场需求在产品中增加规范疾病范围以外的其他疾病，并合理制定相关定义[E1]",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "GEN-04",
+   "query": "通过互联网买保险需要注意什么",
+   "p0": {
+    "refused": true,
+    "partial_rows": 0,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 5,
+    "upgraded": 1,
+    "blocked": [
+     {
+      "s": "通过互联网购买保险应注意以下几点",
+      "why": "no-citation"
+     },
+     {
+      "s": "保险机构应在其官方网站披露营业执照、经营许可证、自营网络平台网址以及偿付能力充足率等监管评价信息[E3]",
+      "why": "hard-class"
+     },
+     {
+      "s": "营销宣传页面应明确标识产品为保险产品，并标明保险产品全称、承保保险公司全称及提供销售或经纪服务的保险中介机构全称[E8]",
+      "why": "judge:KEEP_BASELINE"
+     },
+     {
+      "s": "投保文书材料应由投保人本人以签字、盖章或其他法律法规认可的方式确认，销售人员不得代替确认[E1]",
+      "why": "judge:KEEP_BASELINE"
+     }
+    ],
+    "delivered": false
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  },
+  {
+   "case_id": "GEN-05",
+   "query": "意外伤害保险的保险期间有什么规定",
+   "p0": {
+    "refused": true,
+    "partial_rows": 8,
+    "unsupported_rows": 0
+   },
+   "ca": {
+    "failing_sentences": 5,
+    "upgraded": 2,
+    "blocked": [
+     {
+      "s": "监管规定区分保险期限一年及以下与保险期限一年以上的意外险分别作出要求[E1]",
+      "why": "hard-class"
+     },
+     {
+      "s": "以激活注册方式销售的意外险，产品保险期限应不少于7天，且保险责任开始时间应在激活注册之后[E4]",
+      "why": "hard-class"
+     },
+     {
+      "s": "证据未规定意外险保险期间的上限，但对保险期限一年及以下的意外险，禁止在距保单到期日前间隔60天以上预收下一保单年度保费[",
+      "why": "hard-class"
+     }
+    ],
+    "delivered": true
+   },
+   "cb": {
+    "status": "error",
+    "error": "ImportError(\"cannot import name 'LLMRequest' from 'runtime.agent.model' (D:\\\\Workspace\\\\insurance-agent\\\\runtime\\\\agent\\"
+   }
+  }
+ ],
+ "judge_calls_total": 31
+}

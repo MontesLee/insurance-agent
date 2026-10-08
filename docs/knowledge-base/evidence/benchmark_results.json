@@ -1,0 +1,3375 @@
+{
+ "kb_id": "44af9ff2-ecef-445e-87c6-cb1458cd4d44",
+ "kb_name": "insurance-kb-v1",
+ "ran_at": "2026-10-04T12:44:48",
+ "counts": {
+  "total": 57,
+  "PASS": 35,
+  "FAIL": 22,
+  "retrieval_pass": 40,
+  "qualified_pass": 40,
+  "claim_pass": 16,
+  "claim_total": 25,
+  "claim_module_pass": 16
+ },
+ "results": [
+  {
+   "case_id": "RB-L1-001",
+   "query": "保险公司注册资本的最低限额是多少",
+   "expected": "L1-01",
+   "top_hits": [
+    {
+     "doc": "L1-11",
+     "score": 0.014884868421052631
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01389476467477525
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.013675213675213673
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.013008036739380023
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.01246273106738223
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.012446183953033266
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011766975308641974
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011681329423264906
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011611917494270435
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.011350844277673546
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 7,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-002",
+   "query": "投保人故意不履行如实告知义务，保险公司能否解除合同",
+   "expected": "L1-01",
+   "top_hits": [
+    {
+     "doc": "L1-01",
+     "score": 0.015855532786885243
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.01539991162174105
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.014298169136878813
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.014166666666666668
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.013519813519813519
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.013435194942044256
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.01316080309449254
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012907518296739853
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012335526315789472
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.0112806901128069
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-003",
+   "query": "金融机构销售产品时产品风险等级与机构评定不一致怎么办",
+   "expected": "L1-02",
+   "top_hits": [
+    {
+     "doc": "L1-02",
+     "score": 0.015835777126099706
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.011321514907332795
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01046689628779181
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01044776119402985
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010144927536231883
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.009859154929577464
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.00979960899315738
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.00958904109589041
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.009371657754010694
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-004",
+   "query": "金融机构产品适当性管理办法从什么时候开始施行",
+   "expected": "L1-02",
+   "top_hits": [
+    {
+     "doc": "L1-02",
+     "score": 0.016393442622950817
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.014427750773309765
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.014202943939868462
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.012229437229437229
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.012174940898345152
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.012138030888030886
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011905594405594406
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01158008658008658
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011104331909701037
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01093799682034976
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-005",
+   "query": "保险销售行为管理覆盖哪些环节",
+   "expected": "L1-03",
+   "top_hits": [
+    {
+     "doc": "L1-24",
+     "score": 0.014884500745156482
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.014166666666666668
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.01393686718284693
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.013569048500555347
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013463203463203462
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012460646230323114
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.01233062330623306
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012166847237269771
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012109374999999999
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.01123981804718079
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 4,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-006",
+   "query": "保险销售行为管理办法的施行日期",
+   "expected": "L1-03",
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.014908579465541489
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.014507073882775655
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.01446078431372549
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.014383688600556069
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.01433255269320843
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013968743970673353
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.01365252730505461
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.012987012987012986
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012948665853988892
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012921727395411605
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 10,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-007",
+   "query": "长期健康保险产品的犹豫期不得少于多少天",
+   "expected": "L1-04",
+   "top_hits": [
+    {
+     "doc": "L1-04",
+     "score": 0.01544477028347996
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.0137995337995338
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.012279888785912883
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.01223893065998329
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.011365678346810421
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.011329715061058345
+    },
+    {
+     "doc": "L1-25",
+     "score": 0.010763422818791946
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.0103329925514824
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.00958904109589041
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.009333333333333332
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-008",
+   "query": "保险公司销售长期个人健康保险产品后需要在犹豫期内做什么",
+   "expected": "L1-04",
+   "top_hits": [
+    {
+     "doc": "L1-04",
+     "score": 0.014832427536231884
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.013053740014524327
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.013021801588642893
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011625224301461163
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.010666836995401123
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.01050802139037433
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.010476190476190476
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.010310034855989726
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.010121527777777778
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010021186440677964
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-009",
+   "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料",
+   "expected": "L1-05",
+   "top_hits": [
+    {
+     "doc": "L1-13",
+     "score": 0.014963781929088829
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.013401187446988972
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.013251366120218579
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012714041095890409
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011500392772977219
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.011100687929956221
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010305483989694516
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.010294117647058823
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 3,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-010",
+   "query": "人身保险产品按设计类型分为哪几种",
+   "expected": "L1-05",
+   "top_hits": [
+    {
+     "doc": "L1-05",
+     "score": 0.016129032258064516
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.014445706865768543
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.013501602564102563
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.013084961381190367
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01233062330623306
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.012280701754385965
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.01193864642631246
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011057692307692307
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.010854297693920335
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010606060606060605
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-011",
+   "query": "互联网保险业务可以通过什么平台经营",
+   "expected": "L1-06",
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.016162909836065574
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.015607940446650124
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.014270919635459817
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013485144991994305
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011526881720430107
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011092436974789914
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.010144927536231883
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.009999999999999998
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.009860759493670886
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.009708931419457735
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-012",
+   "query": "互联网保险业务监管办法什么时候施行",
+   "expected": "L1-06",
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.01553113553113553
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013902763902763902
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.013355563355563354
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.012975352112676055
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012966300234276446
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.012698412698412697
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.012604166666666666
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.011344303444428949
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.010932051644519837
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-013",
+   "query": "经营保险代理业务需要取得什么许可",
+   "expected": "L1-07",
+   "top_hits": [
+    {
+     "doc": "L1-07",
+     "score": 0.015314685314685314
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.014298169136878813
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.013731048933809935
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012884615384615385
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012556145365455287
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012063492063492064
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.010794402140358098
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.01078003875968992
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010757314974182444
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.009925474254742547
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-014",
+   "query": "保险销售从业人员应当在何处进行执业登记",
+   "expected": "L1-07",
+   "top_hits": [
+    {
+     "doc": "L1-08",
+     "score": 0.016020864381520117
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.013640202702702702
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.01330282227307399
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.013097826086956522
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.01274242424242424
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.012718894009216589
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011916104274182876
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011562713019768234
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011274249269200105
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010769230769230769
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 7,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-015",
+   "query": "保险经纪人是代表谁的利益办理保险业务",
+   "expected": "L1-08",
+   "top_hits": [
+    {
+     "doc": "L1-01",
+     "score": 0.015117056856187291
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.014701216287678476
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.014346590909090908
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.014285714285714287
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012193362193362192
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01183032079465885
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.010815888352120235
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010721062618595826
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.010521281683405069
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 4,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-016",
+   "query": "保险经纪人监管规定的施行日期",
+   "expected": "L1-08",
+   "top_hits": [
+    {
+     "doc": "L1-07",
+     "score": 0.015625
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.012594202898550724
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.012507132260641332
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012131882202304736
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.011837121212121212
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.011695906432748537
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.011428571428571427
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.011186868686868686
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-017",
+   "query": "保险公司设立分支机构需要经过什么程序",
+   "expected": "L1-09",
+   "top_hits": [
+    {
+     "doc": "L1-09",
+     "score": 0.016237314597970336
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.015336463223787166
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.015132827324478178
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.014245229548460228
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013546195652173913
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.013077413188913665
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.012692519251925192
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.012487360970677451
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.011892130857648099
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011553738317757009
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-018",
+   "query": "保险公司管理规定的施行日期是哪一天",
+   "expected": "L1-09",
+   "top_hits": [
+    {
+     "doc": "L1-09",
+     "score": 0.013813813813813813
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.013813068651778329
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.013295454545454544
+    },
+    {
+     "doc": "L1-11",
+     "score": 0.013117996044825312
+    },
+    {
+     "doc": "L1-17",
+     "score": 0.013056456846203763
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012745098039215686
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.012243230625583567
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.012209699453551912
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011394176931690928
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-019",
+   "query": "保险保障基金由谁缴纳、按什么缴纳",
+   "expected": "L1-10",
+   "top_hits": [
+    {
+     "doc": "L1-10",
+     "score": 0.015056022408963584
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.014600409836065573
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.013995726495726495
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.013605655930871954
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01358904109589041
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.013563049853372432
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.013442922374429223
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.013337499999999999
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011127819548872181
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.010609412711182622
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-020",
+   "query": "人寿保险公司破产时保单持有人能够获得什么救助",
+   "expected": "L1-10",
+   "top_hits": [
+    {
+     "doc": "L1-13",
+     "score": 0.013914434226309476
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.013502673796791443
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.013077413188913665
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.012927689594356261
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.012324805339265851
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.012229437229437229
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01178030303030303
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011763038548752835
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011100687929956221
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.0109375
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-021",
+   "query": "偿付能力达标公司需要满足哪些条件",
+   "expected": "L1-11",
+   "top_hits": [
+    {
+     "doc": "L1-11",
+     "score": 0.01631411951348493
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.01446078431372549
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.014007936507936507
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.01344163083293518
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013376524390243902
+    },
+    {
+     "doc": "L1-11",
+     "score": 0.013305613305613305
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012914813547724939
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01255933812559338
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.011615168539325841
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011071428571428572
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-022",
+   "query": "保险公司偿付能力管理规定的施行日期",
+   "expected": "L1-11",
+   "top_hits": [
+    {
+     "doc": "L1-11",
+     "score": 0.016237314597970336
+    },
+    {
+     "doc": "L1-11",
+     "score": 0.015212150433944069
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.013229437229437228
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01254177807486631
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.012328384864382185
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01218266253869969
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011636470761525998
+    },
+    {
+     "doc": "L1-17",
+     "score": 0.011380985426786953
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011245954692556634
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01111111111111111
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-023",
+   "query": "银行保险机构收到消费投诉后多久作出处理决定",
+   "expected": "L1-12",
+   "top_hits": [
+    {
+     "doc": "L1-12",
+     "score": 0.014615384615384615
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.013745173745173745
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.012436332767402376
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.011974358974358973
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.011799870045484079
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011492338441039305
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.01111111111111111
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.010769230769230769
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-024",
+   "query": "哪些机构适用银行业保险业消费投诉处理管理办法",
+   "expected": "L1-12",
+   "top_hits": [
+    {
+     "doc": "L1-12",
+     "score": 0.016393442622950817
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.014409722222222223
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01336038255325315
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.01296296296296296
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.012153143659992973
+    },
+    {
+     "doc": "L1-15",
+     "score": 0.012123270750988142
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.011588972431077694
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.011542792792792791
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.010523340332741075
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-025",
+   "query": "人身保险公司应当为投保人和被保险人提供哪些基本服务",
+   "expected": "L1-13",
+   "top_hits": [
+    {
+     "doc": "L1-04",
+     "score": 0.01569940476190476
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.015062960323117129
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.01359082094376212
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012271750805585391
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012263519169596516
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011922107032782292
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.01176194939081537
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011556064073226544
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01108303249097473
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011011904761904761
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-026",
+   "query": "人身保险业务基本服务规定的施行日期",
+   "expected": "L1-13",
+   "top_hits": [
+    {
+     "doc": "L1-07",
+     "score": 0.014994582881906825
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.014983637213651238
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.014348171701112878
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.01348010360254297
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.011791187739463601
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01111111111111111
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011013071895424836
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.010963768115942027
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.010794402140358098
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-027",
+   "query": "人身保险公司的保险条款和保险费率需要审批还是备案",
+   "expected": "L1-14",
+   "top_hits": [
+    {
+     "doc": "L1-13",
+     "score": 0.01277975766215253
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.01176194939081537
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011498499191872546
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.011247868712702471
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011041666666666667
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.0106799501867995
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010113636363636363
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L1-028",
+   "query": "人身保险公司保险条款和保险费率管理办法现行版本是哪年修订的",
+   "expected": "L1-14",
+   "top_hits": [
+    {
+     "doc": "L1-14",
+     "score": 0.014000805801772763
+    },
+    {
+     "doc": "L2-03",
+     "score": 0.013419117647058823
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.013097826086956522
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.01282871357498223
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.012730639961588585
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01258894362342638
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.012514812376563527
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.012199722056779829
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.012027027027027027
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011945701357466063
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L1-029",
+   "query": "保险销售可回溯资料应当保存多长时间",
+   "expected": "L1-15",
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.013108504398826978
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01273372018052869
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.012558442327040302
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.01206531954887218
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011992263056092842
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.011879117431768272
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.01093984962406015
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.010518982932776037
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.010294117647058823
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L1-15 not in top-10"
+  },
+  {
+   "case_id": "RB-L1-030",
+   "query": "银行保险机构董事近亲属与机构发生的关联交易要经过什么程序",
+   "expected": "L1-21",
+   "top_hits": [
+    {
+     "doc": "L1-21",
+     "score": 0.013588709677419354
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.012503334815473544
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01247050893158072
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011599438089504314
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.011129740518962076
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01111111111111111
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.010833734939759036
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010739171374764595
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-001",
+   "query": "2020版重疾规范规定必须包含哪三种轻度疾病",
+   "expected": "L2-01",
+   "top_hits": [
+    {
+     "doc": "L2-03",
+     "score": 0.01605222734254992
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.015588723051409618
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.01245945945945946
+    },
+    {
+     "doc": "L2-02",
+     "score": 0.01213953488372093
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.011985418333777895
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.011902844873859366
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011468169357295156
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011293586550435865
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010606060606060605
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported",
+     "claim_support:unsupported",
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     },
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     },
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L2-002",
+   "query": "严重溃疡性结肠炎的重疾定义是什么",
+   "expected": "L2-01",
+   "top_hits": [
+    {
+     "doc": "L1-08",
+     "score": 0.013316993464052285
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01250633767111712
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011715918594926121
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011530793685004578
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.011463414634146341
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01119047619047619
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.010382809678584326
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01031795296227326
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.010248716936439004
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 10,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": false,
+    "module_ok": false,
+    "verbatim_contained": false,
+    "violations": [
+     "claim_support:unsupported"
+    ],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "UNSUPPORTED"
+     }
+    ]
+   },
+   "status": "FAIL",
+   "failure_reason": "expected_fact neither SUPPORTED by module nor verbatim-contained in qualified chunks"
+  },
+  {
+   "case_id": "RB-L2-003",
+   "query": "重大疾病保险的疾病定义使用规范由哪些组织修订",
+   "expected": "L2-01",
+   "top_hits": [
+    {
+     "doc": "L2-02",
+     "score": 0.01631411951348493
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.012191947240541477
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012014511310285957
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010845295055821371
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.010565052231718898
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.010460761966786063
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.010051736881005172
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.009859154929577464
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-01 not in top-10"
+  },
+  {
+   "case_id": "RB-L2-004",
+   "query": "2020版重疾定义是对哪一年的定义进行的修订",
+   "expected": "L2-01",
+   "top_hits": [
+    {
+     "doc": "L2-03",
+     "score": 0.01631411951348493
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.016208355367530406
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.014095394736842105
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.013409798923817613
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013093008739076154
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.012975116215477166
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.011892130857648099
+    },
+    {
+     "doc": "L2-02",
+     "score": 0.01178018575851393
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.011652930402930403
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.011340357038337724
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-005",
+   "query": "轻度疾病的累计保险金额与重度疾病有什么比例限制",
+   "expected": "L2-01",
+   "top_hits": [
+    {
+     "doc": "L1-01",
+     "score": 0.015136476426799007
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.014128989361702126
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.013862014274385407
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.013260927862697773
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.012890504175688215
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.012512980269989614
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01175820707070707
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.01093984962406015
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.010536585365853657
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01044776119402985
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-01 not in top-10"
+  },
+  {
+   "case_id": "RB-L2-006",
+   "query": "重疾定义修订前后严重脑中风后遗症的定义有什么变化",
+   "expected": "L2-02",
+   "top_hits": [
+    {
+     "doc": "L1-11",
+     "score": 0.013576357635763574
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.01221590909090909
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.01204780361757106
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.011899313501144164
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011878814298169137
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011606060606060606
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.01141550312951372
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01111111111111111
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-02 not in top-10"
+  },
+  {
+   "case_id": "RB-L2-007",
+   "query": "重疾定义对比表中恶性肿瘤定义修订前后的差异",
+   "expected": "L2-02",
+   "top_hits": [
+    {
+     "doc": "L2-01",
+     "score": 0.01486111111111111
+    },
+    {
+     "doc": "L1-11",
+     "score": 0.012544927536231883
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01177337578115788
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.011713583978839976
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.010220588235294117
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.009722222222222222
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.00958904109589041
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-02 not in top-10"
+  },
+  {
+   "case_id": "RB-L2-008",
+   "query": "哪里可以查到重疾定义修订前和修订后的全文对照",
+   "expected": "L2-02",
+   "top_hits": [
+    {
+     "doc": "L1-11",
+     "score": 0.014734968354430378
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.012685265911072361
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.012381103360811668
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.012310730743910467
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.012097960899726718
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.011781609195402299
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01158008658008658
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.01138157894736842
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.011011904761904761
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-02 not in top-10"
+  },
+  {
+   "case_id": "RB-L2-009",
+   "query": "不符合2020版定义的重疾产品最迟可以销售到什么时候",
+   "expected": "L2-03",
+   "top_hits": [
+    {
+     "doc": "L2-03",
+     "score": 0.016393442622950817
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.015522875816993463
+    },
+    {
+     "doc": "L2-02",
+     "score": 0.014553429027113237
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.014477611940298507
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012513416815742397
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.012212994626282364
+    },
+    {
+     "doc": "L2-02",
+     "score": 0.011801896733403582
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011715608164504135
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011385026737967914
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011204446409398092
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-010",
+   "query": "重疾新旧定义切换时监管对销售行为有什么禁止性要求",
+   "expected": "L2-03",
+   "top_hits": [
+    {
+     "doc": "L2-03",
+     "score": 0.01389239176124422
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.013536409516943041
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.012757461118116856
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012524801587301586
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01211445559271646
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.011975806451612902
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011766549157853506
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.011661585365853657
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.01044776119402985
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-011",
+   "query": "新开发的成年人重大疾病产品应当符合什么要求",
+   "expected": "L2-03",
+   "top_hits": [
+    {
+     "doc": "L2-01",
+     "score": 0.014267676767676768
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.012953242348380843
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.012828282828282828
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.011854341736694677
+    },
+    {
+     "doc": "L1-17",
+     "score": 0.011471861471861472
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L2-03",
+     "score": 0.011224339093191552
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.010930047694753576
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010484637313905606
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 7,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-012",
+   "query": "中国人身保险业经验生命表2025从什么时候开始使用",
+   "expected": "L2-05",
+   "top_hits": [
+    {
+     "doc": "L2-05",
+     "score": 0.01631411951348493
+    },
+    {
+     "doc": "L2-05",
+     "score": 0.01579861111111111
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.01489177489177489
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.013229941446431397
+    },
+    {
+     "doc": "L1-25",
+     "score": 0.012152306648575304
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012056784417299439
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.012035638779824826
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01201865423051299
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.011806722689075629
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.011557361557361557
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-013",
+   "query": "年金保险评估法定责任准备金应当采用哪张生命表",
+   "expected": "L2-05",
+   "top_hits": [
+    {
+     "doc": "L1-04",
+     "score": 0.015117056856187291
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.015089867667390875
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.014814814814814814
+    },
+    {
+     "doc": "L1-17",
+     "score": 0.014254516577327774
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012922374429223744
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.011666666666666667
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01121384542437174
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.011107201501290171
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.010416666666666666
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.010294117647058823
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-05 not in top-10"
+  },
+  {
+   "case_id": "RB-L2-014",
+   "query": "健康保险和定期寿险准备金评估用哪张生命表",
+   "expected": "L2-05",
+   "top_hits": [
+    {
+     "doc": "L1-04",
+     "score": 0.015529463890119628
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.015083672546359114
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.013605655930871954
+    },
+    {
+     "doc": "L2-05",
+     "score": 0.011714149291739615
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.010588563458856344
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.01042606516290727
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.010363984674329502
+    },
+    {
+     "doc": "L1-25",
+     "score": 0.01034675615212528
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.009834785467696859
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.009643412359113875
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 4,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-L2-015",
+   "query": "单一生命体表有什么用途",
+   "expected": "L2-05",
+   "top_hits": [
+    {
+     "doc": "L1-23",
+     "score": 0.012174940898345152
+    },
+    {
+     "doc": "L2-02",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011264991433466591
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.011210571184995737
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.011055555555555556
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010990910254768914
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010394519253484526
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.010144927536231883
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L2-05 not in top-10"
+  },
+  {
+   "case_id": "RB-X-001",
+   "query": "消费者遇到保险销售误导应该怎么投诉维权",
+   "expected": "L1-12",
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.013997821350762527
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.013653483992467042
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012991452991452991
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012607485307763686
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012471395881006864
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012194092827004219
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011585576259489304
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.01092639302912176
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.010896103896103895
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L1-12 not in top-10"
+  },
+  {
+   "case_id": "RB-X-002",
+   "query": "在网上销售保险需要遵守哪些专门的监管规定",
+   "expected": "L1-06",
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.012796504369538076
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01254177807486631
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.012360446570972886
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.01155440414507772
+    },
+    {
+     "doc": "L1-17",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.011406164006604292
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.011296842565279143
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.011184785776741474
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011145703611457036
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 1,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-X-003",
+   "query": "保险公司破产了消费者的人寿保险保单怎么办",
+   "expected": "L1-10",
+   "top_hits": [
+    {
+     "doc": "L1-01",
+     "score": 0.014285714285714287
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.013665190857963383
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.013459459459459458
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.013095773381294962
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.012964009798379498
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.012267521277713564
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011986814504045549
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.011821862348178138
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.01118659420289855
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.011055555555555556
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 3,
+   "expected_qualified": true,
+   "claim_support": {
+    "ok": true,
+    "module_ok": true,
+    "verbatim_contained": true,
+    "violations": [],
+    "claims": [
+     {
+      "claim_type": "C-FACT",
+      "support_status": "SUPPORTED"
+     }
+    ]
+   },
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-X-004",
+   "query": "买重疾险时新旧疾病定义有什么区别需要注意什么",
+   "expected": "L2-01",
+   "top_hits": [
+    {
+     "doc": "L2-03",
+     "score": 0.015887174541947928
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.013997821350762527
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01356907894736842
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.013519813519813519
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.013020833333333332
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.011549925484351714
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01044776119402985
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.010144927536231883
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": true,
+   "expected_rank": 2,
+   "expected_qualified": true,
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-X-005",
+   "query": "保险公司与股东之间的关联交易受什么监管约束",
+   "expected": "L1-21",
+   "top_hits": [
+    {
+     "doc": "L1-20",
+     "score": 0.014516129032258063
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.013436194149791063
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012180823345492444
+    },
+    {
+     "doc": "L1-11",
+     "score": 0.011792349726775956
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01111111111111111
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.011001737116386797
+    },
+    {
+     "doc": "L1-05",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-10",
+     "score": 0.010710940825883353
+    },
+    {
+     "doc": "L1-04",
+     "score": 0.010294117647058823
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.010144927536231883
+    }
+   ],
+   "hit_count": 10,
+   "expected_in_top_k": false,
+   "expected_rank": null,
+   "expected_qualified": false,
+   "status": "FAIL",
+   "failure_reason": "expected doc L1-21 not in top-10"
+  },
+  {
+   "case_id": "RB-N-001",
+   "query": "如何办理机动车驾驶证换证手续",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.013529411764705882
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.013083948015454865
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.012256433139967274
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.01111111111111111
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.010488176964149505
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.01044776119402985
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [
+    "L1-18",
+    "L2-01",
+    "L2-01",
+    "L2-01",
+    "L1-13",
+    "L1-13",
+    "L2-01"
+   ],
+   "status": "FAIL",
+   "failure_reason": "negative query qualified hits: L1-18,L2-01,L2-01,L2-01,L1-13,L1-13,L2-01"
+  },
+  {
+   "case_id": "RB-N-002",
+   "query": "社会保险里的养老保险退休后怎么办理领取手续",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-24",
+     "score": 0.01429864253393665
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.013536409516943041
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012702702702702703
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.012456402590931738
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01206766917293233
+    },
+    {
+     "doc": "L1-09",
+     "score": 0.01175780486215212
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-06",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.010979060554612338
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010205453149001537
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [
+    "L1-24",
+    "L1-08",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-01",
+    "L1-06",
+    "L1-18",
+    "L1-08"
+   ],
+   "status": "FAIL",
+   "failure_reason": "negative query qualified hits: L1-24,L1-08,L1-06,L1-06,L1-06,L1-01,L1-06,L1-18,L1-08"
+  },
+  {
+   "case_id": "RB-N-003",
+   "query": "医院门诊挂号预约有哪些方式",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-06",
+     "score": 0.014661109097499094
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.014445706865768543
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.014343865090133745
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.013823529411764705
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.0137995337995338
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.013664772727272727
+    },
+    {
+     "doc": "L1-03",
+     "score": 0.013077413188913665
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.011310043668122272
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01055722891566265
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [],
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-N-004",
+   "query": "机动车年检流程是怎样的",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-14",
+     "score": 0.014665334665334664
+    },
+    {
+     "doc": "L1-17",
+     "score": 0.013294117647058824
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.013199547767100056
+    },
+    {
+     "doc": "L1-22",
+     "score": 0.012862745098039214
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.012043505874880914
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-23",
+     "score": 0.010144927536231883
+    },
+    {
+     "doc": "L1-19",
+     "score": 0.010122086570477246
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [],
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-N-005",
+   "query": "明天天气怎么样适合出游吗",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-22",
+     "score": 0.014198981590285938
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.01111111111111111
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.010606060606060605
+    },
+    {
+     "doc": "L1-21",
+     "score": 0.01044776119402985
+    },
+    {
+     "doc": "L1-02",
+     "score": 0.010294117647058823
+    },
+    {
+     "doc": "L1-18",
+     "score": 0.009859154929577464
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [],
+   "status": "PASS",
+   "failure_reason": ""
+  },
+  {
+   "case_id": "RB-N-006",
+   "query": "未成年人办理身份证需要什么材料",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-22",
+     "score": 0.015367965367965367
+    },
+    {
+     "doc": "L1-14",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.011303630363036304
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.0109375
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.010769230769230769
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.010294117647058823
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010234680573663623
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.010227475468331845
+    },
+    {
+     "doc": "L1-12",
+     "score": 0.010210184552289815
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [
+    "L1-22",
+    "L1-07",
+    "L1-07",
+    "L1-12"
+   ],
+   "status": "FAIL",
+   "failure_reason": "negative query qualified hits: L1-22,L1-07,L1-07,L1-12"
+  },
+  {
+   "case_id": "RB-N-007",
+   "query": "个人所得税专项附加扣除怎么填报",
+   "expected": null,
+   "top_hits": [
+    {
+     "doc": "L1-24",
+     "score": 0.0130718954248366
+    },
+    {
+     "doc": "L1-07",
+     "score": 0.01288837744533947
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.012198275862068965
+    },
+    {
+     "doc": "L1-24",
+     "score": 0.011963109354413701
+    },
+    {
+     "doc": "L2-01",
+     "score": 0.011475409836065573
+    },
+    {
+     "doc": "L1-13",
+     "score": 0.01129032258064516
+    },
+    {
+     "doc": "L1-16",
+     "score": 0.011148564294631711
+    },
+    {
+     "doc": "L1-08",
+     "score": 0.010849253939478453
+    },
+    {
+     "doc": "L1-01",
+     "score": 0.01044776119402985
+    },
+    {
+     "doc": "L1-20",
+     "score": 0.01043501611170784
+    }
+   ],
+   "hit_count": 10,
+   "qualified_hits": [],
+   "status": "PASS",
+   "failure_reason": ""
+  }
+ ]
+}

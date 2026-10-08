@@ -1,0 +1,36 @@
+{
+  "registry_version": 1,
+  "description": "Agent Registry v1 declarations (Phase 28.A-1 / ADR-021 APPROVED). CONFIGURATION BASED: loaded read-only at startup with fail-closed validation against schema/agent-registry.schema.json. Runtime dynamic registration is FORBIDDEN. v1 is declaration-only — no execution fields (workflow/tools/skills arrive in a later versioned contract revision with 28.A-1+ implementation). The deterministic Router (runtime/router.py) derives its intent->agent table ONLY from these declarations.",
+  "agents": [
+    {
+      "id": "insurance-qa-agent",
+      "name": "Insurance QA Agent",
+      "description": "Insurance knowledge QA and product-fact QA with mandatory evidence grounding (WeKnora governed evidence / Product Catalog deterministic lookup).",
+      "supported_intents": ["insurance_qa", "product_qa"],
+      "input_contract": "schema/intent-result.schema.json",
+      "output_contract": "contracts/knowledge-evidence.schema.json",
+      "capabilities": ["knowledge-grounded-qa", "catalog-fact-lookup"],
+      "risk_level": "low"
+    },
+    {
+      "id": "insurance-planning-agent",
+      "name": "Insurance Planning Agent",
+      "description": "Family risk and coverage-gap analysis, plan design, product recommendation, report generation. Owns the existing 8-stage planning workflow (referenced, not copied).",
+      "supported_intents": ["insurance_plan", "modify_existing_plan"],
+      "input_contract": "schema/intent-result.schema.json",
+      "output_contract": "contracts/insurance-report.schema.json",
+      "capabilities": ["planning-workflow", "plan-modification"],
+      "risk_level": "high"
+    },
+    {
+      "id": "conversation-agent",
+      "name": "Conversation Agent",
+      "description": "Clarification and presentation front-end. Owns no business workflow; serves the fail-closed unknown-intent path.",
+      "supported_intents": ["unknown_insurance_intent"],
+      "input_contract": "schema/intent-result.schema.json",
+      "output_contract": "schema/intent-result.schema.json",
+      "capabilities": ["clarification"],
+      "risk_level": "low"
+    }
+  ]
+}

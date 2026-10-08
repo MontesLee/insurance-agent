@@ -1,0 +1,30 @@
+{
+ "test": "SELF-RETRIEVAL (verbatim chunk text as query) — root-cause exhibit",
+ "ran_at": "2026-10-04",
+ "kb": "insurance-kb-v1 (44af9ff2-ecef-445e-87c6-cb1458cd4d44)",
+ "method": "vector_search top-10",
+ "results": [
+  {
+   "query": "严重溃疡性结肠炎指伴有致命性电解质紊乱",
+   "expected_doc": "L2-01",
+   "fact_chunk_rank": null,
+   "note": "含该原文的块未进 top-10"
+  },
+  {
+   "query": "应当自收到消费投诉之日起15日内作出处理决定",
+   "expected_doc": "L1-12",
+   "fact_chunk_rank": 1
+  },
+  {
+   "query": "其注册资本的最低限额为人民币二亿元",
+   "expected_doc": "L1-01",
+   "fact_chunk_rank": 8
+  },
+  {
+   "query": "本办法自2024年3月1日起施行",
+   "expected_doc": "L1-03",
+   "fact_chunk_rank": 5
+  }
+ ],
+ "conclusion": "块文本逐字作为查询仍无法稳定检回自身块 → nomic-embed-text 对中文法律文本的向量区分度接近噪声级。KB 数据层无缺陷（791/791 块全嵌入·事实文本逐字在块内·benchmark 失败案例的 expected_fact 均可在库内块文本中找到）。检索质量瓶颈=部署级嵌入模型，Owner 杠杆=更换中文嵌入模型(如 bge-m3)+重建向量索引。"
+}

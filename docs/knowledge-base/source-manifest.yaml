@@ -1,0 +1,935 @@
+# WeKnora Insurance KB v1.0 — Source Manifest
+# Built from verified official sources on 2026-10-04.
+# Layers: L1=法律法规/监管规章/正式监管文件  L2=行业正式标准/官方行业文件
+# Source priority: P0=全国人大/中国政府网/国务院/司法部 P1=国家金融监督管理总局(含原银保监会/保监会官网及公报转载)
+#               P2=中国保险行业协会/中国医师协会/中国精算师协会
+
+L1-01:
+  title: 中华人民共和国保险法
+  layer: L1
+  source_organization: 全国人民代表大会常务委员会（NFRA官方转载全文）
+  source_type: P0锚点(flk)+P1全文(NFRA)
+  official_url: "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7c4060811"
+  alternate_url: "https://www.nfra.gov.cn/cn/view/pages/ItemDetail.html?docId=879931&itemId=927&generaltype=0"
+  publication_date: 2015-04-24
+  effective_date: 2015-04-24
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2015年第三次修正
+  document_number: 主席令公布；1995年通过，2002/2014/2015年三次修正
+  checksum: e4d5cd944d1046e35c6edbaeffb3e06483f82e4e2a55c56cb9ac7b3d4ba4f21b
+  local_source_path: docs/knowledge-base/sources/raw/L1-01.json
+  corpus_path: docs/knowledge-base/sources/corpus/L1-01.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 1995制定→2002第一次修正→2009修订→2014第二次修正→2015第三次修正(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: flk.npc.gov.cn 国家法律法规数据库标注【有效】(公布2015-04-24/施行2015-04-24)；全文取自NFRA法律法规栏目docId=879931；修订草案征求意见稿(docId=1270897)进行中，现行版仍为2015修正
+
+L1-02:
+  title: 金融机构产品适当性管理办法
+  layer: L1
+  source_organization: 国家金融监督管理总局
+  source_type: P1
+  official_url: "https://www.gov.cn/gongbao/2025/issue_12246/202508/content_7038009.html"
+  alternate_url: ""
+  publication_date: 2025-07-11
+  effective_date: 2026-02-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2025年第7号令
+  document_number: 国家金融监督管理总局令2025年第7号
+  checksum: 474df1e72d4950d74e21b3f7dfb1916c20b817c2abf9a422bccf30da2c36f5d4
+  local_source_path: docs/knowledge-base/sources/raw/L1-02.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-02.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: 国务院公报2025年 issuing text; 2025-06-05局务会议通过
+
+L1-03:
+  title: 保险销售行为管理办法
+  layer: L1
+  source_organization: 国家金融监督管理总局
+  source_type: P1
+  official_url: "https://www.gov.cn/gongbao/2023/issue_10826/202311/content_6915815.html"
+  alternate_url: ""
+  publication_date: 2023-09-20
+  effective_date: 2024-03-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2023年第2号令
+  document_number: 国家金融监督管理总局令2023年第2号
+  checksum: a079675ef50c773b8259c171dfd0e9ad592a10612a95fa11f98f4dc3a902966c
+  local_source_path: docs/knowledge-base/sources/raw/L1-03.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-03.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-04:
+  title: 健康保险管理办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2019-12/04/content_5458542.htm"
+  alternate_url: ""
+  publication_date: 2019-10-31
+  effective_date: 2019-12-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2019年第3号令
+  document_number: 中国银行保险监督管理委员会令2019年第3号
+  checksum: fe892a22066d7a0b7e8518d7a965c5550873ffb8d7d9df0020fde94b9006230a
+  local_source_path: docs/knowledge-base/sources/raw/L1-04.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-04.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 废止2006年健康保险管理办法
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-05:
+  title: 人身保险产品信息披露管理办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2023/content_5739545.htm"
+  alternate_url: ""
+  publication_date: 2022-11-11
+  effective_date: 2023-06-30
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2022年第8号令
+  document_number: 中国银行保险监督管理委员会令2022年第8号
+  checksum: d682fd673be968851550e3d1ddb2bbc675eb0074abb8bff5e5047d99dfab510f
+  local_source_path: docs/knowledge-base/sources/raw/L1-05.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-05.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: "废止:人身保险新型产品信息披露管理办法(保监会令2009年第3号,2009-09-24公布,2010-01-01施行)"
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: "明确废止《人身保险新型产品信息披露管理办法》(保监会令2009年第3号)；旧办法未导入（如需历史留档须SUPERSEDED+runtime_enabled:false）"
+
+L1-06:
+  title: 互联网保险业务监管办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2020-12/14/content_5569402.htm"
+  alternate_url: ""
+  publication_date: 2020-12-07
+  effective_date: 2021-02-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2020年第13号令
+  document_number: 中国银行保险监督管理委员会令2020年第13号
+  checksum: 80143bf408a017c52253830694ace9e7d0a7c42dfba6030ad069bdedef6370c8
+  local_source_path: docs/knowledge-base/sources/raw/L1-06.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-06.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 废止互联网保险业务监管暂行办法(2015)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-07:
+  title: 保险代理人监管规定
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2020-11/24/content_5563685.htm"
+  alternate_url: ""
+  publication_date: 2020-11-12
+  effective_date: 2021-01-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2020年第11号令
+  document_number: 中国银行保险监督管理委员会令2020年第11号
+  checksum: 2213ba3175a937faab2073cdf149b42485c4f809b2c25d36d1cae4641deb4cbd
+  local_source_path: docs/knowledge-base/sources/raw/L1-07.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-07.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-08:
+  title: 保险经纪人监管规定
+  layer: L1
+  source_organization: 中国保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2018/content_5288836.htm"
+  alternate_url: ""
+  publication_date: 2018-01-31
+  effective_date: 2018-05-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2018年第3号令
+  document_number: 中国保险监督管理委员会令2018年第3号
+  checksum: 526a26588ca9af8a4067993ed553649b47aeb0b8049051ae9bf2904447c77d5c
+  local_source_path: docs/knowledge-base/sources/raw/L1-08.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-08.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: NFRA规章栏现行条目docId=1025626/1025629(令[2018]3号)确认现行有效
+
+L1-09:
+  title: 保险公司管理规定
+  layer: L1
+  source_organization: 中国保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2010/content_1585443.htm"
+  alternate_url: ""
+  publication_date: 2009-09-18
+  effective_date: 2009-10-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2009年第1号令
+  document_number: 中国保险监督管理委员会令2009年第1号
+  checksum: 3789b6663f8ec79cb7de676bd9f9fcc74f5824c8ee0fe7f3d897ea478b46f4cf
+  local_source_path: docs/knowledge-base/sources/raw/L1-09.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-09.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2004版废止→2009版现行
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: NFRA规章栏现行条目docId=372897(2009年第1号)确认现行有效；2025年第4号令未触及
+
+L1-10:
+  title: 保险保障基金管理办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会、财政部、中国人民银行
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2022-11/14/content_5726811.htm"
+  alternate_url: ""
+  publication_date: 2022-10-26
+  effective_date: 2022-12-12
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2022年第7号令
+  document_number: 银保监会、财政部、人民银行令2022年第7号
+  checksum: f8b3b7653d3066260da8e66d5f4092f9f33cf0bc720364471eb91580bccf2db6
+  local_source_path: docs/knowledge-base/sources/raw/L1-10.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-10.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2008年第2号令(已废止,未导入)→2022年第7号令(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: 现行版=2022年三部门令7号
+
+L1-11:
+  title: 保险公司偿付能力管理规定
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2021/content_5598125.htm"
+  alternate_url: ""
+  publication_date: 2021-01-15
+  effective_date: 2021-03-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2021年第1号令
+  document_number: 中国银行保险监督管理委员会令2021年第1号
+  checksum: ca2333c87cd1a4b7e11cee55d3ba4483636d202349b856b0edb3ccb9b969e2ad
+  local_source_path: docs/knowledge-base/sources/raw/L1-11.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-11.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2008年第1号令(已废止,未导入)→2021年第1号令(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-12:
+  title: 银行业保险业消费投诉处理管理办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2020/content_5512564.htm"
+  alternate_url: ""
+  publication_date: 2020-01-14
+  effective_date: 2020-03-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2020年第3号令
+  document_number: 中国银行保险监督管理委员会令2020年第3号
+  checksum: 7d055f7e5020a30d709a8dd9631a6a398b169a5300ef8006385a51210f77039c
+  local_source_path: docs/knowledge-base/sources/raw/L1-12.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-12.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-13:
+  title: 人身保险业务基本服务规定
+  layer: L1
+  source_organization: 中国保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2010/content_1702219.htm"
+  alternate_url: ""
+  publication_date: 2010-01-26
+  effective_date: 2010-05-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2010年第4号令
+  document_number: 中国保险监督管理委员会令2010年第4号
+  checksum: 8a9d5e631b25d83559f293c8005c5bf67815e07e74aaf506f22efb509d780ea2
+  local_source_path: docs/knowledge-base/sources/raw/L1-13.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-13.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: NFRA规章栏现行条目docId=1025465(令[2010]4号)确认现行有效
+
+L1-14:
+  title: 人身保险公司保险条款和保险费率管理办法
+  layer: L1
+  source_organization: 中国保险监督管理委员会
+  source_type: P1
+  official_url: "https://www.nfra.gov.cn/cn/view/pages/ItemDetail.html?docId=372901&itemId=925&generaltype=0"
+  alternate_url: ""
+  publication_date: 2015-10-19(修订)
+  effective_date: 2011年第3号令自颁布之日施行；2015年修订
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2015年修订版
+  document_number: 保监会令2011年第3号发布，经保监会令2015年第3号修订
+  checksum: 887ba7601afa33cca15a432f85320b6dc7676553f0bc823f26de62c700f54380
+  local_source_path: docs/knowledge-base/sources/raw/L1-14-2015.json
+  corpus_path: docs/knowledge-base/sources/corpus/L1-14.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2004年第6号令(废止)→2011年第3号令→2015年第3号令修订(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: 现行版=2015年修订版(NFRA docId=372901全文含修订头)；gov.cn公报2011年第3号令原文为SUPERSEDED版本(text/L1-14.txt仅作lineage留档,不导入)
+
+L1-15:
+  title: 保险销售行为可回溯管理暂行办法
+  layer: L1
+  source_organization: 中国保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2017/content_5248245.htm"
+  alternate_url: ""
+  publication_date: 2017-06-28
+  effective_date: 2017-11-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 保监发〔2017〕54号
+  document_number: 保监发〔2017〕54号
+  checksum: 77a1ba601e69af3e1c80a0c5c5880b5cfd5b13347afa0aca95f19b9343608468
+  local_source_path: docs/knowledge-base/sources/raw/L1-15.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-15.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-16:
+  title: 意外伤害保险业务监管办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会办公厅
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2021-10/15/content_5642766.htm"
+  alternate_url: ""
+  publication_date: 2021-10-13
+  effective_date: 2022-01-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 银保监办发〔2021〕106号
+  document_number: 银保监办发〔2021〕106号
+  checksum: ad3255744e3121c96914f432e4636bf9103e07deb2d3460d3b0a603820ebf543
+  local_source_path: docs/knowledge-base/sources/raw/L1-16.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-16.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-17:
+  title: 保险公司信息披露管理办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2018/content_5312244.htm"
+  alternate_url: ""
+  publication_date: 2018-04-28
+  effective_date: 2018-07-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2018年第2号令
+  document_number: 中国银行保险监督管理委员会令2018年第2号
+  checksum: a601a8bda63ac33b4fefdab43fe0bd4edbdf8b40504c35749f797b425d102087
+  local_source_path: docs/knowledge-base/sources/raw/L1-17.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-17.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2010年第7号令(已废止,未导入)→2018年第2号令(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: NFRA规章栏现行条目docId=1025446(令[2018]2号)确认现行有效
+
+L1-18:
+  title: 保险公司分支机构市场准入管理办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2021-09/14/content_5637138.htm"
+  alternate_url: ""
+  publication_date: 2021-09-02
+  effective_date: ""
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 银保监发〔2021〕37号
+  document_number: 银保监发〔2021〕37号
+  checksum: 71fe9254648aa9a85030a0d2a16c701cf141f82a2dfdbae9b951ff476c9fbf2b
+  local_source_path: docs/knowledge-base/sources/raw/L1-18.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-18.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2013版(废止)→2021版(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-19:
+  title: 保险公司董事、监事和高级管理人员任职资格管理规定
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2021/content_5633451.htm"
+  alternate_url: ""
+  publication_date: 2021-06-03
+  effective_date: 2021-07-03
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2021年第6号令
+  document_number: 中国银行保险监督管理委员会令2021年第6号
+  checksum: e5e6a46ddb24382ce67d4363c198aaf85c10bf13929cf81b54617ad4a172096d
+  local_source_path: docs/knowledge-base/sources/raw/L1-19.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-19.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2010年第2号/2014年第1号(废止)→2021年第6号(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-20:
+  title: 保险公司股权管理办法
+  layer: L1
+  source_organization: 中国保险监督管理委员会
+  source_type: P1
+  official_url: "http://www.gov.cn/gongbao/content/2018/content_5294432.htm"
+  alternate_url: ""
+  publication_date: 2018-03-02
+  effective_date: 2018-04-10
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2018年第5号令
+  document_number: 中国保险监督管理委员会令2018年第5号
+  checksum: c732afc2b344253f6a9c5261adefac736b651bb2876adf2b9a7b41c743c75352
+  local_source_path: docs/knowledge-base/sources/raw/L1-20.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-20.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2010年第6号令→2014年第4号修改→2018年第5号(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: NFRA规章栏条目docId=1025450(令[2018]5号)确认现行有效
+
+L1-21:
+  title: 银行保险机构关联交易管理办法
+  layer: L1
+  source_organization: 国家金融监督管理总局（重新公布）
+  source_type: P1
+  official_url: "https://www.gov.cn/gongbao/2025/issue_12146/202507/content_7030979.html"
+  alternate_url: "https://www.gov.cn/zhengce/zhengceku/2022-01/15/content_5668356.htm"
+  publication_date: 2025-05-15(修正公布)
+  effective_date: 2022-03-01(施行)；修正自2025-05-15
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2022年第1号令公布，2025年第4号令修正后重新公布
+  document_number: 银保监会令2022年第1号；经总局令2025年第4号第一次修正
+  checksum: fbfce95ecdc611f980ffa837a523cfa415888073266f01fbc3c992e67d28932b
+  local_source_path: docs/knowledge-base/sources/raw/L1-21A.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-21.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2004年第3号令/银保监发〔2019〕35号(废止)→2022年第1号令→2025年第4号令修正(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: 现行权威文本=公报2025年第19号重新公布之修正版全文(text/L1-21-amended.txt)；2022年原版(content_5668356)与修正决定原文同页留档(L1-21.txt/L1-21A.txt)
+
+L1-22:
+  title: 保险中介行政许可及备案实施办法
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2021-11/06/content_5649398.htm"
+  alternate_url: ""
+  publication_date: 2021-10-28
+  effective_date: 2022-02-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2021年第12号令
+  document_number: 中国银行保险监督管理委员会令2021年第12号
+  checksum: 5e36d1bd368deee98437ccd4292a89f85bc8e5372203db103ccab8fab1814e55
+  local_source_path: docs/knowledge-base/sources/raw/L1-22.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-22.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-23:
+  title: 中国银保监会办公厅关于规范保险公司健康管理服务的通知
+  layer: L1
+  source_organization: 中国银行保险监督管理委员会办公厅
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/2020-09/10/content_5542206.htm"
+  alternate_url: ""
+  publication_date: 2020-09-06
+  effective_date: ""
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 银保监办发〔2020〕83号
+  document_number: 银保监办发〔2020〕83号
+  checksum: 95ac20e1bd403d0086b72831745a52c468d988ffb86c66899f0f78321d9e3264
+  local_source_path: docs/knowledge-base/sources/raw/L1-23.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-23.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-24:
+  title: 国家金融监督管理总局关于推动深化人身保险行业个人营销体制改革的通知
+  layer: L1
+  source_organization: 国家金融监督管理总局
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/202504/content_7019852.htm"
+  alternate_url: ""
+  publication_date: 2025-04-14
+  effective_date: ""
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 金规〔2025〕13号
+  document_number: 金规〔2025〕13号
+  checksum: 920457928bc6d224075e399d0df6d4c54f58cade653a4829f1bc1c2bcd0b515c
+  local_source_path: docs/knowledge-base/sources/raw/L1-24.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-24.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L1-25:
+  title: 国务院关于加强监管防范风险推动保险业高质量发展的若干意见
+  layer: L1
+  source_organization: 国务院
+  source_type: P0
+  official_url: "https://www.gov.cn/zhengce/zhengceku/202409/content_6973835.htm"
+  alternate_url: ""
+  publication_date: 2024-09-08
+  effective_date: ""
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 国发〔2024〕21号
+  document_number: 国发〔2024〕21号
+  checksum: 866754b215598abfb84d27cc7229921fcf6dcbaeeec406b7b1b1dba6417a670e
+  local_source_path: docs/knowledge-base/sources/raw/L1-25.html
+  corpus_path: docs/knowledge-base/sources/corpus/L1-25.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: ""
+
+L2-01:
+  title: 重大疾病保险的疾病定义使用规范（2020年修订版）
+  layer: L2
+  source_organization: 中国保险行业协会、中国医师协会
+  source_type: P2
+  official_url: "https://www.iachina.cn/art/2020/11/5/art_8616_104704.html"
+  alternate_url: ""
+  publication_date: 2020-11-05
+  effective_date: 2020-11-05(发布)
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2020年修订版
+  document_number: 中保协/医师协会联合发布
+  checksum: 71258b8b30d1503c2b9573692b69ff765eda680dbf1c48dfd473e40d59f39644
+  local_source_path: docs/knowledge-base/sources/raw/L2-01-pdf.pdf
+  corpus_path: docs/knowledge-base/sources/corpus/L2-01.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 2007版规范→2020修订版(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: WeKnora导入用官方PDF原件(25页,docreader原生解析35块)；corpus md为文本投影留档；发布页时间2020年11月05日
+
+L2-02:
+  title: 《重大疾病保险的疾病定义使用规范（2020年修订版）》修订内容对比表
+  layer: L2
+  source_organization: 中国保险行业协会
+  source_type: P2
+  official_url: "https://www.iachina.cn/art/2020/11/5/art_8616_104703.html"
+  alternate_url: ""
+  publication_date: 2020-11-05
+  effective_date: ""
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 2020年修订版对比表
+  document_number: 中保协发布
+  checksum: f18af8660a05870a7ddf742eb58dbde731c43daade28dbdc0df81fe2ac6c2a25
+  local_source_path: docs/knowledge-base/sources/raw/L2-02-pdf.pdf
+  corpus_path: docs/knowledge-base/sources/corpus/L2-02.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: WeKnora导入用官方PDF原件(13页,docreader原生解析44块)；corpus md为文本投影留档
+
+L2-03:
+  title: 中国银保监会办公厅关于使用重大疾病保险的疾病定义有关事项的通知
+  layer: L2
+  source_organization: 中国银行保险监督管理委员会办公厅
+  source_type: P1
+  official_url: "https://www.nfra.gov.cn/cn/view/pages/ItemDetail.html?docId=940130&itemId=925&generaltype=0"
+  alternate_url: ""
+  publication_date: 2020-11-05
+  effective_date: ""
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 银保监办便函〔2020〕1452号
+  document_number: 银保监办便函〔2020〕1452号
+  checksum: 92bb034eb7cb0e39a3452abfbb914f100907fc967cc41064dabd438d13ed6a17
+  local_source_path: docs/knowledge-base/sources/raw/L2-03.json
+  corpus_path: docs/knowledge-base/sources/corpus/L2-03.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: ""
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: NFRA官方原文(docId=940130)；新定义过渡期：2021-01-31前旧定义产品可售，2021-02-01起禁售不符合2020版定义产品
+
+L2-04:
+  title: 中国人身保险业经验生命表（2025）
+  layer: L2
+  source_organization: 中国精算师协会
+  source_type: P2
+  official_url: ""
+  alternate_url: ""
+  publication_date: 2025-10-29(发布)
+  effective_date: 2026-01-01(使用)
+  expiry_date: ""
+  current_status: BLOCKED
+  runtime_enabled: false
+  version: 第四套(CL1养老类/CL2非养老一/CL3非养老二/CL4单一生命体)
+  document_number: "-"
+  checksum: ""
+  local_source_path: ""
+  corpus_path: ""
+  retrieval_date: ""
+  verified_by: ""
+  version_lineage: 第三套(2010-2013,保监发〔2016〕108号已废止)→第四套(2025)
+  verification:
+    SOURCE_EXISTS: BLOCKED
+    SOURCE_AUTHORITY: BLOCKED
+    TITLE_MATCH: BLOCKED
+    DOCUMENT_NUMBER_MATCH: BLOCKED
+    DATE_MATCH: BLOCKED
+    VERSION_MATCH: BLOCKED
+    CURRENT_STATUS: BLOCKED
+    CONTENT_INTEGRITY: BLOCKED
+  note: "BLOCKED: 表格数据文件无官方公开下载渠道(中国精算师协会官网e-caa.org.cn各栏目/NFRA通知附件/iachina均无公开文件；仅第三方流传2023征求意见稿)。发布事实由金规〔2025〕21号及NFRA答记者问佐证，但按规则不得以通知或二手文章替代表格本体，不导入、不替换"
+
+L2-05:
+  title: 国家金融监督管理总局关于做好《中国人身保险业经验生命表（2025）》发布使用有关事项的通知
+  layer: L2
+  source_organization: 国家金融监督管理总局
+  source_type: P1
+  official_url: "https://www.gov.cn/zhengce/zhengceku/202510/content_7046318.htm"
+  alternate_url: ""
+  publication_date: 2025-10-15
+  effective_date: 2026-01-01
+  expiry_date: ""
+  current_status: CURRENT
+  runtime_enabled: true
+  version: 金规〔2025〕21号
+  document_number: 金规〔2025〕21号
+  checksum: 368976f950d7dc30a9e5bcf3ab8a0ce26c44a3920d749088171dbcce892fec19
+  local_source_path: docs/knowledge-base/sources/raw/L2-05.html
+  corpus_path: docs/knowledge-base/sources/corpus/L2-05.md
+  retrieval_date: 2026-10-04
+  verified_by: Claude Code (automated session verification; owner review pending)
+  version_lineage: 保监发〔2016〕108号(废止)→金规〔2025〕21号(现行)
+  verification:
+    SOURCE_EXISTS: PASS
+    SOURCE_AUTHORITY: PASS
+    TITLE_MATCH: PASS
+    DOCUMENT_NUMBER_MATCH: PASS
+    DATE_MATCH: PASS
+    VERSION_MATCH: PASS
+    CURRENT_STATUS: PASS
+    CONTENT_INTEGRITY: PASS
+  note: 废止保监发〔2016〕108号；NFRA docId=1231212同文

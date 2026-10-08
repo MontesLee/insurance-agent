@@ -1,0 +1,34 @@
+KB insurance-kb-v1: 44af9ff2-ecef-445e-87c6-cb1458cd4d44 (reused)
+KB embedding_model_id: builtin-embedding-local
+existing docs in KB: 0
+[1/29] L1-01: uploaded parse=completed chunks=53
+[2/29] L1-02: uploaded parse=completed chunks=16
+[3/29] L1-03: uploaded parse=completed chunks=20
+[4/29] L1-04: uploaded parse=completed chunks=34
+[5/29] L1-05: uploaded parse=completed chunks=10
+[6/29] L1-06: uploaded parse=completed chunks=68
+[7/29] L1-07: uploaded parse=completed chunks=88
+[8/29] L1-08: uploaded parse=completed chunks=34
+[9/29] L1-09: uploaded parse=completed chunks=23
+[10/29] L1-10: uploaded parse=completed chunks=27
+[11/29] L1-11: uploaded parse=completed chunks=11
+[12/29] L1-12: uploaded parse=completed chunks=13
+[13/29] L1-13: uploaded parse=completed chunks=9
+[14/29] L1-14: uploaded parse=completed chunks=19
+[15/29] L1-15: uploaded parse=completed chunks=8
+[16/29] L1-16: uploaded parse=completed chunks=27
+[17/29] L1-17: uploaded parse=completed chunks=13
+[18/29] L1-18: uploaded parse=completed chunks=30
+[19/29] L1-19: uploaded parse=completed chunks=20
+[20/29] L1-20: uploaded parse=completed chunks=30
+[21/29] L1-21: uploaded parse=completed chunks=32
+[22/29] L1-22: uploaded parse=completed chunks=76
+[23/29] L1-23: uploaded parse=completed chunks=13
+[24/29] L1-24: uploaded parse=completed chunks=14
+[25/29] L1-25: uploaded parse=completed chunks=13
+[26/29] L2-01: uploaded parse=completed chunks=34
+[27/29] L2-02: uploaded parse=completed chunks=45
+[28/29] L2-03: uploaded parse=completed chunks=3
+[29/29] L2-05: uploaded parse=completed chunks=8
+
+IMPORT SUMMARY: 29/29 verified (completed + chunks>0)

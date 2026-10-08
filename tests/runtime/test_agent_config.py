@@ -96,7 +96,7 @@ def test_field_resolution_and_defaults(c: Checks):
     c.chk("OPENAI_API_KEY legacy fallback still works", cfg4.api_key == FAKE_KEY)
     c.chk("describe() is key-free",
           set(cfg.describe()) == {"configured", "provider", "model", "fast_model",
-                                  "base_url"}
+                                  "qa_model", "base_url", "reasoning_effort"}
           and FAKE_KEY not in json.dumps(cfg.describe()))
 
 
@@ -281,6 +281,102 @@ def test_smoke_test_config_surface(c: Checks):
           p.returncode == 0 and "SKIP" in p.stdout, p.stdout[:120])
     c.chk("smoke: output contains no key material",
           FAKE_KEY not in p.stdout + p.stderr)
+
+
+@section
+def test_reasoning_effort_budget(c: Checks):
+    """28.K.27: bounded reasoning budget for ALWAYS-THINKING models.
+
+    glm-5.3 refuses to disable thinking (code 1210) and, with the provider
+    default, an agent-loop step-1 call streamed 4418 `reasoning` deltas in 90s
+    without ever reaching content/tool_calls — the generation watchdog killed
+    every attempt at exactly GENERATION_WALL_S (240s), so 3 attempts = 720s and
+    the turn unconditionally ended needs_review. This pins the knob, its
+    documented default, and the exact request payload it produces."""
+    from runtime.agent.config import (REASONING_EFFORT_ENV,  # noqa: PLC0415
+                                      _DEFAULT_REASONING_EFFORT)
+    base = {"LLM_PROVIDER": "glm", "LLM_MODEL": "glm-5.3",
+            "LLM_API_KEY": FAKE_KEY}
+
+    cfg = load_llm_config(env=dict(base))
+    c.chk("reasoning: documented default is 'low' (bug-fix default)",
+          _DEFAULT_REASONING_EFFORT == "low"
+          and cfg.resolved_reasoning_effort == "low")
+    c.chk("reasoning: default reaches the main provider",
+          cfg.to_provider()._reasoning_effort == "low")
+    c.chk("reasoning: default reaches the fast tier too",
+          cfg.to_provider(fast=True)._reasoning_effort == "low")
+    c.chk("reasoning: describe() reports the effective value, still key-free",
+          cfg.describe()["reasoning_effort"] == "low"
+          and FAKE_KEY not in json.dumps(cfg.describe()))
+
+    for value in ("low", "high", "max", "HIGH"):
+        got = load_llm_config(env=dict(base, **{REASONING_EFFORT_ENV: value})
+                              ).resolved_reasoning_effort
+        c.chk("reasoning: %r honoured (normalised)" % value,
+              got == value.lower())
+
+    for value in ("default", "none", "off", "OFF"):
+        got = load_llm_config(env=dict(base, **{REASONING_EFFORT_ENV: value})
+                              ).resolved_reasoning_effort
+        c.chk("reasoning: %r omits the parameter (pre-28.K.27 behaviour)" % value,
+              got == "")
+
+    # the payload contract: present when configured, absent when omitted,
+    # and NEVER touching the delta shape the frontend consumes
+    msgs = [{"role": "user", "content": "hi"}]
+    on = OpenAICompatProvider(name="glm", model="m", api_key=FAKE_KEY,
+                              base_url="http://127.0.0.1:9/v1",
+                              reasoning_effort="low")._payload_base(msgs)
+    off = OpenAICompatProvider(name="glm", model="m", api_key=FAKE_KEY,
+                               base_url="http://127.0.0.1:9/v1")._payload_base(msgs)
+    c.chk("payload: reasoning_effort sent when configured",
+          on.get("reasoning_effort") == "low")
+    c.chk("payload: parameter omitted when unset",
+          "reasoning_effort" not in off)
+    c.chk("payload: model/messages untouched by the knob",
+          on["model"] == off["model"] == "m"
+          and on["messages"] == off["messages"] == [
+              {"role": "user", "content": "hi"}])
+    c.chk("payload: no key material in the request body",
+          FAKE_KEY not in json.dumps(on))
+
+
+
+@section
+def test_qa_model_isolation_tier(c: Checks):
+    """28.K.32-C: LLM_QA_MODEL isolates the QA slice from the shared fast
+    slot — qa → fast → main fallback chain, default unchanged."""
+    base = {"LLM_PROVIDER": "glm", "LLM_MODEL": "glm-5.3",
+            "LLM_API_KEY": FAKE_KEY, "LLM_BASE_URL": "http://x"}
+    # T1 default: no LLM_QA_MODEL -> qa follows fast (pre-K.32-C behavior)
+    cfg = load_llm_config(env={**base, "LLM_FAST_MODEL": "glm-5.3-flash"},
+                          dotenv_path=False)
+    c.chk("T1 default: qa == fast", cfg.resolved_qa_model == "glm-5.3-flash")
+    c.chk("T1 provider(qa) model", cfg.to_provider(qa=True).model
+          == "glm-5.3-flash")
+    # T2 explicit QA model (FlashX rollout config)
+    cfg2 = load_llm_config(env={**base, "LLM_FAST_MODEL": "glm-5.3-flashx",
+                                "LLM_QA_MODEL": "glm-5.3-flash"},
+                           dotenv_path=False)
+    c.chk("T2 rollout: QA stays flash", cfg2.to_provider(qa=True).model
+          == "glm-5.3-flash")
+    c.chk("T2 describe exposes qa_model",
+          cfg2.describe()["qa_model"] == "glm-5.3-flash")
+    # T3 step2+ isolation: fast tier NOT polluted by qa_model
+    c.chk("T3 step2+ uses fast (flashx)", cfg2.to_provider(fast=True).model
+          == "glm-5.3-flashx")
+    c.chk("T3 step1 uses main", cfg2.to_provider().model == "glm-5.3")
+    # T4 full fallback chain
+    cfg3 = load_llm_config(env=base, dotenv_path=False)   # no fast, no qa
+    c.chk("T4 no fast/qa -> qa falls to main",
+          cfg3.resolved_qa_model == "glm-5.3")
+    cfg4 = load_llm_config(env={**base, "LLM_QA_MODEL": "glm-5.3-flash"},
+                           dotenv_path=False)             # qa but no fast
+    c.chk("T4 qa set, fast missing -> qa explicit",
+          cfg4.to_provider(qa=True).model == "glm-5.3-flash")
+    c.chk("T4 fast tier itself unaffected",
+          cfg4.to_provider(fast=True).model == "glm-5.3")
 
 
 def main():

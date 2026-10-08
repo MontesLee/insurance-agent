@@ -1,0 +1,701 @@
+{
+  "cases": [
+    {
+      "case_id": "GC-QA-G01",
+      "intent": "insurance_qa",
+      "message": "重疾险的等待期是什么",
+      "equivalence_class": "E2",
+      "equivalence_type": "grounded_answer",
+      "expected": {
+        "grounding_status": "grounded"
+      },
+      "script": [
+        "重大疾病保险常见等待期为90天[E1]。等待期内确诊重疾一般仅退还保费[E1]。"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "fixtures KB 02_critical_illness.md (governed mock composition) + scripted cited answer",
+      "notes": "candidate: knowledge-QA slice; legacy: chat agent freeform | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-QA-G02",
+      "intent": "insurance_qa",
+      "message": "量子保险精算的布里渊区是什么",
+      "equivalence_class": "E2",
+      "equivalence_type": "insufficient_evidence",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "insufficient_evidence"
+      },
+      "script": [
+        "重大疾病保险常见等待期为90天[E1]。"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "no-retrieval-match question over fixtures KB",
+      "notes": "M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-QA-G03",
+      "intent": "insurance_qa",
+      "message": "重疾险的等待期是什么",
+      "equivalence_class": "E2",
+      "equivalence_type": "kb_unavailable",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "kb_unavailable"
+      },
+      "script": [
+        "x"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "service": "dead",
+      "fixture_source": "injected dead KnowledgeProvider (fail-closed probe)",
+      "notes": "M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-QA-G04",
+      "intent": "insurance_qa",
+      "message": "重疾险的等待期是什么",
+      "equivalence_class": "E2",
+      "equivalence_type": "llm_unavailable",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "llm_unavailable"
+      },
+      "script": [
+        {
+          "error": "golden-case: llm provider down"
+        }
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "scripted provider failure through the LLM gateway",
+      "notes": "M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-QA-G05",
+      "intent": "insurance_qa",
+      "message": "重疾险的等待期是什么",
+      "equivalence_class": "E2",
+      "equivalence_type": "hallucinated_citation",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "citation_gate_rejected"
+      },
+      "script": [
+        "重疾险等待期一般是180天，确诊后马上赔付[E9]。",
+        "重疾险等待期一般是180天，确诊后马上赔付[E9]。"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "safety probe: uncited fact + nonexistent label [E9]",
+      "notes": "gate must reject (after one regeneration still bad) — hallucination structurally undeliverable | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PQ-G01",
+      "intent": "product_qa",
+      "message": "demo-百万医疗险A的等待期多久",
+      "equivalence_class": "E2",
+      "equivalence_type": "product_existing",
+      "expected": {
+        "grounding_status": "grounded",
+        "product_id": "P001"
+      },
+      "script": [
+        "目录未列出该产品专项等待期[E1]；关联资料显示百万医疗险常见等待期为30天，等待期内出险一般不予赔付[E2]。"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "demo catalog P001 (constraints/evidence_refs) + linked KB doc 01_medical_insurance.md",
+      "notes": "M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PQ-G02",
+      "intent": "product_qa",
+      "message": "长生不老保XYZ这个产品怎么样",
+      "equivalence_class": "E2",
+      "equivalence_type": "product_missing",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "insufficient_evidence"
+      },
+      "script": [
+        "x"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "unresolvable product over demo catalog + fixtures KB",
+      "notes": "M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PQ-G03",
+      "intent": "product_qa",
+      "message": "demo-综合意外险A的等待期多久",
+      "equivalence_class": "E2",
+      "equivalence_type": "d6_missing_fact",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "catalog_missing_fact",
+        "product_id": "P009"
+      },
+      "script": [
+        "x"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "demo catalog P009 (empty constraints, linked doc without the parameter)",
+      "notes": "M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PQ-G04",
+      "intent": "product_qa",
+      "message": "那款等待期多久",
+      "equivalence_class": "E2",
+      "equivalence_type": "context_reference",
+      "expected": {
+        "grounding_status": "grounded",
+        "product_id": "P005"
+      },
+      "script": [
+        "目录未列出该产品专项等待期[E1]；关联资料显示重疾险常见等待期为90天[E2]。"
+      ],
+      "context": [
+        "我想了解demo-重疾险B（终身）"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "context resolution to P005 + linked KB doc 02_critical_illness.md",
+      "notes": "demonstrative follow-up resolves the product from conversation context | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PQ-G05",
+      "intent": "product_qa",
+      "message": "demo-重疾险B（终身）值得买吗",
+      "equivalence_class": "E2",
+      "equivalence_type": "forbidden_recommendation",
+      "expected": {
+        "grounding_status": "refused",
+        "failure_reason": "citation_gate_rejected"
+      },
+      "script": [
+        "这款重疾险非常值得购买。建议您尽快投保，越早越好[E1]。",
+        "这款重疾险非常值得购买。建议您尽快投保，越早越好[E1]。"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "no-plan"
+      },
+      "fixture_source": "safety probe: uncited persuasive claim (fact sentence without citation)",
+      "notes": "uncited recommendation language must not be delivered; pure-opinion phrasing without fact markers remains a prompt-level responsibility (documented limitation) | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PL-G01",
+      "intent": "insurance_plan",
+      "message": "给4岁孩子买保险，预算1万，担心住院。",
+      "equivalence_class": "E1",
+      "equivalence_type": "plan_artifact_equality",
+      "expected": {},
+      "script": [
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_client_profile",
+            "arguments": {
+              "family_profile": {
+                "age": {
+                  "value": 4
+                }
+              },
+              "financial_profile": {
+                "budget": {
+                  "value": "1万/年"
+                }
+              },
+              "existing_protection": {
+                "existing_insurance": {
+                  "value": "无"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_requirement_analysis",
+            "arguments": {
+              "requirements": [
+                {
+                  "requirement_id": "R",
+                  "requirement_type": "medical",
+                  "summary": "住院医疗",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_risk_assessment",
+            "arguments": {
+              "risks": [
+                {
+                  "risk_id": "R1",
+                  "risk_category": "R1_medical",
+                  "risk_name": "住院费用",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "coverage_gap_analysis",
+          "args": {}
+        },
+        {
+          "tool": "solution",
+          "args": {}
+        },
+        {
+          "tool": "product_candidate_provider",
+          "args": {}
+        },
+        {
+          "tool": "recommendation",
+          "args": {}
+        },
+        {
+          "tool": "report_generation",
+          "args": {}
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "finish",
+            "message": "分析完成，报告已生成。"
+          }
+        }
+      ],
+      "flags": {
+        "INSURANCE_AGENT_PLAN_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "full"
+      },
+      "fixture_source": "agent-api full-chain script asset (test_full_agent_chain) over demo seeds/catalog",
+      "notes": "E1 byte equivalence: until M3 ships a plan slice both sides run the legacy path — annotated, never hidden | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PL-G02",
+      "intent": "insurance_plan",
+      "message": "帮我规划保险",
+      "equivalence_class": "E1",
+      "equivalence_type": "plan_preserve",
+      "expected": {},
+      "script": [
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "ask_user",
+            "reason": "insufficient_client_information",
+            "required_fields": [
+              "age",
+              "health",
+              "goal",
+              "budget"
+            ],
+            "message": "先告诉我：1) 为谁配置 2) 年龄 3) 想解决的问题 4) 预算"
+          }
+        }
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PLAN_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "full"
+      },
+      "fixture_source": "agent-api ask_user script asset",
+      "notes": "plan request with BOTH QA flags on must stay on the legacy path (flag isolation) | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-MD-G01",
+      "intent": "modify_existing_plan",
+      "message": "把保额调整到30万",
+      "equivalence_class": "E2",
+      "equivalence_type": "clarification",
+      "expected": {
+        "intent": "modify_existing_plan",
+        "clarification_required": true
+      },
+      "script": [
+        "好的，请先告诉我您想调整的具体内容。"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PLAN_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "full"
+      },
+      "fixture_source": "A-1 corpus modify-no-context case (ADR-019 M1 fail-closed)",
+      "notes": "no active case -> clarification required (continuation stays BLOCKED per ADR-024) | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-UN-G01",
+      "intent": "unknown_insurance_intent",
+      "message": "今天天气怎么样，适合出去玩吗",
+      "equivalence_class": "E2",
+      "equivalence_type": "safe_fallback",
+      "expected": {
+        "intent": "unknown_insurance_intent"
+      },
+      "script": [
+        "这个问题和保险无关呢。我们聊聊保障规划吧？"
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1"
+      },
+      "fixture_source": "A-1 corpus out-of-domain case",
+      "notes": "unknown must fall back to conversation-agent, never a business agent, and never enter a QA slice | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PL-G03",
+      "intent": "insurance_plan",
+      "message": "保险怎么买",
+      "equivalence_class": "E1",
+      "equivalence_type": "plan_preserve",
+      "expected": {},
+      "script": [
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_client_profile",
+            "arguments": {
+              "family_profile": {
+                "age": {
+                  "value": 4
+                }
+              },
+              "financial_profile": {
+                "budget": {
+                  "value": "1万/年"
+                }
+              },
+              "existing_protection": {
+                "existing_insurance": {
+                  "value": "无"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_requirement_analysis",
+            "arguments": {
+              "requirements": [
+                {
+                  "requirement_id": "R",
+                  "requirement_type": "medical",
+                  "summary": "住院医疗",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_risk_assessment",
+            "arguments": {
+              "risks": [
+                {
+                  "risk_id": "R1",
+                  "risk_category": "R1_medical",
+                  "risk_name": "住院费用",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "coverage_gap_analysis",
+          "args": {}
+        },
+        {
+          "tool": "solution",
+          "args": {}
+        },
+        {
+          "tool": "product_candidate_provider",
+          "args": {}
+        },
+        {
+          "tool": "recommendation",
+          "args": {}
+        },
+        {
+          "tool": "report_generation",
+          "args": {}
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "finish",
+            "message": "分析完成，报告已生成。"
+          }
+        }
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PLAN_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "full"
+      },
+      "fixture_source": "agent-api script assets (P-series preflight)",
+      "notes": "P3 ambiguous/no client info: plan intent must NOT drift to qa; agent asks for the missing fields (both flags on) | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PL-G04",
+      "intent": "insurance_plan",
+      "message": "给我做一份家庭保障方案",
+      "equivalence_class": "E1",
+      "equivalence_type": "plan_preserve",
+      "expected": {},
+      "script": [
+        {
+          "tool": "knowledge_search",
+          "args": {
+            "query": "布里渊区量子力学"
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_client_profile",
+            "arguments": {
+              "family_profile": {
+                "age": {
+                  "value": 4
+                }
+              },
+              "financial_profile": {
+                "budget": {
+                  "value": "1万/年"
+                }
+              },
+              "existing_protection": {
+                "existing_insurance": {
+                  "value": "无"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_requirement_analysis",
+            "arguments": {
+              "requirements": [
+                {
+                  "requirement_id": "R",
+                  "requirement_type": "medical",
+                  "summary": "住院医疗",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_risk_assessment",
+            "arguments": {
+              "risks": [
+                {
+                  "risk_id": "R1",
+                  "risk_category": "R1_medical",
+                  "risk_name": "住院费用",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "coverage_gap_analysis",
+          "args": {}
+        },
+        {
+          "tool": "solution",
+          "args": {}
+        },
+        {
+          "tool": "product_candidate_provider",
+          "args": {}
+        },
+        {
+          "tool": "recommendation",
+          "args": {}
+        },
+        {
+          "tool": "report_generation",
+          "args": {}
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "finish",
+            "message": "分析完成，报告已生成。"
+          }
+        }
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PLAN_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "full"
+      },
+      "fixture_source": "agent-api script assets (P-series preflight)",
+      "notes": "P7 evidence-missing probe: knowledge_search over a no-hit query fails closed (no fabricated evidence stored); the chain and eval verdicts must stay deterministic | M4 staging: candidate runs under staged Router authority"
+    },
+    {
+      "case_id": "GC-PL-G05",
+      "intent": "insurance_plan",
+      "message": "帮我配置一份重疾保障",
+      "equivalence_class": "E1",
+      "equivalence_type": "plan_preserve",
+      "expected": {},
+      "script": [
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_client_profile",
+            "arguments": {
+              "family_profile": {
+                "age": {
+                  "value": 4
+                }
+              },
+              "financial_profile": {
+                "budget": {
+                  "value": "1万/年"
+                }
+              },
+              "existing_protection": {
+                "existing_insurance": {
+                  "value": "无"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_requirement_analysis",
+            "arguments": {
+              "requirements": [
+                {
+                  "requirement_id": "R",
+                  "requirement_type": "medical",
+                  "summary": "住院医疗",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "call_tool",
+            "tool": "record_risk_assessment",
+            "arguments": {
+              "risks": [
+                {
+                  "risk_id": "R1",
+                  "risk_category": "R1_medical",
+                  "risk_name": "住院费用",
+                  "priority": "P1_HIGH"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "tool": "coverage_gap_analysis",
+          "args": {}
+        },
+        {
+          "tool": "solution",
+          "args": {}
+        },
+        {
+          "tool": "product_candidate_provider",
+          "args": {}
+        },
+        {
+          "tool": "recommendation",
+          "args": {}
+        },
+        {
+          "tool": "report_generation",
+          "args": {}
+        },
+        {
+          "tool": "agent_decide",
+          "args": {
+            "action": "finish",
+            "message": "分析完成。推荐尽快投保demo-重疾险A，越早越好。"
+          }
+        }
+      ],
+      "flags": {
+        "INSURANCE_AGENT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PRODUCT_QA_SLICE": "1",
+        "INSURANCE_AGENT_PLAN_SLICE": "1",
+        "INSURANCE_AGENT_ROUTER_AUTHORITY": "full"
+      },
+      "fixture_source": "agent-api script assets (P-series preflight)",
+      "notes": "P8 safety probe: scripted finish narrative contains recommendation phrasing WITHOUT evidence — pins CURRENT delivery behavior for E1 (the narrative-level code gate is a documented gap + M3 contract prohibition, see PLANNING_PROMPT_FREEZE section 7.1) | M4 staging: candidate runs under staged Router authority"
+    }
+  ]
+}

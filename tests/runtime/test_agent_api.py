@@ -100,7 +100,11 @@ def test_sse_stream_for_agent_run(c: Checks):
         ("agent_decide", {"action": "finish", "message": "依据知识库证据回答完毕。"}),
     ])
     rid = client.post("/api/chats/chat_sse/messages",
-                      json={"text": "百万医疗险和重疾险有什么区别？"}).json()["run_id"]
+                      json={"text": "给4岁孩子买保险，预算1万，担心住院。"}).json()["run_id"]
+    # (28.C-1) fixture message is intentionally insurance_plan — an
+    # insurance_qa text would now route to the Insurance QA Agent slice
+    # (owner ruling D4) instead of the general chat agent this SSE test
+    # exercises; routing semantics for this test are unchanged.
     evs = stream_events(client, "/api/runs/%s/stream" % rid)
     types = [e["event_type"] for e in evs]
     c.chk("agent run streams over the EXISTING SSE endpoint",
@@ -222,6 +226,69 @@ def test_review_card_endpoint(c: Checks):
     c.chk("path-traversal run id refused",
           client.get("/api/runs/..%2F..%2Fetc%2Fpasswd/review-card").status_code == 404
           and client.get("/api/runs/run..%2F./review-card").status_code == 404)
+
+
+@section
+def test_run_read_endpoints_survive_restart(c: Checks):
+    """Phase 27.7.6-F: after a backend restart (fresh RunManager over the
+    SAME run_root = empty registry, same disk), the READ endpoints keep
+    serving a persisted run with REAL data; unknown ids still 404; the
+    live path is untouched (no 'restored' key before the restart).
+    Uses the demo path — the same path as the staged HR pilot runs."""
+    client, mgr, _ = make_client()
+    r = client.post("/api/runs", json={"case_id": "bm-complete-001"})
+    rid = r.json()["run_id"]
+    run = wait_terminal(client, rid, timeout=180.0)
+    c.chk("demo run completes before the restart drill",
+          run["status"] == "completed", run["status"])
+    live = client.get("/api/runs/%s" % rid).json()
+    c.chk("live run response carries no restored marker",
+          "restored" not in live)
+    before = client.get("/api/runs/%s/events" % rid).json()["events"]
+    c.chk("pre-restart events captured", len(before) > 2, len(before))
+
+    # --- 'restart': fresh manager + bus over the SAME run_root ----------
+    client2, mgr2, _ = make_client(run_root=mgr.run_root)
+
+    r2 = client2.get("/api/runs/%s" % rid)
+    b = r2.json()
+    c.chk("GET /runs/{id} after restart -> 200 restored summary",
+          r2.status_code == 200 and b.get("restored") is True
+          and b.get("status") == "completed"
+          and b.get("case_id") == live["case_id"], (r2.status_code, b))
+
+    r2 = client2.get("/api/runs/%s/events" % rid)
+    evs = r2.json()["events"]
+    c.chk("GET /events after restart -> 200, replay matches ids/order/length",
+          r2.status_code == 200 and len(evs) == len(before)
+          and [e["event_id"] for e in evs] == [e["event_id"] for e in before],
+          (r2.status_code, len(evs), len(before)))
+    stage_a = [e for e in before if str(e.get("event_type", "")).startswith("stage_")]
+    stage_b = [e for e in evs if str(e.get("event_type", "")).startswith("stage_")]
+    c.chk("replayed stage events are IDENTICAL to the live stream "
+          "(timestamp/stage/skill/status/artifact/data)",
+          stage_a == stage_b, (len(stage_a), len(stage_b)))
+    half = before[len(before) // 2]["event_id"]
+    cur = client2.get("/api/runs/%s/events?after_event_id=%s" % (rid, half)).json()
+    c.chk("replay honours the after_event_id cursor",
+          cur["count"] == len(evs) - (len(evs) // 2 + 1), cur["count"])
+
+    r2 = client2.get("/api/runs/%s/artifacts" % rid)
+    arts = r2.json()
+    c.chk("GET /artifacts after restart -> 200 with real persisted artifacts",
+          r2.status_code == 200 and arts.get("count") == 9,
+          (r2.status_code, arts.get("count")))
+    det = client2.get("/api/runs/%s/artifacts/product-recommendation" % rid)
+    c.chk("GET /artifacts/{type} after restart -> 200 with real payload",
+          det.status_code == 200 and det.json().get("artifact") is not None)
+
+    for path in ("/api/runs/run_nope123", "/api/runs/run_nope123/events",
+                 "/api/runs/run_nope123/artifacts",
+                 "/api/runs/run_nope123/artifacts/x"):
+        c.chk("unknown run id still 404 (%s)" % path.rsplit("/", 1)[-1],
+              client2.get(path).status_code == 404)
+    c.chk("path traversal still refused after restart support",
+          client2.get("/api/runs/..%2Fx/events").status_code == 404)
 
 
 @section

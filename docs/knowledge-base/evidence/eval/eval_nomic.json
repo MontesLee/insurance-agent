@@ -1,0 +1,2089 @@
+{
+ "tag": "nomic",
+ "model": "nomic-embed-text:latest",
+ "dim": 768,
+ "chunks": 791,
+ "index_embed_seconds": 0.1,
+ "metrics": {
+  "Recall@1": 0.26,
+  "Recall@5": 0.58,
+  "Recall@10": 0.68,
+  "MRR": 0.3983227533917003,
+  "QualifiedEvidence": "33/50",
+  "QualificationRate": 0.66,
+  "ClaimSupport": "8/18",
+  "ClaimModuleOnly": "8/18",
+  "NegativePass": "6/7",
+  "NegativeFPR": 0.14285714285714285
+ },
+ "cases": [
+  {
+   "case_id": "RB-L1-001",
+   "query": "保险公司注册资本的最低限额是多少",
+   "top10": [
+    "L1-07",
+    "L1-16",
+    "L1-09",
+    "L1-17",
+    "L1-20",
+    "L1-11",
+    "L1-20",
+    "L1-11",
+    "L1-20",
+    "L1-08"
+   ],
+   "expected_rank_full": 22,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-002",
+   "query": "投保人故意不履行如实告知义务，保险公司能否解除合同",
+   "top10": [
+    "L1-24",
+    "L1-24",
+    "L1-01",
+    "L1-04",
+    "L1-13",
+    "L1-07",
+    "L1-24",
+    "L1-24",
+    "L1-01",
+    "L1-01"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-003",
+   "query": "金融机构销售产品时产品风险等级与机构评定不一致怎么办",
+   "top10": [
+    "L1-01",
+    "L1-02",
+    "L1-02",
+    "L1-21",
+    "L1-14",
+    "L1-02",
+    "L1-02",
+    "L1-07",
+    "L1-22",
+    "L1-22"
+   ],
+   "expected_rank_full": 2,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-004",
+   "query": "金融机构产品适当性管理办法从什么时候开始施行",
+   "top10": [
+    "L1-02",
+    "L1-21",
+    "L1-07",
+    "L1-22",
+    "L1-22",
+    "L1-08",
+    "L1-21",
+    "L1-21",
+    "L1-22",
+    "L1-22"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-005",
+   "query": "保险销售行为管理覆盖哪些环节",
+   "top10": [
+    "L1-12",
+    "L1-06",
+    "L1-06",
+    "L1-12",
+    "L1-15",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-07",
+    "L1-06"
+   ],
+   "expected_rank_full": 15,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-006",
+   "query": "保险销售行为管理办法的施行日期",
+   "top10": [
+    "L1-14",
+    "L1-18",
+    "L1-12",
+    "L1-06",
+    "L1-06",
+    "L1-22",
+    "L1-22",
+    "L1-15",
+    "L1-01",
+    "L1-22"
+   ],
+   "expected_rank_full": 46,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-007",
+   "query": "长期健康保险产品的犹豫期不得少于多少天",
+   "top10": [
+    "L1-25",
+    "L1-23",
+    "L1-06",
+    "L1-04",
+    "L1-06",
+    "L1-14",
+    "L1-25",
+    "L1-04",
+    "L1-25",
+    "L1-04"
+   ],
+   "expected_rank_full": 4,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-008",
+   "query": "保险公司销售长期个人健康保险产品后需要在犹豫期内做什么",
+   "top10": [
+    "L1-23",
+    "L1-23",
+    "L1-04",
+    "L1-23",
+    "L1-04",
+    "L1-23",
+    "L1-23",
+    "L1-24",
+    "L1-24",
+    "L1-04"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-009",
+   "query": "保险公司销售人身保险产品时应当向消费者披露哪些产品材料",
+   "top10": [
+    "L1-04",
+    "L1-13",
+    "L1-24",
+    "L1-24",
+    "L1-07",
+    "L1-04",
+    "L1-20",
+    "L1-24",
+    "L1-24",
+    "L1-06"
+   ],
+   "expected_rank_full": 18,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-010",
+   "query": "人身保险产品按设计类型分为哪几种",
+   "top10": [
+    "L1-01",
+    "L1-01",
+    "L1-05",
+    "L1-08",
+    "L1-01",
+    "L1-01",
+    "L1-01",
+    "L1-01",
+    "L1-03",
+    "L1-24"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-011",
+   "query": "互联网保险业务可以通过什么平台经营",
+   "top10": [
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-012",
+   "query": "互联网保险业务监管办法什么时候施行",
+   "top10": [
+    "L1-12",
+    "L1-15",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-15",
+    "L1-06",
+    "L1-06",
+    "L1-03"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-013",
+   "query": "经营保险代理业务需要取得什么许可",
+   "top10": [
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-24",
+    "L1-24",
+    "L1-07"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-014",
+   "query": "保险销售从业人员应当在何处进行执业登记",
+   "top10": [
+    "L1-08",
+    "L1-07",
+    "L1-21",
+    "L1-01",
+    "L1-01",
+    "L1-01",
+    "L1-01",
+    "L1-03",
+    "L1-24",
+    "L1-24"
+   ],
+   "expected_rank_full": 2,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-015",
+   "query": "保险经纪人是代表谁的利益办理保险业务",
+   "top10": [
+    "L1-07",
+    "L1-07",
+    "L1-13",
+    "L1-07",
+    "L1-07",
+    "L1-08",
+    "L1-07",
+    "L1-01",
+    "L1-07",
+    "L1-01"
+   ],
+   "expected_rank_full": 6,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-016",
+   "query": "保险经纪人监管规定的施行日期",
+   "top10": [
+    "L1-01",
+    "L1-01",
+    "L1-01",
+    "L1-07",
+    "L1-01",
+    "L1-01",
+    "L1-07",
+    "L1-07",
+    "L1-22",
+    "L1-22"
+   ],
+   "expected_rank_full": 26,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-017",
+   "query": "保险公司设立分支机构需要经过什么程序",
+   "top10": [
+    "L1-09",
+    "L1-06",
+    "L1-06",
+    "L1-08",
+    "L1-09",
+    "L1-23",
+    "L1-20",
+    "L1-01",
+    "L1-09",
+    "L1-11"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-018",
+   "query": "保险公司管理规定的施行日期是哪一天",
+   "top10": [
+    "L1-20",
+    "L1-06",
+    "L1-17",
+    "L1-08",
+    "L1-23",
+    "L1-09",
+    "L1-16",
+    "L1-13",
+    "L1-13",
+    "L1-20"
+   ],
+   "expected_rank_full": 6,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-019",
+   "query": "保险保障基金由谁缴纳、按什么缴纳",
+   "top10": [
+    "L1-01",
+    "L1-10",
+    "L1-14",
+    "L1-04",
+    "L1-10",
+    "L1-01",
+    "L1-10",
+    "L1-24",
+    "L1-25",
+    "L1-06"
+   ],
+   "expected_rank_full": 2,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-020",
+   "query": "人寿保险公司破产时保单持有人能够获得什么救助",
+   "top10": [
+    "L1-13",
+    "L1-24",
+    "L1-24",
+    "L1-04",
+    "L1-24",
+    "L1-24",
+    "L1-20",
+    "L1-10",
+    "L1-07",
+    "L1-04"
+   ],
+   "expected_rank_full": 8,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-021",
+   "query": "偿付能力达标公司需要满足哪些条件",
+   "top10": [
+    "L1-11",
+    "L1-11",
+    "L1-11",
+    "L1-06",
+    "L1-06",
+    "L1-11",
+    "L1-11",
+    "L1-20",
+    "L1-18",
+    "L1-09"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-022",
+   "query": "保险公司偿付能力管理规定的施行日期",
+   "top10": [
+    "L1-20",
+    "L1-23",
+    "L1-11",
+    "L1-11",
+    "L1-06",
+    "L1-06",
+    "L1-13",
+    "L1-20",
+    "L1-06",
+    "L1-17"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-023",
+   "query": "银行保险机构收到消费投诉后多久作出处理决定",
+   "top10": [
+    "L1-06",
+    "L1-06",
+    "L1-04",
+    "L1-12",
+    "L1-16",
+    "L1-07",
+    "L1-04",
+    "L1-12",
+    "L1-22",
+    "L1-06"
+   ],
+   "expected_rank_full": 4,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-024",
+   "query": "哪些机构适用银行业保险业消费投诉处理管理办法",
+   "top10": [
+    "L1-12",
+    "L1-15",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-15",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-12"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-025",
+   "query": "人身保险公司应当为投保人和被保险人提供哪些基本服务",
+   "top10": [
+    "L1-13",
+    "L1-04",
+    "L1-24",
+    "L1-24",
+    "L1-07",
+    "L1-13",
+    "L1-24",
+    "L1-24",
+    "L1-10",
+    "L1-08"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L1-026",
+   "query": "人身保险业务基本服务规定的施行日期",
+   "top10": [
+    "L1-01",
+    "L1-08",
+    "L1-07",
+    "L1-01",
+    "L1-14",
+    "L1-07",
+    "L1-01",
+    "L1-13",
+    "L1-01",
+    "L1-01"
+   ],
+   "expected_rank_full": 8,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-027",
+   "query": "人身保险公司的保险条款和保险费率需要审批还是备案",
+   "top10": [
+    "L1-04",
+    "L1-24",
+    "L1-24",
+    "L1-13",
+    "L1-24",
+    "L1-24",
+    "L1-20",
+    "L1-04",
+    "L1-07",
+    "L1-06"
+   ],
+   "expected_rank_full": 40,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-028",
+   "query": "人身保险公司保险条款和保险费率管理办法现行版本是哪年修订的",
+   "top10": [
+    "L1-14",
+    "L1-20",
+    "L1-24",
+    "L1-24",
+    "L1-07",
+    "L1-20",
+    "L1-07",
+    "L1-13",
+    "L1-04",
+    "L1-01"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-029",
+   "query": "保险销售可回溯资料应当保存多长时间",
+   "top10": [
+    "L1-06",
+    "L1-06",
+    "L1-04",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-01",
+    "L1-03",
+    "L1-14"
+   ],
+   "expected_rank_full": 85,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L1-030",
+   "query": "银行保险机构董事近亲属与机构发生的关联交易要经过什么程序",
+   "top10": [
+    "L1-03",
+    "L1-01",
+    "L1-21",
+    "L1-01",
+    "L1-01",
+    "L1-08",
+    "L1-12",
+    "L1-12",
+    "L1-07",
+    "L1-24"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-001",
+   "query": "2020版重疾规范规定必须包含哪三种轻度疾病",
+   "top10": [
+    "L2-03",
+    "L2-02",
+    "L2-03",
+    "L2-01",
+    "L1-10",
+    "L1-12",
+    "L2-02",
+    "L2-01",
+    "L1-07",
+    "L2-01"
+   ],
+   "expected_rank_full": 4,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-002",
+   "query": "严重溃疡性结肠炎的重疾定义是什么",
+   "top10": [
+    "L1-19",
+    "L1-08",
+    "L1-08",
+    "L1-08",
+    "L1-01",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07"
+   ],
+   "expected_rank_full": 18,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-003",
+   "query": "重大疾病保险的疾病定义使用规范由哪些组织修订",
+   "top10": [
+    "L2-02",
+    "L2-02",
+    "L2-02",
+    "L2-01",
+    "L1-16",
+    "L1-01",
+    "L1-14",
+    "L1-01",
+    "L1-01",
+    "L1-08"
+   ],
+   "expected_rank_full": 4,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-004",
+   "query": "2020版重疾定义是对哪一年的定义进行的修订",
+   "top10": [
+    "L2-03",
+    "L2-02",
+    "L2-01",
+    "L2-03",
+    "L1-07",
+    "L2-01",
+    "L1-07",
+    "L1-07",
+    "L1-06",
+    "L1-12"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-005",
+   "query": "轻度疾病的累计保险金额与重度疾病有什么比例限制",
+   "top10": [
+    "L1-01",
+    "L1-10",
+    "L1-10",
+    "L1-25",
+    "L1-10",
+    "L1-04",
+    "L1-04",
+    "L1-01",
+    "L1-04",
+    "L1-14"
+   ],
+   "expected_rank_full": 130,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-006",
+   "query": "重疾定义修订前后严重脑中风后遗症的定义有什么变化",
+   "top10": [
+    "L2-02",
+    "L1-08",
+    "L1-21",
+    "L1-07",
+    "L1-11",
+    "L1-07",
+    "L1-09",
+    "L1-07",
+    "L1-08",
+    "L2-01"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-007",
+   "query": "重疾定义对比表中恶性肿瘤定义修订前后的差异",
+   "top10": [
+    "L2-02",
+    "L1-08",
+    "L1-09",
+    "L1-08",
+    "L1-21",
+    "L1-07",
+    "L1-21",
+    "L2-01",
+    "L1-07",
+    "L2-02"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-008",
+   "query": "哪里可以查到重疾定义修订前和修订后的全文对照",
+   "top10": [
+    "L2-02",
+    "L1-09",
+    "L1-19",
+    "L1-08",
+    "L1-18",
+    "L1-21",
+    "L1-07",
+    "L1-07",
+    "L1-07",
+    "L1-07"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-009",
+   "query": "不符合2020版定义的重疾产品最迟可以销售到什么时候",
+   "top10": [
+    "L2-03",
+    "L2-03",
+    "L2-02",
+    "L2-01",
+    "L2-02",
+    "L1-12",
+    "L2-02",
+    "L1-07",
+    "L1-06",
+    "L1-07"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-010",
+   "query": "重疾新旧定义切换时监管对销售行为有什么禁止性要求",
+   "top10": [
+    "L1-21",
+    "L1-01",
+    "L1-06",
+    "L1-01",
+    "L1-07",
+    "L1-07",
+    "L1-08",
+    "L1-23",
+    "L1-12",
+    "L1-03"
+   ],
+   "expected_rank_full": 38,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-011",
+   "query": "新开发的成年人重大疾病产品应当符合什么要求",
+   "top10": [
+    "L1-14",
+    "L2-02",
+    "L1-13",
+    "L1-18",
+    "L2-01",
+    "L1-09",
+    "L1-22",
+    "L1-22",
+    "L1-24",
+    "L1-13"
+   ],
+   "expected_rank_full": 42,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-012",
+   "query": "中国人身保险业经验生命表2025从什么时候开始使用",
+   "top10": [
+    "L2-05",
+    "L2-05",
+    "L2-05",
+    "L1-07",
+    "L1-08",
+    "L1-20",
+    "L1-16",
+    "L1-24",
+    "L1-08",
+    "L1-24"
+   ],
+   "expected_rank_full": 1,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": true,
+    "contained": true,
+    "ok": true
+   },
+   "pass": true
+  },
+  {
+   "case_id": "RB-L2-013",
+   "query": "年金保险评估法定责任准备金应当采用哪张生命表",
+   "top10": [
+    "L1-14",
+    "L1-16",
+    "L1-04",
+    "L1-10",
+    "L1-01",
+    "L1-04",
+    "L1-24",
+    "L1-16",
+    "L1-16",
+    "L1-21"
+   ],
+   "expected_rank_full": 68,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-014",
+   "query": "健康保险和定期寿险准备金评估用哪张生命表",
+   "top10": [
+    "L1-14",
+    "L1-25",
+    "L1-14",
+    "L1-04",
+    "L1-04",
+    "L1-04",
+    "L1-04",
+    "L1-25",
+    "L1-04",
+    "L1-01"
+   ],
+   "expected_rank_full": 24,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-L2-015",
+   "query": "单一生命体表有什么用途",
+   "top10": [
+    "L2-02",
+    "L2-02",
+    "L1-13",
+    "L2-01",
+    "L2-02",
+    "L2-01",
+    "L1-14",
+    "L2-01",
+    "L1-01",
+    "L2-01"
+   ],
+   "expected_rank_full": 34,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-X-001",
+   "query": "消费者遇到保险销售误导应该怎么投诉维权",
+   "top10": [
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-01",
+    "L1-06",
+    "L1-04",
+    "L1-03"
+   ],
+   "expected_rank_full": 19,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-X-002",
+   "query": "在网上销售保险需要遵守哪些专门的监管规定",
+   "top10": [
+    "L1-16",
+    "L1-01",
+    "L1-06",
+    "L1-06",
+    "L1-01",
+    "L1-17",
+    "L1-06",
+    "L1-01",
+    "L2-02",
+    "L1-14"
+   ],
+   "expected_rank_full": 3,
+   "qualified_expected": true,
+   "pass": true
+  },
+  {
+   "case_id": "RB-X-003",
+   "query": "保险公司破产了消费者的人寿保险保单怎么办",
+   "top10": [
+    "L1-04",
+    "L1-24",
+    "L1-24",
+    "L1-13",
+    "L1-20",
+    "L1-07",
+    "L1-10",
+    "L1-06",
+    "L1-06",
+    "L1-04"
+   ],
+   "expected_rank_full": 7,
+   "qualified_expected": true,
+   "claim": {
+    "module_ok": false,
+    "contained": false,
+    "ok": false
+   },
+   "pass": false
+  },
+  {
+   "case_id": "RB-X-004",
+   "query": "买重疾险时新旧疾病定义有什么区别需要注意什么",
+   "top10": [
+    "L1-07",
+    "L2-01",
+    "L1-25",
+    "L2-03",
+    "L1-07",
+    "L1-24",
+    "L1-22",
+    "L1-22",
+    "L1-22",
+    "L1-22"
+   ],
+   "expected_rank_full": 2,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-X-005",
+   "query": "保险公司与股东之间的关联交易受什么监管约束",
+   "top10": [
+    "L1-23",
+    "L1-20",
+    "L1-20",
+    "L1-06",
+    "L1-06",
+    "L1-17",
+    "L2-05",
+    "L2-05",
+    "L1-20",
+    "L1-04"
+   ],
+   "expected_rank_full": 146,
+   "qualified_expected": false,
+   "pass": false
+  },
+  {
+   "case_id": "RB-N-001",
+   "query": "如何办理机动车驾驶证换证手续",
+   "top10": [
+    "L2-01",
+    "L2-02",
+    "L2-01",
+    "L2-02",
+    "L2-02",
+    "L2-02",
+    "L1-03",
+    "L2-01",
+    "L1-13",
+    "L1-02"
+   ],
+   "qualified": [],
+   "pass": true
+  },
+  {
+   "case_id": "RB-N-002",
+   "query": "社会保险里的养老保险退休后怎么办理领取手续",
+   "top10": [
+    "L1-06",
+    "L1-06",
+    "L1-01",
+    "L1-22",
+    "L1-22",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-09"
+   ],
+   "qualified": [
+    "L1-06",
+    "L1-06",
+    "L1-01",
+    "L1-06",
+    "L1-06",
+    "L1-06",
+    "L1-06"
+   ],
+   "pass": false
+  },
+  {
+   "case_id": "RB-N-003",
+   "query": "医院门诊挂号预约有哪些方式",
+   "top10": [
+    "L1-06",
+    "L1-06",
+    "L1-14",
+    "L1-21",
+    "L1-20",
+    "L1-21",
+    "L1-02",
+    "L1-22",
+    "L1-22",
+    "L1-21"
+   ],
+   "qualified": [],
+   "pass": true
+  },
+  {
+   "case_id": "RB-N-004",
+   "query": "机动车年检流程是怎样的",
+   "top10": [
+    "L2-01",
+    "L2-01",
+    "L1-14",
+    "L1-19",
+    "L1-14",
+    "L1-07",
+    "L1-16",
+    "L1-17",
+    "L1-05",
+    "L1-16"
+   ],
+   "qualified": [],
+   "pass": true
+  },
+  {
+   "case_id": "RB-N-005",
+   "query": "明天天气怎么样适合出游吗",
+   "top10": [
+    "L1-18",
+    "L1-21",
+    "L1-20",
+    "L2-02",
+    "L1-12",
+    "L1-22",
+    "L1-22",
+    "L1-14",
+    "L2-02",
+    "L1-18"
+   ],
+   "qualified": [],
+   "pass": true
+  },
+  {
+   "case_id": "RB-N-006",
+   "query": "未成年人办理身份证需要什么材料",
+   "top10": [
+    "L1-14",
+    "L1-13",
+    "L1-01",
+    "L1-07",
+    "L1-24",
+    "L1-05",
+    "L1-18",
+    "L1-07",
+    "L2-01",
+    "L1-16"
+   ],
+   "qualified": [],
+   "pass": true
+  },
+  {
+   "case_id": "RB-N-007",
+   "query": "个人所得税专项附加扣除怎么填报",
+   "top10": [
+    "L2-01",
+    "L1-24",
+    "L1-24",
+    "L1-13",
+    "L1-24",
+    "L1-01",
+    "L1-25",
+    "L1-25",
+    "L2-01",
+    "L1-01"
+   ],
+   "qualified": [],
+   "pass": true
+  }
+ ],
+ "self_retrieval": {
+  "sample": {
+   "n": 50,
+   "seed": 42,
+   "prefix_len": 64
+  },
+  "identical@1/5/10": [
+   0.94,
+   1.0,
+   1.0
+  ],
+  "prefix64@1/5/10": [
+   0.82,
+   1.0,
+   1.0
+  ],
+  "prefix64_by_layer": {
+   "法律": {
+    "n": 5,
+    "prefix64@1": 1.0,
+    "prefix64@10": 1.0
+   },
+   "监管规章": {
+    "n": 36,
+    "prefix64@1": 0.8333333333333334,
+    "prefix64@10": 1.0
+   },
+   "政策意见": {
+    "n": 1,
+    "prefix64@1": 1.0,
+    "prefix64@10": 1.0
+   },
+   "行业规范-疾病定义": {
+    "n": 7,
+    "prefix64@1": 0.5714285714285714,
+    "prefix64@10": 1.0
+   },
+   "监管通知": {
+    "n": 1,
+    "prefix64@1": 1.0,
+    "prefix64@10": 1.0
+   }
+  },
+  "rows": [
+   {
+    "chunk_id": "30897680-7eaf-41b1-ab4b-885802da5c05",
+    "doc": "L1-01",
+    "layer": "法律",
+    "chunk_index": 6,
+    "chars": 445,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "投保人故意或者因重大过失未履行前款规定的如实告知义务，足以影响保险人决定是否同意承保或者提高保险费率的，保险人有权解除合同。\n前"
+   },
+   {
+    "chunk_id": "e2b71fae-1228-4e41-83da-06be13e7aff7",
+    "doc": "L1-01",
+    "layer": "法律",
+    "chunk_index": 25,
+    "chars": 476,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第七十四条 保险公司在中华人民共和国境内设立分支机构，应当经保险监督管理机构批准。\n保险公司分支机构不具有法人资格，其民事责任由"
+   },
+   {
+    "chunk_id": "571e1b76-684f-4697-80cf-a492d68c31d4",
+    "doc": "L1-01",
+    "layer": "法律",
+    "chunk_index": 27,
+    "chars": 465,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第八十三条 保险公司的董事、监事、高级管理人员执行公司职务时违反法律、行政法规或者公司章程的规定，给公司造成损失的，应当承担赔偿"
+   },
+   {
+    "chunk_id": "307f9531-3cdd-4937-a138-7c11378cf70f",
+    "doc": "L1-01",
+    "layer": "法律",
+    "chunk_index": 30,
+    "chars": 507,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第九十四条 保险公司，除本法另有规定外，适用《中华人民共和国公司法》的规定。\n第四章 保险经营规则\n第九十五条 保险公司的业务范"
+   },
+   {
+    "chunk_id": "2936b5cc-2308-4df5-aa41-3d32b3e2a219",
+    "doc": "L1-01",
+    "layer": "法律",
+    "chunk_index": 32,
+    "chars": 509,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第一百零二条 经营财产保险业务的保险公司当年自留保险费，不得超过其实有资本金加公积金总和的四倍。\n第一百零三条 保险公司对每一危"
+   },
+   {
+    "chunk_id": "6b809fa2-478e-44f6-8883-b1cb72ce9d26",
+    "doc": "L1-04",
+    "layer": "监管规章",
+    "chunk_index": 0,
+    "chars": 474,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "---\ndocument_id: L1-04\ntitle: 健康保险管理办法\ndocument_number: 中国银行保险监督"
+   },
+   {
+    "chunk_id": "f9441e7c-484d-4947-a0c1-20b150c64d6f",
+    "doc": "L1-04",
+    "layer": "监管规章",
+    "chunk_index": 5,
+    "chars": 512,
+    "identical_rank": 1,
+    "prefix64_rank": 2,
+    "prefix_query": "第十三条 保险公司拟定的健康保险产品包含两种以上健康保障责任的，应当由总精算师按照一般精算原理判断主要责任，并根据主要责任确定产"
+   },
+   {
+    "chunk_id": "c04138b3-02a7-4d6d-93aa-2c9831b97185",
+    "doc": "L1-04",
+    "layer": "监管规章",
+    "chunk_index": 6,
+    "chars": 495,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第十九条 保险公司将产品参数可调的短期团体健康保险产品报送审批或者备案时，提交的申请材料应当包含产品参数调整办法，并由总精算师遵"
+   },
+   {
+    "chunk_id": "63bc358d-e04f-494e-8a3f-e455af398bd8",
+    "doc": "L1-04",
+    "layer": "监管规章",
+    "chunk_index": 10,
+    "chars": 505,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "保险公司不得以被保险人家族遗传病史之外的遗传信息、基因检测资料作为核保条件。\n第三十九条 保险公司销售健康保险产品，应当以书面或"
+   },
+   {
+    "chunk_id": "66bab57e-9b10-4ef7-b80e-484342b0521b",
+    "doc": "L1-04",
+    "layer": "监管规章",
+    "chunk_index": 15,
+    "chars": 506,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "超出以上限额的服务，应当单独定价，不计入保险费，并在合同中明示健康管理服务价格。\n第五十八条 保险公司经营医疗保险，应当加强与医"
+   },
+   {
+    "chunk_id": "eeb133a3-10f0-48fb-9370-a7618601cb41",
+    "doc": "L1-04",
+    "layer": "监管规章",
+    "chunk_index": 25,
+    "chars": 499,
+    "identical_rank": 1,
+    "prefix64_rank": 2,
+    "prefix_query": "对于事实清楚、责任明确的健康保险理赔申请，保险公司可以借助互联网等信息技术手段，对被保险人的数字化理赔材料进行审核，简化理赔流程"
+   },
+   {
+    "chunk_id": "0f0279cf-eaa4-45b7-b53a-c0f95f4c98c0",
+    "doc": "L1-06",
+    "layer": "监管规章",
+    "chunk_index": 9,
+    "chars": 388,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（一）保险产品名称（条款名称和宣传名称），审批类产品的批复文号，备案类产品的备案编号或产品注册号，以及报备文件编号或条款编码。\n"
+   },
+   {
+    "chunk_id": "4a75fa47-7014-4124-a9df-a5bfe9dbbe28",
+    "doc": "L1-06",
+    "layer": "监管规章",
+    "chunk_index": 26,
+    "chars": 443,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第三节 保险中介机构\n第五十六条 保险中介机构应从消费者实际保险需求出发，立足角色独立、贴近市场的优势，积极运用新技术，提升保险"
+   },
+   {
+    "chunk_id": "81a2185e-2034-4dfa-af27-d9a6941b1baf",
+    "doc": "L1-06",
+    "layer": "监管规章",
+    "chunk_index": 30,
+    "chars": 507,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第六十八条 互联网企业可根据保险公司或保险专业中介机构委托代理保险业务，不得将互联网保险业务转委托给其他机构或个人。\n互联网企业"
+   },
+   {
+    "chunk_id": "0f197e58-93ed-406a-bad2-482d7ff6bd30",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 2,
+    "chars": 483,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "本规定所称保险兼业代理机构是指利用自身主业与保险的相关便利性，依法兼营保险代理业务的企业，包括保险兼业代理法人机构及其分支机构。"
+   },
+   {
+    "chunk_id": "2eb7a984-62e3-4c1d-a40b-14f0db28eb1a",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 19,
+    "chars": 418,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第四十三条 保险代理人从事保险代理业务不得超出被代理保险公司的业务范围和经营区域；保险专业代理机构从事保险代理业务涉及异地共保、"
+   },
+   {
+    "chunk_id": "45e7e29b-0703-458c-8009-be3dce276bdf",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 22,
+    "chars": 483,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第五十二条 保险代理人应当妥善管理和使用被代理保险公司提供的各种单证、材料；代理关系终止后，应当在30日内将剩余的单证及材料交付"
+   },
+   {
+    "chunk_id": "93cf0dec-0811-49a3-bead-24807723b5cc",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 24,
+    "chars": 461,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第五十九条 保险专业代理公司应当按规定将监管费交付到国务院保险监督管理机构指定账户。国务院保险监督管理机构对监管费另有规定的，适"
+   },
+   {
+    "chunk_id": "2cfec750-a1a0-4ebb-b208-2debe958a0bf",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 27,
+    "chars": 421,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "个人保险代理人发生违法违规行为的，保险公司应当按照有关规定对团队主管追责。\n第七十条 保险代理人及其从业人员在办理保险业务活动中"
+   },
+   {
+    "chunk_id": "329de16a-62e0-42a5-a85b-b975dfa1cfe1",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 37,
+    "chars": 457,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第九十九条 保险专业代理机构、保险兼业代理机构有下列情形之一的，由保险监督管理机构责令改正，给予警告，没有违法所得的，处1万元以"
+   },
+   {
+    "chunk_id": "f5f6612c-d302-469b-9997-cecc8d6f0b98",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 49,
+    "chars": 469,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第十二条 保险兼业代理机构经营保险代理业务，应当符合下列条件：\n（一）有市场监督管理部门核发的营业执照，其主营业务依法须经批准的"
+   },
+   {
+    "chunk_id": "e63814d7-726d-4380-abf0-47282c9604cc",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 69,
+    "chars": 478,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第六十三条 保险专业代理公司有下列情形之一的，可以动用保证金：\n（一）注册资本减少；\n（二）许可证被注销；\n（三）投保符合条件的"
+   },
+   {
+    "chunk_id": "5a92f3e8-f7e3-474d-bbbd-dc5fe92c50f9",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 80,
+    "chars": 466,
+    "identical_rank": 2,
+    "prefix64_rank": 2,
+    "prefix_query": "（一）未按规定放置许可证的；\n（二）未按规定办理许可证变更登记的；\n（三）未按规定交回许可证的；\n（四）未按规定进行公告的。\n第"
+   },
+   {
+    "chunk_id": "5410a7fc-70a6-433f-bc98-fc1386db174c",
+    "doc": "L1-07",
+    "layer": "监管规章",
+    "chunk_index": 83,
+    "chars": 353,
+    "identical_rank": 2,
+    "prefix64_rank": 4,
+    "prefix_query": "第一百零五条 保险专业代理机构、保险兼业代理机构违反本规定第七十三条、第七十七条的，由保险监督管理机构给予警告，没有违法所得的，"
+   },
+   {
+    "chunk_id": "0d8a2f8f-2720-4814-b519-4920d9e6b525",
+    "doc": "L1-09",
+    "layer": "监管规章",
+    "chunk_index": 21,
+    "chars": 509,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "对外国保险公司分公司的其他管理，参照本规定对保险公司总公司的有关规定执行，法律、行政法规和中国保监会另有规定的除外。\n第七十二条"
+   },
+   {
+    "chunk_id": "bda59342-581c-412f-9cd2-83e34fb67ea7",
+    "doc": "L1-10",
+    "layer": "监管规章",
+    "chunk_index": 2,
+    "chars": 491,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "本办法所称保单持有人，是指对保单利益依法享有请求权的主体，包括投保人、被保险人或者受益人。\n本办法所称保单受让公司，是指经营有人"
+   },
+   {
+    "chunk_id": "61680854-fba9-4567-acc7-9cc4fdb0482a",
+    "doc": "L1-10",
+    "layer": "监管规章",
+    "chunk_index": 6,
+    "chars": 444,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（二）国务院保险监督管理机构经商有关部门认定，保险公司存在重大风险，可能严重危害社会公共利益和金融稳定的；\n（三）国务院批准的其"
+   },
+   {
+    "chunk_id": "b64d1c8f-07c6-42f7-841f-9be1c1a97574",
+    "doc": "L1-10",
+    "layer": "监管规章",
+    "chunk_index": 21,
+    "chars": 494,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第二十二条 被依法撤销或者依法实施破产的保险公司的清算资产不足以偿付人寿保险合同保单利益的，保险保障基金可以按照下列规则向保单受"
+   },
+   {
+    "chunk_id": "585b36cd-a7c9-44c2-9564-0e43efd88031",
+    "doc": "L1-12",
+    "layer": "监管规章",
+    "chunk_index": 5,
+    "chars": 495,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（四）投诉人提交书面材料的，应当由投诉人签字或者盖章。\n银行保险机构已经掌握或者通过查询内部信息档案可以获得的材料，不得要求投诉"
+   },
+   {
+    "chunk_id": "fa363bed-1fdf-4455-b940-1ca799adca69",
+    "doc": "L1-15",
+    "layer": "监管规章",
+    "chunk_index": 4,
+    "chars": 507,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（一）保险销售从业人员出示有效身份证明。\n（二）保险销售从业人员出示投保提示书、产品条款和免除保险人责任条款的书面说明。\n（三）"
+   },
+   {
+    "chunk_id": "dbe39d23-3391-4288-9cb8-780dd71022f2",
+    "doc": "L1-15",
+    "layer": "监管规章",
+    "chunk_index": 7,
+    "chars": 220,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第十五条 保险公司、保险中介机构应建立完善内部控制制度，对未按本办法规定实施销售行为可回溯管理的，应追究直接负责的主管人员和其他"
+   },
+   {
+    "chunk_id": "ae221a57-7c8b-44c0-bc45-83e15966a042",
+    "doc": "L1-16",
+    "layer": "监管规章",
+    "chunk_index": 26,
+    "chars": 187,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "附件：\n1.个人意外伤害保险业务年度经营数据\n2.个人意外伤害保险产品年度经营数据\n（四类产品）\n3.个人意外伤害保险产品年度经"
+   },
+   {
+    "chunk_id": "3926f627-fc8a-4a4a-a714-9774b2ca4cf5",
+    "doc": "L1-19",
+    "layer": "监管规章",
+    "chunk_index": 14,
+    "chars": 512,
+    "identical_rank": 1,
+    "prefix64_rank": 2,
+    "prefix_query": "第三十七条 保险公司总公司总经理、总精算师、合规负责人、财务负责人和审计责任人，省级分公司、其他分公司和中心支公司总经理不能履行"
+   },
+   {
+    "chunk_id": "29bb6127-a6ec-496b-9e57-d46e5da49bbf",
+    "doc": "L1-21",
+    "layer": "监管规章",
+    "chunk_index": 5,
+    "chars": 487,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（二）本办法第六条第（一）至（三）项所列关联方的其他关系密切的家庭成员；\n（三）银行保险机构内部工作人员及其控制的法人或其他组织"
+   },
+   {
+    "chunk_id": "c987ba0b-10ff-4073-83e7-35563ac37603",
+    "doc": "L1-21",
+    "layer": "监管规章",
+    "chunk_index": 21,
+    "chars": 430,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "董事会会议所作决议须经非关联董事2/3以上通过。出席董事会会议的非关联董事人数不足三人的，应当提交股东会审议。\n董事、监事、高级"
+   },
+   {
+    "chunk_id": "0b627eda-1fba-4b8f-84d6-6a36ef57a2fb",
+    "doc": "L1-22",
+    "layer": "监管规章",
+    "chunk_index": 18,
+    "chars": 471,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（八）内部管理制度，包括公司治理结构、组织机构设置、业务管理制度、财务制度、信息化管理制度、反洗钱内控制度、消费者权益保护制度以"
+   },
+   {
+    "chunk_id": "325ec00f-1670-4a2b-8cfd-8a9464fb7ccb",
+    "doc": "L1-22",
+    "layer": "监管规章",
+    "chunk_index": 19,
+    "chars": 486,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第四十三条  申请人应按规定接受风险测试。风险测试应综合考虑和全面了解机构、股东及存在关联关系的单位或者个人的历史经营状况，判断"
+   },
+   {
+    "chunk_id": "91cc6050-c3cf-42c0-b77d-cb75f748ff56",
+    "doc": "L1-22",
+    "layer": "监管规章",
+    "chunk_index": 31,
+    "chars": 508,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（七）业务、财务等计算机软硬件配备及信息安全保障情况说明等；\n（八）《保险公估机构董事长（执行董事）、高级管理人员任职报告表》及"
+   },
+   {
+    "chunk_id": "e9a47ef3-738b-4243-b914-7c0dde2d8821",
+    "doc": "L1-22",
+    "layer": "监管规章",
+    "chunk_index": 33,
+    "chars": 502,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "第六十九条  保险专业代理机构、保险经纪机构高级管理人员拟任人应符合以下条件：\n（一）大学专科以上学历，从事金融工作10年以上的"
+   },
+   {
+    "chunk_id": "a11d0a07-d7fe-44e0-b577-48d3c83f9d4c",
+    "doc": "L1-22",
+    "layer": "监管规章",
+    "chunk_index": 69,
+    "chars": 485,
+    "identical_rank": 2,
+    "prefix64_rank": 2,
+    "prefix_query": "全国性保险公估机构及合伙制保险公估机构申请经营保险公估业务的，由工商注册登记所在地银保监局接收备案材料并初审，由银保监会依法备案"
+   },
+   {
+    "chunk_id": "ceb86e7d-84a2-43ec-8a30-e8e11ef58645",
+    "doc": "L1-23",
+    "layer": "监管规章",
+    "chunk_index": 4,
+    "chars": 440,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "（八）保险公司应建立健康管理服务信息系统,实现客户健康信息变化和健康管理服务的记录和管理功能。\n保险公司健康管理服务信息应与客户"
+   },
+   {
+    "chunk_id": "52a2690e-ae67-4a2e-bd7d-5729aeeb45dd",
+    "doc": "L1-25",
+    "layer": "政策意见",
+    "chunk_index": 4,
+    "chars": 452,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "引导优化资产配置结构，提升跨市场跨周期投资管理能力。督促理顺委托人和受托人职责分工。加强投资全流程监管。依法合规运用金融衍生品。"
+   },
+   {
+    "chunk_id": "31678f50-f21f-4152-adf0-1aa1d735be68",
+    "doc": "L2-01",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 13,
+    "chars": 302,
+    "identical_rank": 1,
+    "prefix64_rank": 2,
+    "prefix_query": " 阿尔茨海默病之外的其他类型痴呆不在保障范围内。 注：如果保险公司仅承担被保险人在某年龄之前的保障责任， 须在疾病定义中特别说明"
+   },
+   {
+    "chunk_id": "06115ad5-0dd5-4f26-b70b-05f49743c291",
+    "doc": "L2-01",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 17,
+    "chars": 418,
+    "identical_rank": 1,
+    "prefix64_rank": 2,
+    "prefix_query": "3.1.1.25 主动脉手术 指为治疗主动脉疾病或主动脉创伤，已经实施了开胸（含胸 腔镜下）或开腹（含腹腔镜下）进行的切除、置换"
+   },
+   {
+    "chunk_id": "5bbb49cd-bb13-46d5-ab99-ef644f8f134e",
+    "doc": "L2-01",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 32,
+    "chars": 483,
+    "identical_rank": 1,
+    "prefix64_rank": 2,
+    "prefix_query": " 4 重大疾病保险宣传材料的相关规定 在重大疾病保险的宣传材料中，如果保障的疾病名称单独出 现，应当采用以下主标题和副标题结合的"
+   },
+   {
+    "chunk_id": "4712c9d6-4f64-4d12-b1bf-39e14c1899fa",
+    "doc": "L2-02",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 18,
+    "chars": 364,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "|3.1.14 双目失明|3.1.1.14 双目失明|\n|指因疾病或意外伤害导致双眼视力永久不可逆性丧失， 双眼中较好眼须满足下"
+   },
+   {
+    "chunk_id": "472567c2-f44f-4fc0-90bb-c55ef35a542d",
+    "doc": "L2-02",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 22,
+    "chars": 395,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "体表面积根据《中国新九分法》 计算。|指烧伤程度为Ⅲ度，且Ⅲ度烧伤的面积达到全身体 表面积的 20％或 20％以上。体表面积根据"
+   },
+   {
+    "chunk_id": "b45c46e1-01c8-4df9-b6e9-760372bad127",
+    "doc": "L2-02",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 23,
+    "chars": 481,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "|3.1.22 严重运动神经元病|3.1.1.22 严重运动神经元病|\n|是一组中枢神经系统运动神经元的进行性变性疾病，包 括进"
+   },
+   {
+    "chunk_id": "6feadb08-8b79-4f74-8459-c4cc85a17564",
+    "doc": "L2-02",
+    "layer": "行业规范-疾病定义",
+    "chunk_index": 41,
+    "chars": 493,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "|4.20 严重Ⅲ度烧伤——至少达体表面积的 20%|4.20 严重Ⅲ度烧伤——至少达体表面积的 20%|\n|4.21 严重原发"
+   },
+   {
+    "chunk_id": "b5763484-39bc-4a37-944c-dc9e7620b67c",
+    "doc": "L2-03",
+    "layer": "监管通知",
+    "chunk_index": 1,
+    "chars": 493,
+    "identical_rank": 1,
+    "prefix64_rank": 1,
+    "prefix_query": "发布日期: 2020-11-06 11:38:24.0\nNFRA docId: 940130\n官方页面: https://www"
+   }
+  ]
+ },
+ "failure_matrix": {
+  "RANKING": [
+   {
+    "case": "RB-L1-001",
+    "holder_query_rank": 184,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-003",
+    "holder_query_rank": 53,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-005",
+    "holder_query_rank": 85,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-006",
+    "holder_query_rank": 548,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-007",
+    "holder_query_rank": 29,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-009",
+    "holder_query_rank": 54,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-012",
+    "holder_query_rank": 12,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-016",
+    "holder_query_rank": 49,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-018",
+    "holder_query_rank": 459,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-022",
+    "holder_query_rank": 270,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-023",
+    "holder_query_rank": 204,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-026",
+    "holder_query_rank": 378,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-027",
+    "holder_query_rank": 119,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-028",
+    "holder_query_rank": 299,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L1-029",
+    "holder_query_rank": 232,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-001",
+    "holder_query_rank": 606,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-002",
+    "holder_query_rank": 438,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-005",
+    "holder_query_rank": 130,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-010",
+    "holder_query_rank": 38,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-011",
+    "holder_query_rank": 376,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-013",
+    "holder_query_rank": 84,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-014",
+    "holder_query_rank": 243,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-L2-015",
+    "holder_query_rank": 300,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-X-001",
+    "holder_query_rank": 636,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-X-003",
+    "holder_query_rank": 67,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-X-004",
+    "holder_query_rank": 11,
+    "note": "chunk findable by own prefix but not by case query"
+   },
+   {
+    "case": "RB-X-005",
+    "holder_query_rank": 680,
+    "note": "chunk findable by own prefix but not by case query"
+   }
+  ],
+  "NEGATIVE_NOISE": [
+   {
+    "case": "RB-N-002",
+    "qualified": [
+     "L1-06",
+     "L1-06",
+     "L1-01",
+     "L1-06",
+     "L1-06",
+     "L1-06",
+     "L1-06"
+    ]
+   }
+  ]
+ },
+ "ladders": {
+  "销售阶梯": {
+   "nearest_docs": {
+    "保险销售": [
+     [
+      "L1-06",
+      0.8121
+     ],
+     [
+      "L1-14",
+      0.7983
+     ],
+     [
+      "L1-04",
+      0.7974
+     ]
+    ],
+    "保险销售行为": [
+     [
+      "L1-12",
+      0.831
+     ],
+     [
+      "L1-15",
+      0.8216
+     ],
+     [
+      "L1-06",
+      0.8209
+     ]
+    ],
+    "保险销售行为管理": [
+     [
+      "L1-12",
+      0.8372
+     ],
+     [
+      "L1-06",
+      0.8282
+     ],
+     [
+      "L1-15",
+      0.825
+     ]
+    ],
+    "保险销售行为管理办法": [
+     [
+      "L1-12",
+      0.861
+     ],
+     [
+      "L1-15",
+      0.8418
+     ],
+     [
+      "L1-06",
+      0.8346
+     ]
+    ]
+   },
+   "pair_sims": [
+    [
+     1.0,
+     0.9408,
+     0.9301,
+     0.8854
+    ],
+    [
+     0.9408,
+     1.0,
+     0.9964,
+     0.9562
+    ],
+    [
+     0.9301,
+     0.9964,
+     1.0,
+     0.9593
+    ],
+    [
+     0.8854,
+     0.9562,
+     0.9593,
+     1.0
+    ]
+   ],
+   "terms": [
+    "保险销售",
+    "保险销售行为",
+    "保险销售行为管理",
+    "保险销售行为管理办法"
+   ]
+  },
+  "重疾阶梯": {
+   "nearest_docs": {
+    "重大疾病": [
+     [
+      "L2-02",
+      0.702
+     ],
+     [
+      "L2-01",
+      0.6931
+     ],
+     [
+      "L1-20",
+      0.6344
+     ]
+    ],
+    "重大疾病保险": [
+     [
+      "L2-02",
+      0.8136
+     ],
+     [
+      "L2-01",
+      0.7984
+     ],
+     [
+      "L1-06",
+      0.7781
+     ]
+    ],
+    "重大疾病保险的疾病定义": [
+     [
+      "L2-02",
+      0.8695
+     ],
+     [
+      "L2-01",
+      0.8339
+     ],
+     [
+      "L1-16",
+      0.8037
+     ]
+    ],
+    "重大疾病保险的疾病定义使用规范": [
+     [
+      "L2-02",
+      0.8742
+     ],
+     [
+      "L2-01",
+      0.8373
+     ],
+     [
+      "L1-16",
+      0.8067
+     ]
+    ]
+   },
+   "pair_sims": [
+    [
+     1.0,
+     0.8003,
+     0.7626,
+     0.7531
+    ],
+    [
+     0.8003,
+     1.0,
+     0.9406,
+     0.925
+    ],
+    [
+     0.7626,
+     0.9406,
+     1.0,
+     0.9955
+    ],
+    [
+     0.7531,
+     0.925,
+     0.9955,
+     1.0
+    ]
+   ],
+   "terms": [
+    "重大疾病",
+    "重大疾病保险",
+    "重大疾病保险的疾病定义",
+    "重大疾病保险的疾病定义使用规范"
+   ]
+  }
+ },
+ "failure_matrix_counts": {
+  "DATA_MISSING": 0,
+  "CHUNKING": 0,
+  "EMBEDDING": 0,
+  "RANKING": 27,
+  "QUALIFICATION": 0,
+  "NEGATIVE_NOISE": 1,
+  "UNKNOWN": 0
+ }
+}

@@ -1,0 +1,35 @@
+created KB e38edd35-3d75-441e-9a76-d7ab1466d590
+model config: 配置更新成功
+existing docs: 0
+[1/29] L1-01.md: completed chunks=53
+[2/29] L1-02.md: completed chunks=16
+[3/29] L1-03.md: completed chunks=20
+[4/29] L1-04.md: completed chunks=34
+[5/29] L1-05.md: completed chunks=10
+[6/29] L1-06.md: completed chunks=68
+[7/29] L1-07.md: completed chunks=88
+[8/29] L1-08.md: completed chunks=34
+[9/29] L1-09.md: completed chunks=23
+[10/29] L1-10.md: completed chunks=27
+[11/29] L1-11.md: completed chunks=11
+[12/29] L1-12.md: completed chunks=13
+[13/29] L1-13.md: completed chunks=9
+[14/29] L1-14.md: completed chunks=19
+[15/29] L1-15.md: completed chunks=8
+[16/29] L1-16.md: completed chunks=27
+[17/29] L1-17.md: completed chunks=13
+[18/29] L1-18.md: completed chunks=30
+[19/29] L1-19.md: completed chunks=20
+[20/29] L1-20.md: completed chunks=30
+[21/29] L1-21.md: completed chunks=32
+[22/29] L1-22.md: completed chunks=76
+[23/29] L1-23.md: completed chunks=13
+[24/29] L1-24.md: completed chunks=14
+[25/29] L1-25.md: completed chunks=13
+[26/29] L2-03.md: completed chunks=3
+[27/29] L2-05.md: completed chunks=8
+[28/29] L2-01.pdf: completed chunks=35
+[29/29] L2-02.pdf: completed chunks=44
+
+EVAL KB IMPORT: 29/29 verified in 5454s
+kb_id: e38edd35-3d75-441e-9a76-d7ab1466d590

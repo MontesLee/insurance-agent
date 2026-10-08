@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://insurance-agent.local/schema/intent-result/v1.json",
+  "title": "IntentResult Contract (v1)",
+  "description": "Phase 28.A-0 / ADR-019 (APPROVED, M1 applied). The ONLY validated output of the Insurance Intent Layer; the Router consumes only this contract. Intent truth lives in schema + rules + runtime events — a prompt is NEVER an intent source. STRUCTURAL BOUNDARY: this contract deliberately has no workflow / skill / tool / tool-selection / agent fields (additionalProperties:false makes them impossible) — the Intent Layer must not know execution detail. Context rule (ADR-019 M1): when intent is modify_existing_plan and no active case context is available, clarification_required MUST be true (safe degradation to clarification, never a guess).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "intent_id",
+    "confidence",
+    "confidence_source",
+    "context_refs",
+    "clarification_required",
+    "reason_codes",
+    "created_at"
+  ],
+  "properties": {
+    "intent_id": {
+      "type": "string",
+      "enum": [
+        "insurance_qa",
+        "product_qa",
+        "insurance_plan",
+        "modify_existing_plan",
+        "unknown_insurance_intent"
+      ],
+      "description": "v1 intent vocabulary (minimal viable set per ADR-019; coverage_review / policy_compare / risk_analysis are deliberately NOT in v1). unknown_insurance_intent is the fail-closed value — schema validation failure or unclassifiable input MUST land here, never a guess."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Rule hit = 1.0; LLM proposal = the model-reported value. Never fabricated. High-risk intents below the approved threshold must not auto-route (enforced downstream, not by this schema)."
+    },
+    "confidence_source": {
+      "type": "string",
+      "enum": ["rule", "llm", "hybrid"],
+      "description": "Who produced the classification: deterministic rules (rule), LLM proposal accepted by the deterministic layer (llm), or rules + LLM proposal agreement (hybrid). The deterministic layer always makes the final decision (ADR-019: LLM may propose, deterministic layer decides)."
+    },
+    "context_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conversation_id", "active_case_id", "message_id"],
+      "properties": {
+        "conversation_id": {
+          "type": ["string", "null"],
+          "description": "Owning conversation; null when unavailable (fresh session / restart)."
+        },
+        "active_case_id": {
+          "type": ["string", "null"],
+          "description": "Active planning case bound to the conversation (ADR-024). null = no active case; modify_existing_plan with null here forces clarification (see if/then rule)."
+        },
+        "message_id": {
+          "type": ["string", "null"],
+          "description": "The user message this classification was made for."
+        }
+      },
+      "description": "ADR-019 M1: intent input = message + recent conversation context + active case context. Refs may be null when context is unavailable — never fabricated."
+    },
+    "clarification_required": {
+      "type": "boolean",
+      "description": "true = the layer could not safely classify (unknown) or a high-risk intent lacks confident context; routing MUST go to clarification, never auto-execution."
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Audit trail: matched rule ids (e.g. 'rule:qa-difference-01'), LLM proposal reference, or fallback reason (e.g. 'schema_validation_failed', 'context_unavailable'). At least one reason is always present."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp of the classification decision."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "intent_id": { "const": "modify_existing_plan" } },
+        "required": ["intent_id"]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "properties": {
+              "context_refs": {
+                "properties": { "active_case_id": { "type": "string" } },
+                "required": ["active_case_id"]
+              }
+            }
+          },
+          {
+            "properties": { "clarification_required": { "const": true } }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -31,3 +31,8 @@ client-intake-data/clients/*
 # local browser-validation tooling (bridgic-browser uv project, not product code)
 web/pyproject.toml
 web/uv.lock
+
+# Claude Code local machine state (project commands/ stay tracked)
+.claude/settings.local.json
+.claude/scheduled_tasks.json
+.claude/scheduled_tasks.lock

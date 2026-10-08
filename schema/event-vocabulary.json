@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "event-vocabulary.json",
+  "title": "RuntimeEvent vocabulary — the dual-end contract source (Phase 28.B prep)",
+  "description": "Canonical event-type vocabulary shared by backend and frontend. 'vocabulary' MUST equal runtime/events.py EVENT_TYPES exactly (asserted by tests/contract/test_event_vocabulary.py). 'reserved' are frontend-known types whose backend emission does not exist yet (contract-first for the router-authority migration): grounding phases are currently embedded in qa_answered data and become standalone events only under a runtime-authorized phase. The frontend union MUST contain vocabulary + reserved (asserted by web/src/types/runtime.test.ts).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "vocabulary",
+    "reserved"
+  ],
+  "properties": {
+    "vocabulary": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "reserved": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "uniqueItems": true
+    }
+  },
+  "vocabulary": [
+    "agent_assigned",
+    "agent_completed",
+    "agent_decision",
+    "agent_failed",
+    "agent_message_acknowledged",
+    "agent_message_failed",
+    "agent_message_received",
+    "agent_message_sent",
+    "agent_output_validated",
+    "agent_started",
+    "agent_step_error",
+    "agent_step_started",
+    "agent_stream_delta",
+    "agent_tool_call",
+    "agent_tool_completed",
+    "agent_validation_failed",
+    "approval_approved",
+    "approval_expired",
+    "approval_failed",
+    "approval_rejected",
+    "approval_requested",
+    "approval_resumed",
+    "approval_waiting",
+    "artifact_created",
+    "checkpoint_created",
+    "checkpoint_resumed",
+    "eval_failed",
+    "eval_passed",
+    "eval_started",
+    "graph_validation_failed",
+    "graph_validation_passed",
+    "graph_validation_started",
+    "handoff_rejected",
+    "handoff_validated",
+    "intent_classified",
+    "planner_completed",
+    "planner_failed",
+    "planner_started",
+    "qa_answered",
+    "repair_completed",
+    "repair_exhausted",
+    "repair_started",
+    "run_completed",
+    "run_failed",
+    "run_started",
+    "stage_completed",
+    "stage_failed",
+    "stage_started",
+    "task_activated",
+    "tool_completed",
+    "tool_failed",
+    "tool_started"
+  ],
+  "reserved": [
+    "grounding_started",
+    "grounding_completed"
+  ]
+}

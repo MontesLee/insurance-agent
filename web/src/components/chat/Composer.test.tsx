@@ -71,10 +71,14 @@ describe("Welcome screen (§23)", () => {
     expect(onPick).toHaveBeenCalledTimes(1); // fill only, never auto-send
   });
 
-  it("discloses the honest limitation (structured Client State upstream)", () => {
+  it("consumer welcome carries no stale demo-mode disclaimer (28.E-1)", () => {
+    // The old note claimed natural language was NOT wired into the main
+    // execution path — false since the 28.x agent path. The consumer
+    // shell must not ship known-wrong copy (demo internals remain a
+    // developer-console concern).
     const { container } = render(<WelcomeScreen onPick={() => {}} />);
-    expect(container.textContent).toContain("Portfolio Demo Mode");
-    expect(container.textContent).toContain("结构化 Client State");
+    expect(container.textContent).not.toContain("Portfolio Demo Mode");
+    expect(container.textContent).not.toContain("演示 case");
   });
 });
 
@@ -116,7 +120,10 @@ describe("Conversation transcript", () => {
       />,
     );
     const banner = screen.getByTestId("chat-conflict");
-    expect(banner.textContent).toContain("run_busy");
+    // 28.E-2: the banner stays consumer-safe — internal run/case ids never render
+    expect(banner.textContent).not.toContain("run_busy");
+    expect(banner.textContent).not.toContain("bm-complete-001");
+    expect(banner.textContent).toContain("分析任务已在进行中");
     fireEvent.click(screen.getByRole("button", { name: /打开正在分析的对话/ }));
     expect(onOpen).toHaveBeenCalledWith("chat_2");
   });

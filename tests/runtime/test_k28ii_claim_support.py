@@ -401,6 +401,72 @@ def fix1_normalization(c: Checks):
           r4["ok"] and r4["claims"][0]["support_status"] == cs.SUPPORTED)
 
 
+@section
+def fix2_numeric_boundary(c: Checks):
+    """K.28-II-FIX2 (P2-3 substring false-support): numeric anchors
+    match with digit boundaries — a short token never matches inside
+    a longer one; exact tokens keep matching."""
+    R = {"claim_support": {"enabled": True},
+         "gate": {"sentence_separators": ["。", "！", "？", "；"],
+                  "fact_markers": ["免赔额", "保额", "等待期", "赔付"],
+                  "max_answer_chars": 4000, "max_regenerations": 1},
+         "citation": {"pattern": r"\[E(\d+)\]", "label_format": "E%d"}}
+
+    def st(claim, ev_text):
+        r = cs.check(claim + "[E1]。", [{"content": ev_text}], R)
+        return r["claims"][0]["support_status"], r["ok"]
+
+    def blocked(claim, ev_text):
+        """Non-SUPPORTED + gate fail. When the label sits adjacent to
+        the evidence digits the contradiction path fires FIRST and
+        yields the sharper CONTRADICTED — both states block delivery,
+        which is the FIX2 requirement ("NOT SUPPORTED")."""
+        state, ok = st(claim, ev_text)
+        return state in (cs.UNSUPPORTED, cs.CONTRADICTED) and ok is False
+    # FIX2-01 short-in-long -> NOT supported
+    c.chk("FIX2-01 0元 vs 10000元 NOT supported",
+          blocked("免赔额为0元", "免赔额为10000元"))
+    # FIX2-02 exact short
+    c.chk("FIX2-02 0元 vs 0元 supported",
+          st("免赔额为0元", "免赔额为0元") == (cs.SUPPORTED, True))
+    # FIX2-03 exact long
+    c.chk("FIX2-03 10000元 exact supported",
+          st("免赔额为10000元", "免赔额为10000元") == (cs.SUPPORTED, True))
+    # FIX2-04 1000 in 10000
+    c.chk("FIX2-04 1000元 vs 10000元 NOT supported",
+          blocked("免赔额为1000元", "免赔额为10000元"))
+    # FIX2-05 / FIX2-06 both directions, different label
+    c.chk("FIX2-05 1000 vs 10000 (赔付)",
+          blocked("赔付1000元", "赔付10000元"))
+    c.chk("FIX2-06 10000 vs 1000 (赔付)",
+          blocked("赔付10000元", "赔付1000元"))
+    # FIX2-07 Chinese punctuation around digits
+    c.chk("FIX2-07 punctuated evidence",
+          blocked("免赔额为0元", "（一）免赔额为10000元；"))
+    # FIX2-08 different unit lengths
+    c.chk("FIX2-08 1000元 vs 10000元 bare",
+          cs._value_found("1000", "元", "10000元") is False
+          and cs._value_found("10000", "元", "10000元") is True)
+    # FIX2-09 unrelated numeric text
+    c.chk("FIX2-09 unrelated numerics not supported",
+          blocked("等待期为90天", "本合同编号2026-0号，金额10000元"))
+    # FIX2-10 REAL frozen-corpus supported numeric case (P06 shape)
+    c.chk("FIX2-10 corpus numeric case still supported",
+          st("该产品等待期为90天", "本产品条款约定：等待期为90天。")
+          == (cs.SUPPORTED, True))
+    # P2-3 discovery shape (catalog record, label far from digits)
+    r = cs.check("免赔额为0元[E1]。",
+                 [{"content": "coverage_directions: [\"医疗\", \"免赔额\"]" + chr(10) +
+                              "constraints: [{\"constraint\": \"deductible\", \"value\": \"10000元\"}]"}], R)
+    c.chk("FIX2 P2-3 catalog shape NOT supported",
+          r["claims"][0]["support_status"] == cs.UNSUPPORTED
+          and not r["ok"])
+    # no new false support: exhaustively 0/00/000/10/100/1000/10000
+    for short in ("0", "00", "000", "10", "100", "1000"):
+        c.chk("FIX2 no-substring %s in 10000元" % short,
+              cs._value_found(short, "元", "x10000元") is False)
+
+
 def main():
     return run_sections(SECTIONS, "webui_test_k28ii_claim_support.txt",
                         "K.28-II CLAIM SUPPORT IMPL")

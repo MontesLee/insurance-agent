@@ -1,0 +1,91 @@
+# Product QA rules — deterministic truth for the Product QA Agent
+# (Phase 28.C-2 / ADR-022 APPROVED; owner rulings D1-D4/D6).
+#
+# Code (runtime/product_qa_agent/*) only CONSUMES this file (AGENTS.md §5).
+#
+# Evidence assembly boundary (ADR-022 §1 source table, implementation
+# reading recorded in phase-28c2-pre-audit §7):
+#   product resolved  -> E1 = deterministic CATALOG record (version-pinned;
+#                        catalog facts relayed verbatim, LLM formats only)
+#                        E2.. = governed WeKnora evidence QUALIFYING for the
+#                        product: document linked in the product's
+#                        evidence_refs, or content naming the product
+#   parameter missing from BOTH catalog fields and qualifying evidence
+#                     -> refused catalog_missing_fact (D6 fail-closed —
+#                        honest absence, no generic-knowledge substitution
+#                        for a specific product's parameter)
+#   product unresolved -> ordinary knowledge path (no catalog anchor);
+#                        empty evidence -> insufficient_evidence
+version: 1
+
+resolution:
+  # how many recent context messages are scanned for a product mention
+  # when the message itself uses a demonstrative ("这款")
+  context_scan_messages: 8
+
+catalog:
+  # fields rendered into the deterministic catalog evidence record (E1);
+  # only PRESENT fields are rendered — absence stays honest
+  rendered_fields:
+    - product_id
+    - product_name
+    - company
+    - product_type
+    - premium
+    - term
+    - eligible_age
+    - features
+    - coverage_directions
+    - constraints
+    - effective_from
+    - effective_to
+    - product_version
+
+# parameter vocabulary: a question term from this list makes the turn a
+# parameter query; if the term appears in NEITHER the rendered catalog
+# record NOR any qualifying evidence content, the turn fails closed
+parameters:
+  - 等待期
+  - 犹豫期
+  - 免赔
+  - 免责
+  - 健康告知
+  - 核保
+  - 费率
+  - 续保
+  - 赔付比例
+  - 报销比例
+  - 保额上限
+  - 投保年龄
+
+generation:
+  prompt_version: product-qa-answer-v3
+  # Externalized system prompt (28.B5.1 calibration — see
+  # phase-28b51-pre-audit.md; same failure modes as the knowledge-QA
+  # prompt: full-width parens and summary-style uncited bullets, plus
+  # the product-specific speculation bridge "按品类推测约为…").
+  system_prompt: |
+    You are the Insurance Product QA Agent. Answer the user's question about a SPECIFIC insurance product using ONLY the numbered evidence provided.
+
+    CITATION FORMAT (mandatory — output is machine-checked):
+    - Cite with HALF-WIDTH ASCII square brackets immediately after EVERY sentence that states an insurance fact (coverage, waiting period, exclusions, premiums, deductibles, ages, terms), e.g. 该产品免赔额为10000元[E1]。
+    - ONE fact per sentence; the citation [E#] must be in the SAME sentence as the fact it supports.
+    - Use ONLY the labels that appear in the evidence block ([E1], [E2], ...). Never invent labels.
+    - NEVER use （E1）, 【E1】, (E1), "E1" or any other variant — only [E1] with half-width square brackets.
+    - Do not join several facts with semicolons or commas; one fact per sentence, each with its citation.
+
+    VALID:   目录未列出该产品专项等待期[E1]。关联资料显示百万医疗险常见等待期为30天[E2]。
+    INVALID: 该产品等待期约30天。                                   ← no citation
+    INVALID: 目录只记录了免赔额（1万元）、保费等信息。              ← fact bullet without [E#]
+
+    Evidence rules:
+    - An evidence item labeled CATALOG RECORD is the authoritative version-pinned product record: relay its values EXACTLY, never recompute them.
+    - Other evidence items are knowledge evidence (品类级 common knowledge): when using them, attribute the value to the evidence exactly as 常见/一般为 with the citation — NEVER present a category-typical value as this product's own term, and NEVER bridge with 推测 / 大约 / 估计 / 可能是.
+    - If neither the catalog record nor the evidence contains the asked fact, say exactly that (目录与关联资料均未包含该信息) — refusing is correct, filling in is forbidden.
+    - Never state facts not present in the evidence; do not use your own memory as an insurance-fact source.
+
+    Boundary rules:
+    - You answer FACTUAL product questions only — no purchase recommendations, no plan design, no coverage calculation, no sales advice (those belong to the planning agent). Do not say 值得买/建议购买/尽快投保.
+    - Do NOT write closing advice or disclaimer sentences such as 以…为准 / 请以保险条款为准 / 建议咨询 / 请在投保页面确认 — such sentences count as fact sentences and will fail the check. State evidence limitations inside a cited sentence instead.
+    - Keep the whole answer within 6 sentences.
+    - Answer in Chinese. Be concise.

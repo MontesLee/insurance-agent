@@ -1,0 +1,216 @@
+{
+  "_comment": "KB-V1 L1 URL assignments from gov.cn policy library search (2026-10-04). Each entry: url picked from official gov.cn (zhengceku preferred over gongbao), markers that MUST appear in fetched text, source metadata.",
+  "L1-02": {
+    "title": "金融机构产品适当性管理办法",
+    "url": "https://www.gov.cn/gongbao/2025/issue_12246/202508/content_7038009.html",
+    "doc_number": "国家金融监督管理总局令2025年第7号",
+    "source_org": "国家金融监督管理总局",
+    "source_type": "P1",
+    "markers": ["金融机构产品适当性管理办法", "2025年第7号", "2026年2月1日"]
+  },
+  "L1-03": {
+    "title": "保险销售行为管理办法",
+    "url": "https://www.gov.cn/gongbao/2023/issue_10826/202311/content_6915815.html",
+    "doc_number": "国家金融监督管理总局令2023年第2号",
+    "source_org": "国家金融监督管理总局",
+    "source_type": "P1",
+    "markers": ["保险销售行为管理办法", "2023年第2号", "2024年3月1日"]
+  },
+  "L1-04": {
+    "title": "健康保险管理办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2019-12/04/content_5458542.htm",
+    "doc_number": "中国银行保险监督管理委员会令2019年第3号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["健康保险管理办法", "2019年第3号", "2019年12月1日"]
+  },
+  "L1-05": {
+    "title": "人身保险产品信息披露管理办法",
+    "url": "http://www.gov.cn/gongbao/content/2023/content_5739545.htm",
+    "doc_number": "中国银行保险监督管理委员会令2022年第8号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["人身保险产品信息披露管理办法", "2022年第8号", "2023年6月30日"]
+  },
+  "L1-06": {
+    "title": "互联网保险业务监管办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2020-12/14/content_5569402.htm",
+    "doc_number": "中国银行保险监督管理委员会令2020年第13号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["互联网保险业务监管办法", "2020年第13号", "2021年2月1日"]
+  },
+  "L1-07": {
+    "title": "保险代理人监管规定",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2020-11/24/content_5563685.htm",
+    "doc_number": "中国银行保险监督管理委员会令2020年第11号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险代理人监管规定", "2020年第11号", "2021年1月1日"]
+  },
+  "L1-08": {
+    "title": "保险经纪人监管规定",
+    "url": "http://www.gov.cn/gongbao/content/2018/content_5288836.htm",
+    "doc_number": "中国保险监督管理委员会令2018年第3号",
+    "source_org": "中国保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险经纪人监管规定", "2018年第3号", "2018年5月1日"]
+  },
+  "L1-09": {
+    "title": "保险公司管理规定",
+    "url": "http://www.gov.cn/gongbao/content/2010/content_1585443.htm",
+    "doc_number": "中国保险监督管理委员会令2009年第1号",
+    "source_org": "中国保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险公司管理规定", "2009年第1号"],
+    "note": "current-status check required: any amendment after 2009?"
+  },
+  "L1-10": {
+    "title": "保险保障基金管理办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2022-11/14/content_5726811.htm",
+    "doc_number": "中国银行保险监督管理委员会、中华人民共和国财政部、中国人民银行令2022年第7号",
+    "source_org": "中国银行保险监督管理委员会等",
+    "source_type": "P1",
+    "markers": ["保险保障基金管理办法", "2022年第7号", "2022年12月12日"]
+  },
+  "L1-11": {
+    "title": "保险公司偿付能力管理规定",
+    "url": "http://www.gov.cn/gongbao/content/2021/content_5598125.htm",
+    "doc_number": "中国银行保险监督管理委员会令2021年第1号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险公司偿付能力管理规定", "2021年第1号", "2021年3月1日"]
+  },
+  "L1-12": {
+    "title": "银行业保险业消费投诉处理管理办法",
+    "url": "http://www.gov.cn/gongbao/content/2020/content_5512564.htm",
+    "doc_number": "中国银行保险监督管理委员会令2020年第3号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["银行业保险业消费投诉处理管理办法", "2020年第3号", "2020年3月1日"]
+  },
+  "L1-13": {
+    "title": "人身保险业务基本服务规定",
+    "url": "http://www.gov.cn/gongbao/content/2010/content_1702219.htm",
+    "doc_number": "中国保险监督管理委员会令2010年第4号",
+    "source_org": "中国保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["人身保险业务基本服务规定", "2010年第4号"],
+    "note": "current-status check required"
+  },
+  "L1-14": {
+    "title": "人身保险公司保险条款和保险费率管理办法",
+    "url": "http://www.gov.cn/gongbao/content/2012/content_2163594.htm",
+    "doc_number": "中国保险监督管理委员会令2011年第3号",
+    "source_org": "中国保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["人身保险公司保险条款和保险费率管理办法", "2011年第3号"],
+    "note": "current-status check required"
+  },
+  "L1-15": {
+    "title": "保险销售行为可回溯管理暂行办法",
+    "url": "http://www.gov.cn/gongbao/content/2017/content_5248245.htm",
+    "doc_number": "保监发〔2017〕54号",
+    "source_org": "中国保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险销售行为可回溯管理暂行办法", "54号"]
+  },
+  "L1-16": {
+    "title": "意外伤害保险业务监管办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2021-10/15/content_5642766.htm",
+    "doc_number": "银保监办发〔2021〕106号",
+    "source_org": "中国银行保险监督管理委员会办公厅",
+    "source_type": "P1",
+    "markers": ["意外伤害保险业务监管办法", "106号", "2022年1月1日"]
+  },
+  "L1-17": {
+    "title": "保险公司信息披露管理办法",
+    "url": "http://www.gov.cn/gongbao/content/2018/content_5312244.htm",
+    "doc_number": "中国银行保险监督管理委员会令2018年第2号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险公司信息披露管理办法", "2018年第2号"]
+  },
+  "L1-18": {
+    "title": "保险公司分支机构市场准入管理办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2021-09/14/content_5637138.htm",
+    "doc_number": "银保监发〔2021〕37号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险公司分支机构市场准入管理办法", "37号"]
+  },
+  "L1-19": {
+    "title": "保险公司董事、监事和高级管理人员任职资格管理规定",
+    "url": "http://www.gov.cn/gongbao/content/2021/content_5633451.htm",
+    "doc_number": "中国银行保险监督管理委员会令2021年第6号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["任职资格管理规定", "2021年第6号"]
+  },
+  "L1-20": {
+    "title": "保险公司股权管理办法",
+    "url": "http://www.gov.cn/gongbao/content/2018/content_5294432.htm",
+    "doc_number": "中国保险监督管理委员会令2018年第5号",
+    "source_org": "中国保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险公司股权管理办法", "2018年第5号"]
+  },
+  "L1-21": {
+    "title": "银行保险机构关联交易管理办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2022-01/15/content_5668356.htm",
+    "doc_number": "中国银行保险监督管理委员会令2022年第1号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["银行保险机构关联交易管理办法", "〔2022〕1号"],
+    "note": "AMENDED 2025 by 总局令2025年第4号 — fetch amendment too; version lineage critical"
+  },
+  "L1-21A": {
+    "title": "金融监管总局关于修改部分规章的决定",
+    "url": "https://www.gov.cn/gongbao/2025/issue_12146/202507/content_7030979.html",
+    "doc_number": "国家金融监督管理总局令2025年第4号",
+    "source_org": "国家金融监督管理总局",
+    "source_type": "P1",
+    "markers": ["修改部分规章的决定", "2025年第4号"],
+    "note": "amendment decision; check full list of amended regs (L1-09/13/14/17/20/21 status)"
+  },
+  "L1-22": {
+    "title": "保险中介行政许可及备案实施办法",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2021-11/06/content_5649398.htm",
+    "doc_number": "中国银行保险监督管理委员会令2021年第12号",
+    "source_org": "中国银行保险监督管理委员会",
+    "source_type": "P1",
+    "markers": ["保险中介行政许可及备案实施办法", "2021年第12号", "2022年2月1日"]
+  },
+  "L1-23": {
+    "title": "中国银保监会办公厅关于规范保险公司健康管理服务的通知",
+    "url": "https://www.gov.cn/zhengce/zhengceku/2020-09/10/content_5542206.htm",
+    "doc_number": "银保监办发〔2020〕83号",
+    "source_org": "中国银行保险监督管理委员会办公厅",
+    "source_type": "P1",
+    "markers": ["健康管理服务", "83号"]
+  },
+  "L1-24": {
+    "title": "国家金融监督管理总局关于推动深化人身保险行业个人营销体制改革的通知",
+    "url": "https://www.gov.cn/zhengce/zhengceku/202504/content_7019852.htm",
+    "doc_number": "金规〔2025〕13号",
+    "source_org": "国家金融监督管理总局",
+    "source_type": "P1",
+    "markers": ["个人营销体制改革", "13号"]
+  },
+  "L1-25": {
+    "title": "国务院关于加强监管防范风险推动保险业高质量发展的若干意见",
+    "url": "https://www.gov.cn/zhengce/zhengceku/202409/content_6973835.htm",
+    "doc_number": "国发〔2024〕21号",
+    "source_org": "国务院",
+    "source_type": "P0",
+    "markers": ["保险业高质量发展的若干意见", "21号"]
+  },
+  "L2-05": {
+    "title": "国家金融监督管理总局关于做好《中国人身保险业经验生命表（2025）》发布使用有关事项的通知",
+    "url": "https://www.gov.cn/zhengce/zhengceku/202510/content_7046318.htm",
+    "doc_number": "金规〔2025〕21号",
+    "source_org": "国家金融监督管理总局",
+    "source_type": "P1",
+    "markers": ["经验生命表", "21号"]
+  }
+}
